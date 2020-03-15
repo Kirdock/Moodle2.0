@@ -9,10 +9,13 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",
+    "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.7.0",
     "core-js": "^3.6.4",
     "jquery": "^3.4.1",
+    "portal-vue": "^2.1.7",
+    "q": "^1.5.1",
     "vue": "^2.6.11",
     "vue-router": "^3.1.5"
   },
