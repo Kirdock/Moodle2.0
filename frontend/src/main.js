@@ -10,6 +10,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import auth from './services/authentication';
 import config from './services/config';
 import {ToastPlugin} from 'bootstrap-vue';
+import store from './store'
 
 Vue.config.productionTip = true;
 Vue.prototype.$config = config;
@@ -26,5 +27,6 @@ axios.interceptors.request.use(function (config) {
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')
