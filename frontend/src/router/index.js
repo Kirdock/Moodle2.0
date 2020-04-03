@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Courses from '../views/Courses.vue';
+import store from '../store/index';
 
 Vue.use(VueRouter)
 
@@ -12,7 +13,7 @@ const routes = [
     component: Home
   },
   {
-    path: '/courses',
+    path: '/Courses',
     name: 'Kurse',
     component: Courses,
     meta:{
@@ -28,7 +29,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.authentication && !router.app.$auth.isLoggedIn()) {
+  if (to.matched.some(record => record.meta.authentication) && store.getters.isLoggedIn) {
     next('/');
   }
   else{
