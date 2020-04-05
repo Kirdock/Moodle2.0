@@ -13,7 +13,7 @@ axios.interceptors.request.use(function (config) {
 
 export default {
     login(user, password){
-        axios.post('/login',{
+        return axios.post('/login',{
             auth:{
                 username: user,
                 password: password

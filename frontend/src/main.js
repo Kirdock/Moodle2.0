@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import {ToastPlugin} from 'bootstrap-vue';
 import store from './store'
+store.commit('initialiseStore');
 
 Vue.config.productionTip = true;
 Vue.use(ToastPlugin);
@@ -15,8 +16,5 @@ Vue.use(ToastPlugin);
 new Vue({
   router,
   store,
-  render: h => h(App),
-  beforeCreate() {
-		this.$store.commit('initialiseStore');
-	}
+  render: h => h(App)
 }).$mount('#app')

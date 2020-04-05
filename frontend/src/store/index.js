@@ -8,7 +8,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    toast_delay: 8000
+    toast_delay: 8000,
+    token: undefined
   },
   mutations: {
     initialiseStore(state) {
@@ -16,49 +17,48 @@ export default new Vuex.Store({
       // this.replaceState(
       // 	Object.assign(state, JSON.parse(localStorage.getItem('store')))
       // );
+      state.token = getToken();
     },
-    login_success(state, payload){
+    loginSuccess(state, payload){
       state.loggedIn = true;
-      state.userInfo = state.getters.decodedToken;
-      this.setToken(tokenName, payload.token);
+      state.token = payload.token;
+      state.userInfo = state.decodedToken;
+      setToken(payload.token);
     },
+    logout(state){
+      state.token = false;
+    }
   },
   actions: {
-    setToken(token){
-      storage.setItem(tokenName, token);
-    },
-    deleteToken(){
-      storage.removeItem(tokenName);
+    logout({commit}){
+      deleteToken();
+      commit('logout');
     },
     login({commit}, {user, password}) {
       return new Promise((resolve, reject) => {
-        resolve(true);
-          // api.login(user, password)
-          //     .then(response => {
-          //       commit('login_success',{
-          //         token: response.data
-          //       });
-          //       resolve(response);
-          //     })
-          //     .catch(error => {
-          //         reject(error);
-          //     });
+          api.login(user, password)
+              .then(response => {
+                commit('loginSuccess',{
+                  token: response.data
+                });
+                resolve(response);
+              })
+              .catch(error => {
+                reject(error);
+              });
       });
     }
   },
   modules: {
   },
   getters: {
-    isLoggedIn: state => state.loggedIn,
+    isLoggedIn: state => !!state.token,
     isTeacher: state => state.userInfo.teacher,
     getUserName: state => state.userInfo.username,
-    token: state => {
-      return storage.getItem(tokenName);
-    },
     decodedToken: state =>{
         let decoded_payload;
         let payload;
-        const token = state.getters.token;
+        const token = state.token;
     
         if (token) {
             payload = token.split(".")[1];
@@ -80,4 +80,17 @@ export default new Vuex.Store({
         return decoded_payload;
     }
   }
-})
+});
+
+
+function getToken(){
+  return storage.getItem(tokenName);
+}
+
+function setToken(token){
+  storage.setItem(tokenName, token);
+}
+
+function deleteToken(){
+  storage.removeItem(tokenName);
+}
