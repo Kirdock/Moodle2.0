@@ -1,12 +1,11 @@
 import AXIOS from 'axios';
 import store from '../store/index';
-
 const axios = AXIOS.create({
   baseURL: `/api`
 });
 
 axios.interceptors.request.use(function (config) {
-    config.headers.Authorization = 'Bearer ' + store.getters.token;
+    config.headers.Authorization = 'Bearer ' + store.getters.getToken;
     return config;
   });
 

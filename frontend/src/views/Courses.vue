@@ -5,46 +5,47 @@
 </template>
 
 <script>
-import api from '../components/backend-api';
+    import api from '../components/backend-api';
 
-export default {
-    data() {
-        return {
-          courses: [],
-          semesters: []
-        };
-    },
-    created() {
-        // this.fetchSemesters();
-        // this.fetchCourses();
-    },
-    methods: {
-        fetchSemesters(){
-            api.fetchSemesters().then(response=>{
-                this.semesters = response.semesters;
-            }).then(()=>{
-                this.fetchCourses();
-            }).catch(()=>{
-                this.$bvToast.toast(`Semester konnten nicht geladen werden`, {
-                    title: 'Fehler',
-                    autoHideDelay: this.$store.toastDelay,
-                    variant: 'danger',
-                    appendToast: true
-                });
-            })
+    export default {
+        data() {
+            return {
+            courses: [],
+            semesters: []
+            };
         },
-        fetchCourses(){
-            api.fetchCourses().then(response =>{
-                this.courses = response.data;
-            }).catch(() =>{
-                this.$bvToast.toast(`Kurse konnten nicht geladen werden`, {
-                    title: 'Fehler',
-                    autoHideDelay: this.$store.toastDelay,
-                    variant: 'danger',
-                    appendToast: true
-                });
-            })
+        created() {
+            this.fetchSemesters();
+            this.fetchCourses();
+        },
+        methods: {
+            fetchSemesters(){
+                api.fetchSemesters().then(response=>{
+                    this.semesters = response.semesters;
+                }).then(()=>{
+                    this.fetchCourses();
+                }).catch(()=>{
+                    this.$bvToast.toast(`Semester konnten nicht geladen werden`, {
+                        title: 'Fehler',
+                        autoHideDelay: this.$store.toastDelay,
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                })
+            },
+            fetchCourses(){
+                api.fetchCourses().then(response =>{
+                    this.courses = response.data;
+                }).catch(() =>{
+                    this.$bvToast.toast(`Kurse konnten nicht geladen werden`, {
+                        title: 'Fehler',
+                        autoHideDelay: this.$store.toastDelay,
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                })
+            }
         }
-    }
 
-}
+    }
+</script>

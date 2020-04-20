@@ -53,6 +53,7 @@ export default new Vuex.Store({
   },
   getters: {
     isLoggedIn: state => !!state.token,
+    getToken: state => getToken(),
     isTeacher: state => state.userInfo.teacher,
     getUserName: state => state.userInfo.username,
     decodedToken: state =>{
