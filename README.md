@@ -13,6 +13,20 @@ __How to run:__
 - run "mvn --projects backend spring-boot:run" in root directory
 - Access http://localhost:8098
 
+__Local Database Configuration__
 
+For local development configure the following environment variables
+in your IDE 
+
+- SPRING_DATASOURCE_URL = jdbc:h2:file:./data/demo
+- SPRING_DATASOURCE_DRIVER-CLASS-NAME = org.h2.Driver
+- SPRING_DATASOURCE_PASSWORD = sa 
+- SPRING_DATASOURCE_USERNAME = password
+- SPRING_JPA_DATABASE-PLATFORM = org.hibernate.dialect.H2Dialect
+- SPRING_H2_CONSOLE_ENABLED = true
+
+Access H2 Console 
+- http://localhost:8098/h2-console
 # Heroku
 https://moodlev2.herokuapp.com/
+
