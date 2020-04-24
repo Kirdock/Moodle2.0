@@ -1,7 +1,15 @@
 package com.aau.moodle20.repository;
 
 import com.aau.moodle20.domain.User;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends CrudRepository<User,Long> {
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User,Long> {
+
+    Optional<User> findByUsername(String username);
+
+    Boolean existsByUsername(String username);
+
+    Boolean existsByEmail(String email);
 }
