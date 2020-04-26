@@ -28,17 +28,25 @@
                                 <label for="password" class="control-label">Passwort</label>
                                 <input id="password" type="password" class="form-control" v-model="password" required>
                             </div>
-                            <div class="form-group">
+                            <div class="form-inline">
                                 <button class="btn btn-primary" type="submit">Anlegen</button>
-                                <div class="loader" v-if="loadingCreateUser"></div>
+                                <div class="offset-md-1 form-inline" v-if="loadingCreateUser">
+                                    <div class="loader"></div>
+                                    <label class="control-label">Laden...</label>
+                                </div>
                             </div>
                         </form>
                     </div>
                     <div class="form-horizontal col-md-4 offset-md-1">
-                        <label class="btn btn-primary col-md-5 finger">
-                            CSV Datei hochladen <input type="file" style="display:none" id="file" ref="file" accept=".csv" @change="submitFile()"/>
-                        </label>
-                        <div class="loader" v-if="loadingFileUpload"></div>
+                        <div class="form-inline">
+                            <label class="btn btn-primary col-md-5 finger">
+                                CSV Datei hochladen <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitFile()"/>
+                            </label>
+                            <div class="offset-md-1 form-inline" v-if="loadingFileUpload">
+                                <div class="loader"></div>
+                                <label class="control-label">Laden...</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </b-tab>

@@ -35,7 +35,7 @@ export default {
             userData: userData
         });
     },
-    createUser(formData){
+    createUsers(formData){
         return axios.put('/users',
             formData,
             {
