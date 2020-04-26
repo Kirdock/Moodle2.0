@@ -1,11 +1,13 @@
 import AXIOS from 'axios';
-import store from '../store/index';
 const axios = AXIOS.create({
   baseURL: `/api`
 });
+let Token;
 
 axios.interceptors.request.use(function (config) {
-    config.headers.Authorization = 'Bearer ' + store.getters.getToken;
+    if(Token){
+        config.headers.Authorization = 'Bearer ' + Token;
+    }
     return config;
   });
 
@@ -24,6 +26,24 @@ export default {
     },
     fetchCourses(){
         return axios.get('/courses');
+    },
+    setToken(token){
+        Token = token;
+    },
+    createUser(userData){
+        return axios.put('/user',{
+            userData: userData
+        });
+    },
+    createUser(formData){
+        return axios.put('/users',
+            formData,
+            {
+                headers: {
+                    'Content-Type': undefined
+                }
+            }
+        );
     }
 }
 

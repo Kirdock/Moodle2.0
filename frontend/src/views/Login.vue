@@ -41,7 +41,7 @@ export default {
         .catch(error => {
           this.$bvToast.toast(`Benutzername oder Password stimmt nicht überein`, {
             title: 'Fehler',
-            autoHideDelay: this.$store.toastDelay,
+            autoHideDelay: this.$store.getters.toastDelay,
             appendToast: true,
             variant: 'danger'
           });

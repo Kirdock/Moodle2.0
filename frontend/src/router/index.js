@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Courses from '../views/Courses.vue';
 import Login from '../views/Login.vue';
+import Account from '../views/Account.vue';
 import store from '../store/index';
 
 Vue.use(VueRouter)
@@ -23,6 +24,14 @@ const routes = [
     name: 'Kurse',
     component: Courses,
     meta:{
+      authentication: true
+    }
+  },
+  {
+    path: '/Account',
+    name: 'Konto',
+    component: Account,
+    meta: {
       authentication: true
     }
   }

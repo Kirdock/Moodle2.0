@@ -20,7 +20,7 @@ export default {
     testToast(){
       this.$bvToast.toast(`This is toast number 1`, {
           title: 'BootstrapVue Toast',
-          autoHideDelay: this.$store.toastDelay,
+          autoHideDelay: this.$store.getters.toastDelay,
           appendToast: true,
           variant: 'success'
         })

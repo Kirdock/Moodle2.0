@@ -5,13 +5,13 @@
 </template>
 
 <script>
-    import api from '../components/backend-api';
 
     export default {
         data() {
             return {
             courses: [],
-            semesters: []
+            semesters: [],
+            selectedSemester: undefined
             };
         },
         created() {
@@ -20,26 +20,27 @@
         },
         methods: {
             fetchSemesters(){
-                api.fetchSemesters().then(response=>{
+                this.$store.dispatch("fetchSemesters").then(response=>{
                     this.semesters = response.semesters;
+                    this.selectedSemester = this.semesters[this.semesters.length - 1]; //this.$store.selectedSemester
                 }).then(()=>{
                     this.fetchCourses();
                 }).catch(()=>{
                     this.$bvToast.toast(`Semester konnten nicht geladen werden`, {
                         title: 'Fehler',
-                        autoHideDelay: this.$store.toastDelay,
+                        autoHideDelay: this.$store.getters.toastDelay,
                         variant: 'danger',
                         appendToast: true
                     });
                 })
             },
             fetchCourses(){
-                api.fetchCourses().then(response =>{
+                this.$store.dispatch("fetchCourses").then(response=>{
                     this.courses = response.data;
                 }).catch(() =>{
                     this.$bvToast.toast(`Kurse konnten nicht geladen werden`, {
                         title: 'Fehler',
-                        autoHideDelay: this.$store.toastDelay,
+                        autoHideDelay: this.$store.getters.toastDelay,
                         variant: 'danger',
                         appendToast: true
                     });
