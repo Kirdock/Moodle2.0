@@ -6,6 +6,11 @@ The store has two major tasks:
 api should not be called directly from components, it should always be called through this store
 */
 
+/*
+ATTENTION!!
+new properties for state have to be in state initialization or a explizit call to Vue, else update will not be recognized
+ */
+
 import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '../components/backend-api';
@@ -16,6 +21,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     toastDelay: 8000,
+    userInfo: {},
+    token: undefined
   },
   mutations: {
     initialiseStore(state) {
@@ -23,17 +30,16 @@ export default new Vuex.Store({
       // this.replaceState(
       // 	Object.assign(state, JSON.parse(localStorage.getItem('store')))
       // );
-      const token = getToken();
-      state.userInfo = decodeToken(token);
-      api.setToken(token);
+      state.token = getToken();
+      state.userInfo = decodeToken(state.token);
     },
     loginSuccess(state, payload){
-      state.loggedIn = true;
-      state.userInfo = decodeToken(payload.token);
-      setToken(payload.token);
+      state.token = payload.accessToken;
+      state.userInfo = decodeToken(payload.accessToken);
+      setToken(payload.accessToken);
     },
     logout(state){
-      state.userInfo = undefined;
+      state.token = state.userInfo = undefined;
       deleteToken();
     }
   },
@@ -46,9 +52,7 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
           api.login(user, password)
               .then(response => {
-                commit('loginSuccess',{
-                  token: response.data
-                });
+                commit('loginSuccess',response.data);
                 resolve(response);
               })
               .catch(error => {
@@ -75,7 +79,8 @@ export default new Vuex.Store({
     userInfo: state => state.userInfo,
     toastDelay: state => state.toastDelay,
     isLoggedIn: state => !!state.userInfo,
-    decodedToken: state => state.userInfo
+    decodedToken: state => state.userInfo,
+    token: state=> state.token
   }
 });
 
@@ -85,13 +90,11 @@ function getToken(){
 }
 
 function setToken(token){
-  api.setToken(token);
   storage.setItem(tokenName, token);
 }
 
 function deleteToken(){
   storage.removeItem(tokenName);
-  api.setToken();
 }
 
 function decodeToken(token){

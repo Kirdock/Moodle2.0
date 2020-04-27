@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
+import store from './store'
+store.commit('initialiseStore');
 import router from './router';
 import 'bootstrap';
 import 'bootstrap-vue';
@@ -8,8 +10,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/style.css';
 import {ToastPlugin, TabsPlugin} from 'bootstrap-vue';
-import store from './store'
-store.commit('initialiseStore');
 
 Vue.config.productionTip = true;
 Vue.use(ToastPlugin);

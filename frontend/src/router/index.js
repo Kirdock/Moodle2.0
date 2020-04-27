@@ -6,7 +6,7 @@ import Login from '../views/Login.vue';
 import Account from '../views/Account.vue';
 import store from '../store/index';
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
@@ -21,7 +21,7 @@ const routes = [
   },
   {
     path: '/Courses',
-    name: 'Kurse',
+    name: 'Courses',
     component: Courses,
     meta:{
       authentication: true
@@ -29,7 +29,7 @@ const routes = [
   },
   {
     path: '/Account',
-    name: 'Konto',
+    name: 'Account',
     component: Account,
     meta: {
       authentication: true
@@ -52,7 +52,7 @@ router.beforeEach((to, from, next) => {
       next('/Login');
     }
   }
-  else if(to.path === '/Login' && store.getters.isLoggedIn){
+  else if(to.matched.some(record => record.name === 'Login') && store.getters.isLoggedIn){
     next('/');
   }
   else{

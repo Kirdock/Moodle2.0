@@ -36,7 +36,7 @@ export default {
     login(){
       this.$store.dispatch("login", { user: this.user, password: this.password})
         .then(() => {
-          this.$router.push('/Courses');
+          this.$router.push('Courses');
         })
         .catch(error => {
           this.$bvToast.toast(`Benutzername oder Password stimmt nicht überein`, {

@@ -50,6 +50,10 @@
                     </div>
                 </div>
             </b-tab>
+            <b-tab title="Kurse anlegen" active v-if="$store.getters.userInfo.isAdmin">
+            </b-tab>
+            <b-tab title="Semester anlegen" active v-if="$store.getters.userInfo.isAdmin">
+            </b-tab>
       </b-tabs>
   </div>
 </template>
