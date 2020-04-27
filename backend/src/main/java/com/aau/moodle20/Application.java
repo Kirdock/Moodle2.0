@@ -20,10 +20,10 @@ public class Application implements ApplicationRunner {
 	@Autowired
 	PasswordEncoder encoder;
 
-
-	private String adminUserName ="admin";
-
-	private String adminPassword = "admin";
+	@Value("${moodle20.app.adminUserName}")
+	private String adminUserName;
+	@Value("${moodle20.app.adminPassword}")
+	private String adminPassword;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
