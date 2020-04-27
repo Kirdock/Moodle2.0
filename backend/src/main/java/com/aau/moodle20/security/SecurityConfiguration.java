@@ -67,10 +67,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/hello").permitAll()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/signup").permitAll()
-                .antMatchers("api/user/*").authenticated() // protect all other requests
+                .antMatchers("/h2-console/*").permitAll()
+                .antMatchers("/api/*").authenticated() // protect all other requests
+                .and()
+                .headers().frameOptions().disable()
                 .and()
                 .csrf().disable(); // disable cross site request forgery, as we don't use cookies - otherwise ALL PUT, POST, DELETE will get HTTP 403!
 

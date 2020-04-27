@@ -37,9 +37,6 @@ public class BackendController {
 
     private static final Logger LOG = LoggerFactory.getLogger(BackendController.class);
 
-    public static final String HELLO_TEXT = "Hello from Spring Boot Backend!";
-    public static final String SECURED_TEXT = "Hello from the secured resource!";
-
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -55,12 +52,6 @@ public class BackendController {
     @Autowired
     JwtUtils jwtUtils;
 
-    @RequestMapping(path = "/hello")
-    public String sayHello() {
-        LOG.info("GET called on /hello resource");
-        return HELLO_TEXT;
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -71,16 +62,10 @@ public class BackendController {
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-       /* List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());*/
-       List<String> roles = new ArrayList<>();
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+                userDetails.getUsername()));
     }
 
 
@@ -92,46 +77,14 @@ public class BackendController {
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
-        }
-
-        // Create new user's account
+        // Create new user's account - no admin
         User user = new User(signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
+                encoder.encode(signUpRequest.getPassword()),Boolean.FALSE);
 
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
 
-        /*if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
 
-                        break;
-                    case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
-
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }*/
 
        // user.setRoles(roles);
         userRepository.save(user);
@@ -140,13 +93,15 @@ public class BackendController {
     }
 
 
-     @GetMapping(path = "/user/{id}")
-     public User getUserById(@PathVariable("id") long id) {
+     @GetMapping(path = "/user")
+     public List<User> getUsers() {
 
-         return userRepository.findById(id).map(user -> {
+         return userRepository.findAll();
+
+                 /*.map(user -> {
              LOG.info("Reading user with id " + id + " from database.");
             return user;
-         }).orElseThrow(() -> new UserNotFoundException("The user with the id " + id + " couldn't be found in the database."));
+         }).orElseThrow(() -> new UserNotFoundException("The user with the id " + id + " couldn't be found in the database."));*/
      }
 
     // @RequestMapping(path="/secured", method = RequestMethod.GET)

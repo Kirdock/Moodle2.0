@@ -2,6 +2,7 @@ package com.aau.moodle20.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +11,7 @@ import java.util.Set;
 @Table(name ="user",
 uniqueConstraints = {
         @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "email")
+        @UniqueConstraint(columnNames = "martikelNummer")
 })
 public class User {
 
@@ -18,33 +19,40 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 50)
-    private String username;
-
-    @NotBlank
-    @Size(max = 50)
-    private String email;
+    @Size(max = 20)
+    private String martikelNummer;
+    private Boolean isAdmin;
 
     @NotBlank
     @Size(max = 120)
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(	name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    @NotBlank
+    private String username;
+
+    private String forename;
+    private String surename;
+
 
     public User()
     {
 
     }
-    public User(String username, String email, String password)
+
+    public User(String username, String password, Boolean isAdmin)
     {
         this.username = username;
-        this.email = email;
         this.password = password;
+        this.isAdmin = isAdmin;
+    }
+    public User(String username, String martikelNummer, String forename, String surename, String password)
+    {
+        this.username = username;
+        this.martikelNummer = martikelNummer;
+        this.forename = forename;
+        this.surename = surename;
+        this.password = password;
+        this.isAdmin = false;
     }
 
     public Long getId() {
@@ -55,20 +63,20 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getMartikelNummer() {
+        return martikelNummer;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setMartikelNummer(String martikelNummer) {
+        this.martikelNummer = martikelNummer;
     }
 
-    public String getEmail() {
-        return email;
+    public Boolean getAdmin() {
+        return isAdmin;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
     }
 
     public String getPassword() {
@@ -79,11 +87,27 @@ public class User {
         this.password = password;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public String getUsername() {
+        return username;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getForename() {
+        return forename;
+    }
+
+    public void setForename(String forename) {
+        this.forename = forename;
+    }
+
+    public String getSurename() {
+        return surename;
+    }
+
+    public void setSurename(String surename) {
+        this.surename = surename;
     }
 }
