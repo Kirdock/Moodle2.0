@@ -19,17 +19,25 @@ public class UserDetailsImpl implements UserDetails {
 
     private String username;
 
+    private Boolean isAdmin;
+    private String matrikelNumber;
+    private String forename;
+    private String surename;
 
     @JsonIgnore
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username, String password) {
+    public UserDetailsImpl(Long id, String username, String password, Boolean isAdmin, String matrikelNumber, String forename, String surename) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
+        this.isAdmin = isAdmin;
+        this.matrikelNumber = matrikelNumber;
+        this.forename = forename;
+        this.surename = surename;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -38,7 +46,11 @@ public class UserDetailsImpl implements UserDetails {
         return new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),
-                user.getPassword());
+                user.getPassword(),
+                user.getAdmin(),
+                user.getMartikelNumber(),
+                user.getForename(),
+                user.getSurename());
     }
 
     @Override
@@ -79,6 +91,38 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
+
+    public String getMatrikelNumber() {
+        return matrikelNumber;
+    }
+
+    public void setMatrikelNumber(String matrikelNumber) {
+        this.matrikelNumber = matrikelNumber;
+    }
+
+    public String getForename() {
+        return forename;
+    }
+
+    public void setForename(String forename) {
+        this.forename = forename;
+    }
+
+    public String getSurename() {
+        return surename;
+    }
+
+    public void setSurename(String surename) {
+        this.surename = surename;
     }
 
     @Override

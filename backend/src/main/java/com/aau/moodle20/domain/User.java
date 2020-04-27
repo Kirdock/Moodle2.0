@@ -2,16 +2,13 @@ package com.aau.moodle20.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name ="user",
 uniqueConstraints = {
         @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "martikelNummer")
+        @UniqueConstraint(columnNames = "matrikelNumber")
 })
 public class User {
 
@@ -20,7 +17,9 @@ public class User {
     private Long id;
 
     @Size(max = 20)
-    private String martikelNummer;
+    @Column(name = "matrikelNumber")
+    private String matrikelNumber;
+    @Column(name = "isAdmin")
     private Boolean isAdmin;
 
     @NotBlank
@@ -45,14 +44,14 @@ public class User {
         this.password = password;
         this.isAdmin = isAdmin;
     }
-    public User(String username, String martikelNummer, String forename, String surename, String password)
+    public User(String username, String matrikelNumber, String forename, String surename, String password, Boolean isAdmin)
     {
         this.username = username;
-        this.martikelNummer = martikelNummer;
+        this.matrikelNumber = matrikelNumber;
         this.forename = forename;
         this.surename = surename;
         this.password = password;
-        this.isAdmin = false;
+        this.isAdmin = isAdmin;
     }
 
     public Long getId() {
@@ -63,12 +62,12 @@ public class User {
         this.id = id;
     }
 
-    public String getMartikelNummer() {
-        return martikelNummer;
+    public String getMartikelNumber() {
+        return matrikelNumber;
     }
 
-    public void setMartikelNummer(String martikelNummer) {
-        this.martikelNummer = martikelNummer;
+    public void setMartikelNumber(String martikelNummer) {
+        this.matrikelNumber = martikelNummer;
     }
 
     public Boolean getAdmin() {

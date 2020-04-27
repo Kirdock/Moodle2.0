@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS USER;
 
 CREATE TABLE USER (
   id INT AUTO_INCREMENT  PRIMARY KEY,
-  martikel_nummer VARCHAR(20),
+  matrikel_Number VARCHAR(20),
   password VARCHAR(120) NOT NULL,
   username VARCHAR(50) NOT NULL,
   forename VARCHAR(50) ,

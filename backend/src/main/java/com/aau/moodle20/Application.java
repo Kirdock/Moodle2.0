@@ -33,7 +33,7 @@ public class Application implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		if (!userRepository.existsByUsername(adminUserName)) {
-			userRepository.save(new User(adminUserName, encoder.encode(adminPassword), Boolean.TRUE) );
+			userRepository.save(new User(adminUserName,"123","admin", "admin", encoder.encode(adminPassword), Boolean.TRUE) );
 		}
 	}
 }

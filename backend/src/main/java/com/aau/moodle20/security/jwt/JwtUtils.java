@@ -29,6 +29,10 @@ public class JwtUtils {
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .claim("isAdmin", userPrincipal.getAdmin())
+                .claim("matrikelNumber", userPrincipal.getMatrikelNumber())
+                .claim("forename",userPrincipal.getForename())
+                .claim("surename",userPrincipal.getSurename())
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
