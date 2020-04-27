@@ -4,6 +4,8 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Kirdock_Moodle2.0&metric=code_smells)](https://sonarcloud.io/dashboard?id=Kirdock_Moodle2.0)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Kirdock_Moodle2.0&metric=alert_status)](https://sonarcloud.io/dashboard?id=Kirdock_Moodle2.0)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Kirdock_Moodle2.0&metric=sqale_index)](https://sonarcloud.io/dashboard?id=Kirdock_Moodle2.0)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Kirdock_Moodle2.0&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=Kirdock_Moodle2.0)
+
 __Install:__
 - make sure the following is installed and in system variable PATH: maven, java (jdk 1.8), node
 - if you run Maven from console, add the "PathToJavaJDK" to system variable "JAVA_HOME"
@@ -27,6 +29,11 @@ in your IDE
 
 Access H2 Console 
 - http://localhost:8098/h2-console
+
+__UML__
+
+https://www.lucidchart.com/documents/edit/c07a6905-07a6-41ca-b6e5-ce2c819f0b01/0_0?beaconFlowId=9175431D68038623
+
 # Heroku
 https://moodlev2.herokuapp.com/
 
