@@ -15,10 +15,10 @@ public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${moodle20.app.jwtSecret}")
+    @Value("${jwtSecret}")
     private String jwtSecret;
 
-    @Value("${moodle20.app.jwtExpirationMs}")
+    @Value("${jwtExpirationMs}")
     private int jwtExpirationMs;
 
     public String generateJwtToken(Authentication authentication) {

@@ -20,9 +20,9 @@ public class Application implements ApplicationRunner {
 	@Autowired
 	PasswordEncoder encoder;
 
-	@Value("${moodle20.app.adminUserName}")
+	@Value("${adminUserName}")
 	private String adminUserName;
-	@Value("${moodle20.app.adminPassword}")
+	@Value("${adminPassword}")
 	private String adminPassword;
 
 	public static void main(String[] args) {
