@@ -31,7 +31,7 @@
                             <div class="form-inline">
                                 <button class="btn btn-primary" type="submit">Anlegen</button>
                                 <div class="offset-md-1 form-inline" v-if="loadingCreateUser">
-                                    <i class="fa fa-sync fa-spin"></i>
+                                    <span class="fa fa-sync fa-spin"></span>
                                     <label class="control-label">Laden...</label>
                                 </div>
                             </div>
@@ -43,7 +43,7 @@
                                 CSV Datei hochladen <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitFile()"/>
                             </label>
                             <div class="offset-md-1 form-inline" v-if="loadingFileUpload">
-                                <i class="fa fa-sync fa-spin"></i>
+                                <span class="fa fa-sync fa-spin"></span>
                                 <label class="control-label">Laden...</label>
                             </div>
                         </div>
