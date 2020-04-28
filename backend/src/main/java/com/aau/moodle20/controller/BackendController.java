@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -61,14 +62,35 @@ public class BackendController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
+    @PreAuthorize("hasAuthority('Admin')")
+    @PutMapping(value = "/user")
+    public ResponseEntity<?> registerUser(@Valid  @RequestBody SignUpRequest signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
+        }
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        String password = "password";//TODO should not be hardcoded
+        if(signUpRequest.getPassword()!=null && !signUpRequest.getPassword().isEmpty())
+        {
+            password = encoder.encode(signUpRequest.getPassword());
+        }else
+        {
+            password = encoder.encode(password);
+        }
+        //username, matrikelNumber, forename, surename, password, isAdmin
+        User user = new User(signUpRequest.getUsername(), signUpRequest.getMatrikelNumber(),signUpRequest.getForename(),signUpRequest.getSurename(),password,Boolean.FALSE);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    @PutMapping("/users")
+    public ResponseEntity<?> registerUsers(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
@@ -78,13 +100,6 @@ public class BackendController {
         // Create new user's account - no admin
         User user = new User(signUpRequest.getUsername(),
                 encoder.encode(signUpRequest.getPassword()),Boolean.FALSE);
-
-        Set<String> strRoles = signUpRequest.getRole();
-        Set<Role> roles = new HashSet<>();
-
-
-
-       // user.setRoles(roles);
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
@@ -93,13 +108,7 @@ public class BackendController {
 
      @GetMapping(path = "/user")
      public List<User> getUsers() {
-
          return userRepository.findAll();
-
-                 /*.map(user -> {
-             LOG.info("Reading user with id " + id + " from database.");
-            return user;
-         }).orElseThrow(() -> new UserNotFoundException("The user with the id " + id + " couldn't be found in the database."));*/
      }
 
     // @RequestMapping(path="/secured", method = RequestMethod.GET)

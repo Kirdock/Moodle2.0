@@ -11,16 +11,12 @@ public class SignUpRequest {
     @Size(min = 3, max = 20)
     private String username;
 
-    @NotBlank
-    @Size(max = 50)
-    @Email
-    private String email;
-
-    private Set<String> role;
-
-    @NotBlank
     @Size(min = 6, max = 40)
     private String password;
+    private String matrikelNumber;
+
+    private String forename;
+    private String surename;
 
     public String getUsername() {
         return username;
@@ -28,14 +24,6 @@ public class SignUpRequest {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPassword() {
@@ -46,11 +34,27 @@ public class SignUpRequest {
         this.password = password;
     }
 
-    public Set<String> getRole() {
-        return this.role;
+    public String getMatrikelNumber() {
+        return matrikelNumber;
     }
 
-    public void setRole(Set<String> role) {
-        this.role = role;
+    public void setMatrikelNumber(String matrikelNumber) {
+        this.matrikelNumber = matrikelNumber;
+    }
+
+    public String getForename() {
+        return forename;
+    }
+
+    public void setForename(String forename) {
+        this.forename = forename;
+    }
+
+    public String getSurename() {
+        return surename;
+    }
+
+    public void setSurename(String surename) {
+        this.surename = surename;
     }
 }

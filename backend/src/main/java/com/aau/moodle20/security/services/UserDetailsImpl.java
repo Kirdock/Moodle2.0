@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +34,6 @@ public class UserDetailsImpl implements UserDetails {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.authorities = authorities;
         this.isAdmin = isAdmin;
         this.matrikelNumber = matrikelNumber;
         this.forename = forename;
@@ -42,8 +42,13 @@ public class UserDetailsImpl implements UserDetails {
 
     public static UserDetailsImpl build(User user) {
 
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if(user.getAdmin())
+        {
+            authorities.add(new SimpleGrantedAuthority("Admin")); // TODO define a constant somewhere
+        }
 
-        return new UserDetailsImpl(
+        UserDetailsImpl userDetails = new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),
                 user.getPassword(),
@@ -51,6 +56,10 @@ public class UserDetailsImpl implements UserDetails {
                 user.getMartikelNumber(),
                 user.getForename(),
                 user.getSurename());
+
+                userDetails.setAuthorities(authorities);
+
+        return userDetails ;
     }
 
     @Override
@@ -123,6 +132,10 @@ public class UserDetailsImpl implements UserDetails {
 
     public void setSurename(String surename) {
         this.surename = surename;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
     }
 
     @Override
