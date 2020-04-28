@@ -17,14 +17,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,45 +67,83 @@ public class BackendController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
-
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    @PreAuthorize("hasAuthority('Admin')")
+    @PutMapping(value = "/user")
+    public ResponseEntity<?> registerUser(@Valid  @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        // Create new user's account - no admin
-        User user = new User(signUpRequest.getUsername(),
-                encoder.encode(signUpRequest.getPassword()),Boolean.FALSE);
-
-        Set<String> strRoles = signUpRequest.getRole();
-        Set<Role> roles = new HashSet<>();
-
-
-
-       // user.setRoles(roles);
+        String password = "password";//TODO should not be hardcoded
+        if(signUpRequest.getPassword()!=null && !signUpRequest.getPassword().isEmpty())
+        {
+            password = encoder.encode(signUpRequest.getPassword());
+        }else
+        {
+            password = encoder.encode(password);
+        }
+        //username, matrikelNumber, forename, surename, password, isAdmin
+        User user = new User(signUpRequest.getUsername(), signUpRequest.getMatrikelNumber(),signUpRequest.getForename(),signUpRequest.getSurename(),password,Boolean.FALSE);
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
 
+
+    @PreAuthorize("hasAuthority('Admin')")
+    @PutMapping(value = "/users")
+    public ResponseEntity<?> registerUsers(@Valid  @RequestParam("file") MultipartFile file) {
+        List<User> users = new ArrayList<>();
+
+        BufferedReader br;
+        List<String> result = new ArrayList<>();
+        try {
+            String line;
+            InputStream is = file.getInputStream();
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((line = br.readLine()) != null) {
+                result.add(line);
+            }
+
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+
+        result.remove(0); // remove first line
+
+        String password = encoder.encode("password");//TODO should not be hardcoded
+
+        for (int i=0; i<result.size(); i++)
+        {
+            String [] columns = result.get(i).split(";");
+            User user = new User();
+            user.setUsername(columns[0]);
+            user.setMartikelNumber(columns[1]);
+            user.setSurename(columns[2]);
+            user.setForename(columns[3]);
+            user.setAdmin(Boolean.FALSE);
+            user.setPassword(password);
+            users.add(user);
+        }
+
+
+
+        users.removeIf(user -> userRepository.findByUsername(user.getUsername()).isPresent());
+        userRepository.saveAll(users);
+
+        return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
+    }
+
+
      @GetMapping(path = "/user")
      public List<User> getUsers() {
-
          return userRepository.findAll();
-
-                 /*.map(user -> {
-             LOG.info("Reading user with id " + id + " from database.");
-            return user;
-         }).orElseThrow(() -> new UserNotFoundException("The user with the id " + id + " couldn't be found in the database."));*/
      }
 
     // @RequestMapping(path="/secured", method = RequestMethod.GET)
