@@ -47,7 +47,7 @@ public class Application implements ApplicationRunner, ErrorController {
 
 	@RequestMapping(value = PATH)
 	public String error() {
-		return "redirect:/";
+		return "forward:/";
 	}
 
 	@Override
