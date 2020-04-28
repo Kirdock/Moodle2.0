@@ -26,9 +26,7 @@ export default {
         return axios.get('/courses');
     },
     createUser(userData){
-        return axios.put('/user',{
-            userData: userData
-        });
+        return axios.put('/user',userData);
     },
     createUsers(formData){
         return axios.put('/users',
@@ -39,6 +37,9 @@ export default {
                 }
             }
         );
+    },
+    createSemester(data){
+        return axios.put('/user',data);
     }
 }
 

@@ -66,6 +66,9 @@ export default new Vuex.Store({
     createUsers({commit}, formData){
       return api.createUsers(formData);
     },
+    createSemester({commit}, semesterData){
+      return api.createSemester(semesterData);
+    },
     fetchSemesters({commit}){
       return api.fetchSemesters();
     },
