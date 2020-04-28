@@ -51,6 +51,38 @@
                 </div>
             </b-tab>
             <b-tab title="Kurse anlegen" active v-if="$store.getters.userInfo.isAdmin">
+                <div class="form-horizontal col-md-4">
+                    <form @submit.prevent @submit="createCourse()">
+                        <select class="form-control" v-model="selectedSemester">
+                            <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
+                                {{semester.year}} {{semester.type === 'w' ? 'WS' : 'SS'}}
+                            </option>
+                        </select>
+                        <div class="form-group">
+                            <label for="courseNumber" class="control-label required">Nummer</label>
+                            <input id="courseNumber" type="text" class="form-control"  pattern="[0-9]{3}\.[0-9]{3}" title="Format: 000.000" v-model="courseNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseName" class="control-label required">Name</label>
+                            <input id="courseName" type="text" class="form-control" v-model="courseName" required>
+                        </div>
+                        <div class="form-group col-md-6" style="padding-left:0px">
+                            <label for="minKreuzel" class="control-label">Mindestanforderung Kreuzel (in %)</label>
+                            <input id="minKreuzel" type="number" class="form-control" min="0" max="100" v-model="minKreuzel">
+                        </div>
+                        <div class="form-group col-md-6" style="padding-left:0px">
+                            <label for="minPoints" class="control-label">Mindestanforderung Punkte</label>
+                            <input id="minPoints" type="text" class="form-control" min="0" v-model="minPoints">
+                        </div>
+                        <div class="form-inline">
+                            <button class="btn btn-primary" type="submit">Anlegen</button>
+                            <div class="offset-md-1 form-inline" v-if="loadingCreateCourse">
+                                <span class="fa fa-sync fa-spin"></span>
+                                <label class="control-label">Laden...</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </b-tab>
             <b-tab title="Semester anlegen" active v-if="$store.getters.userInfo.isAdmin">
                 <div class="form-horizontal col-md-4">
@@ -59,14 +91,16 @@
                             <label for="semesterYear" class="control-label required">Jahr</label>
                             <input id="semesterYear" type="number" class="form-control"  :max="maxYear" :min="maxYear-100" v-model="semesterYear" required>
                         </div>
-                        <div class="form-group">
-                            <label for="semesterTypeWinter"   class="control-label" style="margin-right:15px">
-                                <input id="semesterTypeWinter" type="radio" value="w" class="form-control"  v-model="semesterType">
-                                Wintersemester
-                            </label>
-                            <label for="semesterTypeSummer" class="control-label">
-                                <input id="semesterTypeSummer" type="radio" value="s" class="form-control"  v-model="semesterType">
+                        <div class="form-check">
+                            <input id="semesterTypeSummer" type="radio" value="s" class="form-check-input"  v-model="semesterType">
+                            <label for="semesterTypeSummer" class="form-check-label">
                                 Sommersemester
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input id="semesterTypeWinter" type="radio" value="w" class="form-check-input"  v-model="semesterType">
+                            <label for="semesterTypeWinter"   class="form-check-label" style="margin-right:15px">
+                                Wintersemester
                             </label>
                         </div>
                         <div class="form-inline">
@@ -96,11 +130,21 @@ export default {
         loadingFileUpload: false,
         loadingCreateUser: false,
         loadingCreateSemester: false,
+        loadingCreateCourse: false,
         semesterYear: new Date().getFullYear(),
         maxYear: new Date().getFullYear(),
-        currentMonth: new Date().getMonth(),
-        semesterType: new Date().getMonth() > 1 && new Date().getMonth() < 9 ? 's' : 'w'
+        semesterType: undefined,
+        semesters: [],
+        selectedSemester: undefined,
+        courseNumber: undefined,
+        courseName: undefined,
+        minKreuzel: undefined,
+        minPoints: undefined
     }
+  },
+  created(){
+    this.semesterType = this.getSemesterType();
+    this.getSemesters();
   },
   methods:{
     createUser(){
@@ -135,9 +179,32 @@ export default {
                 appendToast: true
             });
             this.semesterYear = this.maxYear;
+            this.semesterType = this.getSemesterType();
         }).catch(()=>{
             this.loadingCreateSemester = false;
             this.$bvToast.toast(`Semester konnte nicht angelegt werden`, {
+                title: 'Fehler',
+                autoHideDelay: this.$store.getters.toastDelay,
+                variant: 'danger',
+                appendToast: true
+            });
+        });
+    },
+    createCourse(){
+        this.loadingCreateCourse = true;
+        this.$store.dispatch("createCourse", {}).then(response=>{
+            this.loadingCreateCourse = false;
+            this.$bvToast.toast(`Kurs wurde angelegt`, {
+                title: 'Erfolg',
+                autoHideDelay: this.$store.getters.toastDelay,
+                variant: 'success',
+                appendToast: true
+            });
+            this.selectedSemester = this.semesters[0].id;
+            this.courseNumber = this.courseName = this.minKreuzel = this.minPoints = undefined;
+        }).catch(()=>{
+            this.loadingCreateCourse = false;
+            this.$bvToast.toast(`Kurs konnte nicht angelegt werden`, {
                 title: 'Fehler',
                 autoHideDelay: this.$store.getters.toastDelay,
                 variant: 'danger',
@@ -161,6 +228,22 @@ export default {
         }).catch(()=>{
             this.loadingFileUpload = false;
             this.$bvToast.toast(`Benutzer konnten nicht angelegt werden`, {
+                title: 'Fehler',
+                autoHideDelay: this.$store.getters.toastDelay,
+                variant: 'danger',
+                appendToast: true
+            });
+        })
+    },
+    getSemesterType(){
+        return new Date().getMonth() > 1 && new Date().getMonth() < 9 ? 's' : 'w';
+    },
+    getSemesters(){
+        this.$store.dispatch("getSemesters").then(response =>{
+            this.semesters = response.data;
+            this.selectedSemester = this.semesters[0].id;
+        }).catch(()=>{
+            this.$bvToast.toast(`Semester konnten nicht geladen werden`, {
                 title: 'Fehler',
                 autoHideDelay: this.$store.getters.toastDelay,
                 variant: 'danger',

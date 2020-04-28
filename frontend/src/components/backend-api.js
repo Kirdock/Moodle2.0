@@ -19,10 +19,10 @@ export default {
             password: password
         })
     },
-    fetchSemesters(){
+    getSemesters(){
         return axios.get('/semesters');
     },
-    fetchCourses(){
+    getCourses(){
         return axios.get('/courses');
     },
     createUser(userData){
@@ -40,6 +40,9 @@ export default {
     },
     createSemester(data){
         return axios.put('/user',data);
+    },
+    createCourse(data){
+        return axios.put('/courses', data);
     }
 }
 

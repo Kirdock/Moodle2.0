@@ -69,11 +69,14 @@ export default new Vuex.Store({
     createSemester({commit}, semesterData){
       return api.createSemester(semesterData);
     },
-    fetchSemesters({commit}){
-      return api.fetchSemesters();
+    createCourse({commit}, courseData){
+      return api.createCourse(courseData);
     },
-    fetchCourses({commit}){
-      return api.fetchCourses();
+    getSemesters({commit}){
+      return api.getSemesters();
+    },
+    getCourses({commit}){
+      return api.getCourses();
     }
   },
   modules: {

@@ -20,7 +20,7 @@
         },
         methods: {
             fetchSemesters(){
-                this.$store.dispatch("fetchSemesters").then(response=>{
+                this.$store.dispatch("getSemesters").then(response=>{
                     this.semesters = response.semesters;
                     this.selectedSemester = this.semesters[this.semesters.length - 1]; //this.$store.selectedSemester
                 }).then(()=>{
@@ -35,7 +35,7 @@
                 })
             },
             fetchCourses(){
-                this.$store.dispatch("fetchCourses").then(response=>{
+                this.$store.dispatch("getCourses").then(response=>{
                     this.courses = response.data;
                 }).catch(() =>{
                     this.$bvToast.toast(`Kurse konnten nicht geladen werden`, {
