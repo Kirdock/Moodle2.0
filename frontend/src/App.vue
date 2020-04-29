@@ -5,6 +5,7 @@
         <router-link class="navbar-brand" to="/">Home</router-link>
         <router-link class="nav-link" to="/Courses" v-if="$store.getters.isLoggedIn">Kurse</router-link>
         <router-link to="/Account" class="nav-link" v-if="$store.getters.isLoggedIn">Konto</router-link>
+        <router-link to="/Admin" class="nav-link" v-if="$store.getters.userInfo.isAdmin">Admin</router-link>
         <a href="javascript:void(0)" class="nav-link" @click="logout" v-if="$store.getters.isLoggedIn">Abmelden</a>
         <router-link to="/Login" class="nav-link" v-else >Anmelden</router-link>
       </div>

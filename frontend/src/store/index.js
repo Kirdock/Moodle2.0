@@ -22,7 +22,8 @@ export default new Vuex.Store({
   state: {
     toastDelay: 8000,
     userInfo: {},
-    token: undefined
+    token: undefined,
+    loggedIn: false
   },
   mutations: {
     initialiseStore(state) {
@@ -32,14 +33,18 @@ export default new Vuex.Store({
       // );
       state.token = getToken();
       state.userInfo = decodeToken(state.token);
+      state.loggedIn = !!state.token;
     },
     loginSuccess(state, payload){
       state.token = payload.accessToken;
       state.userInfo = decodeToken(payload.accessToken);
+      state.loggedIn = true;
       setToken(payload.accessToken);
     },
     logout(state){
-      state.token = state.userInfo = undefined;
+      state.token = undefined;
+      state.userInfo = {};
+      state.loggedIn = false;
       deleteToken();
     }
   },
@@ -84,7 +89,7 @@ export default new Vuex.Store({
   getters: {
     userInfo: state => state.userInfo,
     toastDelay: state => state.toastDelay,
-    isLoggedIn: state => !!state.userInfo,
+    isLoggedIn: state => state.loggedIn,
     decodedToken: state => state.userInfo,
     token: state=> state.token
   }
@@ -104,7 +109,7 @@ function deleteToken(){
 }
 
 function decodeToken(token){
-  let decoded_payload;
+  let decoded_payload = {};
   let payload;
 
   if (token) {
