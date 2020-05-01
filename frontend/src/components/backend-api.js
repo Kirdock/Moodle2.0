@@ -39,10 +39,10 @@ export default {
         );
     },
     createSemester(data){
-        return axios.put('/user',data);
+        return axios.put('/semester',data);
     },
     createCourse(data){
-        return axios.put('/courses', data);
+        return axios.put('/course', data);
     }
 }
 

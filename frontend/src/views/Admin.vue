@@ -180,6 +180,7 @@ export default {
             });
             this.semesterYear = this.maxYear;
             this.semesterType = this.getSemesterType();
+            this.getSemesters();
         }).catch(()=>{
             this.loadingCreateSemester = false;
             this.$bvToast.toast(`Semester konnte nicht angelegt werden`, {
