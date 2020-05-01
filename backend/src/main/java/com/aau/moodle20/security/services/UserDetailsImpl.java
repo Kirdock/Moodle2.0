@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
 
@@ -55,7 +54,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getAdmin(),
                 user.getMartikelNumber(),
                 user.getForename(),
-                user.getSurename());
+                user.getSurname());
 
                 userDetails.setAuthorities(authorities);
 

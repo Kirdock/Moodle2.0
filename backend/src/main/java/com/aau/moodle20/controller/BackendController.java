@@ -1,21 +1,21 @@
 package com.aau.moodle20.controller;
 
-import com.aau.moodle20.domain.ERole;
-import com.aau.moodle20.domain.Role;
+import com.aau.moodle20.domain.Semester;
 import com.aau.moodle20.domain.User;
-import com.aau.moodle20.exception.UserNotFoundException;
+import com.aau.moodle20.exception.SemesterAlreadyCreatedException;
+import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.response.JwtResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.repository.RoleRepository;
+import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
-import com.aau.moodle20.security.services.UserDetailsImpl;
+import com.aau.moodle20.security.services.SemesterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.io.BufferedReader;
@@ -32,10 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController()
 @RequestMapping("/api")
@@ -50,13 +48,18 @@ public class BackendController {
     UserRepository userRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    SemesterRepository semesterRepository;
 
     @Autowired
     PasswordEncoder encoder;
 
     @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    SemesterService semesterService;
+
+
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -88,12 +91,11 @@ public class BackendController {
             password = encoder.encode(password);
         }
         //username, matrikelNumber, forename, surename, password, isAdmin
-        User user = new User(signUpRequest.getUsername(), signUpRequest.getMatrikelNumber(),signUpRequest.getForename(),signUpRequest.getSurename(),password,Boolean.FALSE);
+        User user = new User(signUpRequest.getUsername(), signUpRequest.getMatrikelnummer(),signUpRequest.getForename(),signUpRequest.getSurname(),password,Boolean.FALSE);
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
-
 
 
     @PreAuthorize("hasAuthority('Admin')")
@@ -125,7 +127,7 @@ public class BackendController {
             User user = new User();
             user.setUsername(columns[0]);
             user.setMartikelNumber(columns[1]);
-            user.setSurename(columns[2]);
+            user.setSurname(columns[2]);
             user.setForename(columns[3]);
             user.setAdmin(Boolean.FALSE);
             user.setPassword(password);
@@ -141,8 +143,23 @@ public class BackendController {
     }
 
 
-     @GetMapping(path = "/user")
-     public List<User> getUsers() {
+    @PreAuthorize("hasAuthority('Admin')")
+    @PutMapping(value = "/semester")
+    public ResponseEntity<?> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  throws SemesterAlreadyCreatedException {
+
+        semesterService.createSemester(createSemesterRequest);
+        return ResponseEntity.ok(new MessageResponse("Semester was sucessfully created!"));
+    }
+
+    @PreAuthorize("hasAuthority('Admin')")
+    @GetMapping(value = "/semesters")
+    public List<Semester> getSemesters()  {
+        return semesterService.getSemesters();
+    }
+
+    @PreAuthorize("hasAuthority('Admin')")
+    @GetMapping(path = "/user")
+    public List<User> getUsers() {
          return userRepository.findAll();
      }
 

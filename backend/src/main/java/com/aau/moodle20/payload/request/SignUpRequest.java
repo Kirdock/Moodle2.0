@@ -1,9 +1,7 @@
 package com.aau.moodle20.payload.request;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Set;
 
 public class SignUpRequest {
 
@@ -13,10 +11,10 @@ public class SignUpRequest {
 
     @Size(min = 6, max = 40)
     private String password;
-    private String matrikelNumber;
+    private String matrikelnummer;
 
     private String forename;
-    private String surename;
+    private String surname;
 
     public String getUsername() {
         return username;
@@ -34,12 +32,12 @@ public class SignUpRequest {
         this.password = password;
     }
 
-    public String getMatrikelNumber() {
-        return matrikelNumber;
+    public String getMatrikelnummer() {
+        return matrikelnummer;
     }
 
-    public void setMatrikelNumber(String matrikelNumber) {
-        this.matrikelNumber = matrikelNumber;
+    public void setMatrikelnummer(String matrikelnummer) {
+        this.matrikelnummer = matrikelnummer;
     }
 
     public String getForename() {
@@ -50,11 +48,11 @@ public class SignUpRequest {
         this.forename = forename;
     }
 
-    public String getSurename() {
-        return surename;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setSurename(String surename) {
-        this.surename = surename;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 }

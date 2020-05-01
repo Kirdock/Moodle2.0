@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 @Table(name ="user",
 uniqueConstraints = {
         @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "matrikelNumber")
+        @UniqueConstraint(columnNames = "matrikelNummer")
 })
 public class User {
 
@@ -17,8 +17,8 @@ public class User {
     private Long id;
 
     @Size(max = 20)
-    @Column(name = "matrikelNumber")
-    private String matrikelNumber;
+    @Column(name = "matrikelNummer")
+    private String matrikelNummer;
     @Column(name = "isAdmin")
     private Boolean isAdmin;
 
@@ -30,7 +30,7 @@ public class User {
     private String username;
 
     private String forename;
-    private String surename;
+    private String surname;
 
 
     public User()
@@ -44,12 +44,12 @@ public class User {
         this.password = password;
         this.isAdmin = isAdmin;
     }
-    public User(String username, String matrikelNumber, String forename, String surename, String password, Boolean isAdmin)
+    public User(String username, String matrikelNummer, String forename, String surename, String password, Boolean isAdmin)
     {
         this.username = username;
-        this.matrikelNumber = matrikelNumber;
+        this.matrikelNummer = matrikelNummer;
         this.forename = forename;
-        this.surename = surename;
+        this.surname = surename;
         this.password = password;
         this.isAdmin = isAdmin;
     }
@@ -63,11 +63,11 @@ public class User {
     }
 
     public String getMartikelNumber() {
-        return matrikelNumber;
+        return matrikelNummer;
     }
 
     public void setMartikelNumber(String martikelNummer) {
-        this.matrikelNumber = martikelNummer;
+        this.matrikelNummer = martikelNummer;
     }
 
     public Boolean getAdmin() {
@@ -102,11 +102,11 @@ public class User {
         this.forename = forename;
     }
 
-    public String getSurename() {
-        return surename;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setSurename(String surename) {
-        this.surename = surename;
+    public void setSurname(String surename) {
+        this.surname = surename;
     }
 }
