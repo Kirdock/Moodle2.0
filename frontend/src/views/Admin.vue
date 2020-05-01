@@ -72,7 +72,7 @@
                         </div>
                         <div class="form-group col-md-6" style="padding-left:0px">
                             <label for="minPoints" class="control-label">Mindestanforderung Punkte</label>
-                            <input id="minPoints" type="text" class="form-control" min="0" v-model="minPoints">
+                            <input id="minPoints" type="number" class="form-control" min="0" v-model="minPoints">
                         </div>
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">Anlegen</button>
@@ -193,7 +193,14 @@ export default {
     },
     createCourse(){
         this.loadingCreateCourse = true;
-        this.$store.dispatch("createCourse", {}).then(response=>{
+        this.$store.dispatch("createCourse", 
+        {
+            semesterId: this.selectedSemester,
+            number: this.courseNumber,
+            name: this.courseName,
+            minKreuzel: this.minKreuzel,
+            minPoints: this.minPoints
+        }).then(response=>{
             this.loadingCreateCourse = false;
             this.$bvToast.toast(`Kurs wurde angelegt`, {
                 title: 'Erfolg',
