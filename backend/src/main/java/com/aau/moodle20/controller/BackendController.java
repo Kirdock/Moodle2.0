@@ -2,13 +2,13 @@ package com.aau.moodle20.controller;
 
 import com.aau.moodle20.domain.Semester;
 import com.aau.moodle20.domain.User;
-import com.aau.moodle20.exception.SemesterAlreadyCreatedException;
+import com.aau.moodle20.exception.SemesterException;
+import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.response.JwtResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
-import com.aau.moodle20.repository.RoleRepository;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
@@ -25,7 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.io.BufferedReader;
@@ -145,10 +144,18 @@ public class BackendController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/semester")
-    public ResponseEntity<?> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  throws SemesterAlreadyCreatedException {
+    public ResponseEntity<?> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  throws SemesterException {
 
         semesterService.createSemester(createSemesterRequest);
         return ResponseEntity.ok(new MessageResponse("Semester was sucessfully created!"));
+    }
+
+    @PreAuthorize("hasAuthority('Admin')")
+    @PutMapping(value = "/course")
+    public ResponseEntity<?> createCourse(@Valid  @RequestBody CreateCourseRequest createCourseRequest)  throws SemesterException {
+
+        semesterService.createCourse(createCourseRequest);
+        return ResponseEntity.ok(new MessageResponse("Course was sucessfully created!"));
     }
 
     @PreAuthorize("hasAuthority('Admin')")
@@ -158,7 +165,7 @@ public class BackendController {
     }
 
     @PreAuthorize("hasAuthority('Admin')")
-    @GetMapping(path = "/user")
+    @GetMapping(path = "/users")
     public List<User> getUsers() {
          return userRepository.findAll();
      }

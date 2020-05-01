@@ -23,6 +23,14 @@ public class Semester {
     )
     private Set<Course> courses;
 
+    public Semester(Long id)
+    {
+        this.id = id;
+    }
+
+    public Semester()
+    {
+    }
     public Long getId() {
         return id;
     }

@@ -1,26 +1,50 @@
 package com.aau.moodle20.payload.request;
 
-import com.aau.moodle20.domain.ESemesterType;
-
 public class CreateCourseRequest {
 
-    private Integer year;
+    private Long semesterId;
+    private String number;
+    private String name;
+    private Integer minKreuzel;
+    private Integer minPoints;
 
-    private ESemesterType type;
-
-    public Integer getYear() {
-        return year;
+    public Long getSemesterId() {
+        return semesterId;
     }
 
-    public void setYear(Integer year) {
-        this.year = year;
+    public void setSemesterId(Long semesterId) {
+        this.semesterId = semesterId;
     }
 
-    public ESemesterType getType() {
-        return type;
+    public String getNumber() {
+        return number;
     }
 
-    public void setType(ESemesterType type) {
-        this.type = type;
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getMinKreuzel() {
+        return minKreuzel;
+    }
+
+    public void setMinKreuzel(Integer minKreuzel) {
+        this.minKreuzel = minKreuzel;
+    }
+
+    public Integer getMinPoints() {
+        return minPoints;
+    }
+
+    public void setMinPoints(Integer minPoints) {
+        this.minPoints = minPoints;
     }
 }
