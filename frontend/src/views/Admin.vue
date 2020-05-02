@@ -1,12 +1,10 @@
 <template>
   <div class="admin">
+      <label class="control-label requiredField" style="margin-left: 10px">Pflichtfeld</label>
       <b-tabs content-class="mt-3">
             <b-tab title="Benutzer anlegen" active>
                 <div class="row" style="margin-left: 0px">
                     <div class="form-horizontal col-md-4">
-                        <div class="requiredField">
-                            <label class="control-label">Pflichtfeld</label>
-                        </div>
                         <form @submit.prevent @submit="createUser()">
                             <div class="form-group">
                                 <label for="username" class="control-label required">Benutzername</label> 
@@ -53,11 +51,14 @@
             <b-tab title="Kurse anlegen">
                 <div class="form-horizontal col-md-4">
                     <form @submit.prevent @submit="createCourse()">
-                        <select class="form-control" v-model="selectedSemester">
-                            <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
-                                {{semester.year}} {{semester.type === 'w' ? 'WS' : 'SS'}}
-                            </option>
-                        </select>
+                        <div class="form-group">
+                            <label for="courseSemester" class="control-label required">Semester</label>
+                            <select class="form-control" v-model="selectedSemester" id="courseSemester">
+                                <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
+                                    {{semester.year}} {{semester.type === 'w' ? 'WS' : 'SS'}}
+                                </option>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="courseNumber" class="control-label required">Nummer</label>
                             <input id="courseNumber" type="text" class="form-control"  pattern="[0-9]{3}\.[0-9]{3}" title="Format: 000.000" v-model="courseNumber" required>
@@ -68,11 +69,11 @@
                         </div>
                         <div class="form-group col-md-6" style="padding-left:0px">
                             <label for="minKreuzel" class="control-label">Mindestanforderung Kreuzel (in %)</label>
-                            <input id="minKreuzel" type="number" class="form-control" min="0" max="100" v-model="minKreuzel">
+                            <nc-input id="minKreuzel" class="form-control" min="0" max="100" v-model="minKreuzel"> </nc-input>
                         </div>
                         <div class="form-group col-md-6" style="padding-left:0px">
                             <label for="minPoints" class="control-label">Mindestanforderung Punkte</label>
-                            <input id="minPoints" type="number" class="form-control" min="0" v-model="minPoints">
+                            <nc-input id="minPoints" class="form-control" min="0" v-model="minPoints"> </nc-input>
                         </div>
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">Anlegen</button>
@@ -89,7 +90,7 @@
                     <form @submit.prevent @submit="createSemester()">
                         <div class="form-group">
                             <label for="semesterYear" class="control-label required">Jahr</label>
-                            <input id="semesterYear" type="number" class="form-control"  :max="maxYear" :min="maxYear-100" v-model="semesterYear" required>
+                            <nc-input id="semesterYear" class="form-control"  :max="maxYear" :min="maxYear-100" v-model="semesterYear" required></nc-input>
                         </div>
                         <div class="form-check">
                             <input id="semesterTypeSummer" type="radio" value="s" class="form-check-input"  v-model="semesterType">
@@ -147,6 +148,15 @@ export default {
     this.getSemesters();
   },
   methods:{
+    filterKey(e){ //onInput
+    //TO-DO: No-Comma-Input-Component
+        if (e.key === ',' || e.key === '.'){
+            return e.preventDefault();
+        }
+    },
+    preventComma(e){ //onPaste
+        e.target.value = e.target.value.split(/\.|\,/)[0];
+    },
     createUser(){
         this.loadingCreateUser = true;
         this.$store.dispatch("createUser", {username: this.username, password: this.password, martikelnummer: this.martikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
@@ -208,7 +218,6 @@ export default {
                 variant: 'success',
                 appendToast: true
             });
-            this.selectedSemester = this.semesters[0].id;
             this.courseNumber = this.courseName = this.minKreuzel = this.minPoints = undefined;
         }).catch(()=>{
             this.loadingCreateCourse = false;

@@ -10,12 +10,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/style.css';
 import {ToastPlugin, TabsPlugin} from 'bootstrap-vue';
+import NoCommaInput from './components/NoCommaInput.vue';
 
 Vue.config.productionTip = true;
 Vue.use(ToastPlugin);
 Vue.use(TabsPlugin);
 
+Vue.component('nc-input', NoCommaInput);
+
 new Vue({
+  // components:{ not working
+  //   NoCommaInput
+  // },
   router,
   store,
   render: h => h(App)

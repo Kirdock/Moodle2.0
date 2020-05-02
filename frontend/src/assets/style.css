@@ -1,4 +1,4 @@
-.requiredField .control-label:before, .form-group .control-label.required:after {
+.control-label.requiredField:before, .form-group .control-label.required:after {
   content:"*";
   color:red;
 }
