@@ -53,7 +53,7 @@
                     <form @submit.prevent @submit="createCourse()">
                         <div class="form-group">
                             <label for="courseSemester" class="control-label required">Semester</label>
-                            <select class="form-control" v-model="selectedSemester" id="courseSemester">
+                            <select class="form-control" v-model="selectedSemester" id="courseSemester" required>
                                 <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
                                     {{semester.year}} {{semester.type === 'w' ? 'WS' : 'SS'}}
                                 </option>
@@ -69,11 +69,11 @@
                         </div>
                         <div class="form-group col-md-6" style="padding-left:0px">
                             <label for="minKreuzel" class="control-label">Mindestanforderung Kreuzel (in %)</label>
-                            <nc-input id="minKreuzel" class="form-control" min="0" max="100" v-model="minKreuzel"> </nc-input>
+                            <i-input id="minKreuzel" class="form-control" min="0" max="100" v-model="minKreuzel"> </i-input>
                         </div>
                         <div class="form-group col-md-6" style="padding-left:0px">
                             <label for="minPoints" class="control-label">Mindestanforderung Punkte</label>
-                            <nc-input id="minPoints" class="form-control" min="0" v-model="minPoints"> </nc-input>
+                            <i-input id="minPoints" class="form-control" min="0" v-model="minPoints"> </i-input>
                         </div>
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">Anlegen</button>
@@ -90,7 +90,7 @@
                     <form @submit.prevent @submit="createSemester()">
                         <div class="form-group">
                             <label for="semesterYear" class="control-label required">Jahr</label>
-                            <nc-input id="semesterYear" class="form-control"  :max="maxYear" :min="maxYear-100" v-model="semesterYear" required></nc-input>
+                            <i-input id="semesterYear" class="form-control"  :max="maxYear" :min="maxYear-100" v-model="semesterYear" required></i-input>
                         </div>
                         <div class="form-check">
                             <input id="semesterTypeSummer" type="radio" value="s" class="form-check-input"  v-model="semesterType">

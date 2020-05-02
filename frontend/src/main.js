@@ -10,16 +10,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/style.css';
 import {ToastPlugin, TabsPlugin} from 'bootstrap-vue';
-import NoCommaInput from './components/NoCommaInput.vue';
+import IntegerInput from './components/IntegerInput.vue';
 
 Vue.config.productionTip = true;
 Vue.use(ToastPlugin);
 Vue.use(TabsPlugin);
 
-Vue.component('nc-input', NoCommaInput);
+Vue.component('i-input', IntegerInput); //Global registration
 
 new Vue({
-  // components:{ not working
+  // components:{ //not global
   //   NoCommaInput
   // },
   router,

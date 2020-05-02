@@ -4,11 +4,10 @@
 
 <script>
 export default {
-    name: 'nc-input',
-    props: ['value'], //https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
+    name: 'i-input',
+    props: ['value'],
     methods:{
         filterKey(e){ //onInput
-            //TO-DO: No-Comma-Input-Component
             if (e.key === ',' || e.key === '.'){
                 e.preventDefault();
                 this.update(e);
