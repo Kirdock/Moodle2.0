@@ -36,9 +36,9 @@ import java.util.List;
 
 @RestController()
 @RequestMapping("/api")
-public class BackendController {
+public class UserController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BackendController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -47,16 +47,12 @@ public class BackendController {
     UserRepository userRepository;
 
     @Autowired
-    SemesterRepository semesterRepository;
-
-    @Autowired
     PasswordEncoder encoder;
 
     @Autowired
     JwtUtils jwtUtils;
 
-    @Autowired
-    SemesterService semesterService;
+
 
 
 
@@ -141,29 +137,6 @@ public class BackendController {
         return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
     }
 
-
-    @PreAuthorize("hasAuthority('Admin')")
-    @PutMapping(value = "/semester")
-    public ResponseEntity<?> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  throws SemesterException {
-
-        semesterService.createSemester(createSemesterRequest);
-        return ResponseEntity.ok(new MessageResponse("Semester was sucessfully created!"));
-    }
-
-    @PreAuthorize("hasAuthority('Admin')")
-    @PutMapping(value = "/course")
-    public ResponseEntity<?> createCourse(@Valid  @RequestBody CreateCourseRequest createCourseRequest)  throws SemesterException {
-
-        semesterService.createCourse(createCourseRequest);
-        return ResponseEntity.ok(new MessageResponse("Course was sucessfully created!"));
-    }
-
-    @PreAuthorize("hasAuthority('Admin')")
-    @GetMapping(value = "/semesters")
-    public List<Semester> getSemesters()  {
-        return semesterService.getSemesters();
-    }
-
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(path = "/users")
     public List<User> getUsers() {
@@ -173,19 +146,4 @@ public class BackendController {
 
         return allUsers;
      }
-
-    // @RequestMapping(path="/secured", method = RequestMethod.GET)
-    // public @ResponseBody String getSecured() {
-    //     LOG.info("GET successfully called on /secured resource");
-    //     return SECURED_TEXT;
-    // }
-
-    // // Forwards all routes to FrontEnd except: '/', '/index.html', '/api', '/api/**'
-    // // Required because of 'mode: history' usage in frontend routing, see README for further details
-    // @RequestMapping(value = "{_:^(?!index\\.html|api).*$}")
-    // public String redirectApi() {
-    //     LOG.info("URL entered directly into the Browser, so we need to redirect...");
-    //     return "forward:/";
-    // }
-
 }
