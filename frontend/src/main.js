@@ -9,12 +9,22 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/style.css';
-import {ToastPlugin, TabsPlugin} from 'bootstrap-vue';
+import {BVConfigPlugin, ToastPlugin, TabsPlugin, ModalPlugin, ButtonPlugin} from 'bootstrap-vue';
 import IntegerInput from './components/IntegerInput.vue';
 
 Vue.config.productionTip = true;
+Vue.use(BVConfigPlugin, {
+  BModal:{
+    cancelTitle: 'Abbrechen'
+  },
+  BToast:{
+    autoHideDelay: store.getters.toastDelay
+  }
+});
 Vue.use(ToastPlugin);
 Vue.use(TabsPlugin);
+Vue.use(ModalPlugin);
+Vue.use(ButtonPlugin);
 
 Vue.component('i-input', IntegerInput); //Global registration
 

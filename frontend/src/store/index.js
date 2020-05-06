@@ -80,8 +80,17 @@ export default new Vuex.Store({
     getSemesters({commit}){
       return api.getSemesters();
     },
-    getCourses({commit}){
-      return api.getCourses();
+    getCourses({commit}, semesterData){
+      return api.getCourses(semesterData);
+    },
+    getCourse({commit}, data){
+      return api.getCourse(data);
+    },
+    getUsers({commit}){
+      return api.getUsers();
+    },
+    deleteCourse({commit}, data){
+      return api.deleteCourse(data);
     }
   },
   modules: {

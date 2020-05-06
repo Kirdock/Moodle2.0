@@ -28,7 +28,6 @@
                 }).catch(()=>{
                     this.$bvToast.toast(`Semester konnten nicht geladen werden`, {
                         title: 'Fehler',
-                        autoHideDelay: this.$store.getters.toastDelay,
                         variant: 'danger',
                         appendToast: true
                     });
@@ -40,7 +39,6 @@
                 }).catch(() =>{
                     this.$bvToast.toast(`Kurse konnten nicht geladen werden`, {
                         title: 'Fehler',
-                        autoHideDelay: this.$store.getters.toastDelay,
                         variant: 'danger',
                         appendToast: true
                     });

@@ -44,7 +44,9 @@ const routes = [
       authentication: true,
       isAdmin: true
     }
-  }
+  },
+  //otherwise
+  { path: '*', redirect: '/' }
 ]
 
 const router = new VueRouter({

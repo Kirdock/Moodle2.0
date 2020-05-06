@@ -2,7 +2,7 @@
   <div class="home">
     <div class="form-horizontal col-md-6">
       <div class="form-group">
-        <button type="button" class="btn btn-primary" v-on:click="testToast()">Toast Test</button>
+        <h1>Willkommen!</h1>
       </div>
     </div>
   </div>
@@ -20,7 +20,6 @@ export default {
     testToast(){
       this.$bvToast.toast(`This is toast number 1`, {
           title: 'BootstrapVue Toast',
-          autoHideDelay: this.$store.getters.toastDelay,
           appendToast: true,
           variant: 'success'
         })

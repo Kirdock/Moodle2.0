@@ -17,7 +17,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary">Login</button>
+          <b-button type="submit" variant="primary">Login</b-button>
         </form>
     </div>
 </template>
@@ -41,7 +41,6 @@ export default {
         .catch(error => {
           this.$bvToast.toast(`Benutzername oder Password stimmt nicht überein`, {
             title: 'Fehler',
-            autoHideDelay: this.$store.getters.toastDelay,
             appendToast: true,
             variant: 'danger'
           });

@@ -22,8 +22,14 @@ export default {
     getSemesters(){
         return axios.get('/semesters');
     },
-    getCourses(){
-        return axios.get('/courses');
+    getCourse(data){
+        return axios.get(`/semesters/${data.semesterId}/course/${data.courseId}`); //all data
+    },
+    getCourses(semesterData){
+        return axios.get(`/semesters/${semesterData.id}/courses`); //only id, name, number
+    },
+    getUsers(){
+        return axios.get('/users'); //without admin
     },
     createUser(userData){
         return axios.put('/user',userData);
@@ -43,6 +49,9 @@ export default {
     },
     createCourse(data){
         return axios.put('/course', data);
+    },
+    deleteCourse(data){
+        return axios.delete(`/course/${data.id}`);
     }
 }
 
