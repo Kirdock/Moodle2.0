@@ -167,7 +167,11 @@ public class BackendController {
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(path = "/users")
     public List<User> getUsers() {
-         return userRepository.findAll();
+
+        List<User> allUsers = userRepository.findAll();
+        allUsers.removeIf(User::getAdmin);
+
+        return allUsers;
      }
 
     // @RequestMapping(path="/secured", method = RequestMethod.GET)
