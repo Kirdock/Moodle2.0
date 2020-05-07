@@ -6,7 +6,7 @@
         <router-link class="nav-link" to="/Courses" v-if="$store.getters.isLoggedIn">Kurse</router-link>
         <router-link to="/Account" class="nav-link" v-if="$store.getters.isLoggedIn">Konto</router-link>
         <router-link to="/Admin" class="nav-link" v-if="$store.getters.userInfo.isAdmin">Admin</router-link>
-        <a href="javascript:void(0)" class="nav-link" @click="logout" v-if="$store.getters.isLoggedIn">Abmelden</a>
+        <b-button variant="link" class="nav-link" @click="logout" v-if="$store.getters.isLoggedIn">Abmelden</b-button>
         <router-link to="/Login" class="nav-link" v-else >Anmelden</router-link>
       </div>
       <div class="navbar-collapse order-2">
@@ -24,10 +24,11 @@
 export default {
   methods:{
     logout(){
-      this.$store.dispatch('logout');
-      if(this.$route.path !== '/'){
-        this.$router.push('/');
-      }
+      this.$store.dispatch('logout').then(()=>{
+        if(this.$route.path !== '/'){
+          this.$router.push('/');
+        }
+      });
     }
   }
 }

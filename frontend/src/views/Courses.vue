@@ -9,22 +9,20 @@
     export default {
         data() {
             return {
-            courses: [],
-            semesters: [],
-            selectedSemester: undefined
+                courses: [],
+                semesters: [],
+                selectedSemester: undefined
             };
         },
         created() {
-            this.fetchSemesters();
-            this.fetchCourses();
+            this.getSemesters();
         },
         methods: {
-            fetchSemesters(){
+            getSemesters(){
                 this.$store.dispatch("getSemesters").then(response=>{
                     this.semesters = response.semesters;
-                    this.selectedSemester = this.semesters[this.semesters.length - 1]; //this.$store.selectedSemester
-                }).then(()=>{
-                    this.fetchCourses();
+                    this.selectedSemester = this.semesters[this.semesters.length - 1].id; //this.$store.selectedSemester
+                    this.getCourses(this.selectedSemester);
                 }).catch(()=>{
                     this.$bvToast.toast(`Semester konnten nicht geladen werden`, {
                         title: 'Fehler',
@@ -33,8 +31,8 @@
                     });
                 })
             },
-            fetchCourses(){
-                this.$store.dispatch("getCourses").then(response=>{
+            getCourses(id){
+                this.$store.dispatch("getCourses", {id}).then(response=>{
                     this.courses = response.data;
                 }).catch(() =>{
                     this.$bvToast.toast(`Kurse konnten nicht geladen werden`, {

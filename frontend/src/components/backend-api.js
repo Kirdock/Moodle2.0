@@ -50,6 +50,9 @@ export default {
     createCourse(data){
         return axios.put('/course', data);
     },
+    updateCourse(data){
+        return axios.post('/course',data);
+    },
     deleteCourse(data){
         return axios.delete(`/course/${data.id}`);
     }

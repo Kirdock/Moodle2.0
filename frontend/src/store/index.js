@@ -77,6 +77,9 @@ export default new Vuex.Store({
     createCourse({commit}, courseData){
       return api.createCourse(courseData);
     },
+    updateCourse({commit}, courseData){
+      return api.updateCourse(courseData)
+    },
     getSemesters({commit}){
       return api.getSemesters();
     },

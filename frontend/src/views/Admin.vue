@@ -79,7 +79,7 @@
                                 </div>
                                 <div class="form-inline">
                                     <b-button variant="primary" type="submit">Anlegen</b-button>
-                                    <div class="offset-md-1 form-inline" v-if="loadingCreateCourse">
+                                    <div class="offset-md-1 form-inline" v-if="loadingCourse_create">
                                         <span class="fa fa-sync fa-spin"></span>
                                         <label class="control-label">Laden...</label>
                                     </div>
@@ -102,7 +102,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="selectedCourse" class="control-label">Kurs</label>
-                                    <select class="form-control" v-model="selectedCourse" id="selectedCourse" @change="getCourse(selectedSemester_edit, selectedCourse)">
+                                    <select class="form-control" v-model="selectedCourse.id" id="selectedCourse" @change="getCourse(selectedSemester_edit, selectedCourse.id)">
                                         <option v-for="course in courses" :value="course.id" :key="course.id">
                                             {{course.number}} {{course.name}}
                                         </option>
@@ -111,12 +111,12 @@
                             </div>
                             <div class="col-md-1" style="margin-top: 30px">
                                 <b-button variant="danger" v-b-modal="'modal-delete-course'">Löschen</b-button>
-                                <b-modal id="modal-delete-course" title="Löschbestätigung" :ok-title="'Ja'" :cancel-title="'Nein'" @ok="deleteCourse(selectedCourse)">
+                                <b-modal id="modal-delete-course" title="Löschbestätigung" :ok-title="'Ja'" :cancel-title="'Nein'" @ok="deleteCourse(selectedCourse.id)">
                                     Wollen Sie den Kurs wirklich löschen?
                                 </b-modal>
                             </div>
                         </div>
-                        <div class="row col-md-12" v-if="selectedCourse">
+                        <div class="row col-md-12" v-if="selectedCourse.id">
                             <div class="form-horizontal col-md-4" style="margin-left: 0px">
                                 <form @submit.prevent @submit="updateCourse()">
                                     <div class="form-group">
@@ -137,7 +137,7 @@
                                     </div>
                                     <div class="form-inline">
                                         <b-button variant="primary" type="submit">Aktualisieren</b-button>
-                                        <div class="offset-md-1 form-inline" v-if="loadingEditCourse">
+                                        <div class="offset-md-1 form-inline" v-if="loadingCourse_edit">
                                             <span class="fa fa-sync fa-spin"></span>
                                             <label class="control-label">Laden...</label>
                                         </div>
@@ -234,8 +234,8 @@ export default {
             loadingFileUpload: false,
             loadingCreateUser: false,
             loadingCreateSemester: false,
-            loadingCreateCourse: false,
-            loadingEditCourse: false,
+            loadingCourse_create: false,
+            loadingCourse_edit: false,
             semesterYear: new Date().getFullYear(),
             maxYear: new Date().getFullYear(),
             semesterType: undefined,
@@ -246,7 +246,7 @@ export default {
             courseName_create: undefined,
             minKreuzel_create: undefined,
             minPoints_create: undefined,
-            selectedCourse: undefined,
+            selectedCourse: {},
             courses: [],
             searchUserText: undefined,
             users: []
@@ -257,13 +257,13 @@ export default {
             let result = [];
             if(this.checkedUsersView){
                 if(this.searchUserText){
-                    result = this.users.filter(user => user.role[selectedCourse] &&
+                    result = this.users.filter(user => user.role[this.selectedCourse.id] &&
                                                             (user.martikelnummer.indexOf(this.searchUserText) > -1
                                                             || user.surname.indexOf(this.searchUserText) > -1
                                                             || user.forename.indexOf(this.searchUserText) > -1));
                 }
                 else{
-                    result = this.users.filter(user => user.role[selectedCourse]);
+                    result = this.users.filter(user => user.role[this.selectedCourse.id]);
                 }
             }
             else {
@@ -326,7 +326,7 @@ export default {
             });
         },
         createCourse(){
-            this.loadingCreateCourse = true;
+            this.loadingCourse_create = true;
             this.$store.dispatch("createCourse", 
             {
                 semesterId: this.selectedSemester_create,
@@ -335,7 +335,7 @@ export default {
                 minKreuzel: this.minKreuzel_create,
                 minPoints: this.minPoints_create
             }).then(response=>{
-                this.loadingCreateCourse = false;
+                this.loadingCourse_create = false;
                 this.$bvToast.toast(`Kurs wurde angelegt`, {
                     title: 'Erfolg',
                     variant: 'success',
@@ -344,7 +344,7 @@ export default {
                 this.courseNumber = this.courseName = this.minKreuzel = this.minPoints = undefined;
                 this.getCourses(this.selectedSemester_edit);
             }).catch(()=>{
-                this.loadingCreateCourse = false;
+                this.loadingCourse_create = false;
                 this.$bvToast.toast(`Kurs konnte nicht angelegt werden`, {
                     title: 'Fehler',
                     variant: 'danger',
@@ -353,16 +353,16 @@ export default {
             });
         },
         updateCourse(){
-            this.loadingEditCourse = true;
+            this.loadingCourse_edit = true;
             this.$store.dispatch("updateCourse", this.selectedCourse).then(response=>{
-                this.loadingEditCourse = false;
+                this.loadingCourse_edit = false;
                 this.$bvToast.toast(`Kurs wurde aktualisiert`, {
                     title: 'Erfolg',
                     variant: 'success',
                     appendToast: true
                 });
             }).catch(()=>{
-                this.loadingEditCourse = false;
+                this.loadingCourse_edit = false;
                 this.$bvToast.toast(`Kurs konnte nicht aktualisiert werden`, {
                     title: 'Fehler',
                     variant: 'danger',
@@ -432,7 +432,7 @@ export default {
         getCourses(id){
             this.$store.dispatch("getCourses",{id}).then(response =>{
                 this.courses = response.data;
-                this.selectedCourse = this.courses[0].id;
+                this.selectedCourse = this.courses[0];
             }).catch(()=>{
                 this.$bvToast.toast(`Kurse konnten nicht geladen werden`, {
                     title: 'Fehler',

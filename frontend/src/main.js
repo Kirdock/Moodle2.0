@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store'
-store.commit('initialiseStore');
 import router from './router';
 import 'bootstrap';
 import 'bootstrap-vue';
@@ -27,6 +26,8 @@ Vue.use(ModalPlugin);
 Vue.use(ButtonPlugin);
 
 Vue.component('i-input', IntegerInput); //Global registration
+
+store.commit('initialiseStore');
 
 new Vue({
   // components:{ //not global
