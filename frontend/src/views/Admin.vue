@@ -102,7 +102,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="selectedCourse" class="control-label">Kurs</label>
-                                    <select class="form-control" v-model="selectedCourse.id" id="selectedCourse" @change="getCourse(selectedSemester_edit, selectedCourse.id)">
+                                    <select class="form-control" v-model="selectedCourse.id" id="selectedCourse" @change="getCourse(selectedSemester_edit, selectedCourse.id); getUsers(selectedCourse.id)">
                                         <option v-for="course in courses" :value="course.id" :key="course.id">
                                             {{course.number}} {{course.name}}
                                         </option>
@@ -151,7 +151,7 @@
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="checkbox" id="showCheckedUsers" :value="checkedUsersView" @click="checkedUsersView = !checkedUsersView">
-                                    <label class="form-check-label" for="showCheckedUsers">Nur ausgewählte Benutzer anzeigen</label>
+                                    <label class="form-check-label" for="showCheckedUsers">Nur zugeteilte Benutzer anzeigen</label>
                                 </div>
                                 <table class="table">
                                     <thead>
@@ -282,7 +282,6 @@ export default {
     created(){
         this.semesterType = this.getSemesterType();
         this.getSemesters();
-        this.getUsers();
     },
     methods:{
         createUser(){
@@ -391,8 +390,8 @@ export default {
                 });
             })
         },
-        getUsers(){
-            this.$store.dispatch("getUsers").then(response=>{
+        getUsers(courseId){
+            this.$store.dispatch("getUsers",{courseId}).then(response=>{
                 this.users = response.data;
             }).catch(()=>{
                 this.$bvToast.toast(`Benutzer konnten nicht geladen werden`, {

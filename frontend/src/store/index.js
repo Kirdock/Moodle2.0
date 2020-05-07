@@ -89,8 +89,8 @@ export default new Vuex.Store({
     getCourse({commit}, data){
       return api.getCourse(data);
     },
-    getUsers({commit}){
-      return api.getUsers();
+    getUsers({commit}, data){
+      return api.getUsers(data);
     },
     deleteCourse({commit}, data){
       return api.deleteCourse(data);

@@ -23,13 +23,13 @@ export default {
         return axios.get('/semesters');
     },
     getCourse(data){
-        return axios.get(`/semesters/${data.semesterId}/course/${data.courseId}`); //all data
+        return axios.get(`/semester/${data.semesterId}/course/${data.courseId}`); //all data
     },
     getCourses(semesterData){
-        return axios.get(`/semesters/${semesterData.id}/courses`); //only id, name, number
+        return axios.get(`/semester/${semesterData.id}/courses`); //only id, name, number
     },
-    getUsers(){
-        return axios.get('/users'); //without admin
+    getUsers({courseId}){
+        return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
     },
     createUser(userData){
         return axios.put('/user',userData);
