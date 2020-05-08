@@ -15,6 +15,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '../components/backend-api';
 const tokenName = 'Token';
+const settingName = 'Settings';
 const storage = window.localStorage;
 Vue.use(Vuex);
 
@@ -34,6 +35,7 @@ export default new Vuex.Store({
       state.token = getToken();
       state.userInfo = decodeToken(state.token);
       state.loggedIn = !!state.token;
+      state.settings = getSettings();
     },
     loginSuccess(state, payload){
       state.token = payload.accessToken;
@@ -46,6 +48,10 @@ export default new Vuex.Store({
       state.userInfo = {};
       state.loggedIn = false;
       deleteToken();
+    },
+    updateSettings(state, settings){
+      Object.assign(state.settings, settings);
+      saveSettings(state.settings);
     }
   },
   actions: {
@@ -64,6 +70,9 @@ export default new Vuex.Store({
                 reject(error);
               });
       });
+    },
+    updateSettings({commit}, data){
+      return commit('updateSettings', data);
     },
     createUser({commit}, userData){
       return api.createUser(userData);
@@ -100,6 +109,7 @@ export default new Vuex.Store({
   },
   getters: {
     userInfo: state => state.userInfo,
+    locale: state => state.settings.locale,
     toastDelay: state => state.toastDelay,
     isLoggedIn: state => state.loggedIn,
     decodedToken: state => state.userInfo,
@@ -110,6 +120,15 @@ export default new Vuex.Store({
 
 function getToken(){
   return storage.getItem(tokenName);
+}
+
+function getSettings(){
+  let settings = storage.getItem(settingName);
+  return settings ? JSON.parse(settings) : {};
+}
+
+function saveSettings(settings){
+  storage.setItem(settingName, JSON.stringify(settings));
 }
 
 function setToken(token){

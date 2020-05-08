@@ -11,7 +11,9 @@
       </div>
       <div class="navbar-collapse order-2">
         <ul class="navbar-nav ml-auto">
-          <span v-if="$store.getters.isLoggedIn">Angemeldet als
+          <b-button variant="link" class="nav-link" @click="changeLocale('en')" v-if="locale !== 'en'">Englisch</b-button>
+          <b-button variant="link" class="nav-link" @click="changeLocale('de')" v-if="locale !== 'de'">German</b-button>
+          <span v-if="$store.getters.isLoggedIn" style="margin-top: 8px">Angemeldet als
             <router-link to="/Account" > {{$store.getters.userInfo.forename}} {{$store.getters.userInfo.surname}} </router-link>
           </span>
         </ul>
@@ -21,8 +23,25 @@
   </div>
 </template>
 <script>
+import i18n from '@/plugins/i18n';
 export default {
+  computed:{
+    locale(){
+      return i18n.locale;
+    }
+  },
   methods:{
+    changeLocale(locale){
+      this.$store.dispatch('updateSettings', {locale}).then(()=>{
+        i18n.locale = locale;
+      }).catch(()=>{
+        this.$bvToast.toast(this.$t('changeLanguageError'), {
+          title: this.$t('toastErrorTitle'),
+          appendToast: true,
+          variant: 'error'
+        })
+      });
+    },
     logout(){
       this.$store.dispatch('logout').then(()=>{
         if(this.$route.path !== '/'){

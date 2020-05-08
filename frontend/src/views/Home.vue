@@ -3,6 +3,7 @@
     <div class="form-horizontal col-md-6">
       <div class="form-group">
         <h1>Willkommen!</h1>
+        Sprache: {{ $t('test') }}
       </div>
     </div>
   </div>
@@ -17,13 +18,7 @@ export default {
     }
   },
   methods:{
-    testToast(){
-      this.$bvToast.toast(`This is toast number 1`, {
-          title: 'BootstrapVue Toast',
-          appendToast: true,
-          variant: 'success'
-        })
-    }
+    
   }
 }
 </script>
