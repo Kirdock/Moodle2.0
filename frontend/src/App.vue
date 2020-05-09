@@ -2,18 +2,18 @@
   <div id="app">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="navbar-collapse order-1">
-        <router-link class="navbar-brand" to="/">Home</router-link>
-        <router-link class="nav-link" to="/Courses" v-if="$store.getters.isLoggedIn">Kurse</router-link>
-        <router-link to="/Account" class="nav-link" v-if="$store.getters.isLoggedIn">Konto</router-link>
-        <router-link to="/Admin" class="nav-link" v-if="$store.getters.userInfo.isAdmin">Admin</router-link>
-        <b-button variant="link" class="nav-link" @click="logout" v-if="$store.getters.isLoggedIn">Abmelden</b-button>
-        <router-link to="/Login" class="nav-link" v-else >Anmelden</router-link>
+        <router-link class="navbar-brand" to="/">{{ $t('home') }}</router-link>
+        <router-link class="nav-link" to="/Courses" v-if="$store.getters.isLoggedIn">{{ $t('courses') }}</router-link>
+        <router-link to="/Account" class="nav-link" v-if="$store.getters.isLoggedIn">{{ $t('account') }}</router-link>
+        <router-link to="/Admin" class="nav-link" v-if="$store.getters.userInfo.isAdmin">{{ $t('admin') }}</router-link>
+        <b-button variant="link" class="nav-link" @click="logout" v-if="$store.getters.isLoggedIn">{{ $t('logout') }}</b-button>
+        <router-link to="/Login" class="nav-link" v-else >{{ $t('login') }}</router-link>
       </div>
       <div class="navbar-collapse order-2">
         <ul class="navbar-nav ml-auto">
-          <b-button variant="link" class="nav-link" @click="changeLocale('en')" v-if="locale !== 'en'">Englisch</b-button>
-          <b-button variant="link" class="nav-link" @click="changeLocale('de')" v-if="locale !== 'de'">German</b-button>
-          <span v-if="$store.getters.isLoggedIn" style="margin-top: 8px">Angemeldet als
+          <b-button variant="link" class="nav-link" @click="changeLocale('en')" v-if="locale !== 'en'">English</b-button>
+          <b-button variant="link" class="nav-link" @click="changeLocale('de')" v-if="locale !== 'de'">Deutsch</b-button>
+          <span v-if="$store.getters.isLoggedIn" style="margin-top: 8px">{{ $t('loggedInAs') }}
             <router-link to="/Account" > {{$store.getters.userInfo.forename}} {{$store.getters.userInfo.surname}} </router-link>
           </span>
         </ul>
@@ -36,7 +36,7 @@ export default {
         i18n.locale = locale;
       }).catch(()=>{
         this.$bvToast.toast(this.$t('changeLanguageError'), {
-          title: this.$t('toastErrorTitle'),
+          title: this.$t('error'),
           appendToast: true,
           variant: 'error'
         })

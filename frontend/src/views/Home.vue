@@ -2,8 +2,7 @@
   <div class="home">
     <div class="form-horizontal col-md-6">
       <div class="form-group">
-        <h1>Willkommen!</h1>
-        Sprache: {{ $t('test') }}
+        <h1>{{ $t('welcome') }}!</h1>
       </div>
     </div>
   </div>
