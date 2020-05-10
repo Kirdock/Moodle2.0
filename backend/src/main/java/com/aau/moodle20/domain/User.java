@@ -3,6 +3,7 @@ package com.aau.moodle20.domain;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Entity
 @Table(name ="user",
@@ -13,11 +14,9 @@ uniqueConstraints = {
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Size(max = 20)
-    @Column(name = "matrikelNummer")
+    @Column(name = "matrikelNummer", nullable = false)
+    @Basic(optional = false)
     private String matrikelNummer;
     @Column(name = "isAdmin")
     private Boolean isAdmin;
@@ -32,6 +31,8 @@ public class User {
     private String forename;
     private String surname;
 
+    @OneToMany(mappedBy = "user")
+    private Set<UserInCourse> courses;
 
     public User()
     {
@@ -52,14 +53,6 @@ public class User {
         this.surname = surename;
         this.password = password;
         this.isAdmin = isAdmin;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getMartikelNumber() {
@@ -108,5 +101,13 @@ public class User {
 
     public void setSurname(String surename) {
         this.surname = surename;
+    }
+
+    public Set<UserInCourse> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<UserInCourse> courses) {
+        this.courses = courses;
     }
 }

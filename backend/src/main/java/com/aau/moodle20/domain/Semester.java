@@ -1,11 +1,15 @@
 package com.aau.moodle20.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
 @Table(name ="semester")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Semester {
 
     @Id
@@ -21,6 +25,7 @@ public class Semester {
             cascade = CascadeType.PERSIST,
             fetch = FetchType.LAZY
     )
+    @JsonIgnore
     private Set<Course> courses;
 
     public Semester(Long id)

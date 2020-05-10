@@ -1,18 +1,12 @@
 package com.aau.moodle20.controller;
 
-import com.aau.moodle20.domain.Semester;
 import com.aau.moodle20.domain.User;
-import com.aau.moodle20.exception.SemesterException;
-import com.aau.moodle20.payload.request.CreateCourseRequest;
-import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.response.JwtResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
-import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
-import com.aau.moodle20.security.services.SemesterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

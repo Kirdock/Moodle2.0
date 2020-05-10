@@ -1,6 +1,12 @@
 package com.aau.moodle20.domain;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table(name ="course")
@@ -17,6 +23,9 @@ public class Course {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
+
+    @OneToMany(mappedBy = "course")
+    Set<UserInCourse> students;
 
     public Long getId() {
         return id;
@@ -64,5 +73,13 @@ public class Course {
 
     public void setSemester(Semester semester) {
         this.semester = semester;
+    }
+
+    public Set<UserInCourse> getStudents() {
+        return students;
+    }
+
+    public void setStudents(Set<UserInCourse> students) {
+        this.students = students;
     }
 }
