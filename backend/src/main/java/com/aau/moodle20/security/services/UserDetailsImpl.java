@@ -15,8 +15,6 @@ public class UserDetailsImpl implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-
     private String username;
 
     private Boolean isAdmin;
@@ -29,8 +27,7 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username, String password, Boolean isAdmin, String matrikelNumber, String forename, String surename) {
-        this.id = id;
+    public UserDetailsImpl( String username, String password, Boolean isAdmin, String matrikelNumber, String forename, String surename) {
         this.username = username;
         this.password = password;
         this.isAdmin = isAdmin;
@@ -48,7 +45,6 @@ public class UserDetailsImpl implements UserDetails {
         }
 
         UserDetailsImpl userDetails = new UserDetailsImpl(
-                user.getId(),
                 user.getUsername(),
                 user.getPassword(),
                 user.getAdmin(),
@@ -64,10 +60,6 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
-    }
-
-    public Long getId() {
-        return id;
     }
 
 
@@ -145,6 +137,6 @@ public class UserDetailsImpl implements UserDetails {
             return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
         return
-                Objects.equals(id, user.id);
+                Objects.equals(matrikelNumber, user.matrikelNumber);
     }
 }
