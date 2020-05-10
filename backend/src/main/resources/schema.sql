@@ -1,7 +1,6 @@
 
 CREATE  TABLE IF NOT EXISTS USER (
-  id INT AUTO_INCREMENT  PRIMARY KEY,
-  matrikel_Nummer VARCHAR(20),
+  matrikel_Nummer VARCHAR(20) PRIMARY KEY ,
   password VARCHAR(120) NOT NULL,
   username VARCHAR(50) NOT NULL,
   forename VARCHAR(50) ,
@@ -23,5 +22,15 @@ CREATE TABLE IF NOT EXISTS COURSE (
   min_Kreuzel Number (10),
   min_Points Number (10),
   CONSTRAINT  FOREIGN_KEY_SEMESTER FOREIGN KEY (semester_id) references SEMESTER
+);
+
+
+CREATE  TABLE IF NOT EXISTS USER_IN_COURSE (
+ course_id INT,
+ matrikel_Nummer VARCHAR(20),
+ role VARCHAR (20),
+ PRIMARY KEY (course_id,matrikel_Nummer),
+ CONSTRAINT  FOREIGN_KEY_USER FOREIGN KEY (matrikel_Nummer) references USER,
+ CONSTRAINT  FOREIGN_KEY_COURSE FOREIGN KEY (course_id) references COURSE
 );
 
