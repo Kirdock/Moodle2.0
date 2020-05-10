@@ -11,8 +11,8 @@
                                 <input id="username" type="text" class="form-control" v-model="username" required>
                             </div>
                             <div class="form-group">
-                                <label for="martikelnummer" class="control-label required">{{ $t('martikelnummer') }}</label>
-                                <input id="martikelnummer" type="text" class="form-control"  pattern="[0-9]{8}" v-model="martikelnummer" :title="$t('eightDigitNumber')" required>
+                                <label for="matrikelnummer" class="control-label required">{{ $t('matrikelnummer') }}</label>
+                                <input id="matrikelnummer" type="text" class="form-control"  pattern="[0-9]{8}" v-model="matrikelnummer" :title="$t('eightDigitNumber')" required>
                             </div>
                             <div class="form-group">
                                 <label for="surname" class="control-label required">{{ $t('surname') }}</label>
@@ -156,18 +156,18 @@
                                 <table class="table">
                                     <thead>
                                         <th scope="col"></th>
-                                        <th scope="col">{{$t('martikelnummer')}}</th>
+                                        <th scope="col">{{$t('matrikelnummer')}}</th>
                                         <th scope="col">{{$t('surname')}}</th>
                                         <th scope="col">{{$t('forename')}}</th>
                                         <th scope="col">{{$t('role')}}</th>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="user in filteredUsers" :key="user.martikelnummer">
+                                        <tr v-for="user in filteredUsers" :key="user.matrikelnummer">
                                             <td>
                                                 <!-- <input type="checkbox" class="form-check-input" id="showCheckedUsers" :value="!!user.role[selectedCourse]" @click="user.role[selectedCourse] = undefined"> -->
                                             </td>
                                             <td>
-                                                {{user.martikelnummer}}
+                                                {{user.matrikelnummer}}
                                             </td>
                                             <td>
                                                 {{user.surname}}
@@ -227,7 +227,7 @@ export default {
         return {
             username: undefined,
             password: undefined,
-            martikelnummer: undefined,
+            matrikelnummer: undefined,
             forename: undefined,
             surname: undefined,
             checkedUsersView: false,
@@ -258,7 +258,7 @@ export default {
             if(this.checkedUsersView){
                 if(this.searchUserText){
                     result = this.users.filter(user => user.role[this.selectedCourse.id] &&
-                                                            (user.martikelnummer.indexOf(this.searchUserText) > -1
+                                                            (user.matrikelnummer.indexOf(this.searchUserText) > -1
                                                             || user.surname.indexOf(this.searchUserText) > -1
                                                             || user.forename.indexOf(this.searchUserText) > -1));
                 }
@@ -268,7 +268,7 @@ export default {
             }
             else {
                 if(this.searchUserText){
-                    result = this.users.filter(user => user.martikelnummer.indexOf(this.searchUserText) > -1
+                    result = this.users.filter(user => user.matrikelnummer.indexOf(this.searchUserText) > -1
                                                     || user.surname.indexOf(this.searchUserText) > -1
                                                     || user.forename.indexOf(this.searchUserText) > -1);
                 }
@@ -286,27 +286,26 @@ export default {
     methods:{
         createUser(){
             this.loadingCreateUser = true;
-            this.$store.dispatch("createUser", {username: this.username, password: this.password, martikelnummer: this.martikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
-                this.loadingCreateUser = false;
+            this.$store.dispatch("createUser", {username: this.username, password: this.password, martrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
                 this.$bvToast.toast(this.$t('userCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-                this.username = this.password = this.martikelnummer = this.forename = this.surname = undefined;
+                this.username = this.password = this.matrikelnummer = this.forename = this.surname = undefined;
             }).catch(()=>{
-                this.loadingCreateUser = false;
                 this.$bvToast.toast(this.$t('userCreatedError'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
+            }).finally(()=>{
+                this.loadingCreateUser = false;
             });
         },
         createSemester(){
             this.loadingCreateSemester = true;
             this.$store.dispatch("createSemester", {year: this.semesterYear, type: this.semesterType}).then(response=>{
-                this.loadingCreateSemester = false;
                 this.$bvToast.toast(this.$t('semesterCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
@@ -316,12 +315,13 @@ export default {
                 this.semesterType = this.getSemesterType();
                 this.getSemesters();
             }).catch(()=>{
-                this.loadingCreateSemester = false;
                 this.$bvToast.toast(this.$t('semesterCreatedError'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
+            }).finally(()=>{
+                this.loadingCreateSemester = false;
             });
         },
         createCourse(){
@@ -334,7 +334,6 @@ export default {
                 minKreuzel: this.minKreuzel_create,
                 minPoints: this.minPoints_create
             }).then(response=>{
-                this.loadingCourse_create = false;
                 this.$bvToast.toast(this.$t('courseCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
@@ -343,30 +342,31 @@ export default {
                 this.courseNumber = this.courseName = this.minKreuzel = this.minPoints = undefined;
                 this.getCourses(this.selectedSemester_edit);
             }).catch(()=>{
-                this.loadingCourse_create = false;
                 this.$bvToast.toast(this.$t('courseCreatedError'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
+            }).finally(()=>{
+                this.loadingCourse_create = false;
             });
         },
         updateCourse(){
             this.loadingCourse_edit = true;
             this.$store.dispatch("updateCourse", this.selectedCourse).then(response=>{
-                this.loadingCourse_edit = false;
                 this.$bvToast.toast(this.$t('courseUpdated'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
             }).catch(()=>{
-                this.loadingCourse_edit = false;
                 this.$bvToast.toast(this.$t('courseUpdatedError'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
+            }).finally(()=>{
+                this.loadingCourse_edit = false;
             });
         },
         submitFile(){
@@ -375,20 +375,20 @@ export default {
             formData.append('file',this.$refs.file.files[0]);
             this.$refs.file.value = '';
             this.$store.dispatch("createUsers", formData).then(response =>{
-                this.loadingFileUpload = false;
                 this.$bvToast.toast(this.$t('userCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
             }).catch(()=>{
-                this.loadingFileUpload = false;
                 this.$bvToast.toast(this.$t('userCreatedError'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            })
+            }).finally(()=>{
+                this.loadingFileUpload = false;
+            });
         },
         getUsers(courseId){
             this.$store.dispatch("getUsers",{courseId}).then(response=>{
@@ -418,6 +418,7 @@ export default {
             });
         },
         getCourse(semesterId, courseId){
+            this.getUsers(courseId);
             this.$store.dispatch("getCourse",{semesterId, courseId}).then(response =>{
                 this.selectedCourse = response.data;
             }).catch(()=>{
