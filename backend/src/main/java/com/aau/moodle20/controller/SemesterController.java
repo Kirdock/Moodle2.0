@@ -6,6 +6,7 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
+import com.aau.moodle20.payload.response.GetCoursesResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.security.services.SemesterService;
@@ -43,7 +44,7 @@ public class SemesterController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(value = "/semester/{semesterId}/courses")
-    public ResponseEntity<List<Course>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
+    public ResponseEntity<List<GetCoursesResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
         return ResponseEntity.ok(semesterService.getCoursesFromSemester(semesterId));
     }
 
@@ -52,6 +53,15 @@ public class SemesterController {
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/course")
     public ResponseEntity<?> createCourse(@Valid  @RequestBody CreateCourseRequest createCourseRequest)  throws SemesterException {
+
+        semesterService.createCourse(createCourseRequest);
+        return ResponseEntity.ok(new MessageResponse("Course was sucessfully created!"));
+    }
+
+    //Course Section
+    @PreAuthorize("hasAuthority('Admin')")
+    @PostMapping(value = "/course")
+    public ResponseEntity<?> updateCourse(@Valid  @RequestBody CreateCourseRequest createCourseRequest)  throws SemesterException {
 
         semesterService.createCourse(createCourseRequest);
         return ResponseEntity.ok(new MessageResponse("Course was sucessfully created!"));

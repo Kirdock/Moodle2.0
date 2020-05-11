@@ -8,12 +8,14 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
+import com.aau.moodle20.payload.response.GetCoursesResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,12 +80,24 @@ public class SemesterService {
         return semesterRepository.findAll();
     }
 
-    public List<Course> getCoursesFromSemester(Long semesterId)
+    public List<GetCoursesResponseObject> getCoursesFromSemester(Long semesterId)
     {
         //TODO add validation
-
+        List<GetCoursesResponseObject> responseObjects = new ArrayList<>();
         List<Course> courses =  courseRepository.findCoursesBySemester(new Semester(semesterId));
 
-        return courses;
+        if(courses!=null && !courses.isEmpty())
+        {
+            for(Course course : courses)
+            {
+                GetCoursesResponseObject responseObject = new GetCoursesResponseObject();
+                responseObject.setId(course.getId());
+                responseObject.setName(course.getName());
+                responseObject.setNumber(course.getNumber());
+                responseObjects.add(responseObject); 
+            }
+        }
+
+        return responseObjects;
     }
 }
