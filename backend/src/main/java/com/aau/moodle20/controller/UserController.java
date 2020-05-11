@@ -1,12 +1,14 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.domain.User;
+import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.response.JwtResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
+import com.aau.moodle20.security.services.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,9 @@ public class UserController {
 
     @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
 
 
@@ -90,45 +95,9 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
-    public ResponseEntity<?> registerUsers(@Valid  @RequestParam("file") MultipartFile file) {
-        List<User> users = new ArrayList<>();
+    public ResponseEntity<?> registerUsers(@Valid  @RequestParam("file") MultipartFile file) throws UserException {
 
-        BufferedReader br;
-        List<String> result = new ArrayList<>();
-        try {
-            String line;
-            InputStream is = file.getInputStream();
-            br = new BufferedReader(new InputStreamReader(is));
-            while ((line = br.readLine()) != null) {
-                result.add(line);
-            }
-
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-
-        result.remove(0); // remove first line
-
-        String password = encoder.encode("password");//TODO should not be hardcoded
-
-        for (int i=0; i<result.size(); i++)
-        {
-            String [] columns = result.get(i).split(";");
-            User user = new User();
-            user.setUsername(columns[0]);
-            user.setMartikelNumber(columns[1]);
-            user.setSurname(columns[2]);
-            user.setForename(columns[3]);
-            user.setAdmin(Boolean.FALSE);
-            user.setPassword(password);
-            users.add(user);
-        }
-
-
-
-        users.removeIf(user -> userRepository.findByUsername(user.getUsername()).isPresent());
-        userRepository.saveAll(users);
-
+        userDetailsService.registerUsers(file);
         return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
     }
 
