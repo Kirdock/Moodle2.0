@@ -6,6 +6,7 @@ import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.response.JwtResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
+import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import com.aau.moodle20.security.services.UserDetailsServiceImpl;
@@ -110,4 +111,9 @@ public class UserController {
 
         return allUsers;
      }
+
+    @GetMapping(path = "/users/course/{courseId}")
+    public List<UserResponseObject> getUsersFromCourse(@PathVariable("courseId") long courseId) {
+        return userDetailsService.getUsersFromCourse(courseId);
+    }
 }

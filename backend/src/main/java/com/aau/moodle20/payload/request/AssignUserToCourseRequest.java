@@ -6,7 +6,7 @@ public class AssignUserToCourseRequest {
 
     private Long courseId;
     private String matrikelNummer;
-    private ECourseRole courseRole;
+    private ECourseRole role;
 
     public Long getCourseId() {
         return courseId;
@@ -24,11 +24,11 @@ public class AssignUserToCourseRequest {
         this.matrikelNummer = matrikelNummer;
     }
 
-    public ECourseRole getCourseRole() {
-        return courseRole;
+    public ECourseRole getRole() {
+        return role;
     }
 
-    public void setCourseRole(ECourseRole courseRole) {
-        this.courseRole = courseRole;
+    public void setRole(ECourseRole role) {
+        this.role = role;
     }
 }

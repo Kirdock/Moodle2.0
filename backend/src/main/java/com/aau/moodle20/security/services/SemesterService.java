@@ -1,9 +1,6 @@
 package com.aau.moodle20.security.services;
 
-import com.aau.moodle20.domain.Course;
-import com.aau.moodle20.domain.Semester;
-import com.aau.moodle20.domain.UserCourseKey;
-import com.aau.moodle20.domain.UserInCourse;
+import com.aau.moodle20.domain.*;
 import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
@@ -66,11 +63,18 @@ public class SemesterService {
 
         UserCourseKey userCourseKey = new UserCourseKey();
         UserInCourse userInCourse = new UserInCourse();
+        User user = new User();
+        Course course = new Course();
 
         userCourseKey.setCourseId(assignUserToCourseRequest.getCourseId());
         userCourseKey.setMatrikelNummer(assignUserToCourseRequest.getMatrikelNummer());
+
+        user.setMartikelNumber(assignUserToCourseRequest.getMatrikelNummer());
+        course.setId(assignUserToCourseRequest.getCourseId());
+        userInCourse.setRole(assignUserToCourseRequest.getRole());
+        userInCourse.setUser(user);
+        userInCourse.setCourse(course);
         userInCourse.setId(userCourseKey);
-        userInCourse.setRole(assignUserToCourseRequest.getCourseRole());
 
         userInCourseRepository.save(userInCourse);
     }

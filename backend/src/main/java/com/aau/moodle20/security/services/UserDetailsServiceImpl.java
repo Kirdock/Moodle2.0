@@ -1,7 +1,10 @@
 package com.aau.moodle20.security.services;
 
+import com.aau.moodle20.domain.ECourseRole;
 import com.aau.moodle20.domain.User;
+import com.aau.moodle20.domain.UserInCourse;
 import com.aau.moodle20.exception.UserException;
+import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -73,6 +77,34 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.saveAll(users);
     }
 
+
+    public List<UserResponseObject> getUsersFromCourse(Long courseId ) throws UserException
+    {
+        //TODO add validation
+        List<UserResponseObject> userResponseObjectList = new ArrayList<>();
+        List<User> allUsers = userRepository.findByCourses_Course_Id(courseId);
+        if(allUsers != null)
+        {
+            for(User user: allUsers)
+            {
+                UserResponseObject responseObject = new UserResponseObject();
+                responseObject.setAdmin(user.getAdmin());
+                responseObject.setForename(user.getForename());
+                responseObject.setSurname(user.getSurname());
+                responseObject.setMatrikelNummer(user.getMartikelNumber());
+                responseObject.setUsername(user.getUsername());
+
+                Optional<ECourseRole> role = user.getCourses().stream()
+                        .filter(userInCourse -> courseId.equals(userInCourse.getCourse().getId()))
+                        .map(UserInCourse::getRole)
+                        .findFirst();
+                if(role.isPresent())
+                 responseObject.setRole(role.get());
+                userResponseObjectList.add(responseObject);
+            }
+        }
+        return userResponseObjectList;
+    }
 
     protected List<String> readLinesFromFile(MultipartFile file) throws UserException
     {

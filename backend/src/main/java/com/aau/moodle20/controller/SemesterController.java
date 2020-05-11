@@ -74,9 +74,9 @@ public class SemesterController {
     }
 
 
-    @PreAuthorize("hasAuthority('Admin')")
+
     @PutMapping(value = "/course/assign")
-    public ResponseEntity<?> assignCourseToSemester(@Valid  @RequestBody AssignUserToCourseRequest assignUserToCourseRequest)  throws SemesterException {
+    public ResponseEntity<?> assignCourseToSemester(  @RequestBody AssignUserToCourseRequest assignUserToCourseRequest)  throws SemesterException {
 
         semesterService.assignCourse(assignUserToCourseRequest);
         return ResponseEntity.ok(new MessageResponse("Course was sucessfully assigned to user!"));
