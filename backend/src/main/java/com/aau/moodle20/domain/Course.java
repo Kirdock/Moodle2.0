@@ -25,7 +25,7 @@ public class Course {
     private Integer minPoints;
 
     @OneToMany(mappedBy = "course")
-    Set<UserInCourse> students;
+    Set<UserInCourse> students; // TODO find better name
 
     public Long getId() {
         return id;

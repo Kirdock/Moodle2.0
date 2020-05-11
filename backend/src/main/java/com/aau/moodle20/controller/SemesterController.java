@@ -43,7 +43,7 @@ public class SemesterController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(value = "/semester/{semesterId}/courses")
-    public ResponseEntity<Course> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
+    public ResponseEntity<List<Course>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
         return ResponseEntity.ok(semesterService.getCoursesFromSemester(semesterId));
     }
 

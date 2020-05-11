@@ -18,7 +18,7 @@ public class UserCourseKey implements Serializable {
     {
     }
 
-    public UserCourseKey(String martrikelNummer, Long courseId)
+    public UserCourseKey(String martrikelnummer, Long courseId)
     {
         this.courseId= courseId;
         this.matrikelNummer = matrikelNummer;

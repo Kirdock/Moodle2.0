@@ -78,15 +78,12 @@ public class SemesterService {
         return semesterRepository.findAll();
     }
 
-    public Course getCoursesFromSemester(Long semesterId)
+    public List<Course> getCoursesFromSemester(Long semesterId)
     {
         //TODO add validation
 
-        Optional<Course> course =  courseRepository.findCourseBySemester(new Semester(semesterId));
-        if(!course.isPresent())
-        {
-            throw new SemesterException("Error: Course with this id and semester id not found!" );
-        }
-        return course.get();
+        List<Course> courses =  courseRepository.findCoursesBySemester(new Semester(semesterId));
+
+        return courses;
     }
 }

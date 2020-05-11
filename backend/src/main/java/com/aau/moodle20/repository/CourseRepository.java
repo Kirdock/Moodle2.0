@@ -7,11 +7,12 @@ import com.aau.moodle20.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.persistence.Column;
+import java.util.List;
 import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course,Long> {
 
-    Optional<Course> findCourseBySemester( Semester semester);
+    List<Course> findCoursesBySemester(Semester semester);
 }
 
 
