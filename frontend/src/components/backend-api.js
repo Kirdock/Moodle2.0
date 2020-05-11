@@ -53,6 +53,9 @@ export default {
     updateCourse(data){
         return axios.post('/course',data);
     },
+    updateCourseUsers(data){
+        return axios.post('/course/assign', data);
+    },
     deleteCourse(data){
         return axios.delete(`/course/${data.id}`);
     }

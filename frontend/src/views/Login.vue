@@ -34,7 +34,7 @@ export default {
   },
   methods:{
     login(){
-      this.$store.dispatch("login", { user: this.user, password: this.password})
+      this.$store.dispatch('login', { user: this.user, password: this.password})
         .then(() => {
           this.$router.push('Courses');
         })
