@@ -8,7 +8,7 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
-import com.aau.moodle20.payload.response.GetCoursesResponseObject;
+import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
@@ -80,24 +80,42 @@ public class SemesterService {
         return semesterRepository.findAll();
     }
 
-    public List<GetCoursesResponseObject> getCoursesFromSemester(Long semesterId)
+    public List<CourseResponseObject> getCoursesFromSemester(Long semesterId)
     {
         //TODO add validation
-        List<GetCoursesResponseObject> responseObjects = new ArrayList<>();
+        List<CourseResponseObject> responseObjects = new ArrayList<>();
         List<Course> courses =  courseRepository.findCoursesBySemester(new Semester(semesterId));
 
         if(courses!=null && !courses.isEmpty())
         {
             for(Course course : courses)
             {
-                GetCoursesResponseObject responseObject = new GetCoursesResponseObject();
+                CourseResponseObject responseObject = new CourseResponseObject();
                 responseObject.setId(course.getId());
                 responseObject.setName(course.getName());
                 responseObject.setNumber(course.getNumber());
-                responseObjects.add(responseObject); 
+                responseObjects.add(responseObject);
             }
         }
 
         return responseObjects;
+    }
+
+    public CourseResponseObject getCourse (long courseId) throws SemesterException
+    {
+       Optional<Course>  optionalCourse = courseRepository.findById(courseId);
+       if(!optionalCourse.isPresent())
+       {
+           throw new SemesterException("Error:Course not found!");
+       }
+       Course course = optionalCourse.get();
+       CourseResponseObject responseObject = new CourseResponseObject();
+       responseObject.setId(course.getId());
+       responseObject.setName(course.getName());
+       responseObject.setNumber(course.getNumber());
+       responseObject.setMinKreuzel(course.getMinKreuzel());
+       responseObject.setMinPoints(course.getMinPoints());
+
+       return responseObject;
     }
 }

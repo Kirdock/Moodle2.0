@@ -1,13 +1,14 @@
 package com.aau.moodle20.payload.response;
 
-public class GetCoursesResponseObject {
+public class CourseResponseObject {
 
     private Long id;
     private String name;
     private String number;
+    private Integer minKreuzel;
+    private Integer minPoints;
 
-
-    public GetCoursesResponseObject()
+    public CourseResponseObject()
     {
     }
 
@@ -33,5 +34,22 @@ public class GetCoursesResponseObject {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+
+    public Integer getMinKreuzel() {
+        return minKreuzel;
+    }
+
+    public void setMinKreuzel(Integer minKreuzel) {
+        this.minKreuzel = minKreuzel;
+    }
+
+    public Integer getMinPoints() {
+        return minPoints;
+    }
+
+    public void setMinPoints(Integer minPoints) {
+        this.minPoints = minPoints;
     }
 }
