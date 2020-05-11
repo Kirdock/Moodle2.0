@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="form-group col-md-6" style="padding-left:0px">
                                     <label for="minPoints_create" class="control-label">{{$t('minRequirePoints')}}</label>
-                                    <i-input id="minPoints_create" class="form-control" min="0" v-model="minPoints_create"> </i-input>
+                                    <i-input id="minPoints_create" class="form-control" min="0" max="100" v-model="minPoints_create"> </i-input>
                                 </div>
                                 <div class="form-inline">
                                     <b-button variant="primary" type="submit">{{ $t('create') }}</b-button>
@@ -124,12 +124,12 @@
                                         <input id="courseName_edit" type="text" class="form-control" v-model="selectedCourse.name" required>
                                     </div>
                                     <div class="form-group col-md-6" style="padding-left:0px">
-                                        <label for="minKreuzel_edit" class="control-label">Mindestanforderung Kreuzel (in %)</label>
+                                        <label for="minKreuzel_edit" class="control-label">{{$t('minRequireKreuzel')}}</label>
                                         <i-input id="minKreuzel_edit" class="form-control" min="0" max="100" v-model="selectedCourse.minKreuzel"> </i-input>
                                     </div>
                                     <div class="form-group col-md-6" style="padding-left:0px">
-                                        <label for="minPoints_edit" class="control-label">Mindestanforderung Punkte</label>
-                                        <i-input id="minPoints_edit" class="form-control" min="0" v-model="selectedCourse.minPoints"> </i-input>
+                                        <label for="minPoints_edit" class="control-label">{{$t('minRequirePoints')}}</label>
+                                        <i-input id="minPoints_edit" class="form-control" min="0" max="100" v-model="selectedCourse.minPoints"> </i-input>
                                     </div>
                                     <div class="form-inline">
                                         <b-button variant="primary" type="submit">{{ $t('update') }}</b-button>
@@ -142,11 +142,15 @@
                             </div>
                             <div class="form-horizontal col-md-7 offset-md-1">
                                 <div class="form-group">
-                                    <label for="searchUserText" class="control-label">{{ $t('search') }}</label>
+                                    <label for="searchUserText" class="control-label">{{ $t('search') }}
+                                        <span class="fas fa-search"></span>
+                                    </label>
                                     <input id="searchUserText" type="text" class="form-control" v-model="searchUserText">
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label" for="showRoles">{{$t('show')}}</label>
+                                    <label class="control-label" for="showRoles">{{$t('show')}}
+                                        <span class="fas fa-filter"></span>
+                                    </label>
                                     <select class="form-control" id="showRoles" v-model="showRoles">
                                         <option v-for="role in rolesWithAll" :value="role.key" :key="role.key">
                                             {{role.value}}
@@ -160,11 +164,12 @@
                                         <th scope="col">{{$t('surname')}}</th>
                                         <th scope="col">{{$t('forename')}}</th>
                                         <th scope="col">{{$t('role')}}</th>
+                                        <th scope="col">{{$t('change')}}</th>
                                     </thead>
                                     <tbody>
                                         <tr v-for="user in filteredUsers" :key="user.matrikelnummer">
                                             <td>
-                                                <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="!!user.role" @click="user.role = user.role ? undefined : 's'">
+                                                <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="user.role !== 'n'" @click="user.role = user.role === 'n' ? 's' : 'n'">
                                             </td>
                                             <td>
                                                 {{user.matrikelnummer}}
@@ -181,6 +186,9 @@
                                                         {{role.value}}
                                                     </option>
                                                 </select>
+                                            </td>
+                                            <td>
+                                                {{user.role !== user.oldRole ? $t('yes') : $t('no')}}
                                             </td>
                                         </tr>
                                     </tbody>
@@ -252,7 +260,7 @@ export default {
             selectedCourseId: undefined,
             courses: [],
             searchUserText: undefined,
-            showRoles: 'a',
+            showRoles: 'z',
             users: []
         }
     },
@@ -271,9 +279,7 @@ export default {
                     key: 's',
                     value: this.$t('student'),
                 },
-            ].sort((a,b) =>{
-                return a.value.localeCompare(b.value);
-            })
+            ];
         },
         rolesWithAll(){
             return [
@@ -289,17 +295,18 @@ export default {
         },
         filteredUsers(){
             let result = this.users;
-            
-            if(this.searchUserText){
-                result = result.filter(user => user.matrikelnummer.indexOf(this.searchUserText) !== -1
-                                            || user.surname.indexOf(this.searchUserText) !== -1
-                                            || user.forename.indexOf(this.searchUserText) !== -1);
-            }
+
             if(this.showRoles === 'z'){
                 result = result.filter(user => user.role);
             }
             else if(this.showRoles !== 'a'){
                 result = result.filter(user => this.showRoles === user.role)
+            }
+            
+            if(this.searchUserText){
+                result = result.filter(user => user.matrikelnummer.indexOf(this.searchUserText) !== -1
+                                            || user.surname.indexOf(this.searchUserText) !== -1
+                                            || user.forename.indexOf(this.searchUserText) !== -1);
             }
 
             return result;

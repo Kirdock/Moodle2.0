@@ -99,7 +99,15 @@ export default new Vuex.Store({
       return api.getCourse(data);
     },
     getUsers({commit}, data){
-      return api.getUsers(data);
+      return new Promise((resolve, reject) =>{
+        api.getUsers(data).then(response =>{
+          response.data.forEach(user =>{
+            user.oldRole = user.role;
+          });
+          resolve({data: response.data});
+        }).catch(reject);
+        
+      })
     },
     deleteCourse({commit}, data){
       return api.deleteCourse(data);
