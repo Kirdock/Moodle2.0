@@ -1,4 +1,4 @@
-package com.aau.moodle20.security.services;
+package com.aau.moodle20.services;
 
 import com.aau.moodle20.domain.*;
 import com.aau.moodle20.exception.SemesterException;

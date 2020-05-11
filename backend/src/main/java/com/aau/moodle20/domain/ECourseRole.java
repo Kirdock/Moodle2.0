@@ -1,8 +1,25 @@
 package com.aau.moodle20.domain;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import org.hibernate.cfg.Environment;
+
 public enum ECourseRole {
 
-    l,
-    s,
-    t
+    Lecturer("l"),
+    Student("s"),
+    Teacher("t"),
+    None("n");
+
+    private String role;
+
+    ECourseRole(String role)
+    {
+        this.role = role;
+    }
+
+    @JsonValue
+    public String getRole()
+    {
+        return this.role;
+    }
 }

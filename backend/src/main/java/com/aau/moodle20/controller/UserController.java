@@ -9,7 +9,7 @@ import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
-import com.aau.moodle20.security.services.UserDetailsServiceImpl;
+import com.aau.moodle20.services.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +20,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController()
@@ -105,15 +99,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(path = "/users")
     public List<User> getUsers() {
-
-        List<User> allUsers = userRepository.findAll();
-        allUsers.removeIf(User::getAdmin);
-
-        return allUsers;
+        return userDetailsService.getAllUsers();
      }
 
     @GetMapping(path = "/users/course/{courseId}")
-    public List<UserResponseObject> getUsersFromCourse(@PathVariable("courseId") long courseId) {
-        return userDetailsService.getUsersFromCourse(courseId);
+    public List<UserResponseObject> getUsersWithCourseRoles(@PathVariable("courseId") long courseId) {
+        return userDetailsService.getUsersWithCourseRoles(courseId);
     }
 }

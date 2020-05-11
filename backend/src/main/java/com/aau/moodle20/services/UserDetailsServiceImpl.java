@@ -1,10 +1,11 @@
-package com.aau.moodle20.security.services;
+package com.aau.moodle20.services;
 
 import com.aau.moodle20.domain.ECourseRole;
 import com.aau.moodle20.domain.User;
 import com.aau.moodle20.domain.UserInCourse;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.response.UserResponseObject;
+import com.aau.moodle20.repository.UserInCourseRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     UserRepository userRepository;
 
     @Autowired
+    UserInCourseRepository userInCourseRepository;
+
+    @Autowired
     AuthenticationManager authenticationManager;
 
     @Autowired
@@ -50,8 +54,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
 
-    public void registerUsers(MultipartFile file ) throws UserException
-    {
+    public void registerUsers(MultipartFile file) throws UserException {
         //TODO add validation
         List<User> users = new ArrayList<>();
         List<String> lines = readLinesFromFile(file);
@@ -59,9 +62,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         String password = encoder.encode("password");//TODO should not be hardcoded
 
 
-        for (String line : lines)
-        {
-            String [] columns = line.split(";");
+        for (String line : lines) {
+            String[] columns = line.split(";");
             User user = new User();
             user.setUsername(columns[0]);
             user.setMartikelNumber(columns[1]);
@@ -78,36 +80,35 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
 
-    public List<UserResponseObject> getUsersFromCourse(Long courseId ) throws UserException
-    {
+    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws UserException {
         //TODO add validation
         List<UserResponseObject> userResponseObjectList = new ArrayList<>();
-        List<User> allUsers = userRepository.findByCourses_Course_Id(courseId);
-        if(allUsers != null)
-        {
-            for(User user: allUsers)
-            {
-                UserResponseObject responseObject = new UserResponseObject();
-                responseObject.setAdmin(user.getAdmin());
-                responseObject.setForename(user.getForename());
-                responseObject.setSurname(user.getSurname());
-                responseObject.setMatrikelNummer(user.getMartikelNumber());
-                responseObject.setUsername(user.getUsername());
+        List<UserInCourse> userInCourses = userInCourseRepository.findByCourse_Id(courseId);
+        List<User> allUser = getAllUsers();
 
-                Optional<ECourseRole> role = user.getCourses().stream()
-                        .filter(userInCourse -> courseId.equals(userInCourse.getCourse().getId()))
-                        .map(UserInCourse::getRole)
-                        .findFirst();
-                if(role.isPresent())
-                 responseObject.setRole(role.get());
-                userResponseObjectList.add(responseObject);
-            }
+        for (User user : allUser) {
+            UserResponseObject responseObject = new UserResponseObject();
+            responseObject.setAdmin(user.getAdmin());
+            responseObject.setForename(user.getForename());
+            responseObject.setSurname(user.getSurname());
+            responseObject.setMatrikelNummer(user.getMartikelNumber());
+            responseObject.setUsername(user.getUsername());
+
+            Optional<ECourseRole> role = userInCourses.stream()
+                    .filter(userInCourse -> user.getMartikelNumber().equals(userInCourse.getUser().getMartikelNumber()))
+                    .map(UserInCourse::getRole)
+                    .findFirst();
+            if (role.isPresent())
+                responseObject.setRole(role.get());
+            else
+                responseObject.setRole(ECourseRole.None);
+            userResponseObjectList.add(responseObject);
         }
+
         return userResponseObjectList;
     }
 
-    protected List<String> readLinesFromFile(MultipartFile file) throws UserException
-    {
+    protected List<String> readLinesFromFile(MultipartFile file) throws UserException {
         BufferedReader br;
         List<String> lines = new ArrayList<>();
         try {
@@ -121,8 +122,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             lines.remove(0); // Remove first line because it only contains column descriptions
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            throw new UserException(e.getMessage(),e);
+            throw new UserException(e.getMessage(), e);
         }
         return lines;
+    }
+
+    /**
+     * returns all users (except admin)
+     * @return
+     * @throws UserException
+     */
+    public List<User> getAllUsers() throws UserException {
+        List<User> allUsers = userRepository.findAll();
+        allUsers.removeIf(User::getAdmin);
+
+        return allUsers;
     }
 }

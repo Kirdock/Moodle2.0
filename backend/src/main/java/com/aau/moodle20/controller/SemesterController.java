@@ -1,6 +1,5 @@
 package com.aau.moodle20.controller;
 
-import com.aau.moodle20.domain.Course;
 import com.aau.moodle20.domain.Semester;
 import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
@@ -9,7 +8,7 @@ import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.repository.SemesterRepository;
-import com.aau.moodle20.security.services.SemesterService;
+import com.aau.moodle20.services.SemesterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

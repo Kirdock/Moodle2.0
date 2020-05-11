@@ -1,4 +1,4 @@
-package com.aau.moodle20.security.services;
+package com.aau.moodle20.services;
 
 import com.aau.moodle20.domain.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
