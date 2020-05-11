@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="form-group col-md-6" style="padding-left:0px">
                                     <label for="minPoints_create" class="control-label">{{$t('minRequirePoints')}}</label>
-                                    <i-input id="minPoints_create" class="form-control" min="0" v-model="minPoints_create"> </i-input>
+                                    <i-input id="minPoints_create" class="form-control" min="0" max="100" v-model="minPoints_create"> </i-input>
                                 </div>
                                 <div class="form-inline">
                                     <b-button variant="primary" type="submit">{{ $t('create') }}</b-button>
@@ -124,12 +124,12 @@
                                         <input id="courseName_edit" type="text" class="form-control" v-model="selectedCourse.name" required>
                                     </div>
                                     <div class="form-group col-md-6" style="padding-left:0px">
-                                        <label for="minKreuzel_edit" class="control-label">Mindestanforderung Kreuzel (in %)</label>
+                                        <label for="minKreuzel_edit" class="control-label">{{$t('minRequireKreuzel')}}</label>
                                         <i-input id="minKreuzel_edit" class="form-control" min="0" max="100" v-model="selectedCourse.minKreuzel"> </i-input>
                                     </div>
                                     <div class="form-group col-md-6" style="padding-left:0px">
-                                        <label for="minPoints_edit" class="control-label">Mindestanforderung Punkte</label>
-                                        <i-input id="minPoints_edit" class="form-control" min="0" v-model="selectedCourse.minPoints"> </i-input>
+                                        <label for="minPoints_edit" class="control-label">{{$t('minRequirePoints')}}</label>
+                                        <i-input id="minPoints_edit" class="form-control" min="0" max="100" v-model="selectedCourse.minPoints"> </i-input>
                                     </div>
                                     <div class="form-inline">
                                         <b-button variant="primary" type="submit">{{ $t('update') }}</b-button>
@@ -142,11 +142,15 @@
                             </div>
                             <div class="form-horizontal col-md-7 offset-md-1">
                                 <div class="form-group">
-                                    <label for="searchUserText" class="control-label">{{ $t('search') }}</label>
+                                    <label for="searchUserText" class="control-label">{{ $t('search') }}
+                                        <span class="fas fa-search"></span>
+                                    </label>
                                     <input id="searchUserText" type="text" class="form-control" v-model="searchUserText">
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label" for="showRoles">{{$t('show')}}</label>
+                                    <label class="control-label" for="showRoles">{{$t('show')}}
+                                        <span class="fas fa-filter"></span>
+                                    </label>
                                     <select class="form-control" id="showRoles" v-model="showRoles">
                                         <option v-for="role in rolesWithAll" :value="role.key" :key="role.key">
                                             {{role.value}}
@@ -160,14 +164,15 @@
                                         <th scope="col">{{$t('surname')}}</th>
                                         <th scope="col">{{$t('forename')}}</th>
                                         <th scope="col">{{$t('role')}}</th>
+                                        <th scope="col">{{$t('change')}}</th>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="user in filteredUsers" :key="user.matrikelnummer">
+                                        <tr v-for="user in filteredUsers" :key="user.matrikelNummer">
                                             <td>
-                                                <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="!!user.role" @click="user.role = user.role ? undefined : 's'">
+                                                <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="user.role !== 'n'" @click="user.role = user.role === 'n' ? 's' : 'n'">
                                             </td>
                                             <td>
-                                                {{user.matrikelnummer}}
+                                                {{user.matrikelNummer}}
                                             </td>
                                             <td>
                                                 {{user.surname}}
@@ -182,9 +187,19 @@
                                                     </option>
                                                 </select>
                                             </td>
+                                            <td>
+                                                {{user.role !== user.oldRole ? $t('yes') : $t('no')}}
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
+                                <div class="form-inline">
+                                    <b-button variant="primary" @click="updateCourseUsers()">{{ $t('update') }}</b-button>
+                                    <div class="offset-md-1 form-inline" v-if="loadingCourse_edit_updateUsers">
+                                        <span class="fa fa-sync fa-spin"></span>
+                                        <label class="control-label">{{ $t('loading') }}...</label>
+                                    </div>
+                                </div>
                             </div>
                             
                         </div>
@@ -238,6 +253,7 @@ export default {
             loadingCreateSemester: false,
             loadingCourse_create: false,
             loadingCourse_edit: false,
+            loadingCourse_edit_updateUsers: false,
             semesterYear: new Date().getFullYear(),
             maxYear: new Date().getFullYear(),
             semesterType: undefined,
@@ -252,7 +268,7 @@ export default {
             selectedCourseId: undefined,
             courses: [],
             searchUserText: undefined,
-            showRoles: 'a',
+            showRoles: 'z',
             users: []
         }
     },
@@ -271,9 +287,7 @@ export default {
                     key: 's',
                     value: this.$t('student'),
                 },
-            ].sort((a,b) =>{
-                return a.value.localeCompare(b.value);
-            })
+            ];
         },
         rolesWithAll(){
             return [
@@ -289,17 +303,18 @@ export default {
         },
         filteredUsers(){
             let result = this.users;
-            
-            if(this.searchUserText){
-                result = result.filter(user => user.matrikelnummer.indexOf(this.searchUserText) !== -1
-                                            || user.surname.indexOf(this.searchUserText) !== -1
-                                            || user.forename.indexOf(this.searchUserText) !== -1);
-            }
+
             if(this.showRoles === 'z'){
-                result = result.filter(user => user.role);
+                result = result.filter(user => user.role !== 'n');
             }
             else if(this.showRoles !== 'a'){
                 result = result.filter(user => this.showRoles === user.role)
+            }
+            
+            if(this.searchUserText){
+                result = result.filter(user => user.matrikelNummer.indexOf(this.searchUserText) !== -1
+                                            || user.surname.indexOf(this.searchUserText) !== -1
+                                            || user.forename.indexOf(this.searchUserText) !== -1);
             }
 
             return result;
@@ -312,7 +327,7 @@ export default {
     methods:{
         createUser(){
             this.loadingCreateUser = true;
-            this.$store.dispatch("createUser", {username: this.username, matrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
+            this.$store.dispatch('createUser', {username: this.username, matrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
                 this.$bvToast.toast(this.$t('userCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
@@ -329,9 +344,35 @@ export default {
                 this.loadingCreateUser = false;
             });
         },
+        updateCourseUsers(){
+            this.loadingCourse_edit_updateUsers = true;
+            const id = this.selectedCourse.id;
+            const data = this.users.filter(user => user.role !== user.oldRole).map(user =>{
+                return {
+                    courseId: id,
+                    matrikelNummer: user.matrikelNummer,
+                    role: user.role
+                };
+            });
+            this.$store.dispatch('updateCourseUsers', data).then(response=>{
+                this.$bvToast.toast(this.$t('courseUsersUpdated'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('courseUsersUpdatedError'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }).finally(()=>{
+                this.loadingCourse_edit_updateUsers = false;
+            });
+        },
         createSemester(){
             this.loadingCreateSemester = true;
-            this.$store.dispatch("createSemester", {year: this.semesterYear, type: this.semesterType}).then(response=>{
+            this.$store.dispatch('createSemester', {year: this.semesterYear, type: this.semesterType}).then(response=>{
                 this.$bvToast.toast(this.$t('semesterCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
@@ -352,7 +393,7 @@ export default {
         },
         createCourse(){
             this.loadingCourse_create = true;
-            this.$store.dispatch("createCourse", 
+            this.$store.dispatch('createCourse', 
             {
                 semesterId: this.selectedSemester_create,
                 number: this.courseNumber_create,
@@ -379,7 +420,7 @@ export default {
         },
         updateCourse(){
             this.loadingCourse_edit = true;
-            this.$store.dispatch("updateCourse", this.selectedCourse).then(response=>{
+            this.$store.dispatch('updateCourse', this.selectedCourse).then(response=>{
                 this.$bvToast.toast(this.$t('courseUpdated'), {
                     title: this.$t('success'),
                     variant: 'success',
@@ -400,7 +441,7 @@ export default {
             const formData = new FormData();
             formData.append('file',this.$refs.file.files[0]);
             this.$refs.file.value = '';
-            this.$store.dispatch("createUsers", formData).then(response =>{
+            this.$store.dispatch('createUsers', formData).then(response =>{
                 this.$bvToast.toast(this.$t('userCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
@@ -417,7 +458,7 @@ export default {
             });
         },
         getUsers(courseId){
-            this.$store.dispatch("getUsers",{courseId}).then(response=>{
+            this.$store.dispatch('getUsers',{courseId}).then(response=>{
                 this.users = response.data;
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('userGetError'), {
@@ -431,7 +472,7 @@ export default {
             return new Date().getMonth() > 1 && new Date().getMonth() < 9 ? 's' : 'w';
         },
         getSemesters(){
-            this.$store.dispatch("getSemesters").then(response =>{
+            this.$store.dispatch('getSemesters').then(response =>{
                 this.semesters = response.data;
                 this.selectedSemester_create = this.selectedSemester_edit = this.semesters[0].id;
                 this.getCourses(this.selectedSemester_edit);
@@ -444,7 +485,7 @@ export default {
             });
         },
         getCourse(courseId){
-            this.$store.dispatch("getCourse",{courseId}).then(response =>{
+            this.$store.dispatch('getCourse',{courseId}).then(response =>{
                 this.selectedCourse = response.data;
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('courseGetError'), {
@@ -455,7 +496,7 @@ export default {
             });
         },
         getCourses(id){
-            this.$store.dispatch("getCourses",{id}).then(response =>{
+            this.$store.dispatch('getCourses',{id}).then(response =>{
                 this.courses = response.data;
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('coursesGetError'), {
@@ -466,7 +507,7 @@ export default {
             });
         },
         deleteCourse(id){
-            this.$store.dispatch("deleteCourse",{id}).then(response =>{
+            this.$store.dispatch('deleteCourse',{id}).then(response =>{
                 this.$bvToast.toast(this.$t('courseDeleted'), {
                     title: this.$t('error'),
                     variant: 'danger',
