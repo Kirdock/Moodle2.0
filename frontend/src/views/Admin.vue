@@ -286,7 +286,7 @@ export default {
     methods:{
         createUser(){
             this.loadingCreateUser = true;
-            this.$store.dispatch("createUser", {username: this.username, password: this.password, martrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
+            this.$store.dispatch("createUser", {username: this.username, password: this.password, matrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
                 this.$bvToast.toast(this.$t('userCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
