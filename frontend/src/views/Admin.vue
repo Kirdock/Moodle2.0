@@ -145,9 +145,13 @@
                                     <label for="searchUserText" class="control-label">{{ $t('search') }}</label>
                                     <input id="searchUserText" type="text" class="form-control" v-model="searchUserText">
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="showCheckedUsers" :value="checkedUsersView" @click="checkedUsersView = !checkedUsersView">
-                                    <label class="form-check-label" for="showCheckedUsers">{{ $t('onlyShowAssignedUsers') }}</label>
+                                <div class="form-group">
+                                    <label class="control-label" for="showRoles">{{$t('show')}}</label>
+                                    <select class="form-control" id="showRoles" v-model="showRoles">
+                                        <option v-for="role in rolesWithAll" :value="role.key" :key="role.key">
+                                            {{role.value}}
+                                        </option>
+                                    </select>
                                 </div>
                                 <table class="table">
                                     <thead>
@@ -160,7 +164,7 @@
                                     <tbody>
                                         <tr v-for="user in filteredUsers" :key="user.matrikelnummer">
                                             <td>
-                                                <input type="checkbox" class="form-check-input" id="showCheckedUsers" :value="!!user.role" @click="user.role = user.role ? undefined : 's'">
+                                                <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="!!user.role" @click="user.role = user.role ? undefined : 's'">
                                             </td>
                                             <td>
                                                 {{user.matrikelnummer}}
@@ -229,7 +233,6 @@ export default {
             matrikelnummer: undefined,
             forename: undefined,
             surname: undefined,
-            checkedUsersView: false,
             loadingFileUpload: false,
             loadingCreateUser: false,
             loadingCreateSemester: false,
@@ -249,6 +252,7 @@ export default {
             selectedCourseId: undefined,
             courses: [],
             searchUserText: undefined,
+            showRoles: 'a',
             users: []
         }
     },
@@ -267,31 +271,37 @@ export default {
                     key: 's',
                     value: this.$t('student'),
                 },
-            ]
+            ].sort((a,b) =>{
+                return a.value.localeCompare(b.value);
+            })
+        },
+        rolesWithAll(){
+            return [
+                {
+                    key: 'a',
+                    value: this.$t('all')
+                },
+                {
+                    key: 'z',
+                    value: this.$t('assigned')
+                }
+            ].concat(this.roles);
         },
         filteredUsers(){
-            let result = [];
-            if(this.checkedUsersView){
-                if(this.searchUserText){
-                    result = this.users.filter(user => user.role[this.selectedCourse.id] &&
-                                                            (user.matrikelnummer.indexOf(this.searchUserText) > -1
-                                                            || user.surname.indexOf(this.searchUserText) > -1
-                                                            || user.forename.indexOf(this.searchUserText) > -1));
-                }
-                else{
-                    result = this.users.filter(user => user.role[this.selectedCourse.id]);
-                }
+            let result = this.users;
+            
+            if(this.searchUserText){
+                result = result.filter(user => user.matrikelnummer.indexOf(this.searchUserText) !== -1
+                                            || user.surname.indexOf(this.searchUserText) !== -1
+                                            || user.forename.indexOf(this.searchUserText) !== -1);
             }
-            else {
-                if(this.searchUserText){
-                    result = this.users.filter(user => user.matrikelnummer.indexOf(this.searchUserText) > -1
-                                                    || user.surname.indexOf(this.searchUserText) > -1
-                                                    || user.forename.indexOf(this.searchUserText) > -1);
-                }
-                else{
-                    result = this.users;
-                }
+            if(this.showRoles === 'z'){
+                result = result.filter(user => user.role);
             }
+            else if(this.showRoles !== 'a'){
+                result = result.filter(user => this.showRoles === user.role)
+            }
+
             return result;
         }
     },
