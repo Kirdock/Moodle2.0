@@ -22,10 +22,6 @@
                                 <label for="forename" class="control-label required">{{ $t('forename') }}</label>
                                 <input id="forename" type="text" class="form-control" v-model="forename" required>
                             </div>
-                            <div class="form-group">
-                                <label for="password" class="control-label required">{{ $t('password') }}</label>
-                                <input id="password" type="password" class="form-control" v-model="password" required>
-                            </div>
                             <div class="form-inline">
                                 <b-button variant="primary" type="submit">{{ $t('create') }}</b-button>
                                 <div class="offset-md-1 form-inline" v-if="loadingCreateUser">
@@ -62,8 +58,8 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="courseNumber_create" class="control-label required">{{ $t('number') }}</label>
-                                    <input id="courseNumber_create" type="text" class="form-control"  pattern="[0-9]{3}\.[0-9]{3}" :title="$t('format')+': 000.000'" v-model="courseNumber_create" required>
+                                    <label for="courseNumber_create" class="control-label required">{{ $t('number') }} ({{$t('format')}} : 123.456)</label>
+                                    <input id="courseNumber_create" type="text" class="form-control"  pattern="[0-9]{3}\.[0-9]{3}" :title="$t('format')+': 123.456'" v-model="courseNumber_create" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="courseName_create" class="control-label required">{{ $t('name') }}</label>
@@ -102,7 +98,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="selectedCourse" class="control-label">{{ $t('course') }}</label>
-                                    <select class="form-control" v-model="selectedCourse.id" id="selectedCourse" @change="getCourse(selectedCourse.id); getUsers(selectedCourse.id)">
+                                    <select class="form-control" v-model="selectedCourseId" id="selectedCourse" @change="getUsers(selectedCourseId); getCourse(selectedCourseId)">
                                         <option v-for="course in courses" :value="course.id" :key="course.id">
                                             {{course.number}} {{course.name}}
                                         </option>
@@ -116,12 +112,12 @@
                                 </b-modal>
                             </div>
                         </div>
-                        <div class="row col-md-12" v-if="selectedCourse.id">
+                        <div class="row col-md-12" v-if="selectedCourse">
                             <div class="form-horizontal col-md-4" style="margin-left: 0px">
                                 <form @submit.prevent @submit="updateCourse()">
                                     <div class="form-group">
-                                        <label for="courseNumber_edit" class="control-label required">{{ $t('number') }}</label>
-                                        <input id="courseNumber_edit" type="text" class="form-control"  pattern="[0-9]{3}\.[0-9]{3}" :title="$t('format') +': 000.000'" v-model="selectedCourse.number" required>
+                                        <label for="courseNumber_edit" class="control-label required">{{ $t('number') }} ({{$t('format')}} : 123.456)</label>
+                                        <input id="courseNumber_edit" type="text" class="form-control"  pattern="[0-9]{3}\.[0-9]{3}" :title="$t('format') +': 123.456'" v-model="selectedCourse.number" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="courseName_edit" class="control-label required">{{ $t('name') }}</label>
@@ -164,7 +160,7 @@
                                     <tbody>
                                         <tr v-for="user in filteredUsers" :key="user.matrikelnummer">
                                             <td>
-                                                <!-- <input type="checkbox" class="form-check-input" id="showCheckedUsers" :value="!!user.role[selectedCourse]" @click="user.role[selectedCourse] = undefined"> -->
+                                                <input type="checkbox" class="form-check-input" id="showCheckedUsers" :value="!!user.role" @click="user.role = user.role ? undefined : 's'">
                                             </td>
                                             <td>
                                                 {{user.matrikelnummer}}
@@ -176,7 +172,11 @@
                                                 {{user.forename}}
                                             </td>
                                             <td>
-                                                <!-- {{user.role[selectedCourse]}} -->
+                                                <select class="form-control" v-model="user.role">
+                                                    <option v-for="role in roles" :value="role.key" :key="role.key">
+                                                        {{role.value}}
+                                                    </option>
+                                                </select>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -226,7 +226,6 @@ export default {
     data() {
         return {
             username: undefined,
-            password: undefined,
             matrikelnummer: undefined,
             forename: undefined,
             surname: undefined,
@@ -246,13 +245,30 @@ export default {
             courseName_create: undefined,
             minKreuzel_create: undefined,
             minPoints_create: undefined,
-            selectedCourse: {},
+            selectedCourse: undefined,
+            selectedCourseId: undefined,
             courses: [],
             searchUserText: undefined,
             users: []
         }
     },
     computed:{
+        roles(){
+            return [
+                {
+                    key: 'l',
+                    value: this.$t('lecturer'),
+                },
+                {
+                    key: 't',
+                    value: this.$t('tutor'),
+                },
+                {
+                    key: 's',
+                    value: this.$t('student'),
+                },
+            ]
+        },
         filteredUsers(){
             let result = [];
             if(this.checkedUsersView){
@@ -286,13 +302,13 @@ export default {
     methods:{
         createUser(){
             this.loadingCreateUser = true;
-            this.$store.dispatch("createUser", {username: this.username, password: this.password, matrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
+            this.$store.dispatch("createUser", {username: this.username, matrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
                 this.$bvToast.toast(this.$t('userCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-                this.username = this.password = this.matrikelnummer = this.forename = this.surname = undefined;
+                this.username = this.matrikelnummer = this.forename = this.surname = undefined;
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('userCreatedError'), {
                     title: this.$t('error'),
@@ -394,7 +410,7 @@ export default {
             this.$store.dispatch("getUsers",{courseId}).then(response=>{
                 this.users = response.data;
             }).catch(()=>{
-                this.$bvToast.toast('userGetError', {
+                this.$bvToast.toast(this.$t('userGetError'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
@@ -418,7 +434,6 @@ export default {
             });
         },
         getCourse(courseId){
-            this.getUsers(courseId);
             this.$store.dispatch("getCourse",{courseId}).then(response =>{
                 this.selectedCourse = response.data;
             }).catch(()=>{
@@ -432,7 +447,6 @@ export default {
         getCourses(id){
             this.$store.dispatch("getCourses",{id}).then(response =>{
                 this.courses = response.data;
-                this.selectedCourse = this.courses[0];
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('coursesGetError'), {
                     title: this.$t('error'),
