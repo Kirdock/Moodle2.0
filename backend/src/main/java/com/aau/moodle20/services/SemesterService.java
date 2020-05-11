@@ -78,26 +78,32 @@ public class SemesterService {
 
 
 
-    public void assignCourse(AssignUserToCourseRequest assignUserToCourseRequest) throws SemesterException
+    public void assignCourse(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws SemesterException
     {
         //TODO add validation
 
-        UserCourseKey userCourseKey = new UserCourseKey();
-        UserInCourse userInCourse = new UserInCourse();
-        User user = new User();
-        Course course = new Course();
+        List<UserInCourse> userInCourses = new ArrayList<>();
 
-        userCourseKey.setCourseId(assignUserToCourseRequest.getCourseId());
-        userCourseKey.setMatrikelNummer(assignUserToCourseRequest.getMatrikelNummer());
+        for(AssignUserToCourseRequest assignUserToCourseRequest: assignUserToCourseRequests) {
 
-        user.setMartikelNumber(assignUserToCourseRequest.getMatrikelNummer());
-        course.setId(assignUserToCourseRequest.getCourseId());
-        userInCourse.setRole(assignUserToCourseRequest.getRole());
-        userInCourse.setUser(user);
-        userInCourse.setCourse(course);
-        userInCourse.setId(userCourseKey);
+            UserCourseKey userCourseKey = new UserCourseKey();
+            UserInCourse userInCourse = new UserInCourse();
+            User user = new User();
+            Course course = new Course();
 
-        userInCourseRepository.save(userInCourse);
+            userCourseKey.setCourseId(assignUserToCourseRequest.getCourseId());
+            userCourseKey.setMatrikelNummer(assignUserToCourseRequest.getMatrikelNummer());
+
+            user.setMartikelNumber(assignUserToCourseRequest.getMatrikelNummer());
+            course.setId(assignUserToCourseRequest.getCourseId());
+            userInCourse.setRole(assignUserToCourseRequest.getRole());
+            userInCourse.setUser(user);
+            userInCourse.setCourse(course);
+            userInCourse.setId(userCourseKey);
+            userInCourses.add(userInCourse);
+
+        }
+        userInCourseRepository.saveAll(userInCourses);
     }
 
     public List<Semester> getSemesters()
