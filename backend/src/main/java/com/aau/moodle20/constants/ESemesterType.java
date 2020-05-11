@@ -1,4 +1,4 @@
-package com.aau.moodle20.domain;
+package com.aau.moodle20.constants;
 
 public enum ESemesterType {
 

@@ -1,6 +1,6 @@
 package com.aau.moodle20.payload.request;
 
-import com.aau.moodle20.domain.ECourseRole;
+import com.aau.moodle20.constants.ECourseRole;
 
 public class AssignUserToCourseRequest {
 

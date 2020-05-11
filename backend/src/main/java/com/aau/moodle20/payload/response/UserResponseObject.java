@@ -1,12 +1,6 @@
 package com.aau.moodle20.payload.response;
 
-import com.aau.moodle20.domain.ECourseRole;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import com.aau.moodle20.constants.ECourseRole;
 
 public class UserResponseObject {
 

@@ -1,6 +1,6 @@
 package com.aau.moodle20.repository;
 
-import com.aau.moodle20.domain.ESemesterType;
+import com.aau.moodle20.constants.ESemesterType;
 import com.aau.moodle20.domain.Semester;
 import org.springframework.data.jpa.repository.JpaRepository;
 

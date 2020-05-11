@@ -10,12 +10,29 @@ public class ApiError {
     private HttpStatus status;
     private String message;
     private List<String> errors;
+    private Integer errorResponseCode;
+
 
     public ApiError(HttpStatus status, String message, List<String> errors) {
         super();
         this.status = status;
         this.message = message;
         this.errors = errors;
+    }
+    public ApiError(HttpStatus status, String message, List<String> errors, Integer errorResponseCode) {
+        super();
+        this.status = status;
+        this.message = message;
+        this.errors = errors;
+        this.errorResponseCode = errorResponseCode;
+    }
+
+    public ApiError(HttpStatus status, String message, String error,Integer errorResponseCode) {
+        super();
+        this.status = status;
+        this.message = message;
+        errors = Arrays.asList(error);
+        this.errorResponseCode = errorResponseCode;
     }
 
     public ApiError(HttpStatus status, String message, String error) {
@@ -47,5 +64,13 @@ public class ApiError {
 
     public void setErrors(List<String> errors) {
         this.errors = errors;
+    }
+
+    public Integer getErrorResponseCode() {
+        return errorResponseCode;
+    }
+
+    public void setErrorResponseCode(Integer errorResponseCode) {
+        this.errorResponseCode = errorResponseCode;
     }
 }

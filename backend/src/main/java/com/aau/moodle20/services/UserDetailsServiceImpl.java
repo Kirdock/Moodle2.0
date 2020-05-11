@@ -1,6 +1,6 @@
 package com.aau.moodle20.services;
 
-import com.aau.moodle20.domain.ECourseRole;
+import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.domain.User;
 import com.aau.moodle20.domain.UserInCourse;
 import com.aau.moodle20.exception.UserException;

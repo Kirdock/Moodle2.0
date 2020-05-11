@@ -1,6 +1,6 @@
 package com.aau.moodle20.repository;
 
-import com.aau.moodle20.domain.ECourseRole;
+import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.domain.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 

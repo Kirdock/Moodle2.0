@@ -5,6 +5,7 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
+import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.SemesterRepository;
@@ -56,6 +57,26 @@ public class SemesterService {
 
          courseRepository.save(course);
     }
+
+
+    public void updateCourse(UpdateCourseRequest updateCourseRequest) throws SemesterException
+    {
+        //TODO add validation
+        Course course = null;
+        Optional<Course> optionalCourse = courseRepository.findById(updateCourseRequest.getId());
+        if(optionalCourse.isPresent())
+        {
+            course = optionalCourse.get();
+            course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
+            course.setMinPoints(updateCourseRequest.getMinPoints());
+            course.setName(updateCourseRequest.getName());
+            course.setNumber(updateCourseRequest.getNumber());
+            course.setSemester(new Semester(updateCourseRequest.getSemesterId()));
+        }
+        courseRepository.save(course);
+    }
+
+
 
     public void assignCourse(AssignUserToCourseRequest assignUserToCourseRequest) throws SemesterException
     {

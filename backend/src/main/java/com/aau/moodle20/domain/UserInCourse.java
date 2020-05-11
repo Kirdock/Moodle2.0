@@ -1,5 +1,7 @@
 package com.aau.moodle20.domain;
 
+import com.aau.moodle20.constants.ECourseRole;
+
 import javax.persistence.*;
 
 @Entity

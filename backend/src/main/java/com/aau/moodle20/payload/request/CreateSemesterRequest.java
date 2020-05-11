@@ -1,8 +1,6 @@
 package com.aau.moodle20.payload.request;
 
-import com.aau.moodle20.domain.ESemesterType;
-
-import javax.validation.constraints.Size;
+import com.aau.moodle20.constants.ESemesterType;
 
 public class CreateSemesterRequest {
 

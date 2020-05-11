@@ -1,10 +1,10 @@
 package com.aau.moodle20.domain;
 
+import com.aau.moodle20.constants.ESemesterType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
