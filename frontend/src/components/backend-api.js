@@ -23,7 +23,7 @@ export default {
         return axios.get('/semesters');
     },
     getCourse(data){
-        return axios.get(`/semester/${data.semesterId}/course/${data.courseId}`); //all data
+        return axios.get(`/course/${data.courseId}`); //all data
     },
     getCourses(semesterData){
         return axios.get(`/semester/${semesterData.id}/courses`); //only id, name, number

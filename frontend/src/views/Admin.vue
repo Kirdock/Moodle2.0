@@ -102,7 +102,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="selectedCourse" class="control-label">{{ $t('course') }}</label>
-                                    <select class="form-control" v-model="selectedCourse.id" id="selectedCourse" @change="getCourse(selectedSemester_edit, selectedCourse.id); getUsers(selectedCourse.id)">
+                                    <select class="form-control" v-model="selectedCourse.id" id="selectedCourse" @change="getCourse(selectedCourse.id); getUsers(selectedCourse.id)">
                                         <option v-for="course in courses" :value="course.id" :key="course.id">
                                             {{course.number}} {{course.name}}
                                         </option>
@@ -417,9 +417,9 @@ export default {
                 });
             });
         },
-        getCourse(semesterId, courseId){
+        getCourse(courseId){
             this.getUsers(courseId);
-            this.$store.dispatch("getCourse",{semesterId, courseId}).then(response =>{
+            this.$store.dispatch("getCourse",{courseId}).then(response =>{
                 this.selectedCourse = response.data;
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('courseGetError'), {
@@ -448,7 +448,7 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
-                this.getCourse(this.selectedSemester_edit);
+                this.getCourses(this.selectedSemester_edit);
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('courseDeletedError'), {
                     title: this.$t('error'),
