@@ -18,10 +18,10 @@ public class UserCourseKey implements Serializable {
     {
     }
 
-    public UserCourseKey(String martrikelnummer, Long courseId)
+    public UserCourseKey(String matrikelnummer, Long courseId)
     {
         this.courseId= courseId;
-        this.matrikelNummer = matrikelNummer;
+        this.matrikelNummer = matrikelnummer;
     }
 
     public String getMatrikelNummer() {
