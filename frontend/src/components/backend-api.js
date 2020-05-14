@@ -66,6 +66,9 @@ export default {
             }
         );
     },
+    udpatePassword(data){
+        return axios.post('/user/password', data);
+    },
     deleteUser(matrikelNummer){
         return axios.delete(`/user/${matrikelNummer}`);
     },

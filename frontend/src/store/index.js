@@ -129,6 +129,9 @@ export default new Vuex.Store({
         
       })
     },
+    udpatePassword({commit}, data){
+      return api.udpatePassword(data);
+    },
     deleteCourse({commit}, data){
       return api.deleteCourse(data);
     }
