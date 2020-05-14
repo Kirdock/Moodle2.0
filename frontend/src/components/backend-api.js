@@ -44,6 +44,9 @@ export default {
             }
         );
     },
+    deleteUser(matrikelNummer){
+        return axios.delete(`/user/${matrikelNummer}`);
+    },
     createSemester(data){
         return axios.put('/semester',data);
     },

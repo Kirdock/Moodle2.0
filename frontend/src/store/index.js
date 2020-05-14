@@ -80,6 +80,9 @@ export default new Vuex.Store({
     createUsers({commit}, formData){
       return api.createUsers(formData);
     },
+    deleteUser({commit}, matrikelNummer){
+      return api.deleteUser(matrikelNummer);
+    },
     createSemester({commit}, semesterData){
       return api.createSemester(semesterData);
     },
@@ -104,9 +107,11 @@ export default new Vuex.Store({
     getUsers({commit}, data){
       return new Promise((resolve, reject) =>{
         api.getUsers(data).then(response =>{
-          response.data.forEach(user =>{
-            user.oldRole = user.role;
-          });
+          if(data.courseId){
+            response.data.forEach(user =>{
+              user.oldRole = user.role;
+            });
+          }
           resolve({data: response.data});
         }).catch(reject);
         

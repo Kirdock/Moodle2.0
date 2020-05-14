@@ -2,47 +2,69 @@
   <div class="admin">
       <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
       <b-tabs content-class="mt-3">
-            <b-tab :title="$t('createUser')" active>
-                <div class="row" style="margin-left: 0px">
-                    <div class="form-horizontal col-md-4">
-                        <form @submit.prevent @submit="createUser()">
-                            <div class="form-group">
-                                <label for="username" class="control-label required">{{ $t('username') }}</label> 
-                                <input id="username" type="text" class="form-control" v-model="username" required>
+            <b-tab :title="$t('userManagement')" active>
+                 <b-tabs content-class="mt-3">
+                    <b-tab :title="$t('create')" active>
+                        <div class="row" style="margin-left: 0px">
+                            <div class="form-horizontal col-md-4">
+                                <form @submit.prevent @submit="createUser()">
+                                    <div class="form-group">
+                                        <label for="username" class="control-label required">{{ $t('username') }}</label> 
+                                        <input id="username" type="text" class="form-control" v-model="username" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="matrikelnummer" class="control-label required">{{ $t('matrikelnummer') }}</label>
+                                        <input id="matrikelnummer" type="text" class="form-control"  pattern="[0-9]{8}" v-model="matrikelnummer" :title="$t('eightDigitNumber')" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="surname" class="control-label required">{{ $t('surname') }}</label>
+                                        <input id="surname" type="text" class="form-control" v-model="surname" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="forename" class="control-label required">{{ $t('forename') }}</label>
+                                        <input id="forename" type="text" class="form-control" v-model="forename" required>
+                                    </div>
+                                    <div class="form-inline">
+                                        <b-button variant="primary" type="submit">{{ $t('create') }}</b-button>
+                                        <div class="offset-md-1 form-inline" v-if="loadingCreateUser">
+                                            <span class="fa fa-sync fa-spin"></span>
+                                            <label class="control-label">{{ $t('loading') }}...</label>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="form-group">
-                                <label for="matrikelnummer" class="control-label required">{{ $t('matrikelnummer') }}</label>
-                                <input id="matrikelnummer" type="text" class="form-control"  pattern="[0-9]{8}" v-model="matrikelnummer" :title="$t('eightDigitNumber')" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="surname" class="control-label required">{{ $t('surname') }}</label>
-                                <input id="surname" type="text" class="form-control" v-model="surname" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="forename" class="control-label required">{{ $t('forename') }}</label>
-                                <input id="forename" type="text" class="form-control" v-model="forename" required>
-                            </div>
-                            <div class="form-inline">
-                                <b-button variant="primary" type="submit">{{ $t('create') }}</b-button>
-                                <div class="offset-md-1 form-inline" v-if="loadingCreateUser">
-                                    <span class="fa fa-sync fa-spin"></span>
-                                    <label class="control-label">{{ $t('loading') }}...</label>
+                            <div class="form-horizontal col-md-4 offset-md-1">
+                                <div class="form-inline">
+                                    <label class="btn btn-primary col-md-5 finger">
+                                        {{ $t('uploadCSV') }} <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitFile()"/>
+                                    </label>
+                                    <div class="offset-md-1 form-inline" v-if="loadingFileUpload">
+                                        <span class="fa fa-sync fa-spin"></span>
+                                        <label class="control-label">{{ $t('loading') }}...</label>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                    <div class="form-horizontal col-md-4 offset-md-1">
-                        <div class="form-inline">
-                            <label class="btn btn-primary col-md-5 finger">
-                                {{ $t('uploadCSV') }} <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitFile()"/>
-                            </label>
-                            <div class="offset-md-1 form-inline" v-if="loadingFileUpload">
-                                <span class="fa fa-sync fa-spin"></span>
-                                <label class="control-label">{{ $t('loading') }}...</label>
+                        </div>
+                    </b-tab>
+                    <b-tab :title="$t('edit')" @click="getUsers()">
+                        <div class="row col-md-12">
+                            <div class="form-group col-md-6">
+                                <label for="selectUser" class="control-label required">{{$t('user')}}</label>
+                                <select class="form-control" v-model="selectedUser_edit" id="selectUser" required>
+                                    <option v-for="user in users" :value="user.matrikelNummer" :key="user.matrikelNummer">
+                                        {{user.matrikelNummer}} {{user.surname}} {{user.forename}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-1" style="margin-top: 30px">
+                                <b-button variant="danger" v-b-modal="'modal-delete-user'">{{ $t('delete') }}</b-button>
+                                <b-modal id="modal-delete-user" :title="$t('confirmDeletion')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteUser(selectedUser_edit)">
+                                    {{$t('userDeleteQuestion')}}
+                                </b-modal>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </b-tab>
+                 </b-tabs>
             </b-tab>
             <b-tab :title="$t('courseManagement')">
                 <b-tabs content-class="mt-3">
@@ -98,7 +120,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="selectedCourse" class="control-label">{{ $t('course') }}</label>
-                                    <select class="form-control" v-model="selectedCourseId" id="selectedCourse" @change="getUsers(selectedCourseId); getCourse(selectedCourseId)">
+                                    <select class="form-control" v-model="selectedCourseId" id="selectedCourse" @change="getCourseUsers(selectedCourseId); getCourse(selectedCourseId)">
                                         <option v-for="course in courses" :value="course.id" :key="course.id">
                                             {{course.number}} {{course.name}}
                                         </option>
@@ -266,9 +288,11 @@ export default {
             minPoints_create: undefined,
             selectedCourse: undefined,
             selectedCourseId: undefined,
+            selectedUser_edit: undefined,
             courses: [],
             searchUserText: undefined,
             showRoles: 'z',
+            courseUsers: [],
             users: []
         }
     },
@@ -302,7 +326,7 @@ export default {
             ].concat(this.roles);
         },
         filteredUsers(){
-            let result = this.users;
+            let result = this.courseUsers;
 
             if(this.showRoles === 'z'){
                 result = result.filter(user => user.role !== 'n');
@@ -325,29 +349,10 @@ export default {
         this.getSemesters();
     },
     methods:{
-        createUser(){
-            this.loadingCreateUser = true;
-            this.$store.dispatch('createUser', {username: this.username, matrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
-                this.$bvToast.toast(this.$t('userCreated'), {
-                    title: this.$t('success'),
-                    variant: 'success',
-                    appendToast: true
-                });
-                this.username = this.matrikelnummer = this.forename = this.surname = undefined;
-            }).catch(()=>{
-                this.$bvToast.toast(this.$t('userCreatedError'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
-            }).finally(()=>{
-                this.loadingCreateUser = false;
-            });
-        },
         updateCourseUsers(){
             this.loadingCourse_edit_updateUsers = true;
             const id = this.selectedCourse.id;
-            const data = this.users.filter(user => user.role !== user.oldRole).map(user =>{
+            const data = this.courseUsers.filter(user => user.role !== user.oldRole).map(user =>{
                 return {
                     courseId: id,
                     matrikelNummer: user.matrikelNummer,
@@ -457,9 +462,61 @@ export default {
                 this.loadingFileUpload = false;
             });
         },
-        getUsers(courseId){
+        createUser(){
+            this.loadingCreateUser = true;
+            this.$store.dispatch('createUser', {username: this.username, matrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
+                this.$bvToast.toast(this.$t('userCreated'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+                this.username = this.matrikelnummer = this.forename = this.surname = undefined;
+                if(this.users.length !== 0){
+                    this.getUsers(true);
+                }
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('userCreatedError'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }).finally(()=>{
+                this.loadingCreateUser = false;
+            });
+        },
+        deleteUser(matrikelNummer){
+            this.$store.dispatch('deleteUser', matrikelNummer).then(response =>{
+                this.$bvToast.toast(this.$t('userDeleted'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('userDeletedError'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            })
+        },
+        getUsers(forceUpdate){
+            if(forceUpdate || this.users.length === 0){
+                console.log('here', forceUpdate, this.users.length)
+                this.$store.dispatch('getUsers',{}).then(response=>{
+                    this.users = response.data;
+                    console.log(response.data);
+                }).catch(()=>{
+                    this.$bvToast.toast(this.$t('userGetError'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                });
+            }
+        },
+        getCourseUsers(courseId){
             this.$store.dispatch('getUsers',{courseId}).then(response=>{
-                this.users = response.data;
+                this.courseUsers = response.data;
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('userGetError'), {
                     title: this.$t('error'),
@@ -509,8 +566,8 @@ export default {
         deleteCourse(id){
             this.$store.dispatch('deleteCourse',{id}).then(response =>{
                 this.$bvToast.toast(this.$t('courseDeleted'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
+                    title: this.$t('success'),
+                    variant: 'success',
                     appendToast: true
                 });
                 this.getCourses(this.selectedSemester_edit);
