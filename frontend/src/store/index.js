@@ -13,7 +13,8 @@ new properties for state have to be in state initialization or a explizit call t
 
 import Vue from 'vue';
 import Vuex from 'vuex';
-import api from '../components/backend-api';
+import api from '@/components/backend-api';
+import router from '@/router';
 const tokenName = 'Token';
 const settingName = 'Settings';
 const storage = window.localStorage;
@@ -21,21 +22,19 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    toastDelay: 8000,
     userInfo: {},
     token: undefined,
     loggedIn: false
   },
   mutations: {
     initialiseStore(state) {
-      // if you want to store/receive the whole store:
-      // this.replaceState(
-      // 	Object.assign(state, JSON.parse(localStorage.getItem('store')))
-      // );
       state.token = getToken();
       state.userInfo = decodeToken(state.token);
       state.loggedIn = !!state.token;
       state.settings = getSettings();
+      if(state.userInfo.expire < new Date().getTime()/1000){
+        this.dispatch('logout', true);
+      }
     },
     loginSuccess(state, payload){
       state.token = payload.accessToken;
@@ -47,7 +46,6 @@ export default new Vuex.Store({
       state.token = undefined;
       state.userInfo = {};
       state.loggedIn = false;
-      deleteToken();
     },
     updateSettings(state, settings){
       Object.assign(state.settings, settings);
@@ -55,9 +53,20 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    logout({commit}){
+    logout({commit}, isTokenExpired){
       deleteToken();
       commit('logout');
+      if(isTokenExpired){
+        router.push('Login');
+        this.$app.$bvToast.toast(this.$app.$t('sessionExpired'), {
+            title: this.$app.$t('warning'),
+            variant: 'warning',
+            appendToast: true
+        });
+      }
+      else if(router.path !== '/'){
+        router.push('/');
+      }
     },
     login({commit}, {user, password}) {
       return new Promise((resolve, reject) => {
@@ -126,7 +135,6 @@ export default new Vuex.Store({
   getters: {
     userInfo: state => state.userInfo,
     locale: state => state.settings.locale,
-    toastDelay: state => state.toastDelay,
     isLoggedIn: state => state.loggedIn,
     decodedToken: state => state.userInfo,
     token: state=> state.token

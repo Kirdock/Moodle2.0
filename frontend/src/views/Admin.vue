@@ -9,20 +9,28 @@
                             <div class="form-horizontal col-md-4">
                                 <form @submit.prevent @submit="createUser()">
                                     <div class="form-group">
+                                        <label class="control-label" for="userRole">{{$t('role')}}</label>
+                                        <select class="form-control" id="userRole" v-model="createUserInfo.role">
+                                            <option v-for="role in roles" :value="role.key" :key="role.key">
+                                                {{role.value}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="username" class="control-label required">{{ $t('username') }}</label> 
-                                        <input id="username" type="text" class="form-control" v-model="username" required>
+                                        <input id="username" type="text" class="form-control" v-model="createUserInfo.username" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="matrikelnummer" class="control-label required">{{ $t('matrikelnummer') }}</label>
-                                        <input id="matrikelnummer" type="text" class="form-control"  pattern="[0-9]{8}" v-model="matrikelnummer" :title="$t('eightDigitNumber')" required>
+                                        <input id="matrikelnummer" type="text" class="form-control"  pattern="[0-9]{8}" v-model="createUserInfo.matrikelnummer" :title="$t('eightDigitNumber')" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="surname" class="control-label required">{{ $t('surname') }}</label>
-                                        <input id="surname" type="text" class="form-control" v-model="surname" required>
+                                        <input id="surname" type="text" class="form-control" v-model="createUserInfo.surname" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="forename" class="control-label required">{{ $t('forename') }}</label>
-                                        <input id="forename" type="text" class="form-control" v-model="forename" required>
+                                        <input id="forename" type="text" class="form-control" v-model="createUserInfo.forename" required>
                                     </div>
                                     <div class="form-inline">
                                         <b-button variant="primary" type="submit">{{ $t('create') }}</b-button>
@@ -36,7 +44,7 @@
                             <div class="form-horizontal col-md-4 offset-md-1">
                                 <div class="form-inline">
                                     <label class="btn btn-primary col-md-5 finger">
-                                        {{ $t('uploadCSV') }} <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitFile()"/>
+                                        {{ $t('uploadCSV') }} <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitUsers()"/>
                                     </label>
                                     <div class="offset-md-1 form-inline" v-if="loadingFileUpload">
                                         <span class="fa fa-sync fa-spin"></span>
@@ -266,10 +274,7 @@
 export default {
     data() {
         return {
-            username: undefined,
-            matrikelnummer: undefined,
-            forename: undefined,
-            surname: undefined,
+            createUserInfo: {},
             loadingFileUpload: false,
             loadingCreateUser: false,
             loadingCreateSemester: false,
@@ -347,8 +352,14 @@ export default {
     created(){
         this.semesterType = this.getSemesterType();
         this.getSemesters();
+        this.resetCreateUserInfo();
     },
     methods:{
+        resetCreateUserInfo(){
+            this.createUserInfo = {
+                role: 's'
+            };
+        },
         updateCourseUsers(){
             this.loadingCourse_edit_updateUsers = true;
             const id = this.selectedCourse.id;
@@ -441,7 +452,7 @@ export default {
                 this.loadingCourse_edit = false;
             });
         },
-        submitFile(){
+        submitUsers(){
             this.loadingFileUpload = true;
             const formData = new FormData();
             formData.append('file',this.$refs.file.files[0]);
@@ -464,13 +475,13 @@ export default {
         },
         createUser(){
             this.loadingCreateUser = true;
-            this.$store.dispatch('createUser', {username: this.username, matrikelnummer: this.matrikelnummer, forename: this.forename, surname: this.surname}).then(response=>{
+            this.$store.dispatch('createUser', this.createUserInfo).then(response=>{
                 this.$bvToast.toast(this.$t('userCreated'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-                this.username = this.matrikelnummer = this.forename = this.surname = undefined;
+                this.resetCreateUserInfo();
                 if(this.users.length !== 0){
                     this.getUsers(true);
                 }
@@ -501,10 +512,8 @@ export default {
         },
         getUsers(forceUpdate){
             if(forceUpdate || this.users.length === 0){
-                console.log('here', forceUpdate, this.users.length)
                 this.$store.dispatch('getUsers',{}).then(response=>{
                     this.users = response.data;
-                    console.log(response.data);
                 }).catch(()=>{
                     this.$bvToast.toast(this.$t('userGetError'), {
                         title: this.$t('error'),

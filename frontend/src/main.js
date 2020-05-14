@@ -18,7 +18,7 @@ Vue.use(BVConfigPlugin, {
     cancelTitle: 'Abbrechen'
   },
   BToast:{
-    autoHideDelay: store.getters.toastDelay
+    autoHideDelay: 8000
   }
 });
 Vue.use(ToastPlugin);
@@ -31,7 +31,7 @@ Vue.component('i-input', IntegerInput); //Global registration
 store.commit('initialiseStore');
 i18n.locale = store.getters.locale;
 
-new Vue({
+const app = new Vue({
   // components:{ //not global
   //   NoCommaInput
   // },
@@ -39,4 +39,6 @@ new Vue({
   router,
   store,
   render: h => h(App)
-}).$mount('#app')
+}).$mount('#app');
+
+store.$app = app; //need it for logout-toast
