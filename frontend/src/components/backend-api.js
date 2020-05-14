@@ -35,6 +35,21 @@ export default {
     getCourses(semesterData){
         return axios.get(`/semester/${semesterData.id}/courses`); //only id, name, number
     },
+    createCourse(data){
+        return axios.put('/course', data);
+    },
+    updateCourse(data){
+        return axios.post('/course',data);
+    },
+    copyCourse(data){
+        return axios.put(`/course/copy`, data);
+    },
+    updateCourseUsers(data){
+        return axios.post('/course/assign', data);
+    },
+    deleteCourse(data){
+        return axios.delete(`/course/${data.id}`);
+    },
     getUsers({courseId}){
         return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
     },
@@ -56,18 +71,6 @@ export default {
     },
     createSemester(data){
         return axios.put('/semester',data);
-    },
-    createCourse(data){
-        return axios.put('/course', data);
-    },
-    updateCourse(data){
-        return axios.post('/course',data);
-    },
-    updateCourseUsers(data){
-        return axios.post('/course/assign', data);
-    },
-    deleteCourse(data){
-        return axios.delete(`/course/${data.id}`);
     }
 }
 

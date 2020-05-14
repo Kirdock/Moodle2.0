@@ -101,6 +101,9 @@ export default new Vuex.Store({
     updateCourse({commit}, courseData){
       return api.updateCourse(courseData)
     },
+    copyCourse({commit}, data){
+      return api.copyCourse(data);
+    },
     updateCourseUsers({commit}, data){
       return api.updateCourseUsers(data);
     },

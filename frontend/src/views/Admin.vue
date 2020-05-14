@@ -135,11 +135,32 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-1" style="margin-top: 30px">
-                                <b-button variant="danger" v-b-modal="'modal-delete-course'">{{ $t('delete') }}</b-button>
+                            <div class="col-md-2" style="margin-top: 30px" v-show="selectedCourseId">
+                                <b-button variant="primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px">
+                                    <span class="fa fa-copy"></span>
+                                    {{ $t('copy') }}
+                                </b-button>
+                                <b-modal id="modal-copy-course" :title="$t('courseCopyQuestion')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="copyCourse(selectedSemester_edit, courseCopyId)">
+                                    <label for="selectedSemester_copy_course" class="control-label">{{ $t('semester') }}</label>
+                                    <select class="form-control" v-model="courseCopyId" id="selectedSemester_copy_course">
+                                        <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
+                                            {{semester.year}} {{semester.type === 'w' ? $t('winterSemesterShortcut') : $t('summerSemesterShortcut')}}
+                                        </option>
+                                    </select>
+                                </b-modal>
+
+                                <b-button variant="danger" v-b-modal="'modal-delete-course'">
+                                    <span class="fa fa-trash"></span>
+                                    {{ $t('delete') }}
+                                </b-button>
                                 <b-modal id="modal-delete-course" :title="$t('confirmDeletion')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteCourse(selectedCourse.id)">
                                     {{$t('courseDeleteQuestion')}}
                                 </b-modal>
+                                
+                                <div class="offset-md-1 form-inline" v-if="loadingCourse_delete">
+                                    <span class="fa fa-sync fa-spin"></span>
+                                    <label class="control-label">{{ $t('loading') }}...</label>
+                                </div>
                             </div>
                         </div>
                         <div class="row col-md-12" v-if="selectedCourse">
@@ -172,14 +193,16 @@
                             </div>
                             <div class="form-horizontal col-md-7 offset-md-1">
                                 <div class="form-group">
-                                    <label for="searchUserText" class="control-label">{{ $t('search') }}
+                                    <label for="searchUserText" class="control-label">
                                         <span class="fas fa-search"></span>
+                                        {{ $t('search') }}
                                     </label>
                                     <input id="searchUserText" type="text" class="form-control" v-model="searchUserText">
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label" for="showRoles">{{$t('show')}}
+                                    <label class="control-label" for="showRoles">
                                         <span class="fas fa-filter"></span>
+                                        {{$t('show')}}
                                     </label>
                                     <select class="form-control" id="showRoles" v-model="showRoles">
                                         <option v-for="role in rolesWithAll" :value="role.key" :key="role.key">
@@ -280,6 +303,7 @@ export default {
             loadingCreateSemester: false,
             loadingCourse_create: false,
             loadingCourse_edit: false,
+            loadingCourse_delete: false,
             loadingCourse_edit_updateUsers: false,
             semesterYear: new Date().getFullYear(),
             maxYear: new Date().getFullYear(),
@@ -287,12 +311,14 @@ export default {
             semesters: [],
             selectedSemester_create: undefined,
             selectedSemester_edit: undefined,
+            selectedSemester_copy_course: undefined,
             courseNumber_create: undefined,
             courseName_create: undefined,
             minKreuzel_create: undefined,
             minPoints_create: undefined,
             selectedCourse: undefined,
             selectedCourseId: undefined,
+            courseCopyId: undefined,
             selectedUser_edit: undefined,
             courses: [],
             searchUserText: undefined,
@@ -452,6 +478,69 @@ export default {
                 this.loadingCourse_edit = false;
             });
         },
+        copyCourse(courseId, semesterId){
+            this.loadingCourse_delete = true;
+            this.$store.dispatch('copyCourse', {courseId, semesterId}).then(response=>{
+                if(id === selectedSemester_edit){
+                    this.getCourses(id);
+                }
+                this.$bvToast.toast(this.$t('courseCopied'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('courseCopiedError'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }).finally(()=>{
+                this.loadingCourse_delete = false;
+            });
+            
+        },
+        getCourse(courseId){
+            this.$store.dispatch('getCourse',{courseId}).then(response =>{
+                this.selectedCourse = response.data;
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('courseGetError'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            });
+        },
+        getCourses(id){
+            this.$store.dispatch('getCourses',{id}).then(response =>{
+                this.courses = response.data;
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('coursesGetError'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            });
+        },
+        deleteCourse(id){
+            this.loadingCourse_delete = true;
+            this.$store.dispatch('deleteCourse',{id}).then(response =>{
+                this.$bvToast.toast(this.$t('courseDeleted'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+                this.getCourses(this.selectedSemester_edit);
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('courseDeletedError'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }).finally(()=>{
+                this.loadingCourse_delete = false;
+            });
+        },
         submitUsers(){
             this.loadingFileUpload = true;
             const formData = new FormData();
@@ -540,48 +629,10 @@ export default {
         getSemesters(){
             this.$store.dispatch('getSemesters').then(response =>{
                 this.semesters = response.data;
-                this.selectedSemester_create = this.selectedSemester_edit = this.semesters[0].id;
+                this.selectedSemester_create = this.courseCopyId = this.selectedSemester_edit = this.semesters[0].id;
                 this.getCourses(this.selectedSemester_edit);
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('semesterGetError'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
-            });
-        },
-        getCourse(courseId){
-            this.$store.dispatch('getCourse',{courseId}).then(response =>{
-                this.selectedCourse = response.data;
-            }).catch(()=>{
-                this.$bvToast.toast(this.$t('courseGetError'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
-            });
-        },
-        getCourses(id){
-            this.$store.dispatch('getCourses',{id}).then(response =>{
-                this.courses = response.data;
-            }).catch(()=>{
-                this.$bvToast.toast(this.$t('coursesGetError'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
-            });
-        },
-        deleteCourse(id){
-            this.$store.dispatch('deleteCourse',{id}).then(response =>{
-                this.$bvToast.toast(this.$t('courseDeleted'), {
-                    title: this.$t('success'),
-                    variant: 'success',
-                    appendToast: true
-                });
-                this.getCourses(this.selectedSemester_edit);
-            }).catch(()=>{
-                this.$bvToast.toast(this.$t('courseDeletedError'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
