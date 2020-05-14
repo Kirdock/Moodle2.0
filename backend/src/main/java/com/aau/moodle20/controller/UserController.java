@@ -98,8 +98,8 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(path = "/users")
-    public List<User> getUsers() {
-        return userDetailsService.getAllUsers();
+    public List<UserResponseObject> getUsers() {
+        return userDetailsService.getAllUserResponseObjects();
      }
 
     @GetMapping(path = "/users/course/{courseId}")

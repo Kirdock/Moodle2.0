@@ -87,12 +87,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<User> allUser = getAllUsers();
 
         for (User user : allUser) {
-            UserResponseObject responseObject = new UserResponseObject();
-            responseObject.setAdmin(user.getAdmin());
-            responseObject.setForename(user.getForename());
-            responseObject.setSurname(user.getSurname());
-            responseObject.setMatrikelNummer(user.getMartikelNumber());
-            responseObject.setUsername(user.getUsername());
+            UserResponseObject responseObject = createResponseObject(user);
 
             Optional<ECourseRole> role = userInCourses.stream()
                     .filter(userInCourse -> user.getMartikelNumber().equals(userInCourse.getUser().getMartikelNumber()))
@@ -137,5 +132,27 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         allUsers.removeIf(User::getAdmin);
 
         return allUsers;
+    }
+
+    public List<UserResponseObject> getAllUserResponseObjects() throws UserException
+    {
+        List<UserResponseObject> userResponseObjectList = new ArrayList<>();
+        List<User> allUsers = getAllUsers();
+        for(User user: allUsers)
+            userResponseObjectList.add(createResponseObject(user));
+
+        return userResponseObjectList;
+    }
+
+    protected UserResponseObject createResponseObject(User user)
+    {
+        UserResponseObject responseObject = new UserResponseObject();
+        responseObject.setAdmin(user.getAdmin());
+        responseObject.setForename(user.getForename());
+        responseObject.setSurname(user.getSurname());
+        responseObject.setMatrikelNummer(user.getMartikelNumber());
+        responseObject.setUsername(user.getUsername());
+
+        return responseObject;
     }
 }
