@@ -43,11 +43,7 @@ export default {
       });
     },
     logout(){
-      this.$store.dispatch('logout').then(()=>{
-        if(this.$route.path !== '/'){
-          this.$router.push('/');
-        }
-      });
+      this.$store.dispatch('logout');
     }
   }
 }

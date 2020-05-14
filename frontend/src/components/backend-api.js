@@ -1,15 +1,22 @@
 import AXIOS from 'axios';
-import store from '../store/index';
+import store from '@/store/index';
 const axios = AXIOS.create({
   baseURL: `/api`
 });
 
-axios.interceptors.request.use(function (config) {
+axios.interceptors.request.use(config => {
     if(store.getters.token){
         config.headers.Authorization = 'Bearer ' + store.getters.token;
     }
     return config;
-  });
+});
+
+axios.interceptors.response.use(config =>{
+    if(config.status === 401){
+        store.dispatch('logout', true);
+    }
+    return config;
+});
 
 
 export default {
@@ -28,6 +35,21 @@ export default {
     getCourses(semesterData){
         return axios.get(`/semester/${semesterData.id}/courses`); //only id, name, number
     },
+    createCourse(data){
+        return axios.put('/course', data);
+    },
+    updateCourse(data){
+        return axios.post('/course',data);
+    },
+    copyCourse(data){
+        return axios.put(`/course/copy`, data);
+    },
+    updateCourseUsers(data){
+        return axios.post('/course/assign', data);
+    },
+    deleteCourse(data){
+        return axios.delete(`/course/${data.id}`);
+    },
     getUsers({courseId}){
         return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
     },
@@ -44,20 +66,14 @@ export default {
             }
         );
     },
+    udpatePassword(data){
+        return axios.post('/user/password', data);
+    },
+    deleteUser(matrikelNummer){
+        return axios.delete(`/user/${matrikelNummer}`);
+    },
     createSemester(data){
         return axios.put('/semester',data);
-    },
-    createCourse(data){
-        return axios.put('/course', data);
-    },
-    updateCourse(data){
-        return axios.post('/course',data);
-    },
-    updateCourseUsers(data){
-        return axios.post('/course/assign', data);
-    },
-    deleteCourse(data){
-        return axios.delete(`/course/${data.id}`);
     }
 }
 
