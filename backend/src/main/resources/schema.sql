@@ -30,7 +30,7 @@ CREATE  TABLE IF NOT EXISTS USER_IN_COURSE (
  matrikel_Nummer VARCHAR(20),
  role VARCHAR (20),
  PRIMARY KEY (course_id,matrikel_Nummer),
- CONSTRAINT  FOREIGN_KEY_USER FOREIGN KEY (matrikel_Nummer) references USER,
- CONSTRAINT  FOREIGN_KEY_COURSE FOREIGN KEY (course_id) references COURSE
+ CONSTRAINT  FOREIGN_KEY_USER FOREIGN KEY (matrikel_Nummer) references USER on delete cascade ,
+ CONSTRAINT  FOREIGN_KEY_COURSE FOREIGN KEY (course_id) references COURSE on delete cascade
 );
 
