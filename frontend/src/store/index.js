@@ -15,6 +15,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '@/components/backend-api';
 import router from '@/router';
+import i18n from '@/plugins/i18n';
 const tokenName = 'Token';
 const settingName = 'Settings';
 const storage = window.localStorage;
@@ -32,7 +33,7 @@ export default new Vuex.Store({
       state.userInfo = decodeToken(state.token);
       state.loggedIn = !!state.token;
       state.settings = getSettings();
-      if(state.userInfo.expire < new Date().getTime()/1000){
+      if(state.userInfo.exp < new Date().getTime()/1000){
         this.dispatch('logout', true);
       }
     },
@@ -143,7 +144,35 @@ export default new Vuex.Store({
     locale: state => state.settings.locale,
     isLoggedIn: state => state.loggedIn,
     decodedToken: state => state.userInfo,
-    token: state=> state.token
+    token: state=> state.token,
+    courseRoles: () => {
+      return [
+        {
+            key: 'l',
+            value: i18n.t('lecturer'),
+        },
+        {
+            key: 't',
+            value: i18n.t('tutor'),
+        },
+        {
+            key: 's',
+            value: i18n.t('student'),
+        },
+      ];
+    },
+    userRoles: () => {
+      return [
+        {
+            key: 'l',
+            value: i18n.t('lecturer'),
+        },
+        {
+            key: 's',
+            value: i18n.t('student'),
+        },
+      ];
+    }
   }
 });
 
