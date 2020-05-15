@@ -281,6 +281,7 @@ export default {
             }
             else{
                 this.exerciseSheet_create.courseId = this.selectedCourseId;
+                this.exerciseSheet_create.order = (this.selectedCourse.exerciseSheets.length +1);
                 this.$store.dispatch('createExerciseSheet', this.exerciseSheet_create).then(()=>{
                     this.$bvModal.hide('modal-new-exerciseSheet');
                     if(this.exerciseSheet_create.courseId === this.selectedCourseId){
