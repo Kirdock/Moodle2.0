@@ -1,6 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.UserException;
+import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.response.*;
@@ -44,10 +45,6 @@ public class UserController {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-
-
-
-
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -86,5 +83,11 @@ public class UserController {
     @GetMapping(path = "/users/course/{courseId}")
     public List<UserCourseResponseObject> getUsersWithCourseRoles(@PathVariable("courseId") long courseId) {
         return userDetailsService.getUsersWithCourseRoles(courseId);
+    }
+
+    @PostMapping(path = "/user/password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, @RequestHeader("Authorization") String jwtToken) {
+        userDetailsService.changePassword(changePasswordRequest, jwtToken);
+        return ResponseEntity.ok(new MessageResponse("User password changed!"));
     }
 }

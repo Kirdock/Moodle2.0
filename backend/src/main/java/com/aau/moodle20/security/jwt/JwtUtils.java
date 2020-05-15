@@ -42,6 +42,10 @@ public class JwtUtils {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
+    public String getMatrikelNummerFromJwtToken(String token) {
+        return (String) Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get("matrikelNumber");
+    }
+
     public boolean validateJwtToken(String authToken) throws Exception {
 //        try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
