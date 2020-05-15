@@ -459,6 +459,9 @@ export default {
         deleteCourse(id){
             this.loading_delete = true;
             this.$store.dispatch('deleteCourse',{id}).then(response =>{
+                if(id === this.selectedCourseId){
+                    this.selectedCourse = undefined;
+                }
                 this.$bvToast.toast(this.$t('course.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',

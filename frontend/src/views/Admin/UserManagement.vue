@@ -162,6 +162,7 @@ export default {
         },
         deleteUser(matrikelNummer){
             this.$store.dispatch('deleteUser', matrikelNummer).then(response =>{
+                this.getUsers(true);
                 this.$bvToast.toast(this.$t('user.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',
