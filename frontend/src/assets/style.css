@@ -2,3 +2,7 @@
   content:"*";
   color:red;
 }
+
+table td a span.fa{
+  margin-right: 5px;
+}
