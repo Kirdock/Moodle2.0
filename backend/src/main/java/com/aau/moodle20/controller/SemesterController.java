@@ -5,6 +5,7 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
+import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.repository.SemesterRepository;
@@ -63,15 +64,22 @@ public class SemesterController {
         return ResponseEntity.ok(new MessageResponse("Course was sucessfully created!"));
     }
 
-    //Course Section
+
     @PreAuthorize("hasAuthority('Admin')")
     @PostMapping(value = "/course")
-    public ResponseEntity<?> updateCourse(@Valid  @RequestBody CreateCourseRequest createCourseRequest)  throws SemesterException {
+    public ResponseEntity<?> updateCourse(@Valid  @RequestBody UpdateCourseRequest updateCourseRequest)  throws SemesterException {
 
-        semesterService.createCourse(createCourseRequest);
-        return ResponseEntity.ok(new MessageResponse("Course was sucessfully created!"));
+        semesterService.updateCourse(updateCourseRequest);
+        return ResponseEntity.ok(new MessageResponse("Course was sucessfully updated!"));
     }
 
+    @PreAuthorize("hasAuthority('Admin')")
+    @DeleteMapping(value = "/course/{courseId}")
+    public ResponseEntity<?> deleteCourse(@PathVariable("courseId") long courseId)  throws SemesterException {
+
+        semesterService.deleteCourse(courseId);
+        return ResponseEntity.ok(new MessageResponse("Course was sucessfully deleted!"));
+    }
 
 
     @PostMapping(value = "/course/assign")

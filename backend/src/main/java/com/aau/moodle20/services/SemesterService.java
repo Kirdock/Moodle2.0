@@ -30,12 +30,11 @@ public class SemesterService {
     UserInCourseRepository userInCourseRepository;
 
 
-    public void createSemester(CreateSemesterRequest createSemesterRequest) throws SemesterException
-    {
+    public void createSemester(CreateSemesterRequest createSemesterRequest) throws SemesterException {
         //TODO add more validation
 
         if (semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear())) {
-            throw new SemesterException("Error: Semester with this year and type already exists!" );
+            throw new SemesterException("Error: Semester with this year and type already exists!");
         }
         Semester semester = new Semester();
         semester.setType(createSemesterRequest.getType());
@@ -44,28 +43,27 @@ public class SemesterService {
         semesterRepository.save(semester);
     }
 
-    public void createCourse(CreateCourseRequest createCourseRequest) throws SemesterException
-    {
+    public void createCourse(CreateCourseRequest createCourseRequest) throws SemesterException {
         //TODO add validation
-
         Course course = new Course();
-         course.setMinKreuzel(createCourseRequest.getMinKreuzel());
-         course.setMinPoints(createCourseRequest.getMinPoints());
-         course.setName(createCourseRequest.getName());
-         course.setNumber(createCourseRequest.getNumber());
-         course.setSemester(new Semester(createCourseRequest.getSemesterId()));
-
-         courseRepository.save(course);
+        course.setMinKreuzel(createCourseRequest.getMinKreuzel());
+        course.setMinPoints(createCourseRequest.getMinPoints());
+        course.setName(createCourseRequest.getName());
+        course.setNumber(createCourseRequest.getNumber());
+        course.setSemester(new Semester(createCourseRequest.getSemesterId()));
+        courseRepository.save(course);
     }
 
-
-    public void updateCourse(UpdateCourseRequest updateCourseRequest) throws SemesterException
-    {
-        //TODO add validation
+    public void updateCourse(UpdateCourseRequest updateCourseRequest) throws SemesterException {
+        if (!courseRepository.existsById(updateCourseRequest.getId())) {
+            throw new SemesterException("Error: Course with this id does not exists");
+        }
+        if (!semesterRepository.existsById(updateCourseRequest.getSemesterId())) {
+            throw new SemesterException("Error: Semester with this id does not exists");
+        }
         Course course = null;
         Optional<Course> optionalCourse = courseRepository.findById(updateCourseRequest.getId());
-        if(optionalCourse.isPresent())
-        {
+        if (optionalCourse.isPresent()) {
             course = optionalCourse.get();
             course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
             course.setMinPoints(updateCourseRequest.getMinPoints());
@@ -74,6 +72,13 @@ public class SemesterService {
             course.setSemester(new Semester(updateCourseRequest.getSemesterId()));
         }
         courseRepository.save(course);
+    }
+
+    public void deleteCourse(Long courseId) throws SemesterException {
+        if (!courseRepository.existsById(courseId)) {
+            throw new SemesterException("Error: Course with this id does not exists");
+        }
+        courseRepository.deleteById(courseId);
     }
 
 

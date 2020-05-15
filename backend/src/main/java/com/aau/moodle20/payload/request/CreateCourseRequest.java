@@ -1,9 +1,13 @@
 package com.aau.moodle20.payload.request;
 
+import javax.validation.constraints.NotBlank;
+
 public class CreateCourseRequest {
 
     private Long semesterId;
+    @NotBlank
     private String number;
+    @NotBlank
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
