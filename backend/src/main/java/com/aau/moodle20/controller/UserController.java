@@ -66,24 +66,8 @@ public class UserController {
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/user")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        }
 
-        String password = "password";//TODO should not be hardcoded
-        if(signUpRequest.getPassword()!=null && !signUpRequest.getPassword().isEmpty())
-        {
-            password = encoder.encode(signUpRequest.getPassword());
-        }else
-        {
-            password = encoder.encode(password);
-        }
-        //username, matrikelNumber, forename, surename, password, isAdmin
-        User user = new User(signUpRequest.getUsername(), signUpRequest.getMatrikelnummer(),signUpRequest.getForename(),signUpRequest.getSurname(),password,Boolean.FALSE);
-        userRepository.save(user);
-
+        userDetailsService.registerUser(signUpRequest);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 

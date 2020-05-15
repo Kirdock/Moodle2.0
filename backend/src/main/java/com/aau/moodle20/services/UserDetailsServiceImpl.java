@@ -4,11 +4,14 @@ import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.domain.User;
 import com.aau.moodle20.domain.UserInCourse;
 import com.aau.moodle20.exception.UserException;
+import com.aau.moodle20.payload.request.SignUpRequest;
+import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -51,6 +54,25 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
         return UserDetailsImpl.build(user);
+    }
+
+    public void registerUser(SignUpRequest signUpRequest) throws UserException
+    {
+        if (userRepository.existsByMatrikelNummer(signUpRequest.getMatrikelnummer())) {
+           throw new UserException("Error: User with this matrikelNummer already exists!");
+        }
+
+        String password = "password";//TODO should not be hardcoded
+        if(signUpRequest.getPassword()!=null && !signUpRequest.getPassword().isEmpty())
+        {
+            password = encoder.encode(signUpRequest.getPassword());
+        }else
+        {
+            password = encoder.encode(password);
+        }
+        //username, matrikelNumber, forename, surename, password, isAdmin
+        User user = new User(signUpRequest.getUsername(), signUpRequest.getMatrikelnummer(),signUpRequest.getForename(),signUpRequest.getSurname(),password,Boolean.FALSE);
+        userRepository.save(user);
     }
 
 
@@ -144,6 +166,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userResponseObjectList;
     }
 
+    /**
+     * creates a user response object from the given user entity object
+     * @param user
+     * @return
+     */
     protected UserResponseObject createResponseObject(User user)
     {
         UserResponseObject responseObject = new UserResponseObject();

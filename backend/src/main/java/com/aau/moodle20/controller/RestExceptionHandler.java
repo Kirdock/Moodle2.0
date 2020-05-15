@@ -3,6 +3,7 @@ package com.aau.moodle20.controller;
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.exception.ApiError;
 import com.aau.moodle20.exception.SemesterException;
+import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.response.MessageResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -39,6 +40,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new MessageResponse(ex.getMessage()));
 
 
+    }
+
+    @ExceptionHandler(UserException.class)
+    protected ResponseEntity<Object> handleUser(UserException ex) {
+        List<String> errors = new ArrayList<String>();
+        ApiError apiError =
+                new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors, ApiErrorResponseCodes.USER_ALREADY_EXISTS);
+        return  ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
     @Override
