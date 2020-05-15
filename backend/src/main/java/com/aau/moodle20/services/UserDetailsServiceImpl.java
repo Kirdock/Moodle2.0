@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -184,7 +185,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     /**
      * creates a user response object from the given user entity object
      * @param user
-     * @return
      */
     protected void fillResponseObject(User user,AbstractUserResponseObject responseObject)
     {
@@ -196,7 +196,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)
     {
-        String matrikelNumber = jwtUtils.getMatrikelNummerFromJwtToken(jwtToken);
+        String matrikelNumber = jwtUtils.getMatrikelNummerFromJwtToken(jwtToken.substring(7,jwtToken.length()));
 
         Optional<User> optionalUser = userRepository.findByMatrikelNummer(matrikelNumber);
         if(!encoder.matches(changePasswordRequest.getOldPassword(), optionalUser.get().getPassword()))
