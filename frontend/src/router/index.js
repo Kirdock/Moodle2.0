@@ -8,6 +8,7 @@ import Admin from '@/views/Admin.vue';
 import UserManagement from '@/views/Admin/UserManagement.vue';
 import SemesterManagement from '@/views/Admin/SemesterManagement.vue';
 import CourseManagement from '@/views/Admin/CourseManagement.vue';
+import SheetManagement from '@/views/Admin/ExerciseSheet/SheetManagement.vue';
 import store from '@/store/index';
 
 Vue.use(VueRouter);
@@ -74,6 +75,16 @@ const routes = [
       authentication: true,
       isAdmin: true
     }
+  },
+  {
+    path: '/Admin/Course/{courseId}/SheetManagement/{sheetId}',
+    name: 'SheetManagement',
+    component: SheetManagement,
+    meta: {
+      authentication: true,
+      isAdmin: true
+    },
+    props: true
   },
   //otherwise
   { path: '*', redirect: '/' }

@@ -26,7 +26,7 @@ const messages = {
             
             error: {
                 copy: 'Die Lehrveranstaltung konnte nicht kopiert werden',
-                created: 'Lehrveranstaltung konnte nicht angelegt werden',
+                create: 'Lehrveranstaltung konnte nicht angelegt werden',
                 delete: 'Lehrveranstaltung konnte nicht gelöscht werden',
                 get: 'Lehrveranstaltung konnte nicht geladen werden',
                 update: 'Lehrveranstaltung konnte nicht aktualisiert werden',
@@ -38,6 +38,9 @@ const messages = {
             question: {
                 copy: 'In welches Semester soll die Lehrveranstaltung kopiert werden?',
                 delete: 'Wollen Sie die Lehrveranstaltung wirklich löschen?'
+            },
+            title: {
+                create: 'Neue Lehrveranstaltung'
             }
         },
         create: 'Anlegen',
@@ -46,7 +49,28 @@ const messages = {
         eightDigitNumber: 'Achtstellige Nummer',
         error: 'Fehler',
         exerciseSheet: {
-            exerciseSheets: 'Übungsblätter',
+            name: 'Übungsblatt',
+            created: 'Übungsblatt wurde angelegt',
+            updated: 'Übungsblatt wurde aktualisiert',
+            deleted: 'Übungsblatt wurde gelöscht',
+            error: {
+                create: 'Übungsblatt konnte nicht angelegt werden',
+                get: 'Übungsblatt konnte nicht geladen werden',
+                update: 'Übungsblatt konnte nicht aktualisiert werden',
+                delete: 'Übungsblatt konnte nicht gelöscht werden'
+            },
+            title: {
+                create: 'Neues Übungsblatt'
+            },
+            question: {
+                delete: 'Wollen Sie das Übungsblatt wirklich löschen?'
+            }
+        },
+        exerciseSheets: {
+            name: 'Übungsblätter',
+            error: {
+                get: 'Übungsblätter konnten nicht geladen werden',
+            }
         },
         forename: 'Vorname',
         format: 'Format',
@@ -157,6 +181,9 @@ const messages = {
             },
             errors: {
                 get: 'Courses could not be loaded',
+            },
+            title: {
+                create: 'New course'
             }
         },
         create: 'Create',
@@ -165,7 +192,28 @@ const messages = {
         eightDigitNumber: 'Eight-digit number',
         error: 'Error',
         exerciseSheet: {
-            exerciseSheets: 'Exercise sheets'
+            name: 'Exercise sheet',
+            create: 'Exercise sheet created',
+            updated: 'Exercise sheet updated',
+            delete: 'Exercise sheet deleted',
+            error: {
+                create: 'Exercise sheet could not be created',
+                get: 'Exercise sheet could not be loaded',
+                update: 'Exercise sheet could lnto be updated',
+                delete: 'Exercise sheet could not be deleted'
+            },
+            title: {
+                create: 'New exercise sheet'
+            },
+            question: {
+                delete: 'Do you really want to delete this exercise sheet?'
+            }
+        },
+        exerciseSheets: {
+            name: 'Exercise sheets',
+            error: {
+                get: 'Exercise sheets could not be loaded',
+            }
         },
         forename: 'Forename',
         format: 'Format',

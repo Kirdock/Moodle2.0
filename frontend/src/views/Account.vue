@@ -54,7 +54,8 @@ export default {
       }
       else{
         this.loadingPasswordChange = true;
-        this.$store.dispatch('udpatePassword', this.passwordData).then(()=>{
+        const {newPasswordConfirm, ...data} = this.passwordData;
+        this.$store.dispatch('udpatePassword', data).then(()=>{
           this.$bvToast.toast(this.$t('passwordUpdated'), {
             title: this.$t('success'),
             variant: 'success',

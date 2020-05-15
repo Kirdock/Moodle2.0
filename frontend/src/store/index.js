@@ -16,6 +16,7 @@ import Vuex from 'vuex';
 import api from '@/components/backend-api';
 import router from '@/router';
 import i18n from '@/plugins/i18n';
+
 const tokenName = 'Token';
 const settingName = 'Settings';
 const storage = window.localStorage;
@@ -135,6 +136,21 @@ export default new Vuex.Store({
     },
     deleteCourse({commit}, data){
       return api.deleteCourse(data);
+    },
+    createExerciseSheet({commit}, data){
+      return api.createExerciseSheet(data);
+    },
+    getExerciseSheets({commit}, courseData){
+      return api.getExerciseSheets(courseData);
+    },
+    getExerciseSheet({commit}, sheedId){
+      return api.exerciseSheet(sheedId);
+    },
+    updateExerciseSheet({commit}, sheetData){
+      return api.updateExerciseSheet(sheetData);
+    },
+    deleteExerciseSheet({commit}, sheetId){
+      return api.deleteExerciseSheet(sheetId);
     }
   },
   modules: {
@@ -145,6 +161,10 @@ export default new Vuex.Store({
     isLoggedIn: state => state.loggedIn,
     decodedToken: state => state.userInfo,
     token: state=> state.token,
+    currentDateTime: ()=>{
+      const date = new Date();
+      return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split(/ *:..\..../)[0];
+    },
     courseRoles: () => {
       return [
         {

@@ -1,5 +1,6 @@
 import AXIOS from 'axios';
 import store from '@/store/index';
+
 const axios = AXIOS.create({
   baseURL: `/api`
 });
@@ -74,6 +75,21 @@ export default {
     },
     createSemester(data){
         return axios.put('/semester',data);
+    },
+    createExerciseSheet(data){
+        return axios.put('/exerciseSheet', data);
+    },
+    getExerciseSheets(courseData){
+        return axios.get(`/course/${courseData.id}/exerciseSheets`);
+    },
+    getExerciseSheet(sheedId){
+        return axios.get(`/exerciseSheets/${sheedId}`)
+    },
+    updateExerciseSheet(sheetData){
+        return axios.post('/course/exerciseSheet', sheetData);
+    },
+    deleteExerciseSheet(sheedId){
+        return axios.delete(`/exerciseSheet/${sheedId}`);
     }
 }
 
