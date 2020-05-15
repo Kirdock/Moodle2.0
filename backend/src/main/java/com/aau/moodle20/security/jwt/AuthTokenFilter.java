@@ -1,9 +1,14 @@
 package com.aau.moodle20.security.jwt;
 
 import com.aau.moodle20.services.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,8 +47,33 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (SignatureException e) {
+            logger.error("Invalid JWT signature: {}", e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("Invalid JWT signature");
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token: {}", e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("Invalid JWT token");
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT token is expired: {}", e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("JWT token is expired");
+
+        } catch (UnsupportedJwtException e) {
+            logger.error("JWT token is unsupported: {}", e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("JWT token is unsupported");
+
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT claims string is empty: {}", e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("JWT claims string is empty");
+
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("Cannot set user authentication");
         }
 
         filterChain.doFilter(request, response);
