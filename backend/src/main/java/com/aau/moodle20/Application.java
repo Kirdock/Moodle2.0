@@ -1,5 +1,6 @@
 package com.aau.moodle20;
 
+import com.aau.moodle20.constants.EUserRole;
 import com.aau.moodle20.domain.User;
 import com.aau.moodle20.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class Application implements ApplicationRunner, ErrorController {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		if (!userRepository.existsByUsername(adminUserName)) {
-			userRepository.save(new User(adminUserName,"123","admin", "admin", encoder.encode(adminPassword), Boolean.TRUE) );
+			userRepository.save(new User(adminUserName,"123",adminUserName, adminPassword, encoder.encode(adminPassword), EUserRole.Admin) );
 		}
 	}
 

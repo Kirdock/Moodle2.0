@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.EUserRole;
 import com.aau.moodle20.domain.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +18,7 @@ public class UserDetailsImpl implements UserDetails {
 
     private String username;
 
-    private Boolean isAdmin;
+    private EUserRole role;
     private String matrikelNumber;
     private String forename;
     private String surename;
@@ -27,10 +28,10 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl( String username, String password, Boolean isAdmin, String matrikelNumber, String forename, String surename) {
+    public UserDetailsImpl(String username, String password, EUserRole role, String matrikelNumber, String forename, String surename) {
         this.username = username;
         this.password = password;
-        this.isAdmin = isAdmin;
+        this.role = role;
         this.matrikelNumber = matrikelNumber;
         this.forename = forename;
         this.surename = surename;
@@ -39,16 +40,16 @@ public class UserDetailsImpl implements UserDetails {
     public static UserDetailsImpl build(User user) {
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if(user.getAdmin())
+        if(EUserRole.Admin.equals(user.getRole()))
         {
-            authorities.add(new SimpleGrantedAuthority("Admin")); // TODO define a constant somewhere
+            authorities.add(new SimpleGrantedAuthority(user.getRole().toString())); // TODO define a constant somewhere
         }
 
         UserDetailsImpl userDetails = new UserDetailsImpl(
                 user.getUsername(),
                 user.getPassword(),
-                user.getAdmin(),
-                user.getMartikelNumber(),
+                user.getRole(),
+                user.getMatrikelNumber(),
                 user.getForename(),
                 user.getSurname());
 
@@ -93,12 +94,12 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
-    public Boolean getAdmin() {
-        return isAdmin;
+    public EUserRole getRole() {
+        return role;
     }
 
-    public void setAdmin(Boolean admin) {
-        isAdmin = admin;
+    public void setRole(EUserRole role) {
+        this.role = role;
     }
 
     public String getMatrikelNumber() {

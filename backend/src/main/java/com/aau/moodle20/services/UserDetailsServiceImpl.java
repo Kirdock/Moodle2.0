@@ -1,17 +1,18 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ECourseRole;
+import com.aau.moodle20.constants.EUserRole;
 import com.aau.moodle20.domain.User;
 import com.aau.moodle20.domain.UserInCourse;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.SignUpRequest;
-import com.aau.moodle20.payload.response.MessageResponse;
+import com.aau.moodle20.payload.response.AbstractUserResponseObject;
+import com.aau.moodle20.payload.response.UserCourseResponseObject;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -61,6 +62,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (userRepository.existsByMatrikelNummer(signUpRequest.getMatrikelnummer())) {
            throw new UserException("Error: User with this matrikelNummer already exists!");
         }
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            throw new UserException("Error: User with this username already exists!");
+        }
+        if (EUserRole.Admin.equals(signUpRequest.getRole())) {
+            throw new UserException("Error: Admin user role is not allowed!");
+        }
 
         String password = "password";//TODO should not be hardcoded
         if(signUpRequest.getPassword()!=null && !signUpRequest.getPassword().isEmpty())
@@ -71,7 +78,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             password = encoder.encode(password);
         }
         //username, matrikelNumber, forename, surename, password, isAdmin
-        User user = new User(signUpRequest.getUsername(), signUpRequest.getMatrikelnummer(),signUpRequest.getForename(),signUpRequest.getSurname(),password,Boolean.FALSE);
+        User user = new User();
+        user.setUsername(signUpRequest.getUsername());
+        user.setMatrikelNumber(signUpRequest.getMatrikelnummer());
+        user.setForename(signUpRequest.getForename());
+        user.setSurname(signUpRequest.getSurname());
+        user.setPassword(password);
+        user.setRole(signUpRequest.getRole());
         userRepository.save(user);
     }
 
@@ -88,37 +101,38 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             String[] columns = line.split(";");
             User user = new User();
             user.setUsername(columns[0]);
-            user.setMartikelNumber(columns[1]);
+            user.setMatrikelNumber(columns[1]);
             user.setSurname(columns[2]);
             user.setForename(columns[3]);
-            user.setAdmin(Boolean.FALSE);
+            user.setRole(EUserRole.None);
             user.setPassword(password);
             users.add(user);
         }
 
         // remove users which already exists
-        users.removeIf(user -> userRepository.existsByMatrikelNummer(user.getMartikelNumber()));
+        users.removeIf(user -> userRepository.existsByMatrikelNummer(user.getMatrikelNumber()));
         userRepository.saveAll(users);
     }
 
 
-    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws UserException {
+    public List<UserCourseResponseObject> getUsersWithCourseRoles(Long courseId) throws UserException {
         //TODO add validation
-        List<UserResponseObject> userResponseObjectList = new ArrayList<>();
+        List<UserCourseResponseObject> userResponseObjectList = new ArrayList<>();
         List<UserInCourse> userInCourses = userInCourseRepository.findByCourse_Id(courseId);
         List<User> allUser = getAllUsers();
 
         for (User user : allUser) {
-            UserResponseObject responseObject = createResponseObject(user);
+            UserCourseResponseObject responseObject = new UserCourseResponseObject();
+            fillResponseObject(user,responseObject);
 
             Optional<ECourseRole> role = userInCourses.stream()
-                    .filter(userInCourse -> user.getMartikelNumber().equals(userInCourse.getUser().getMartikelNumber()))
+                    .filter(userInCourse -> user.getMatrikelNumber().equals(userInCourse.getUser().getMatrikelNumber()))
                     .map(UserInCourse::getRole)
                     .findFirst();
             if (role.isPresent())
-                responseObject.setRole(role.get());
+                responseObject.setCourseRole(role.get());
             else
-                responseObject.setRole(ECourseRole.None);
+                responseObject.setCourseRole(ECourseRole.None);
             userResponseObjectList.add(responseObject);
         }
 
@@ -151,7 +165,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     public List<User> getAllUsers() throws UserException {
         List<User> allUsers = userRepository.findAll();
-        allUsers.removeIf(User::getAdmin);
+        allUsers.removeIf(user -> EUserRole.Admin.equals(user.getRole()));
 
         return allUsers;
     }
@@ -161,7 +175,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<UserResponseObject> userResponseObjectList = new ArrayList<>();
         List<User> allUsers = getAllUsers();
         for(User user: allUsers)
-            userResponseObjectList.add(createResponseObject(user));
+        {
+            UserResponseObject responseObject= new UserResponseObject();
+            fillResponseObject(user,responseObject);
+            responseObject.setUserRole(user.getRole());
+            userResponseObjectList.add(responseObject);
+        }
 
         return userResponseObjectList;
     }
@@ -171,15 +190,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @param user
      * @return
      */
-    protected UserResponseObject createResponseObject(User user)
+    protected void fillResponseObject(User user,AbstractUserResponseObject responseObject)
     {
-        UserResponseObject responseObject = new UserResponseObject();
-        responseObject.setAdmin(user.getAdmin());
         responseObject.setForename(user.getForename());
         responseObject.setSurname(user.getSurname());
-        responseObject.setMatrikelNummer(user.getMartikelNumber());
+        responseObject.setMatrikelNummer(user.getMatrikelNumber());
         responseObject.setUsername(user.getUsername());
-
-        return responseObject;
     }
 }

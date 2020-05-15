@@ -1,5 +1,7 @@
 package com.aau.moodle20.domain;
 
+import com.aau.moodle20.constants.EUserRole;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -18,8 +20,8 @@ public class User {
     @Column(name = "matrikelNummer", nullable = false)
     @Basic(optional = false)
     private String matrikelNummer;
-    @Column(name = "isAdmin")
-    private Boolean isAdmin;
+    @Column(name = "role")
+    private EUserRole role;
 
     @NotBlank
     @Size(max = 120)
@@ -39,36 +41,36 @@ public class User {
 
     }
 
-    public User(String username, String password, Boolean isAdmin)
+    public User(String username, String password, EUserRole role)
     {
         this.username = username;
         this.password = password;
-        this.isAdmin = isAdmin;
+        this.role = role;
     }
-    public User(String username, String matrikelNummer, String forename, String surename, String password, Boolean isAdmin)
+    public User(String username, String matrikelNummer, String forename, String surename, String password, EUserRole role)
     {
         this.username = username;
         this.matrikelNummer = matrikelNummer;
         this.forename = forename;
         this.surname = surename;
         this.password = password;
-        this.isAdmin = isAdmin;
+        this.role = role;
     }
 
-    public String getMartikelNumber() {
+    public String getMatrikelNumber() {
         return matrikelNummer;
     }
 
-    public void setMartikelNumber(String martikelNummer) {
+    public void setMatrikelNumber(String martikelNummer) {
         this.matrikelNummer = martikelNummer;
     }
 
-    public Boolean getAdmin() {
-        return isAdmin;
+    public EUserRole getRole() {
+        return role;
     }
 
-    public void setAdmin(Boolean admin) {
-        isAdmin = admin;
+    public void setRole(EUserRole role) {
+        this.role = role;
     }
 
     public String getPassword() {

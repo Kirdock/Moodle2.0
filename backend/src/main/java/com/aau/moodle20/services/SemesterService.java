@@ -69,7 +69,6 @@ public class SemesterService {
             course.setMinPoints(updateCourseRequest.getMinPoints());
             course.setName(updateCourseRequest.getName());
             course.setNumber(updateCourseRequest.getNumber());
-            course.setSemester(new Semester(updateCourseRequest.getSemesterId()));
         }
         courseRepository.save(course);
     }
@@ -99,7 +98,7 @@ public class SemesterService {
             userCourseKey.setCourseId(assignUserToCourseRequest.getCourseId());
             userCourseKey.setMatrikelNummer(assignUserToCourseRequest.getMatrikelNummer());
 
-            user.setMartikelNumber(assignUserToCourseRequest.getMatrikelNummer());
+            user.setMatrikelNumber(assignUserToCourseRequest.getMatrikelNummer());
             course.setId(assignUserToCourseRequest.getCourseId());
             userInCourse.setRole(assignUserToCourseRequest.getRole());
             userInCourse.setUser(user);
