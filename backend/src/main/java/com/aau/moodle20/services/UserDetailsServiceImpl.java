@@ -196,7 +196,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)
     {
-        String matrikelNumber = jwtUtils.getMatrikelNummerFromJwtToken(jwtToken.substring(7,jwtToken.length()));
+        String matrikelNumber = jwtUtils.getMatrikelNummerFromJwtToken(jwtToken.split(" ")[1].trim());
 
         Optional<User> optionalUser = userRepository.findByMatrikelNummer(matrikelNumber);
         if(!encoder.matches(changePasswordRequest.getOldPassword(), optionalUser.get().getPassword()))
@@ -205,5 +205,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = optionalUser.get();
         user.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public void deleteUser(String matrikelNummer)
+    {
+        Optional<User> optionalUser = userRepository.findByMatrikelNummer(matrikelNummer);
+        if(!optionalUser.isPresent())
+            throw new UserException("User with the matrikelNummer:"+matrikelNummer+" does not exists");
+
+        if(EUserRole.Admin.equals(optionalUser.get().getRole()))
+            throw new UserException("Admin user cannot be deleted");
+
+        userRepository.delete(optionalUser.get());
     }
 }

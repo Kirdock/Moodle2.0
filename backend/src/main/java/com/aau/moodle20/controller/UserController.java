@@ -90,4 +90,11 @@ public class UserController {
         userDetailsService.changePassword(changePasswordRequest, jwtToken);
         return ResponseEntity.ok(new MessageResponse("User password changed!"));
     }
+
+    @PreAuthorize("hasAuthority('Admin')")
+    @DeleteMapping(path = "/user/{matrikelnummer}")
+    public ResponseEntity<?> deleteUser(@PathVariable String matrikelnummer) {
+        userDetailsService.deleteUser(matrikelnummer);
+        return ResponseEntity.ok(new MessageResponse("User was deleted!"));
+    }
 }
