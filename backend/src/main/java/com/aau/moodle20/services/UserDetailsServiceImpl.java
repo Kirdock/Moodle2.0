@@ -5,6 +5,7 @@ import com.aau.moodle20.constants.EUserRole;
 import com.aau.moodle20.domain.User;
 import com.aau.moodle20.domain.UserInCourse;
 import com.aau.moodle20.exception.UserException;
+import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.response.AbstractUserResponseObject;
 import com.aau.moodle20.payload.response.UserCourseResponseObject;
@@ -70,13 +71,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         String password = "password";//TODO should not be hardcoded
-        if(signUpRequest.getPassword()!=null && !signUpRequest.getPassword().isEmpty())
-        {
-            password = encoder.encode(signUpRequest.getPassword());
-        }else
-        {
-            password = encoder.encode(password);
-        }
+        password = encoder.encode(password);
+
         //username, matrikelNumber, forename, surename, password, isAdmin
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
@@ -196,5 +192,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         responseObject.setSurname(user.getSurname());
         responseObject.setMatrikelNummer(user.getMatrikelNumber());
         responseObject.setUsername(user.getUsername());
+    }
+
+    public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)
+    {
+        String matrikelNumber = jwtUtils.getMatrikelNummerFromJwtToken(jwtToken);
+
+        Optional<User> optionalUser = userRepository.findByMatrikelNummer(matrikelNumber);
+        if(!encoder.matches(changePasswordRequest.getOldPassword(), optionalUser.get().getPassword()))
+            throw new UserException("Password for User not correct!");
+
+        User user = optionalUser.get();
+        user.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(user);
     }
 }
