@@ -27,6 +27,14 @@ public class Course {
     @OneToMany(mappedBy = "course")
     Set<UserInCourse> students; // TODO find better name
 
+    public Course(Long id)
+    {
+        this.id = id;
+    }
+    public Course()
+    {
+    }
+
     public Long getId() {
         return id;
     }
