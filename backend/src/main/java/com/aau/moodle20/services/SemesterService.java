@@ -63,7 +63,6 @@ public class SemesterService {
 
     public void updateCourse(UpdateCourseRequest updateCourseRequest) throws SemesterException {
         checkIfCourseExists(updateCourseRequest.getId());
-        checkIfSemesterExists(updateCourseRequest.getSemesterId());
 
         Course course = null;
         Optional<Course> optionalCourse = courseRepository.findById(updateCourseRequest.getId());
