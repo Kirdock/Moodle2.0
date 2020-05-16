@@ -11,6 +11,7 @@ import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
+import com.aau.moodle20.repository.ExerciseSheetRepository;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SemesterService {
@@ -28,6 +30,9 @@ public class SemesterService {
 
     @Autowired
     CourseRepository courseRepository;
+
+    @Autowired
+    ExerciseSheetRepository exerciseSheetRepository;
 
     @Autowired
     UserInCourseRepository userInCourseRepository;
@@ -45,8 +50,7 @@ public class SemesterService {
 
     public void createCourse(CreateCourseRequest createCourseRequest) throws SemesterException {
 
-        if(!semesterRepository.existsById(createCourseRequest.getSemesterId()))
-            throw new EntityNotFoundException("Error: Semester does not exist");
+        checkIfSemesterExists(createCourseRequest.getSemesterId());
 
         Course course = new Course();
         course.setMinKreuzel(createCourseRequest.getMinKreuzel());
@@ -138,12 +142,15 @@ public class SemesterService {
     {
        checkIfCourseExists(courseId);
        Course course = courseRepository.findById(courseId).get();
+       List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
+
        CourseResponseObject responseObject = new CourseResponseObject();
        responseObject.setId(course.getId());
        responseObject.setName(course.getName());
        responseObject.setNumber(course.getNumber());
        responseObject.setMinKreuzel(course.getMinKreuzel());
        responseObject.setMinPoints(course.getMinPoints());
+       responseObject.setExerciseSheets(exerciseSheets.stream().map(ExerciseSheet::getResponseObject).collect(Collectors.toList()));
 
        return responseObject;
     }

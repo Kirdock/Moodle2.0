@@ -1,5 +1,7 @@
 package com.aau.moodle20.payload.response;
 
+import java.util.List;
+
 public class CourseResponseObject {
 
     private Long id;
@@ -7,6 +9,7 @@ public class CourseResponseObject {
     private String number;
     private Integer minKreuzel;
     private Integer minPoints;
+    private List<ExerciseSheetResponseObject> exerciseSheets;
 
     public CourseResponseObject()
     {
@@ -51,5 +54,13 @@ public class CourseResponseObject {
 
     public void setMinPoints(Integer minPoints) {
         this.minPoints = minPoints;
+    }
+
+    public List<ExerciseSheetResponseObject> getExerciseSheets() {
+        return exerciseSheets;
+    }
+
+    public void setExerciseSheets(List<ExerciseSheetResponseObject> exerciseSheets) {
+        this.exerciseSheets = exerciseSheets;
     }
 }

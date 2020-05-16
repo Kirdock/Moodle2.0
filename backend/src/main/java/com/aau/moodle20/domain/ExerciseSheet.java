@@ -1,5 +1,7 @@
 package com.aau.moodle20.domain;
 
+import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -78,5 +80,19 @@ public class ExerciseSheet {
 
     public void setSubmissionDate(LocalDateTime submissionDate) {
         this.submissionDate = submissionDate;
+    }
+
+    public ExerciseSheetResponseObject getResponseObject()
+    {
+        ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
+        responseObject.setId(getId());
+        responseObject.setCourseId(getCourse().getId());
+        responseObject.setMinKreuzel(getMinKreuzel());
+        responseObject.setMinPoints(getMinPoints());
+        responseObject.setName(getName());
+        responseObject.setSubmissionDate(getSubmissionDate());
+        responseObject.setOrder(getSortOrder());
+
+        return responseObject;
     }
 }

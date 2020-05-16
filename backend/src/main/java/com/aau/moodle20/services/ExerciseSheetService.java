@@ -47,22 +47,10 @@ public class ExerciseSheetService {
         exerciseSheetRepository.save(exerciseSheet);
     }
 
-    public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceValidationException
-    {
-        if(!exerciseSheetRepository.existsById(id))
-            throw new EntityNotFoundException("Exercise Sheet not found"); 
-
+    public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceValidationException {
+        if (!exerciseSheetRepository.existsById(id))
+            throw new EntityNotFoundException("Exercise Sheet not found");
         Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(id);
-        ExerciseSheet exerciseSheet = exerciseSheetOptional.get();
-        ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
-        responseObject.setId(exerciseSheet.getId());
-        responseObject.setCourseId(exerciseSheet.getCourse().getId());
-        responseObject.setMinKreuzel(exerciseSheet.getMinKreuzel());
-        responseObject.setMinPoints(exerciseSheet.getMinPoints());
-        responseObject.setName(exerciseSheet.getName());
-        responseObject.setSubmissionDate(exerciseSheet.getSubmissionDate());
-        responseObject.setOrder(exerciseSheet.getSortOrder());
-
-        return responseObject;
+        return exerciseSheetOptional.get().getResponseObject();
     }
 }

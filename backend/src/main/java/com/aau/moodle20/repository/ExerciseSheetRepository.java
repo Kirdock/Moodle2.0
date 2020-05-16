@@ -11,6 +11,8 @@ public interface ExerciseSheetRepository extends JpaRepository<ExerciseSheet,Lon
 
 
     Boolean existsByCourse_IdAndSortOrder(Long courseId, Integer sortOrder);
+
+    List<ExerciseSheet> findByCourse_Id(Long courseId);
 }
 
 
