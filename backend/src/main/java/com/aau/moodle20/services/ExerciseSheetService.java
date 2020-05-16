@@ -12,6 +12,7 @@ import com.aau.moodle20.repository.UserInCourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,6 +44,28 @@ public class ExerciseSheetService {
         exerciseSheet.setMinPoints(createExerciseSheetRequest.getMinPoints());
         exerciseSheet.setName(createExerciseSheetRequest.getName());
         exerciseSheet.setSubmissionDate(createExerciseSheetRequest.getSubmissionDate());
+
+        exerciseSheetRepository.save(exerciseSheet);
+    }
+
+    public void updateExerciseSheet(UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceValidationException {
+
+        if (!exerciseSheetRepository.existsById(updateExerciseSheetRequest.getId()))
+            throw new EntityNotFoundException("Error: Exercise sheet not found!");
+
+        ExerciseSheet exerciseSheet = exerciseSheetRepository.findById(updateExerciseSheetRequest.getId()).get();
+
+        List<ExerciseSheet> courseExerciseSheets = exerciseSheetRepository.findByCourse_Id(exerciseSheet.getCourse().getId());
+        courseExerciseSheets.removeIf(sheet -> sheet.getId().equals(updateExerciseSheetRequest.getId()));
+        if (courseExerciseSheets.stream().anyMatch(sheet -> sheet.getSortOrder().equals(updateExerciseSheetRequest.getOrder()) ))
+            throw new ServiceValidationException("Error: An exercise Sheet for this course and this order number exists already",
+                    ApiErrorResponseCodes.EXERCISE_SHEET_COURSE_WITH_ORDER_ALREADY_EXISTS);
+
+        exerciseSheet.setSortOrder(updateExerciseSheetRequest.getOrder());
+        exerciseSheet.setMinKreuzel(updateExerciseSheetRequest.getMinKreuzel());
+        exerciseSheet.setMinPoints(updateExerciseSheetRequest.getMinPoints());
+        exerciseSheet.setName(updateExerciseSheetRequest.getName());
+        exerciseSheet.setSubmissionDate(updateExerciseSheetRequest.getSubmissionDate());
 
         exerciseSheetRepository.save(exerciseSheet);
     }

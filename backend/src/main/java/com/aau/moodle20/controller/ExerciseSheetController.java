@@ -1,5 +1,6 @@
 package com.aau.moodle20.controller;
 
+import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
@@ -33,12 +34,14 @@ public class ExerciseSheetController {
     public ExerciseSheetResponseObject getSemesters(@PathVariable("id") long id)  {
         return exerciseSheetService.getExerciseSheet(id);
     }
-//
-//    @PreAuthorize("hasAuthority('Admin')")
-//    @GetMapping(value = "/semester/{semesterId}/courses")
-//    public ResponseEntity<List<CourseResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
-//        return ResponseEntity.ok(semesterService.getCoursesFromSemester(semesterId));
-//    }
+
+
+    @PostMapping(value = "/exerciseSheet")
+    public ResponseEntity<?> updateExerciseSheet(@Valid  @RequestBody UpdateExerciseSheetRequest updateExerciseSheetRequest)  throws ServiceValidationException, EntityNotFoundException {
+
+        exerciseSheetService.updateExerciseSheet(updateExerciseSheetRequest);
+        return ResponseEntity.ok(new MessageResponse("ExerciseSheet was sucessfully updated!"));
+    }
 
 
 
