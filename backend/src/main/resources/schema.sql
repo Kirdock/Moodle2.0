@@ -49,3 +49,30 @@ CREATE TABLE IF NOT EXISTS EXERCISE_SHEET
     submission_Date datetime,
     CONSTRAINT FOREIGN_KEY_COURSE_EXERCISE_SHEET FOREIGN KEY (course_id) references COURSE on delete cascade
 );
+
+CREATE TABLE IF NOT EXISTS EXAMPLE
+(
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    exercise_Sheet_id       INT NOT NULL ,
+    sort_Order     INT ,
+    parentExample_id INT,
+    points Number(10),
+    weighting  Number(10),
+    is_mandator char(1),
+    CONSTRAINT FOREIGN_KEY_EXERCISE_SHEET FOREIGN KEY (exercise_Sheet_id) references EXERCISE_SHEET on delete cascade,
+    CONSTRAINT FOREIGN_KEY_EXAMPLE_PARENT FOREIGN KEY (parentExample_id) references EXAMPLE on delete cascade
+
+);
+
+CREATE TABLE IF NOT EXISTS FINISHES_EXAMPLE
+(
+    example_id       INT,
+    matrikel_Nummer VARCHAR(20),
+    state            VARCHAR(5),
+    reason  TEXT,
+    valid   CHAR(1),
+    attachment CLOB,
+    PRIMARY KEY (example_id, matrikel_Nummer),
+    CONSTRAINT FOREIGN_KEY_USER_FINISHES_EXAMPLE FOREIGN KEY (matrikel_Nummer) references USER on delete cascade,
+    CONSTRAINT FOREIGN_KEY_EXAMPLE_FINISHES_EXAMPLE FOREIGN KEY (example_id) references EXAMPLE on delete cascade
+);
