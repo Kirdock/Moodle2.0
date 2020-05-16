@@ -78,6 +78,12 @@ public class ExerciseSheetService {
         return exerciseSheetOptional.get().getResponseObject();
     }
 
+    public void deleteExerciseSheet(Long id) throws EntityNotFoundException {
+        if (!exerciseSheetRepository.existsById(id))
+            throw new EntityNotFoundException("Exercise Sheet not found");
+        exerciseSheetRepository.deleteById(id);
+    }
+
 
     public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) throws ServiceValidationException {
         if (!courseRepository.existsById(courseId))
