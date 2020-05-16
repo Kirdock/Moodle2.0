@@ -4,11 +4,14 @@ import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.domain.*;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
+import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.ExerciseSheetRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class ExerciseSheetService {
@@ -41,5 +44,24 @@ public class ExerciseSheetService {
         exerciseSheet.setSubmissionDate(createExerciseSheetRequest.getSubmissionDate());
 
         exerciseSheetRepository.save(exerciseSheet);
+    }
+
+    public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceValidationException
+    {
+        if(!exerciseSheetRepository.existsById(id))
+            throw new ServiceValidationException("Error: exercise Sheet not found", ApiErrorResponseCodes.EXERCISE_SHEET_NOT_FOUND);
+
+        Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(id);
+        ExerciseSheet exerciseSheet = exerciseSheetOptional.get();
+        ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
+        responseObject.setId(exerciseSheet.getId());
+        responseObject.setCourseId(exerciseSheet.getCourse().getId());
+        responseObject.setMinKreuzel(exerciseSheet.getMinKreuzel());
+        responseObject.setMinPoints(exerciseSheet.getMinPoints());
+        responseObject.setName(exerciseSheet.getName());
+        responseObject.setSubmissionDate(exerciseSheet.getSubmissionDate());
+        responseObject.setOrder(exerciseSheet.getSortOrder());
+
+        return responseObject;
     }
 }
