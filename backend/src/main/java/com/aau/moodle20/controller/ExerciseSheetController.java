@@ -44,5 +44,11 @@ public class ExerciseSheetController {
     }
 
 
+    @GetMapping(value = "/course/{id}/exerciseSheets")
+    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(@PathVariable("id") long id) throws EntityNotFoundException
+    {
+        return exerciseSheetService.getExerciseSheetsFromCourse(id);
+    }
+
 
 }

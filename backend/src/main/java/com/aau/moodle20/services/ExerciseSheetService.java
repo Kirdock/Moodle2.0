@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExerciseSheetService {
@@ -75,5 +76,13 @@ public class ExerciseSheetService {
             throw new EntityNotFoundException("Exercise Sheet not found");
         Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(id);
         return exerciseSheetOptional.get().getResponseObject();
+    }
+
+
+    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) throws ServiceValidationException {
+        if (!courseRepository.existsById(courseId))
+            throw new EntityNotFoundException("Course not found");
+        List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
+        return exerciseSheets.stream().map(ExerciseSheet::getResponseObject).collect(Collectors.toList());
     }
 }
