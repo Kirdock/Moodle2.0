@@ -2,6 +2,7 @@ package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.domain.*;
+import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
@@ -49,7 +50,7 @@ public class ExerciseSheetService {
     public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceValidationException
     {
         if(!exerciseSheetRepository.existsById(id))
-            throw new ServiceValidationException("Error: exercise Sheet not found", ApiErrorResponseCodes.EXERCISE_SHEET_NOT_FOUND);
+            throw new EntityNotFoundException("Exercise Sheet not found"); 
 
         Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(id);
         ExerciseSheet exerciseSheet = exerciseSheetOptional.get();

@@ -1,7 +1,10 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.domain.*;
+import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.SemesterException;
+import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
@@ -30,12 +33,9 @@ public class SemesterService {
     UserInCourseRepository userInCourseRepository;
 
 
-    public void createSemester(CreateSemesterRequest createSemesterRequest) throws SemesterException {
-        //TODO add more validation
-
-        if (semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear())) {
-            throw new SemesterException("Error: Semester with this year and type already exists!");
-        }
+    public void createSemester(CreateSemesterRequest createSemesterRequest) throws ServiceValidationException {
+        if (semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear()))
+            throw new ServiceValidationException("Error: Semester with this year and type already exists!", ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS);
         Semester semester = new Semester();
         semester.setType(createSemesterRequest.getType());
         semester.setYear(createSemesterRequest.getYear());
@@ -44,7 +44,10 @@ public class SemesterService {
     }
 
     public void createCourse(CreateCourseRequest createCourseRequest) throws SemesterException {
-        //TODO add validation
+
+        if(!semesterRepository.existsById(createCourseRequest.getSemesterId()))
+            throw new EntityNotFoundException("Error: Semester does not exist");
+
         Course course = new Course();
         course.setMinKreuzel(createCourseRequest.getMinKreuzel());
         course.setMinPoints(createCourseRequest.getMinPoints());
@@ -55,12 +58,9 @@ public class SemesterService {
     }
 
     public void updateCourse(UpdateCourseRequest updateCourseRequest) throws SemesterException {
-        if (!courseRepository.existsById(updateCourseRequest.getId())) {
-            throw new SemesterException("Error: Course with this id does not exists");
-        }
-        if (!semesterRepository.existsById(updateCourseRequest.getSemesterId())) {
-            throw new SemesterException("Error: Semester with this id does not exists");
-        }
+        checkIfCourseExists(updateCourseRequest.getId());
+        checkIfSemesterExists(updateCourseRequest.getSemesterId());
+
         Course course = null;
         Optional<Course> optionalCourse = courseRepository.findById(updateCourseRequest.getId());
         if (optionalCourse.isPresent()) {
@@ -73,10 +73,8 @@ public class SemesterService {
         courseRepository.save(course);
     }
 
-    public void deleteCourse(Long courseId) throws SemesterException {
-        if (!courseRepository.existsById(courseId)) {
-            throw new SemesterException("Error: Course with this id does not exists");
-        }
+    public void deleteCourse(Long courseId) throws EntityNotFoundException {
+        checkIfCourseExists(courseId);
         courseRepository.deleteById(courseId);
     }
 
@@ -138,12 +136,8 @@ public class SemesterService {
 
     public CourseResponseObject getCourse (long courseId) throws SemesterException
     {
-       Optional<Course>  optionalCourse = courseRepository.findById(courseId);
-       if(!optionalCourse.isPresent())
-       {
-           throw new SemesterException("Error:Course not found!");
-       }
-       Course course = optionalCourse.get();
+       checkIfCourseExists(courseId);
+       Course course = courseRepository.findById(courseId).get();
        CourseResponseObject responseObject = new CourseResponseObject();
        responseObject.setId(course.getId());
        responseObject.setName(course.getName());
@@ -152,5 +146,13 @@ public class SemesterService {
        responseObject.setMinPoints(course.getMinPoints());
 
        return responseObject;
+    }
+
+    protected void checkIfCourseExists(Long courseId) throws EntityNotFoundException {
+        if (!courseRepository.existsById(courseId)) throw new EntityNotFoundException("Error: Course not found");
+    }
+
+    protected void checkIfSemesterExists(Long semesterId) throws EntityNotFoundException {
+        if (!semesterRepository.existsById(semesterId)) throw new EntityNotFoundException("Error: Semester not found");
     }
 }

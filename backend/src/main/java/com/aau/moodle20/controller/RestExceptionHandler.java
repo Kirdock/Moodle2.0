@@ -1,10 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
-import com.aau.moodle20.exception.ApiError;
-import com.aau.moodle20.exception.SemesterException;
-import com.aau.moodle20.exception.ServiceValidationException;
-import com.aau.moodle20.exception.UserException;
+import com.aau.moodle20.exception.*;
 import com.aau.moodle20.payload.response.MessageResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -36,11 +33,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SemesterException.class)
     protected ResponseEntity<Object> handleSemester(SemesterException ex) {
-        return ResponseEntity
-                .badRequest()
-                .body(new MessageResponse(ex.getMessage()));
+        return ResponseEntity.badRequest().body(new MessageResponse(ex.getMessage()));
+    }
 
-
+    @ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity<Object> handleNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(ServiceValidationException.class)
