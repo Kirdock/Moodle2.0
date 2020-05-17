@@ -42,3 +42,4 @@ const app = new Vue({
 }).$mount('#app');
 
 store.$app = app; //need it for logout-toast
+store.dispatch('checkToken');

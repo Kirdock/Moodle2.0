@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="selectedCourse" class="control-label">{{ $t('course.course') }}</label>
+                    <label for="selectedCourse" class="control-label">{{ $t('course.name') }}</label>
                     <select class="form-control" v-model="selectedCourseId" id="selectedCourse" @change="getCourseUsers(selectedCourseId); getCourse(selectedCourseId)">
                         <option v-for="course in courses" :value="course.id" :key="course.id">
                             {{course.number}} {{course.name}}
@@ -180,15 +180,16 @@
                                             name: 'SheetManagement',
                                             params: {
                                                 courseId: selectedCourseId,
+                                                name: (selectedCourse.number + '_'  +selectedCourse.name),
                                                 sheetId: sheet.id
                                             }
                                         }">
                                             <span class="fa fa-edit fa-2x"></span>
                                         </router-link>
-                                        <a href="#" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'">
+                                        <a href="javascript:void(0)" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'">
                                             <span class="fa fa-trash fa-2x"></span>
                                         </a>
-                                        <b-modal id="'modal-delete-exerciseSheet" :title="$t('title.delete')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="deleteExerciseSheet(sheet.id)">
+                                        <b-modal id="modal-delete-exerciseSheet" :title="$t('title.delete')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="deleteExerciseSheet(sheet.id)">
                                             {{$t('exerciseSheet.question.delete')}}
                                         </b-modal>
                                     </td>
@@ -230,6 +231,11 @@ export default {
         }
     },
     created(){
+        //TO-DO: props['courseId']
+        //Query or property?
+        //if there are props then getCourse(courseId) is called
+        //with the response you also have the semesterId for selecting the right semester in Dropdown
+        //don't forget to set props: true; in router
         this.getSemesters();
         this.resetExerciseSheet();
     },

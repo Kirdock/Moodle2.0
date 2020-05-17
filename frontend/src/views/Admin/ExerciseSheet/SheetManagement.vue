@@ -8,26 +8,33 @@
             <li class="breadcrumb-item">
                 <router-link to="/Admin" >{{ $t('admin') }}</router-link>
             </li>
-            <li class="breadcrumb-item active">{{$t('course')}}</li>
-            <li class="breadcrumb-item active">{{courseId}}</li>
+            <li class="breadcrumb-item active">
+                <router-link to="/Admin/CourseManagement" >{{$t('course.management')}}</router-link></li>
+            <li class="breadcrumb-item active">{{name.replace('_',' ')}}</li>
             <li class="breadcrumb-item active">{{$t('exerciseSheet.name')}}</li>
-            <li class="breadcrumb-item active">{{sheetId}}</li>
-            <li class="breadcrumb-item active">{{$t('exerciseSheet.management')}}</li>
+            <li class="breadcrumb-item active">{{sheetInfo.name}}</li>
         </ol>
-        <div class="form-horizontal">
-            <form ref="exerciseSheet" @submit.prevent="update()">
-                <es-info v-model="sheetInfo"></es-info>
-            </form>
-        </div>
+        <b-tabs class="mt-3">
+            <b-tab :title="$t('information')">
+                <div class="form-horizontal col-md-4">
+                    <form ref="exerciseSheet" @submit.prevent="update()">
+                        <es-info v-model="sheetInfo"></es-info>
+                    </form>
+                </div>
+            </b-tab>
+        </b-tabs>
     </div>
 </template>
 
 
 
 <script>
+//Examples are all <b-tab>, so there is a plus-icon in the tab
+//information in example: name, description, valid fileTypes, subExamples, weighting, points
+//Sub examples: how to infinite: Example has a list of SubExamples. if you click on a subExample the parent-example-view is replaced with the sub-example and a breadcrumb
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
 export default {
-    props: ['courseId', 'sheetId'],
+    props: ['courseId', 'sheetId', 'name'],
     components: {
         'es-info': ExerciseSheetInfo
     },

@@ -77,7 +77,7 @@ const routes = [
     }
   },
   {
-    path: '/Admin/Course/{courseId}/SheetManagement/{sheetId}',
+    path: '/Admin/Course/:courseId,:name/SheetManagement/:sheetId',
     name: 'SheetManagement',
     component: SheetManagement,
     meta: {

@@ -16,7 +16,7 @@ const messages = {
         copy: 'Kopieren',
         course: {
             management: 'Lehrveranstaltungen verwalten',
-            course: 'Lehrveranstaltung',
+            name: 'Lehrveranstaltung',
             copied: 'Die Lehrveranstaltung wurde erfolgreich kopiert',
             created: 'Lehrveranstaltung wurde angelegt',
             deleted: 'Lehrveranstaltung gelöscht',

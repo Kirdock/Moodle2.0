@@ -3,7 +3,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="navbar-collapse order-1">
         <router-link class="navbar-brand" to="/">{{ $t('home') }}</router-link>
-        <router-link class="nav-link" to="/Courses" v-if="$store.getters.isLoggedIn">{{ $t('course.courses') }}</router-link>
+        <router-link class="nav-link" to="/Courses" v-if="$store.getters.isLoggedIn">{{ $t('course.name') }}</router-link>
         <router-link to="/Account" class="nav-link" v-if="$store.getters.isLoggedIn">{{ $t('account') }}</router-link>
         <router-link to="/Admin" class="nav-link" v-if="$store.getters.userInfo.isAdmin">{{ $t('admin') }}</router-link>
         <b-button variant="link" class="nav-link" @click="logout" v-if="$store.getters.isLoggedIn">{{ $t('logout') }}</b-button>

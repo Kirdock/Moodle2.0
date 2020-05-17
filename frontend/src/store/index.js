@@ -34,9 +34,6 @@ export default new Vuex.Store({
       state.userInfo = decodeToken(state.token);
       state.loggedIn = !!state.token;
       state.settings = getSettings();
-      if(state.userInfo.exp < new Date().getTime()/1000){
-        this.dispatch('logout', true);
-      }
     },
     loginSuccess(state, payload){
       state.token = payload.accessToken;
@@ -81,6 +78,11 @@ export default new Vuex.Store({
                 reject(error);
               });
       });
+    },
+    checkToken({state}){
+      if(state.userInfo && state.userInfo.exp < new Date().getTime()/1000){
+        this.dispatch('logout', true);
+      }
     },
     updateSettings({commit}, data){
       return commit('updateSettings', data);
@@ -144,7 +146,7 @@ export default new Vuex.Store({
       return api.getExerciseSheets(courseData);
     },
     getExerciseSheet({commit}, sheedId){
-      return api.exerciseSheet(sheedId);
+      return api.getExerciseSheet(sheedId);
     },
     updateExerciseSheet({commit}, sheetData){
       return api.updateExerciseSheet(sheetData);
