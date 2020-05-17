@@ -19,6 +19,13 @@
                 <div class="form-horizontal col-md-4">
                     <form ref="exerciseSheet" @submit.prevent="update()">
                         <es-info v-model="sheetInfo"></es-info>
+                        <div class="form-inline">
+                            <b-button variant="primary" type="submit">{{ $t('update') }}</b-button>
+                            <div class="offset-md-1 form-inline" v-if="loading_updateInformation">
+                                <span class="fa fa-sync fa-spin"></span>
+                                <label class="control-label">{{ $t('loading') }}...</label>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </b-tab>
@@ -29,6 +36,7 @@
 
 
 <script>
+//remove parameter courseName. instead get course name and number with exerciseSheet information
 //Examples are all <b-tab>, so there is a plus-icon in the tab
 //information in example: name, description, valid fileTypes, subExamples, weighting, points
 //Sub examples: how to infinite: Example has a list of SubExamples. if you click on a subExample the parent-example-view is replaced with the sub-example and a breadcrumb
@@ -43,7 +51,8 @@ export default {
     },
     data(){
         return {
-            sheetInfo: {}
+            sheetInfo: {},
+            loading_updateInformation: false
         }
     },
     methods: {
@@ -59,6 +68,7 @@ export default {
             })
         },
         update(){
+            this.loading_updateInformation = true;
             this.$store.dispatch('updateExerciseSheet', this.sheetInfo).then(()=>{
                 this.$bvToast.toast(this.$t('exerciseSheet.updated'), {
                     title: this.$t('success'),
@@ -71,6 +81,8 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
+            }).finally(()=>{
+                this.loading_updateInformation = false;
             });
         }
     }

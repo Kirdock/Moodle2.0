@@ -86,7 +86,7 @@ export default {
         return axios.get(`/exerciseSheet/${sheedId}`)
     },
     updateExerciseSheet(sheetData){
-        return axios.post('/course/exerciseSheet', sheetData);
+        return axios.post('/exerciseSheet', sheetData);
     },
     deleteExerciseSheet(sheedId){
         return axios.delete(`/exerciseSheet/${sheedId}`);

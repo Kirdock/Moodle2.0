@@ -73,7 +73,7 @@
             <b-tab :title="$t('information')" active>
                 <label class="control-label requiredField" style="margin-left: 10px" v-show="selectedCourse">{{ $t('requiredField') }}</label>
                 <div class="form-horizontal col-md-4">
-                    <form @submit.prevent @submit="updateCourse()">
+                    <form @submit.prevent="updateCourse()">
                         <course-info v-model="selectedCourse"></course-info>
                         
                         <div class="form-inline">
@@ -204,6 +204,7 @@
 </template>
 
 <script>
+//To-Do: adjust exerciseSheet-order on delete
 import CourseInfo from '@/components/CourseInfo.vue';
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
 export default {

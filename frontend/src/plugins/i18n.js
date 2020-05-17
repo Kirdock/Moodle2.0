@@ -161,7 +161,7 @@ const messages = {
         copy: 'Copy',
         course:{
             copied: 'Course copied',
-            course: 'Course',
+            name: 'Course',
             courses: 'Courses',
             management: 'Course Management',
             created: 'Course created',
