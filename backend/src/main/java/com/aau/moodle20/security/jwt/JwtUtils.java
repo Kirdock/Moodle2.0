@@ -33,7 +33,7 @@ public class JwtUtils {
                 .claim("isAdmin", EUserRole.Admin.equals(userPrincipal.getRole()))
                 .claim("matrikelNumber", userPrincipal.getMatrikelNumber())
                 .claim("forename",userPrincipal.getForename())
-                .claim("surename",userPrincipal.getSurename())
+                .claim("surname",userPrincipal.getSurename())
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
