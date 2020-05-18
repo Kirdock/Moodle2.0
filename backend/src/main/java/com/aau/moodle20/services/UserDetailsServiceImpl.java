@@ -2,8 +2,8 @@ package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EUserRole;
-import com.aau.moodle20.domain.User;
-import com.aau.moodle20.domain.UserInCourse;
+import com.aau.moodle20.entity.User;
+import com.aau.moodle20.entity.UserInCourse;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
@@ -21,7 +21,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;

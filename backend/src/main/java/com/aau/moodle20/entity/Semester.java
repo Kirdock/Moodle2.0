@@ -1,4 +1,4 @@
-package com.aau.moodle20.domain;
+package com.aau.moodle20.entity;
 
 import com.aau.moodle20.constants.ESemesterType;
 import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -1,4 +1,4 @@
-package com.aau.moodle20.domain;
+package com.aau.moodle20.entity;
 
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 

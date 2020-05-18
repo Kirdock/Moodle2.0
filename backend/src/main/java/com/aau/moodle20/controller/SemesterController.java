@@ -1,6 +1,6 @@
 package com.aau.moodle20.controller;
 
-import com.aau.moodle20.domain.Semester;
+import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;

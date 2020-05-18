@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS EXAMPLE
     parentExample_id INT,
     points Number(10),
     weighting  Number(10),
-    is_mandator char(1),
+    is_Mandatory char(1),
     CONSTRAINT FOREIGN_KEY_EXERCISE_SHEET FOREIGN KEY (exercise_Sheet_id) references EXERCISE_SHEET on delete cascade,
     CONSTRAINT FOREIGN_KEY_EXAMPLE_PARENT FOREIGN KEY (parentExample_id) references EXAMPLE on delete cascade
 

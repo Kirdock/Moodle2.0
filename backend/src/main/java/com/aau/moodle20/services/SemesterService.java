@@ -1,7 +1,8 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
-import com.aau.moodle20.domain.*;
+import com.aau.moodle20.entity.*;
+import com.aau.moodle20.entity.embeddable.UserCourseKey;
 import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceValidationException;
