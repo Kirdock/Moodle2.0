@@ -22,6 +22,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,11 +100,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 apiError, new HttpHeaders(), apiError.getStatus());
     }
 
-    @ExceptionHandler({ Exception.class })
-    public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
-        ApiError apiError = new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
-        return new ResponseEntity<Object>(
-                apiError, new HttpHeaders(), apiError.getStatus());
-    }
+
+
+//    @ExceptionHandler({ Exception.class })
+//    public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
+//        ApiError apiError = new ApiError(
+//                HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
+//        return new ResponseEntity<Object>(
+//                apiError, new HttpHeaders(), apiError.getStatus());
+//    }
 }

@@ -30,7 +30,7 @@ public class JwtUtils {
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .claim("isAdmin", EUserRole.Admin.equals(userPrincipal.getRole()))
+                .claim("role",userPrincipal.getRole().toString())
                 .claim("matrikelNumber", userPrincipal.getMatrikelNumber())
                 .claim("forename",userPrincipal.getForename())
                 .claim("surname",userPrincipal.getSurename())

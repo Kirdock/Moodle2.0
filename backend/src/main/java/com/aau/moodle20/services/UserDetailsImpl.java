@@ -40,10 +40,8 @@ public class UserDetailsImpl implements UserDetails {
     public static UserDetailsImpl build(User user) {
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if(EUserRole.Admin.equals(user.getRole()))
-        {
-            authorities.add(new SimpleGrantedAuthority(user.getRole().toString())); // TODO define a constant somewhere
-        }
+        authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+
 
         UserDetailsImpl userDetails = new UserDetailsImpl(
                 user.getUsername(),
