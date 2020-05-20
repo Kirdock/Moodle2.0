@@ -31,14 +31,12 @@ export default new Vuex.Store({
   mutations: {
     initialiseStore(state) {
       state.token = getToken();
-      state.userInfo = decodeToken(state.token);
-      state.loggedIn = !!state.token;
+      setUserInfo(state);
       state.settings = getSettings();
     },
     loginSuccess(state, payload){
       state.token = payload.accessToken;
-      state.userInfo = decodeToken(payload.accessToken);
-      state.loggedIn = true;
+      setUserInfo(state);
       setToken(payload.accessToken);
     },
     logout(state){
@@ -56,7 +54,9 @@ export default new Vuex.Store({
       deleteToken();
       commit('logout');
       if(isTokenExpired){
-        router.push('Login');
+        if(router.name !== 'Login'){
+          router.push('/Login');
+        }
         this.$app.$bvToast.toast(this.$app.$t('sessionExpired'), {
             title: this.$app.$t('warning'),
             variant: 'warning',
@@ -153,6 +153,15 @@ export default new Vuex.Store({
     },
     deleteExerciseSheet({commit}, sheetId){
       return api.deleteExerciseSheet(sheetId);
+    },
+    createExample({commit}, exampleData){
+      return api.createExample(exampleData);
+    },
+    updateExample({commit}, exampleData){
+      return api.updateExample(exampleData);
+    },
+    deleteExample({commit}, exampleId){
+      return api.deleteExample(exampleId);
     }
   },
   modules: {
@@ -198,6 +207,13 @@ export default new Vuex.Store({
   }
 });
 
+function setUserInfo(state){
+  state.userInfo = decodeToken(state.token);
+  if(state.userInfo.isAdmin){
+    state.userInfo.isOwner = true;
+  }
+  state.loggedIn = !!state.token;
+}
 
 function getToken(){
   return storage.getItem(tokenName);

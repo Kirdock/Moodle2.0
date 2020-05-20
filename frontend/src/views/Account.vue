@@ -17,9 +17,10 @@
               <input id="newPasswordConfirm" ref="newPasswordConfirm" type="password" class="form-control" @change="resetValidationMessage()" v-model="passwordData.newPasswordConfirm" required>
             </div>
             <div class="form-inline">
-              <b-button variant="primary" type="submit">
-                {{$t('update')}}
-              </b-button>
+              <button class="btn btn-primary" type="submit">
+                <span class="fa fa-save"></span>
+                {{$t('save')}}
+              </button>
               <div class="offset-md-1 form-inline" v-if="loadingPasswordChange">
                 <span class="fa fa-sync fa-spin"></span>
                 <label class="control-label">{{ $t('loading') }}...</label>

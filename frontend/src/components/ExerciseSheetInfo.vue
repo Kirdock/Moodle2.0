@@ -5,6 +5,10 @@
             <input id="name" type="text" class="form-control"  v-model="value.name" required>
         </div>
         <div class="form-group">
+            <label for="issueDate" class="control-label required">{{ $t('issueDate') }}</label>
+            <input id="issueDate" type="datetime-local" class="form-control" v-model="value.issueDate" required>
+        </div>
+        <div class="form-group">
             <label for="submissionDate" class="control-label required">{{ $t('submissionDate') }}</label>
             <input id="submissionDate" type="datetime-local" class="form-control" :min="minDate" v-model="value.submissionDate" required>
         </div>

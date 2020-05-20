@@ -32,20 +32,20 @@
                 </div>
             </div>
             <div class="col-md-4" style="margin-top: 31px">
-                <b-button variant="primary" v-b-modal="'modal-new-course'" style="margin-right: 10px">
+                <button class="btn btn-primary" v-b-modal="'modal-new-course'" style="margin-right: 10px">
                     <span class="fa fa-plus"></span>
                     {{ $t('new') }}
-                </b-button>
+                </button>
                 <b-modal id="modal-new-course" :title="$t('course.title.create')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="createCourse">
                     <label class="control-label requiredField">{{ $t('requiredField') }}</label>
                     <form @submit.prevent="createCourse()" ref="createCourse">
                         <course-info v-model="courseInfo_create"></course-info>
                     </form>
                 </b-modal>
-                <b-button variant="primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId">
+                <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId">
                     <span class="fa fa-copy"></span>
                     {{ $t('copy') }}
-                </b-button>
+                </button>
                 <b-modal id="modal-copy-course" :title="$t('course.question.copy')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="copyCourse(selectedSemester_edit, courseCopyId)">
                     <label for="selectedSemester_copy_course" class="control-label">{{ $t('semester') }}</label>
                     <select class="form-control" v-model="courseCopyId" id="selectedSemester_copy_course">
@@ -55,10 +55,10 @@
                     </select>
                 </b-modal>
 
-                <b-button variant="danger" v-b-modal="'modal-delete-course'" v-show="selectedCourseId">
+                <button class="btn btn-danger" v-b-modal="'modal-delete-course'" v-show="selectedCourseId">
                     <span class="fa fa-trash"></span>
                     {{ $t('delete') }}
-                </b-button>
+                </button>
                 <b-modal id="modal-delete-course" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteCourse(selectedCourse.id)">
                     {{$t('course.question.delete')}}
                 </b-modal>
@@ -71,13 +71,16 @@
         </div>
         <b-tabs content-class="mt-3" v-if="selectedCourse">
             <b-tab :title="$t('information')" active>
-                <label class="control-label requiredField" style="margin-left: 10px" v-show="selectedCourse">{{ $t('requiredField') }}</label>
+                <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
                 <div class="form-horizontal col-md-4">
                     <form @submit.prevent="updateCourse()">
                         <course-info v-model="selectedCourse"></course-info>
                         
                         <div class="form-inline">
-                            <b-button variant="primary" type="submit">{{ $t('update') }}</b-button>
+                            <button class="btn btn-primary" type="submit">
+                                <span class="fa fa-save"></span>
+                                {{ $t('save') }}
+                            </button>
                             <div class="offset-md-1 form-inline" v-if="loading_edit">
                                 <span class="fa fa-sync fa-spin"></span>
                                 <label class="control-label">{{ $t('loading') }}...</label>
@@ -139,7 +142,10 @@
                         </tbody>
                     </table>
                     <div class="form-inline">
-                        <b-button variant="primary" @click="updateCourseUsers()">{{ $t('update') }}</b-button>
+                        <button class="btn btn-primary" @click="updateCourseUsers()">
+                            <span class="fa fa-save"></span>
+                            {{ $t('save') }}
+                        </button>
                         <div class="offset-md-1 form-inline" v-if="loading_edit_updateUsers">
                             <span class="fa fa-sync fa-spin"></span>
                             <label class="control-label">{{ $t('loading') }}...</label>
@@ -150,10 +156,10 @@
             <b-tab :title="$t('exerciseSheets.name')" id="exerciseSheets">
                 <div class="form-horizontal">
                     <div class="form-group col-md-6">
-                        <b-button variant="primary" v-b-modal="'modal-new-exerciseSheet'">
+                        <button class="btn btn-primary" v-b-modal="'modal-new-exerciseSheet'">
                             <span class="fa fa-plus"></span>
                             {{$t('new')}}
-                        </b-button>
+                        </button>
                         <b-modal id="modal-new-exerciseSheet" :title="$t('exerciseSheet.title.create')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="createExerciseSheet">
                             <form ref="exerciseSheet" @submit.prevent="createExerciseSheet()">
                                 <es-info v-model="exerciseSheet_create"></es-info>
@@ -173,14 +179,13 @@
                                         {{sheet.name}}
                                     </td>
                                     <td>
-                                        {{sheet.submissionDate}}
+                                        {{new Date(sheet.submissionDate).toLocaleString()}}
                                     </td>
                                     <td>
                                         <router-link :title="$t('edit')" :to="{
                                             name: 'SheetManagement',
                                             params: {
                                                 courseId: selectedCourseId,
-                                                name: (selectedCourse.number + '_'  +selectedCourse.name),
                                                 sheetId: sheet.id
                                             }
                                         }">
@@ -204,7 +209,6 @@
 </template>
 
 <script>
-//To-Do: adjust exerciseSheet-order on delete
 import CourseInfo from '@/components/CourseInfo.vue';
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
 export default {
@@ -278,7 +282,8 @@ export default {
     methods:{
         resetExerciseSheet(){
             this.exerciseSheet_create = {
-                submissionDate: this.$store.getters.currentDateTime
+                submissionDate: this.$store.getters.currentDateTime,
+                issueDate: this.$store.getters.currentDateTime
             }
         },
         createExerciseSheet(modal){
@@ -288,7 +293,6 @@ export default {
             }
             else{
                 this.exerciseSheet_create.courseId = this.selectedCourseId;
-                this.exerciseSheet_create.order = (this.selectedCourse.exerciseSheets.length +1);
                 this.$store.dispatch('createExerciseSheet', this.exerciseSheet_create).then(()=>{
                     this.$bvModal.hide('modal-new-exerciseSheet');
                     if(this.exerciseSheet_create.courseId === this.selectedCourseId){
@@ -355,13 +359,13 @@ export default {
                 };
             });
             this.$store.dispatch('updateCourseUsers', data).then(response=>{
-                this.$bvToast.toast(this.$t('course.usersUpdated'), {
+                this.$bvToast.toast(this.$t('course.usersSaved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
             }).catch(()=>{
-                this.$bvToast.toast(this.$t('course.error.usersUpdated'), {
+                this.$bvToast.toast(this.$t('course.error.usersSave'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
@@ -404,13 +408,13 @@ export default {
             this.loading_edit = true;
             const {exerciseSheets, ...data} = this.selectedCourse;
             this.$store.dispatch('updateCourse', data).then(response=>{
-                this.$bvToast.toast(this.$t('course.updated'), {
+                this.$bvToast.toast(this.$t('course.saved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
             }).catch(()=>{
-                this.$bvToast.toast(this.$t('course.error.update'), {
+                this.$bvToast.toast(this.$t('course.error.save'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true

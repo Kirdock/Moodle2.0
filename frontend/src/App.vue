@@ -5,14 +5,14 @@
         <router-link class="navbar-brand" to="/">{{ $t('home') }}</router-link>
         <router-link class="nav-link" to="/Courses" v-if="$store.getters.isLoggedIn">{{ $t('course.name') }}</router-link>
         <router-link to="/Account" class="nav-link" v-if="$store.getters.isLoggedIn">{{ $t('account') }}</router-link>
-        <router-link to="/Admin" class="nav-link" v-if="$store.getters.userInfo.isAdmin">{{ $t('admin') }}</router-link>
-        <b-button variant="link" class="nav-link" @click="logout" v-if="$store.getters.isLoggedIn">{{ $t('logout') }}</b-button>
+        <router-link to="/Admin" class="nav-link" v-if="$store.getters.userInfo.isOwner">{{ $t('admin') }}</router-link>
+        <a href="javascriot:void(0)" class="nav-link" @click="logout" v-if="$store.getters.isLoggedIn">{{ $t('logout') }}</a>
         <router-link to="/Login" class="nav-link" v-else >{{ $t('login') }}</router-link>
       </div>
       <div class="navbar-collapse order-2">
         <ul class="navbar-nav ml-auto">
-          <b-button variant="link" class="nav-link" @click="changeLocale('en')" v-if="locale !== 'en'">English</b-button>
-          <b-button variant="link" class="nav-link" @click="changeLocale('de')" v-if="locale !== 'de'">Deutsch</b-button>
+          <a href="javascriot:void(0)" class="nav-link" @click="changeLocale('en')" v-if="locale !== 'en'">English</a>
+          <a href="javascriot:void(0)" class="nav-link" @click="changeLocale('de')" v-if="locale !== 'de'">Deutsch</a>
           <span v-if="$store.getters.isLoggedIn" style="margin-top: 8px">{{ $t('loggedInAs') }}
             <router-link to="/Account" > {{$store.getters.userInfo.forename}} {{$store.getters.userInfo.surname}} </router-link>
           </span>

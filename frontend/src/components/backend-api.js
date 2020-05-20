@@ -90,6 +90,15 @@ export default {
     },
     deleteExerciseSheet(sheedId){
         return axios.delete(`/exerciseSheet/${sheedId}`);
+    },
+    createExample(exampleData){
+        return axios.put('/example', exampleData);
+    },
+    updateExample(exampleData){
+        return axios.post('/example', exampleData);
+    },
+    deleteExample(exampleId){
+        return axios.delete(`/example/${exampleId}`);
     }
 }
 

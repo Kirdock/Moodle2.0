@@ -20,17 +20,17 @@ const messages = {
             copied: 'Die Lehrveranstaltung wurde erfolgreich kopiert',
             created: 'Lehrveranstaltung wurde angelegt',
             deleted: 'Lehrveranstaltung gelöscht',
-            usersUpdated: 'Die Rollen wurden aktualisiert',
+            usersSaved: 'Die Rollen wurden gespeichert',
             courses: 'Lehrveranstaltungen',
-            updated: 'Lehrveranstaltung wurde aktualisiert',
+            saved: 'Lehrveranstaltung wurde gespeichert',
             
             error: {
                 copy: 'Die Lehrveranstaltung konnte nicht kopiert werden',
                 create: 'Lehrveranstaltung konnte nicht angelegt werden',
                 delete: 'Lehrveranstaltung konnte nicht gelöscht werden',
                 get: 'Lehrveranstaltung konnte nicht geladen werden',
-                update: 'Lehrveranstaltung konnte nicht aktualisiert werden',
-                usersUpdated: 'Die Rollen konnten nicht aktualisiert werden'
+                save: 'Lehrveranstaltung konnte nicht gespeichert werden',
+                usersSave: 'Die Rollen konnten nicht gespeichert werden'
             },
             errors: {
                 get: 'Lehrveranstaltungen konnten nicht geladen werden',
@@ -45,18 +45,38 @@ const messages = {
         },
         create: 'Anlegen',
         delete: 'Löschen',
+        description: 'Beschreibung',
         edit: 'Bearbeiten',
         eightDigitNumber: 'Achtstellige Nummer',
         error: 'Fehler',
+        example: {
+            created: 'Beispiel wurde erstellt',
+            deleted: 'Beispiel wurde gelöscht',
+            name: 'Beispiel',
+            new: 'Neues Beispiel',
+            saved: 'Beispiel wurde gespeichert',
+            error: {
+                create: 'Beispiel konnte nicht angelegt werden',
+                delete: 'Beispiel konnte nicht gelöscht werden',
+                save: 'Beispiel konnte nicht gespeichert werden'
+            },
+            question: {
+                delete: 'Wollen Sie das Beispiel wirklich löschen?'
+            }
+        },
+        subExample: {
+            name: 'Unterbeispiel',
+            new: 'Neues Unterbeispiel'
+        },
         exerciseSheet: {
             name: 'Übungsblatt',
             created: 'Übungsblatt wurde angelegt',
-            updated: 'Übungsblatt wurde aktualisiert',
+            saved: 'Übungsblatt wurde gespeichert',
             deleted: 'Übungsblatt wurde gelöscht',
             error: {
                 create: 'Übungsblatt konnte nicht angelegt werden',
                 get: 'Übungsblatt konnte nicht geladen werden',
-                update: 'Übungsblatt konnte nicht aktualisiert werden',
+                save: 'Übungsblatt konnte nicht gespeichert werden',
                 delete: 'Übungsblatt konnte nicht gelöscht werden'
             },
             title: {
@@ -76,11 +96,13 @@ const messages = {
         format: 'Format',
         home: 'Home',
         information: 'Information',
+        issueDate: 'Ausgabedatum',
         lecturer: 'Lehrende/r',
         loading: 'Laden',
         login: 'Anmelden',
         loggedInAs: 'Angemeldet als',
         logout: 'Abmelden',
+        mandatory: 'Verpflichtend',
         matrikelnummer: 'Matrikelnummer',
         minRequireKreuzel: 'Mindestanforderung Kreuzel (in %)',
         minRequirePoints: 'Mindestanforderung Punkte (in %)',
@@ -95,8 +117,10 @@ const messages = {
         passwordOld: 'Altes Passwort',
         passwordUpdated: 'Passwort wurde aktualisiert',
         passwordUpdatedError: 'Passwort konnte nicht aktualisiert werden',
+        points: 'Punkte',
         requiredField: 'Pflichtfeld',
         role: 'Rolle',
+        save: 'Speichern',
         search: 'Suche',
         semester: {
             create: 'Semester anlegen',
@@ -117,9 +141,12 @@ const messages = {
         show: 'Anzeigen',
         student: 'Student',
         submissionDate: 'Abgabedatum',
+        submitFile: 'Dateiabgabe',
         success: 'Erfolg',
+        supportedFileTypes: 'Unterstützte Dateiformate',
         surname: 'Nachname',
         tutor: 'Tutor',
+        typeToSearch: 'Tippen um zu suchen',
         uploadCSV: 'CSV Datei hochladen',
         update: 'Aktualisieren',
         user: {
@@ -140,7 +167,9 @@ const messages = {
         },
         userPwdInvalid: 'Benutzername oder Passwort stimmt nicht überein',
         username: 'Benutzername',
+        validator: 'Validator',
         warning: 'Warnung',
+        weighting: 'Gewichtung',
         welcome: 'Willkommen',
         year: 'Jahr',
         yes: 'Ja',
@@ -166,7 +195,7 @@ const messages = {
             management: 'Course Management',
             created: 'Course created',
             deleted: 'Course deleted',
-            updated: 'Course updated',
+            saved: 'Course saved',
             question:{
                 delete: 'Do you really want to delete this course?',
                 copy: 'In which semester should the course be copied?'
@@ -176,8 +205,8 @@ const messages = {
                 create: 'Course could not be created',
                 delete: 'Course could not be deleted',
                 get: 'Course could not be loaded',
-                usersUpdated: 'Roles could not be updated',
-                update: 'Course could not be updated'
+                usersSave: 'Roles could not be saved',
+                save: 'Course could not be saved'
             },
             errors: {
                 get: 'Courses could not be loaded',
@@ -188,18 +217,38 @@ const messages = {
         },
         create: 'Create',
         delete: 'Delete',
+        description: 'Description',
         edit: 'Edit',
         eightDigitNumber: 'Eight-digit number',
         error: 'Error',
+        example: {
+            created: 'Example created',
+            deleted: 'Example deleted',
+            name: 'example',
+            new: 'New example',
+            saved: 'Example saved',
+            error: {
+                create: 'Example could not be created',
+                delete: 'Example could not be deleted',
+                save: 'Example could not be saved'
+            },
+            question: {
+                delete: 'Do you really want to delete this example?'
+            }
+        },
+        subExample: {
+            name: 'Sub example',
+            new: 'New sub example'
+        },
         exerciseSheet: {
             name: 'Exercise sheet',
             create: 'Exercise sheet created',
-            updated: 'Exercise sheet updated',
+            saved: 'Exercise sheet saved',
             delete: 'Exercise sheet deleted',
             error: {
                 create: 'Exercise sheet could not be created',
                 get: 'Exercise sheet could not be loaded',
-                update: 'Exercise sheet could lnto be updated',
+                save: 'Exercise sheet could lnto be saved',
                 delete: 'Exercise sheet could not be deleted'
             },
             title: {
@@ -219,11 +268,13 @@ const messages = {
         format: 'Format',
         home: 'Home',
         information: 'Information',
+        issueDate: 'Date of issue',
         lecturer: 'Lecturer',
         loading: 'Loading',
         login: 'Login',
         loggedInAs: 'Logged in as',
         logout: 'Logout',
+        mandatory: 'Mandatory',
         matrikelnummer: 'Matrikelnummer',
         minRequireKreuzel: 'Minimum requirement of kreuzel (in %)',
         minRequirePoints: 'Minimum requirement of points (in %)',
@@ -238,8 +289,10 @@ const messages = {
         passwordOld: 'Old Password',
         passwordUpdated: 'Password updated',
         passwordUpdatedError: 'Password could not be updated',
+        points: 'Points',
         requiredField: 'Required field',
         role: 'Role',
+        save: 'Save',
         search: 'Search',
         semester: {
             create: 'Create Semester',
@@ -260,9 +313,12 @@ const messages = {
         show: 'Show',
         student: 'Student',
         submissionDate: 'Submission date',
+        submitFile: 'File submission',
         success: 'Success',
+        supportedFileTypes: 'Supported file types',
         surname: 'Surname',
         tutor: 'Tutor',
+        typeToSearch: 'Type to search',
         uploadCSV: 'Upload CSV file',
         update: 'Update',
         user: {
@@ -283,7 +339,9 @@ const messages = {
         },
         userPwdInvalid: 'Username or password do not match',
         username: 'Username',
+        validator: 'Validator',
         warning: 'Warning',
+        weighting: 'Weighting',
         welcome: "Welcome",
         year: 'Year',
         yes: 'Yes',

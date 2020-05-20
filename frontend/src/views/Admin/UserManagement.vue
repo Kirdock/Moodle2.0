@@ -41,10 +41,10 @@
                                 <input id="forename" type="text" class="form-control" v-model="userInfo.forename" required>
                             </div>
                             <div class="form-inline">
-                                <b-button variant="primary" type="submit">
+                                <button class="btn btn-primary" type="submit">
                                     <span class="fa fa-plus"></span>
                                     {{ $t('create') }}
-                                </b-button>
+                                </button>
                                 <div class="offset-md-1 form-inline" v-if="loadingCreateUser">
                                     <span class="fa fa-sync fa-spin"></span>
                                     <label class="control-label">{{ $t('loading') }}...</label>
@@ -78,10 +78,10 @@
                         </select>
                     </div>
                     <div class="col-md-6" style="margin-top: 30px">
-                        <b-button variant="danger" v-b-modal="'modal-delete-user'">
+                        <button class="btn btn-danger" v-b-modal="'modal-delete-user'">
                             <span class="fa fa-trash"></span>
                             {{ $t('delete') }}
-                        </b-button>
+                        </button>
                         <b-modal id="modal-delete-user" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteUser(selectedUser)">
                             {{$t('user.question.delete')}}
                         </b-modal>
