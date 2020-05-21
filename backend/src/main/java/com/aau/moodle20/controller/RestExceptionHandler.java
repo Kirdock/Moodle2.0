@@ -44,8 +44,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ServiceValidationException.class)
     protected ResponseEntity<Object> handleServiceValidationException(ServiceValidationException ex) {
+        HttpStatus status = ex.getHttpStatus()!=null?ex.getHttpStatus():HttpStatus.BAD_REQUEST;
+
         ApiError apiError =
-                new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getErrors(), ex.getErrorResponseCode());
+                new ApiError(status, ex.getMessage(), ex.getErrors(), ex.getErrorResponseCode());
         return ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
@@ -102,11 +104,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 
 
-//    @ExceptionHandler({ Exception.class })
-//    public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
-//        ApiError apiError = new ApiError(
-//                HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
-//        return new ResponseEntity<Object>(
-//                apiError, new HttpHeaders(), apiError.getStatus());
-//    }
+    @ExceptionHandler({ Exception.class })
+    public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
+        ApiError apiError = null;
+       if(ex instanceof AccessDeniedException)
+       {
+           apiError = new ApiError(
+                   HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), "error occurred");
+       }else {
+           apiError = new ApiError(
+                   HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
+       }
+        return new ResponseEntity<Object>(
+                apiError, new HttpHeaders(), apiError.getStatus());
+    }
 }
