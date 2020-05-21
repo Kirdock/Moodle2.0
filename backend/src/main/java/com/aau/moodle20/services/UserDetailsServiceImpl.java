@@ -1,8 +1,10 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.domain.User;
 import com.aau.moodle20.domain.UserInCourse;
+import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
@@ -57,13 +59,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return UserDetailsImpl.build(user);
     }
 
-    public void registerUser(SignUpRequest signUpRequest) throws UserException
+    public void registerUser(SignUpRequest signUpRequest) throws ServiceValidationException
     {
         if (userRepository.existsByMatrikelNummer(signUpRequest.getMatrikelnummer())) {
-           throw new UserException("Error: User with this matrikelNummer already exists!");
+           throw new ServiceValidationException("Error: User with this matrikelNummer already exists!", ApiErrorResponseCodes.MATRIKELNUMMER_ALREADY_EXISTS);
         }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new UserException("Error: User with this username already exists!");
+            throw new ServiceValidationException("Error: User with this username already exists!",ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
         }
 
         String password = "password";//TODO should not be hardcoded
