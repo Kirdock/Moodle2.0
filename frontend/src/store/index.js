@@ -93,6 +93,9 @@ export default new Vuex.Store({
     createUsers({commit}, formData){
       return api.createUsers(formData);
     },
+    updateUser({commit}, userData){
+      return api.updateUser(userData);
+    },
     deleteUser({commit}, matrikelNummer){
       return api.deleteUser(matrikelNummer);
     },
@@ -120,7 +123,10 @@ export default new Vuex.Store({
     getCourse({commit}, data){
       return api.getCourse(data);
     },
-    getUsers({commit}, data){
+    getUser({commit}){
+      return api.getUser();
+    },
+    getUsers({commit}, data = {}){
       return new Promise((resolve, reject) =>{
         api.getUsers(data).then(response =>{
           if(data.courseId){
@@ -176,7 +182,7 @@ export default new Vuex.Store({
       const date = new Date();
       return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split(/ *:..\..../)[0];
     },
-    courseRoles: () => {
+    roles: () => {
       return [
         {
             key: 'l',
@@ -192,17 +198,40 @@ export default new Vuex.Store({
         },
       ];
     },
-    userRoles: () => {
+    rolesWithAll: (state, getters) =>{
       return [
         {
-            key: 'l',
-            value: i18n.t('lecturer'),
-        },
+            key: 'a',
+            value: this.$t('all')
+        }
+      ].concat(getters.roles);
+    },
+    rolesAllAssign: (state, getters) =>{
+      return getters.rolesWithAll.concat([
         {
-            key: 's',
-            value: i18n.t('student'),
-        },
-      ];
+          key: 'z',
+          value: this.$t('assigned')
+        }
+      ]);
+    },
+    filteredUsers: () => {
+      return ({users, role = 'a', searchText}) =>{
+        let result = users;
+
+        if(role === 'z'){
+            result = result.filter(user => user.role !== 'n');
+        }
+        else if(role !== 'a'){
+            result = result.filter(user => role === user.role)
+        }
+        
+        if(searchText){
+            result = result.filter(user => user.matrikelNummer.indexOf(searchText) !== -1
+                                        || user.surname.indexOf(searchText) !== -1
+                                        || user.forename.indexOf(searchText) !== -1);
+        }
+        return result;
+      }
     }
   }
 });

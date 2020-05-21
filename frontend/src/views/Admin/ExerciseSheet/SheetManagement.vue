@@ -22,13 +22,10 @@
                         <es-info v-model="sheetInfo"></es-info>
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">
-                                <span class="fa fa-save"></span>
+                                <span class="fa fa-sync fa-spin" v-if="loading_updateInformation"></span>
+                                <span class="fa fa-save" v-else></span>
                                 {{ $t('save') }}
                             </button>
-                            <div class="offset-md-1 form-inline" v-if="loading_updateInformation">
-                                <span class="fa fa-sync fa-spin"></span>
-                                <label class="control-label">{{ $t('loading') }}...</label>
-                            </div>
                         </div>
                     </form>
                 </div>

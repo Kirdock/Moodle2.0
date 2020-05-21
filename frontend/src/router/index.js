@@ -55,6 +55,7 @@ const routes = [
     component: UserManagement,
     meta: {
       authentication: true,
+      isAdmin: true
     }
   },
   {
@@ -63,6 +64,7 @@ const routes = [
     component: SemesterManagement,
     meta: {
       authentication: true,
+      isAdmin: true
     }
   },
   {

@@ -48,6 +48,7 @@ const messages = {
         description: 'Beschreibung',
         edit: 'Bearbeiten',
         eightDigitNumber: 'Achtstellige Nummer',
+        email: 'Email',
         error: 'Fehler',
         example: {
             created: 'Beispiel wurde erstellt',
@@ -122,6 +123,7 @@ const messages = {
         role: 'Rolle',
         save: 'Speichern',
         search: 'Suche',
+        security: 'Sicherheit',
         semester: {
             create: 'Semester anlegen',
             semester: 'Semester',
@@ -156,13 +158,24 @@ const messages = {
             users: 'Benutzer',
             deleted: 'Benutzer wurde gelöscht',
             management: 'Benutzerverwaltung',
+            saved: 'Benutzer wurde gespeichert',
             error: {
                 create: 'Benutzer konnte nicht angelegt werden',
                 delete: 'Benutzer konnte nicht gelöscht werden',
-                get: 'Benutzer konnten nicht geladen werden'
+                get: 'Benutzer konnte nicht geladen werden',
+                save: 'Benutzer konnte nicht gespeichert werden'
             },
             question: {
                 delete: 'Wollen Sie den Benutzer wirklich löschen?'
+            },
+            title: {
+                new: 'Neuen Benutzer anlegen',
+                edit: 'Edit user'
+            }
+        },
+        users: {
+            error: {
+                get: 'Benutzer konnten nicht geladen werden',
             }
         },
         userPwdInvalid: 'Benutzername oder Passwort stimmt nicht überein',
@@ -220,6 +233,7 @@ const messages = {
         description: 'Description',
         edit: 'Edit',
         eightDigitNumber: 'Eight-digit number',
+        email: 'Email',
         error: 'Error',
         example: {
             created: 'Example created',
@@ -294,6 +308,7 @@ const messages = {
         role: 'Role',
         save: 'Save',
         search: 'Search',
+        security: 'Security',
         semester: {
             create: 'Create Semester',
             semester: 'Semester',
@@ -328,13 +343,19 @@ const messages = {
             created: 'User created',
             deleted: 'User deleted',
             management: 'User Management',
-            question: {
-                delete: 'Do you really want to delete this user?',
-            },
+            saved: 'User saved',
             error: {
                 create: 'User could not be created',
                 delete: 'User could not be deleted',
-                get: 'User could not be loaded'
+                get: 'User could not be loaded',
+                save: 'User could not be saved'
+            },
+            question: {
+                delete: 'Do you really want to delete this user?',
+            },
+            title: {
+                new: 'Create new user',
+                edit: 'Edit user'
             }
         },
         userPwdInvalid: 'Username or password do not match',

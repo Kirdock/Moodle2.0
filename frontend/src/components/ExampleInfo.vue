@@ -2,40 +2,40 @@
     <div class="row col-md-12">
         <div class="form-horizontal col-md-5">
             <div class="form-group">
-                <label for="name" class="control-label required">{{ $t('name') }}</label>
-                <input id="name" type="text" class="form-control"  v-model="value.name" required>
+                <label for="eInfoName" class="control-label required">{{ $t('name') }}</label>
+                <input id="eInfoName" type="text" class="form-control"  v-model="value.name" required>
             </div>
             <div class="form-group">
-                <label for="description" class="control-label" :class="value.subExamples.length === 0 ? 'required' : ''">{{ $t('description') }}</label>
-                <textarea id="description" type="text" class="form-control"  v-model="value.description" :required="value.subExamples.length === 0">
+                <label for="eInfoDescription" class="control-label" :class="value.subExamples.length === 0 ? 'required' : ''">{{ $t('description') }}</label>
+                <textarea id="eInfoDescription" type="text" class="form-control"  v-model="value.description" :required="value.subExamples.length === 0">
                 </textarea>
             </div>
             <div v-if="value.subExamples.length === 0">
                 <div class="form-group">
-                    <label for="weighting" class="control-label required">{{ $t('weighting') }}</label>
+                    <label for="eInfoWeighting" class="control-label required">{{ $t('weighting') }}</label>
                     <div class="col-md-4" style="padding-left: 0px">
-                        <i-input id="weighting" type="number" min="1" class="form-control"  v-model="value.weighting" required> </i-input>
+                        <i-input id="eInfoWeighting" type="number" min="1" class="form-control"  v-model="value.weighting" required> </i-input>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="points" class="control-label required">{{ $t('points') }}</label>
+                    <label for="eInfoPoints" class="control-label required">{{ $t('points') }}</label>
                     <div class="col-md-4" style="padding-left: 0px">
-                        <i-input id="points" type="number" class="form-control"  v-model="value.points" required> </i-input>
+                        <i-input id="eInfoPoints" type="number" class="form-control"  v-model="value.points" required> </i-input>
                     </div>
                 </div>
                 <div class="form-check" style="margin-top: 20px">
-                    <input id="submitFile" type="checkbox" class="form-check-input" v-model="value.submitFile" @click="submitFile_changed()">
-                    <label for="submitFile"   class="form-check-label" style="margin-right:15px">
+                    <input id="eInfoSubmitFile" type="checkbox" class="form-check-input" v-model="value.submitFile" @click="submitFile_changed()">
+                    <label for="eInfoSubmitFile"   class="form-check-label" style="margin-right:15px">
                         {{$t('submitFile')}}
                     </label>
                 </div>
                 <div class="form-group" v-if="value.submitFile">
-                    <label for="validator" class="control-label">{{ $t('validator') }}</label>
-                    <input id="validator" type="text" class="form-control"  v-model="value.validator">
+                    <label for="eInfoValidator" class="control-label">{{ $t('validator') }}</label>
+                    <input id="eInfoValidator" type="text" class="form-control"  v-model="value.validator">
                 </div>
                 <div class="form-group" v-show="value.submitFile && !value.validator">
-                    <label for="supportedFileTypes" class="control-label required">{{ $t('supportedFileTypes') }}</label>
-                    <multiselect v-model="value.supportedFileTypes" id="supportedFileTypes" label="name" open-direction="bottom"
+                    <label for="eInfoSupportedFileTypes" class="control-label required">{{ $t('supportedFileTypes') }}</label>
+                    <multiselect v-model="value.supportedFileTypes" id="eInfoSupportedFileTypes" label="name" open-direction="bottom"
                                 :placeholder="$t('typeToSearch')"
                                 track-by="value"
                                 selectLabel=""
@@ -54,8 +54,8 @@
                     </multiselect>
                 </div>
                 <div class="form-check" style="margin-top: 20px">
-                    <input id="mandatory" type="checkbox" class="form-check-input" v-model="value.mandatory">
-                    <label for="mandatory"   class="form-check-label" style="margin-right:15px">
+                    <input id="eInfoMandatory" type="checkbox" class="form-check-input" v-model="value.mandatory">
+                    <label for="eInfoMandatory"   class="form-check-label" style="margin-right:15px">
                         {{$t('mandatory')}}
                     </label>
                 </div>

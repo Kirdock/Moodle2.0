@@ -56,17 +56,14 @@
                 </b-modal>
 
                 <button class="btn btn-danger" v-b-modal="'modal-delete-course'" v-show="selectedCourseId">
-                    <span class="fa fa-trash"></span>
+                    <span class="fa fa-sync fa-spin" v-if="loading_delete"></span>
+                    <span class="fa fa-trash" v-else></span>
+                    
                     {{ $t('delete') }}
                 </button>
                 <b-modal id="modal-delete-course" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteCourse(selectedCourse.id)">
                     {{$t('course.question.delete')}}
                 </b-modal>
-                
-                <div class="offset-md-1 form-inline" v-if="loading_delete">
-                    <span class="fa fa-sync fa-spin"></span>
-                    <label class="control-label">{{ $t('loading') }}...</label>
-                </div>
             </div>
         </div>
         <b-tabs content-class="mt-3" v-if="selectedCourse">
@@ -78,13 +75,10 @@
                         
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">
-                                <span class="fa fa-save"></span>
+                                <span class="fa fa-sync fa-spin" v-if="loading_edit"></span>
+                                <span class="fa fa-save" v-else></span>
                                 {{ $t('save') }}
                             </button>
-                            <div class="offset-md-1 form-inline" v-if="loading_edit">
-                                <span class="fa fa-sync fa-spin"></span>
-                                <label class="control-label">{{ $t('loading') }}...</label>
-                            </div>
                         </div>
                     </form>
                 </div>
@@ -118,7 +112,7 @@
                             <th scope="col">{{$t('role')}}</th>
                         </thead>
                         <tbody>
-                            <tr v-for="user in filteredUsers" :key="user.matrikelNummer">
+                            <tr v-for="user in filteredUsers" :key="user.matrikelnummer">
                                 <td>
                                     <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="user.role !== 'n'" @click="user.role = user.role === 'n' ? 's' : 'n'" style="margin-left: 0px">
                                 </td>
@@ -143,13 +137,10 @@
                     </table>
                     <div class="form-inline">
                         <button class="btn btn-primary" @click="updateCourseUsers()">
-                            <span class="fa fa-save"></span>
+                            <span class="fa fa-sync fa-spin" v-if="loading_edit_updateUsers"></span>
+                            <span class="fa fa-save" v-else></span>
                             {{ $t('save') }}
                         </button>
-                        <div class="offset-md-1 form-inline" v-if="loading_edit_updateUsers">
-                            <span class="fa fa-sync fa-spin"></span>
-                            <label class="control-label">{{ $t('loading') }}...</label>
-                        </div>
                     </div>
                 </div>
             </b-tab>
@@ -246,37 +237,13 @@ export default {
     },
     computed: {
         roles(){
-            return this.$store.getters.courseRoles;
+            return this.$store.getters.roles;
         },
         rolesWithAll(){
-            return [
-                {
-                    key: 'a',
-                    value: this.$t('all')
-                },
-                {
-                    key: 'z',
-                    value: this.$t('assigned')
-                }
-            ].concat(this.roles);
+            return this.$store.getters.rolesAllAssign;
         },
         filteredUsers(){
-            let result = this.courseUsers;
-
-            if(this.showRoles === 'z'){
-                result = result.filter(user => user.role !== 'n');
-            }
-            else if(this.showRoles !== 'a'){
-                result = result.filter(user => this.showRoles === user.role)
-            }
-            
-            if(this.searchUserText){
-                result = result.filter(user => user.matrikelNummer.indexOf(this.searchUserText) !== -1
-                                            || user.surname.indexOf(this.searchUserText) !== -1
-                                            || user.forename.indexOf(this.searchUserText) !== -1);
-            }
-
-            return result;
+            return this.$store.getters.filteredUsers({users: this.courseUsers, role: this.showRoles, searchText: this.searchUserText});
         }
     },
     methods:{
@@ -493,7 +460,7 @@ export default {
             this.$store.dispatch('getUsers',{courseId}).then(response=>{
                 this.courseUsers = response.data;
             }).catch(()=>{
-                this.$bvToast.toast(this.$t('user.error.get'), {
+                this.$bvToast.toast(this.$t('users.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true

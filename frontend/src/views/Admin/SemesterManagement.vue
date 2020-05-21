@@ -30,13 +30,10 @@
                 </div>
                 <div class="form-inline">
                     <button class="btn btn-primary" type="submit">
-                        <span class="fa fa-plus"></span>
+                        <span class="fa fa-sync fa-spin" v-if="loadingCreate"></span>
+                        <span class="fa fa-plus" v-else></span>
                         {{$t('create')}}
                     </button>
-                    <div class="offset-md-1 form-inline" v-if="loadingCreate">
-                        <span class="fa fa-sync fa-spin"></span>
-                        <label class="control-label">{{$t('loading')}}...</label>
-                    </div>
                 </div>
             </form>
         </div>

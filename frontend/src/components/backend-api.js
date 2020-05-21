@@ -54,6 +54,9 @@ export default {
     getUsers({courseId}){
         return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
     },
+    getUser(){
+        return axios.get(`/users/${store.getters.userInfo.matrikelnummer}`);
+    },
     createUser(userData){
         return axios.put('/user',userData);
     },
@@ -69,6 +72,9 @@ export default {
     },
     udpatePassword(data){
         return axios.post('/user/password', data);
+    },
+    updateUser(userData){
+        return axios.post('/user', userData);
     },
     deleteUser(matrikelNummer){
         return axios.delete(`/user/${matrikelNummer}`);
