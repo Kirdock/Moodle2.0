@@ -41,6 +41,11 @@ public class User {
 
     }
 
+    public User(String matrikelNummer)
+    {
+        this.matrikelNummer = matrikelNummer;
+    }
+
     public User(String username, String password, EUserRole role)
     {
         this.username = username;
