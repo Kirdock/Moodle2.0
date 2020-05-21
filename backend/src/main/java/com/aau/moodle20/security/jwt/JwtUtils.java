@@ -1,6 +1,5 @@
 package com.aau.moodle20.security.jwt;
 
-import com.aau.moodle20.constants.EUserRole;
 import com.aau.moodle20.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ public class JwtUtils {
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .claim("role",userPrincipal.getRole().toString())
+                .claim("isAdmin",userPrincipal.getAdmin())
                 .claim("matrikelNumber", userPrincipal.getMatrikelNumber())
                 .claim("forename",userPrincipal.getForename())
                 .claim("surname",userPrincipal.getSurename())
