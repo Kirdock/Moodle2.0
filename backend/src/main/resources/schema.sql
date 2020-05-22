@@ -57,13 +57,16 @@ CREATE TABLE IF NOT EXISTS EXAMPLE
 (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     exercise_Sheet_id       INT NOT NULL ,
-    sort_Order     INT ,
-    parentExample_id INT,
+    sort_order     INT ,
+    parent_Example_id INT,
     points Number(10),
     weighting  Number(10),
-    is_Mandatory char(1),
+    mandatory char(5),
+    description CLOB,
+    name varchar(100),
+    validator VARCHAR(1000),
     CONSTRAINT FOREIGN_KEY_EXERCISE_SHEET FOREIGN KEY (exercise_Sheet_id) references EXERCISE_SHEET on delete cascade,
-    CONSTRAINT FOREIGN_KEY_EXAMPLE_PARENT FOREIGN KEY (parentExample_id) references EXAMPLE on delete cascade
+    CONSTRAINT FOREIGN_KEY_EXAMPLE_PARENT FOREIGN KEY (parent_Example_id) references EXAMPLE on delete cascade
 
 );
 
@@ -78,4 +81,20 @@ CREATE TABLE IF NOT EXISTS FINISHES_EXAMPLE
     PRIMARY KEY (example_id, matrikel_Nummer),
     CONSTRAINT FOREIGN_KEY_USER_FINISHES_EXAMPLE FOREIGN KEY (matrikel_Nummer) references USER on delete cascade,
     CONSTRAINT FOREIGN_KEY_EXAMPLE_FINISHES_EXAMPLE FOREIGN KEY (example_id) references EXAMPLE on delete cascade
+);
+
+CREATE TABLE IF NOT EXISTS FILE_TYPE
+(
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    name  VARCHAR(100),
+    value            VARCHAR(1000)
+);
+
+CREATE TABLE IF NOT EXISTS SUPPORT_FILE_TYPE
+(
+    example_id      INT,
+    file_type_id    INT,
+    PRIMARY KEY (example_id, file_type_id),
+    CONSTRAINT FOREIGN_KEY_EXAMPLE_01 FOREIGN KEY (example_id) references EXAMPLE on delete cascade,
+    CONSTRAINT FOREIGN_KEY_FILE_TYPE_01 FOREIGN KEY (file_type_id) references FILE_TYPE on delete cascade
 );

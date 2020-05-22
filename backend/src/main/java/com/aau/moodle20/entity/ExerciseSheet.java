@@ -27,6 +27,11 @@ public class ExerciseSheet {
     {
     }
 
+    public ExerciseSheet(Long id )
+    {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }

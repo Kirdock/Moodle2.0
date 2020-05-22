@@ -1,6 +1,6 @@
 package com.aau.moodle20.services;
 
-import com.aau.moodle20.domain.User;
+import com.aau.moodle20.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

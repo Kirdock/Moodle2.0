@@ -2,6 +2,7 @@ package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.payload.request.CreateExampleRequest;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
@@ -48,6 +49,11 @@ public class ExerciseSheetController {
         exerciseSheetService.deleteExerciseSheet(id);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was sucessfully deleted!"));
 
+    }
+    @PutMapping(value = "/example")
+    public ResponseEntity<?> createExample(@Valid @RequestBody CreateExampleRequest createExampleRequest) throws ServiceValidationException {
+        exerciseSheetService.createExample(createExampleRequest);
+        return ResponseEntity.ok(new MessageResponse("Example was successfully created!"));
     }
 
 }
