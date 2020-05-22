@@ -1,4 +1,4 @@
-package com.aau.moodle20.domain;
+package com.aau.moodle20.entity.embeddable;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

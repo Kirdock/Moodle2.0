@@ -1,4 +1,4 @@
-package com.aau.moodle20.domain;
+package com.aau.moodle20.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

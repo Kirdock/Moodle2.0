@@ -1,6 +1,9 @@
 package com.aau.moodle20;
 
-import com.aau.moodle20.domain.User;
+
+import com.aau.moodle20.entity.FileType;
+import com.aau.moodle20.entity.User;
+import com.aau.moodle20.repository.FileTypeRepository;
 import com.aau.moodle20.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +23,11 @@ public class Application implements ApplicationRunner, ErrorController {
 	@Autowired
 	UserRepository userRepository;
 	@Autowired
+	FileTypeRepository fileTypeRepository;
+	@Autowired
 	PasswordEncoder encoder;
+
+
 
 	private static final String PATH = "/error";
 
@@ -38,6 +45,15 @@ public class Application implements ApplicationRunner, ErrorController {
 	public void run(ApplicationArguments args) throws Exception {
 		if (!userRepository.existsByUsername(adminUserName)) {
 			userRepository.save(new User(adminUserName,"123",adminUserName, adminPassword, encoder.encode(adminPassword), Boolean.TRUE) );
+		}
+		if (!fileTypeRepository.existsByName("Word")) {
+			fileTypeRepository.save(new FileType("Word", "application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+		}
+		if (!fileTypeRepository.existsByName("Excel")) {
+			fileTypeRepository.save(new FileType("Word", "application/msexcel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+		}
+		if (!fileTypeRepository.existsByName("Archiv-Dateien")) {
+			fileTypeRepository.save(new FileType("Word", "*.zip, *.rar"));
 		}
 	}
 

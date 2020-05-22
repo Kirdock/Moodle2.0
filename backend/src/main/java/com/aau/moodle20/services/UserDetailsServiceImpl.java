@@ -2,8 +2,8 @@ package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
-import com.aau.moodle20.domain.User;
-import com.aau.moodle20.domain.UserInCourse;
+import com.aau.moodle20.entity.UserInCourse;
+import com.aau.moodle20.entity.User;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;

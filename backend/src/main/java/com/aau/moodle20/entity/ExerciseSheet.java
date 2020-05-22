@@ -1,4 +1,4 @@
-package com.aau.moodle20.domain;
+package com.aau.moodle20.entity;
 
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 
@@ -25,6 +25,11 @@ public class ExerciseSheet {
     private String description;
     public ExerciseSheet()
     {
+    }
+
+    public ExerciseSheet(Long id )
+    {
+        this.id = id;
     }
 
     public Long getId() {

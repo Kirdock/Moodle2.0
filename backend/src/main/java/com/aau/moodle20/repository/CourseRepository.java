@@ -1,7 +1,7 @@
 package com.aau.moodle20.repository;
 
-import com.aau.moodle20.domain.Course;
-import com.aau.moodle20.domain.Semester;
+import com.aau.moodle20.entity.Course;
+import com.aau.moodle20.entity.Semester;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

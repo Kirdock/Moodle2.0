@@ -1,11 +1,6 @@
-package com.aau.moodle20.domain;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+package com.aau.moodle20.entity;
 
 import javax.persistence.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @Entity

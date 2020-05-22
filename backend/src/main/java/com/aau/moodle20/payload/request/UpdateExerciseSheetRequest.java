@@ -1,10 +1,7 @@
 package com.aau.moodle20.payload.request;
 
-import com.aau.moodle20.domain.Course;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
