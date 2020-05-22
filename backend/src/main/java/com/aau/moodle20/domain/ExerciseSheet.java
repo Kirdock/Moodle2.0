@@ -18,10 +18,11 @@ public class ExerciseSheet {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
-    private Integer sortOrder;
     @Column(name = "submission_Date", columnDefinition="DATETIME")
     private LocalDateTime submissionDate;
-
+    @Column(name = "issue_Date", columnDefinition="DATETIME")
+    private LocalDateTime issueDate;
+    private String description;
     public ExerciseSheet()
     {
     }
@@ -66,20 +67,28 @@ public class ExerciseSheet {
         this.minPoints = minPoints;
     }
 
-    public Integer getSortOrder() {
-        return sortOrder;
-    }
-
-    public void setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-    }
-
     public LocalDateTime getSubmissionDate() {
         return submissionDate;
     }
 
     public void setSubmissionDate(LocalDateTime submissionDate) {
         this.submissionDate = submissionDate;
+    }
+
+    public LocalDateTime getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(LocalDateTime issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public ExerciseSheetResponseObject getResponseObject()
@@ -91,7 +100,8 @@ public class ExerciseSheet {
         responseObject.setMinPoints(getMinPoints());
         responseObject.setName(getName());
         responseObject.setSubmissionDate(getSubmissionDate());
-        responseObject.setOrder(getSortOrder());
+        responseObject.setIssueDate(getIssueDate());
+        responseObject.setDescription(getDescription());
 
         return responseObject;
     }

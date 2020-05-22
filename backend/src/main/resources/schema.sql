@@ -44,10 +44,11 @@ CREATE TABLE IF NOT EXISTS EXERCISE_SHEET
 (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     course_id       INT,
-    sort_Order     INT ,
     name VARCHAR(100),
     min_Kreuzel Number(10),
     min_Points  Number(10),
     submission_Date datetime,
+    issue_Date datetime,
+    description CLOB,
     CONSTRAINT FOREIGN_KEY_COURSE_EXERCISE_SHEET FOREIGN KEY (course_id) references COURSE on delete cascade
 );
