@@ -11,6 +11,7 @@ public class CreateCourseRequest {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
+    private String owner;
 
     public Long getSemesterId() {
         return semesterId;
@@ -50,5 +51,13 @@ public class CreateCourseRequest {
 
     public void setMinPoints(Integer minPoints) {
         this.minPoints = minPoints;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }

@@ -60,6 +60,7 @@ public class SemesterService {
         course.setName(createCourseRequest.getName());
         course.setNumber(createCourseRequest.getNumber());
         course.setSemester(new Semester(createCourseRequest.getSemesterId()));
+        course.setOwner(new User(createCourseRequest.getOwner()));
         courseRepository.save(course);
     }
 
