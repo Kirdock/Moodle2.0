@@ -42,10 +42,10 @@ public class SemesterController {
         return semesterService.getSemesters();
     }
 
-    @PreAuthorize("hasAuthority('Admin')")
+
     @GetMapping(value = "/semester/{semesterId}/courses")
-    public ResponseEntity<List<CourseResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
-        return ResponseEntity.ok(semesterService.getCoursesFromSemester(semesterId));
+    public ResponseEntity<List<CourseResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId, @RequestHeader("Authorization") String jwtToken)  {
+        return ResponseEntity.ok(semesterService.getCoursesFromSemester(semesterId,jwtToken));
     }
 
 
