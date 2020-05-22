@@ -9,6 +9,8 @@ import java.util.List;
 public interface CourseRepository extends JpaRepository<Course,Long> {
 
     List<Course> findCoursesBySemester(Semester semester);
+
+    Boolean existsByNameAndNumberAndSemester_Id(String name,String number, Long semesterId);
 }
 
 

@@ -51,6 +51,8 @@ public class SemesterService {
     public void createCourse(CreateCourseRequest createCourseRequest) throws SemesterException {
 
         checkIfSemesterExists(createCourseRequest.getSemesterId());
+        if(courseRepository.existsByNameAndNumberAndSemester_Id(createCourseRequest.getName(),createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
+            throw new ServiceValidationException("Course in Semester already exists",ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
         Course course = new Course();
         course.setMinKreuzel(createCourseRequest.getMinKreuzel());
