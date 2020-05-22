@@ -55,7 +55,7 @@ export default {
         return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
     },
     getUser(){
-        return axios.get(`/users/${store.getters.userInfo.matrikelnummer}`);
+        return axios.get(`/users/${store.getters.userInfo.matriculationNumber}`);
     },
     createUser(userData){
         return axios.put('/user',userData);
@@ -76,8 +76,8 @@ export default {
     updateUser(userData){
         return axios.post('/user', userData);
     },
-    deleteUser(matrikelNummer){
-        return axios.delete(`/user/${matrikelNummer}`);
+    deleteUser(matriculationNumber){
+        return axios.delete(`/user/${matriculationNumber}`);
     },
     createSemester(data){
         return axios.put('/semester',data);

@@ -11,8 +11,8 @@
             <input id="uInfoUsername" type="text" class="form-control" v-model="value.username" :disabled="isEdit" required>
         </div>
         <div class="form-group">
-            <label for="uInfoMatrikelnummer" class="control-label required">{{ $t('matrikelnummer') }}</label>
-            <input id="uInfoMatrikelnummer" type="text" class="form-control"  pattern="[0-9]{8}" v-model="value.matrikelnummer" :disabled="isEdit" :title="$t('eightDigitNumber')" required>
+            <label for="uInfoMatriculationNumber" class="control-label required">{{ $t('matriculationNumber') }}</label>
+            <input id="uInfoMatriculationNumber" type="text" class="form-control"  pattern="[0-9]{8}" v-model="value.matriculationNumber" :disabled="isEdit" :title="$t('eightDigitNumber')" required>
         </div>
         <div class="form-group">
             <label for="uInfoSurname" class="control-label required">{{ $t('surname') }}</label>

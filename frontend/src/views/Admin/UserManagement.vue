@@ -44,16 +44,16 @@
             </div>
             <table class="table" aria-describedby="users">
                 <thead>
-                    <th scope="col">{{$t('matrikelnummer')}}</th>
+                    <th scope="col">{{$t('matriculationNumber')}}</th>
                     <th scope="col">{{$t('surname')}}</th>
                     <th scope="col">{{$t('forename')}}</th>
                     <th scope="col">{{$t('admin')}}</th>
                     <th scope="col">{{$t('actions')}}</th>
                 </thead>
                 <tbody>
-                    <tr v-for="user in filteredUsers" :key="user.matrikelnummer">
+                    <tr v-for="user in filteredUsers" :key="user.matriculationNumber">
                         <td>
-                            {{user.matrikelnummer}}
+                            {{user.matriculationNumber}}
                         </td>
                         <td>
                             {{user.surname}}
@@ -202,7 +202,7 @@ export default {
             }
         },
         deleteUser(){
-            this.$store.dispatch('deleteUser', this.selectedUser.matrikelnummer).then(response =>{
+            this.$store.dispatch('deleteUser', this.selectedUser.matriculationNumber).then(response =>{
                 this.getUsers(); //just splice instead??
                 this.$bvToast.toast(this.$t('user.deleted'), {
                     title: this.$t('success'),

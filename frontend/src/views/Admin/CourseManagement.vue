@@ -106,18 +106,18 @@
                     <table class="table" aria-describedby="assignedUsers">
                         <thead>
                             <th scope="col"></th>
-                            <th scope="col">{{$t('matrikelnummer')}}</th>
+                            <th scope="col">{{$t('matriculationNumber')}}</th>
                             <th scope="col">{{$t('surname')}}</th>
                             <th scope="col">{{$t('forename')}}</th>
                             <th scope="col">{{$t('role')}}</th>
                         </thead>
                         <tbody>
-                            <tr v-for="user in filteredUsers" :key="user.matrikelnummer">
+                            <tr v-for="user in filteredUsers" :key="user.matriculationNumber">
                                 <td>
                                     <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="user.role !== 'n'" @click="user.role = user.role === 'n' ? 's' : 'n'" style="margin-left: 0px">
                                 </td>
                                 <td>
-                                    {{user.matrikelnummer}}
+                                    {{user.matriculationNumber}}
                                 </td>
                                 <td>
                                     {{user.surname}}
@@ -321,7 +321,7 @@ export default {
             const data = this.courseUsers.filter(user => user.role !== user.oldRole).map(user =>{
                 return {
                     courseId: id,
-                    matrikelNummer: user.matrikelNummer,
+                    matriculationNumber: user.matriculationNumber,
                     role: user.role
                 };
             });

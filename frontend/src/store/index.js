@@ -96,8 +96,8 @@ export default new Vuex.Store({
     updateUser({commit}, userData){
       return api.updateUser(userData);
     },
-    deleteUser({commit}, matrikelNummer){
-      return api.deleteUser(matrikelNummer);
+    deleteUser({commit}, matriculationNumber){
+      return api.deleteUser(matriculationNumber);
     },
     createSemester({commit}, semesterData){
       return api.createSemester(semesterData);
@@ -202,7 +202,7 @@ export default new Vuex.Store({
       return [
         {
             key: 'a',
-            value: this.$t('all')
+            value: i18n.t('all')
         }
       ].concat(getters.roles);
     },
@@ -210,7 +210,7 @@ export default new Vuex.Store({
       return getters.rolesWithAll.concat([
         {
           key: 'z',
-          value: this.$t('assigned')
+          value: i18n.t('assigned')
         }
       ]);
     },
@@ -226,7 +226,7 @@ export default new Vuex.Store({
         }
         
         if(searchText){
-            result = result.filter(user => user.matrikelNummer.indexOf(searchText) !== -1
+            result = result.filter(user => user.matriculationNumber.indexOf(searchText) !== -1
                                         || user.surname.indexOf(searchText) !== -1
                                         || user.forename.indexOf(searchText) !== -1);
         }
