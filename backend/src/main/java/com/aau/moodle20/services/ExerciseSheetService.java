@@ -10,6 +10,7 @@ import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.ExerciseSheetRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,18 +34,16 @@ public class ExerciseSheetService {
         Long courseId = createExerciseSheetRequest.getCourseId();
 
         if (!courseRepository.existsById(courseId))
-            throw new ServiceValidationException("Error: the referenced course does not exists", ApiErrorResponseCodes.COURSE_NOT_FOUND);
-        if (exerciseSheetRepository.existsByCourse_IdAndSortOrder(courseId, createExerciseSheetRequest.getOrder()))
-            throw new ServiceValidationException("Error: An exercise Sheet for this course and this order number exists already",
-                    ApiErrorResponseCodes.EXERCISE_SHEET_COURSE_WITH_ORDER_ALREADY_EXISTS);
+            throw new ServiceValidationException("Error: the referenced course does not exists", ApiErrorResponseCodes.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         ExerciseSheet exerciseSheet = new ExerciseSheet();
         exerciseSheet.setCourse(new Course(createExerciseSheetRequest.getCourseId()));
-        exerciseSheet.setSortOrder(createExerciseSheetRequest.getOrder());
         exerciseSheet.setMinKreuzel(createExerciseSheetRequest.getMinKreuzel());
         exerciseSheet.setMinPoints(createExerciseSheetRequest.getMinPoints());
         exerciseSheet.setName(createExerciseSheetRequest.getName());
         exerciseSheet.setSubmissionDate(createExerciseSheetRequest.getSubmissionDate());
+        exerciseSheet.setIssueDate(createExerciseSheetRequest.getIssueDate());
+        exerciseSheet.setDescription(createExerciseSheetRequest.getDescription());
 
         exerciseSheetRepository.save(exerciseSheet);
     }
@@ -58,15 +57,13 @@ public class ExerciseSheetService {
 
         List<ExerciseSheet> courseExerciseSheets = exerciseSheetRepository.findByCourse_Id(exerciseSheet.getCourse().getId());
         courseExerciseSheets.removeIf(sheet -> sheet.getId().equals(updateExerciseSheetRequest.getId()));
-        if (courseExerciseSheets.stream().anyMatch(sheet -> sheet.getSortOrder().equals(updateExerciseSheetRequest.getOrder()) ))
-            throw new ServiceValidationException("Error: An exercise Sheet for this course and this order number exists already",
-                    ApiErrorResponseCodes.EXERCISE_SHEET_COURSE_WITH_ORDER_ALREADY_EXISTS);
 
-        exerciseSheet.setSortOrder(updateExerciseSheetRequest.getOrder());
         exerciseSheet.setMinKreuzel(updateExerciseSheetRequest.getMinKreuzel());
         exerciseSheet.setMinPoints(updateExerciseSheetRequest.getMinPoints());
         exerciseSheet.setName(updateExerciseSheetRequest.getName());
         exerciseSheet.setSubmissionDate(updateExerciseSheetRequest.getSubmissionDate());
+        exerciseSheet.setIssueDate(updateExerciseSheetRequest.getIssueDate());
+        exerciseSheet.setDescription(updateExerciseSheetRequest.getDescription());
 
         exerciseSheetRepository.save(exerciseSheet);
     }

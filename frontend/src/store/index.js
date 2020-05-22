@@ -31,17 +31,12 @@ export default new Vuex.Store({
   mutations: {
     initialiseStore(state) {
       state.token = getToken();
-      state.userInfo = decodeToken(state.token);
-      state.loggedIn = !!state.token;
+      setUserInfo(state);
       state.settings = getSettings();
-      if(state.userInfo.exp < new Date().getTime()/1000){
-        this.dispatch('logout', true);
-      }
     },
     loginSuccess(state, payload){
       state.token = payload.accessToken;
-      state.userInfo = decodeToken(payload.accessToken);
-      state.loggedIn = true;
+      setUserInfo(state);
       setToken(payload.accessToken);
     },
     logout(state){
@@ -59,7 +54,9 @@ export default new Vuex.Store({
       deleteToken();
       commit('logout');
       if(isTokenExpired){
-        router.push('Login');
+        if(router.name !== 'Login'){
+          router.push('/Login');
+        }
         this.$app.$bvToast.toast(this.$app.$t('sessionExpired'), {
             title: this.$app.$t('warning'),
             variant: 'warning',
@@ -82,6 +79,11 @@ export default new Vuex.Store({
               });
       });
     },
+    checkToken({state}){
+      if(state.userInfo && state.userInfo.exp < new Date().getTime()/1000){
+        this.dispatch('logout', true);
+      }
+    },
     updateSettings({commit}, data){
       return commit('updateSettings', data);
     },
@@ -90,6 +92,9 @@ export default new Vuex.Store({
     },
     createUsers({commit}, formData){
       return api.createUsers(formData);
+    },
+    updateUser({commit}, userData){
+      return api.updateUser(userData);
     },
     deleteUser({commit}, matrikelNummer){
       return api.deleteUser(matrikelNummer);
@@ -118,7 +123,10 @@ export default new Vuex.Store({
     getCourse({commit}, data){
       return api.getCourse(data);
     },
-    getUsers({commit}, data){
+    getUser({commit}){
+      return api.getUser();
+    },
+    getUsers({commit}, data = {}){
       return new Promise((resolve, reject) =>{
         api.getUsers(data).then(response =>{
           if(data.courseId){
@@ -144,13 +152,22 @@ export default new Vuex.Store({
       return api.getExerciseSheets(courseData);
     },
     getExerciseSheet({commit}, sheedId){
-      return api.exerciseSheet(sheedId);
+      return api.getExerciseSheet(sheedId);
     },
     updateExerciseSheet({commit}, sheetData){
       return api.updateExerciseSheet(sheetData);
     },
     deleteExerciseSheet({commit}, sheetId){
       return api.deleteExerciseSheet(sheetId);
+    },
+    createExample({commit}, exampleData){
+      return api.createExample(exampleData);
+    },
+    updateExample({commit}, exampleData){
+      return api.updateExample(exampleData);
+    },
+    deleteExample({commit}, exampleId){
+      return api.deleteExample(exampleId);
     }
   },
   modules: {
@@ -165,7 +182,7 @@ export default new Vuex.Store({
       const date = new Date();
       return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split(/ *:..\..../)[0];
     },
-    courseRoles: () => {
+    roles: () => {
       return [
         {
             key: 'l',
@@ -181,21 +198,51 @@ export default new Vuex.Store({
         },
       ];
     },
-    userRoles: () => {
+    rolesWithAll: (state, getters) =>{
       return [
         {
-            key: 'l',
-            value: i18n.t('lecturer'),
-        },
+            key: 'a',
+            value: this.$t('all')
+        }
+      ].concat(getters.roles);
+    },
+    rolesAllAssign: (state, getters) =>{
+      return getters.rolesWithAll.concat([
         {
-            key: 's',
-            value: i18n.t('student'),
-        },
-      ];
+          key: 'z',
+          value: this.$t('assigned')
+        }
+      ]);
+    },
+    filteredUsers: () => {
+      return ({users, role = 'a', searchText}) =>{
+        let result = users;
+
+        if(role === 'z'){
+            result = result.filter(user => user.role !== 'n');
+        }
+        else if(role !== 'a'){
+            result = result.filter(user => role === user.role)
+        }
+        
+        if(searchText){
+            result = result.filter(user => user.matrikelNummer.indexOf(searchText) !== -1
+                                        || user.surname.indexOf(searchText) !== -1
+                                        || user.forename.indexOf(searchText) !== -1);
+        }
+        return result;
+      }
     }
   }
 });
 
+function setUserInfo(state){
+  state.userInfo = decodeToken(state.token);
+  if(state.userInfo.isAdmin){
+    state.userInfo.isOwner = true;
+  }
+  state.loggedIn = !!state.token;
+}
 
 function getToken(){
   return storage.getItem(tokenName);

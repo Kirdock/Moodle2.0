@@ -1,29 +1,39 @@
 <template>
   <div class="account">
     <b-tabs content-class="mt-3">
-      <b-tab :title="$t('settings')" active>
+      <b-tab :title="$t('information')" active>
+        <div class="form-horizontal col-md-6">
+          <form @submit.prevent="updateUser()">
+            <user-info :value="userInfo" :isEdit="true"></user-info>
+            <button class="btn btn-primary" type="submit">
+              <span class="fa fa-sync fa-spin" v-if="loading_updateInformation"></span>
+              <span class="fa fa-save" v-else></span>
+              {{$t('save')}}
+            </button>
+          </form>
+        </div>
+      </b-tab>
+      <b-tab :title="$t('security')">
         <div class="form-horizontal col-md-4">
-          <form @submit.prevent @submit="updatePassword()">
+          <form ref="form" @submit.prevent="updatePassword()">
             <div class="form-group">
               <label for="oldPassword" class="control-label required">{{ $t('passwordOld') }}</label> 
               <input id="oldPassword" type="password" class="form-control" v-model="passwordData.oldPassword" required>
             </div>
             <div class="form-group">
               <label for="newPassword" class="control-label required">{{ $t('passwordNew') }}</label> 
-              <input id="newPassword" type="password" class="form-control" v-model="passwordData.newPassword" required>
+              <input id="newPassword" type="password" class="form-control" v-model="passwordData.newPassword" @change="resetValidationMessage()" required>
             </div>
             <div class="form-group">
               <label for="newPasswordConfirm" class="control-label required">{{ $t('passwordNewConfirm') }}</label> 
-              <input id="newPasswordConfirm" type="password" class="form-control" v-model="passwordData.newPasswordConfirm" required>
+              <input id="newPasswordConfirm" ref="newPasswordConfirm" type="password" class="form-control" @change="resetValidationMessage()" v-model="passwordData.newPasswordConfirm" required>
             </div>
             <div class="form-inline">
-              <b-button variant="primary" @click="updatePassword()">
-                {{$t('update')}}
-              </b-button>
-              <div class="offset-md-1 form-inline" v-if="loadingPasswordChange">
-                <span class="fa fa-sync fa-spin"></span>
-                <label class="control-label">{{ $t('loading') }}...</label>
-              </div>
+              <button class="btn btn-primary" type="submit">
+                <span class="fa fa-sync fa-spin" v-if="loadingPasswordChange"></span>
+                <span class="fa fa-save" v-else></span>
+                {{$t('save')}}
+              </button>
             </div>
           </form>
         </div>
@@ -33,24 +43,59 @@
 </template>
 
 <script>
-
+import UserInfo from '@/components/UserInfo.vue';
 export default {
+    components:{
+        'user-info': UserInfo
+    },
   data() {
     return {
+      userInfo: {},
       passwordData: {},
-      loadingPasswordChange: false
+      loadingPasswordChange: false,
+      loading_updateInformation: false
     }
   },
   created(){
+    this.getUser();
   },
   methods:{
+    getUser(){
+      this.$store.dispatch('getUser').then(response =>{
+        this.userInfo = response.data;
+      }).catch(()=>{
+        this.$bvToast.toast(this.$t('user.error.get'), {
+            title: this.$t('error'),
+            variant: 'danger',
+            appendToast: true
+          });
+      });
+    },
+    updateUser(){
+      this.loading_updateInformation = true;
+      this.$store.dispatch('updateUser', this.userInfo).then(response=>{
+          this.$bvToast.toast(this.$t('user.saved'), {
+              title: this.$t('success'),
+              variant: 'success',
+              appendToast: true
+          });
+      }).catch(()=>{
+          this.$bvToast.toast(this.$t('user.error.save'), {
+              title: this.$t('error'),
+              variant: 'danger',
+              appendToast: true
+          });
+      }).finally(()=>{
+          this.loading_updateInformation = false;
+      });
+    },
+    resetValidationMessage(){
+      this.$refs.newPasswordConfirm.setCustomValidity('');
+    },
     updatePassword(){
       if(this.passwordData.newPassword !== this.passwordData.newPasswordConfirm){
-        this.$bvToast.toast(this.$t('passwordDontMatch'), {
-          title: this.$t('error'),
-          variant: 'danger',
-          appendToast: true
-        });
+        this.$refs.newPasswordConfirm.setCustomValidity(this.$t('passwordDontMatch'));
+        this.$refs.form.reportValidity();
       }
       else{
         this.loadingPasswordChange = true;

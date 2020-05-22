@@ -1,7 +1,5 @@
 package com.aau.moodle20.entity;
 
-import com.aau.moodle20.constants.EUserRole;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -20,8 +18,7 @@ public class User {
     @Column(name = "matrikelNummer", nullable = false)
     @Basic(optional = false)
     private String matrikelNummer;
-    @Column(name = "role")
-    private EUserRole role;
+    private Boolean isAdmin;
 
     @NotBlank
     @Size(max = 120)
@@ -41,20 +38,25 @@ public class User {
 
     }
 
-    public User(String username, String password, EUserRole role)
+    public User(String matrikelNummer)
+    {
+        this.matrikelNummer = matrikelNummer;
+    }
+
+    public User(String username, String password, Boolean isAdmin)
     {
         this.username = username;
         this.password = password;
-        this.role = role;
+        this.isAdmin  = isAdmin;
     }
-    public User(String username, String matrikelNummer, String forename, String surename, String password, EUserRole role)
+    public User(String username, String matrikelNummer, String forename, String surename, String password, Boolean isAdmin)
     {
         this.username = username;
         this.matrikelNummer = matrikelNummer;
         this.forename = forename;
         this.surname = surename;
         this.password = password;
-        this.role = role;
+        this.isAdmin = isAdmin;
     }
 
     public String getMatrikelNumber() {
@@ -63,14 +65,6 @@ public class User {
 
     public void setMatrikelNumber(String martikelNummer) {
         this.matrikelNummer = martikelNummer;
-    }
-
-    public EUserRole getRole() {
-        return role;
-    }
-
-    public void setRole(EUserRole role) {
-        this.role = role;
     }
 
     public String getPassword() {
@@ -111,5 +105,13 @@ public class User {
 
     public void setCourses(Set<UserInCourse> courses) {
         this.courses = courses;
+    }
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
     }
 }

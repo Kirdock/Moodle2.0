@@ -1,9 +1,10 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
-import com.aau.moodle20.constants.EUserRole;
-import com.aau.moodle20.entity.User;
-import com.aau.moodle20.entity.UserInCourse;
+import com.aau.moodle20.domain.User;
+import com.aau.moodle20.domain.UserInCourse;
+import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
@@ -58,16 +59,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return UserDetailsImpl.build(user);
     }
 
-    public void registerUser(SignUpRequest signUpRequest) throws UserException
+    public void registerUser(SignUpRequest signUpRequest) throws ServiceValidationException
     {
         if (userRepository.existsByMatrikelNummer(signUpRequest.getMatrikelnummer())) {
-           throw new UserException("Error: User with this matrikelNummer already exists!");
+           throw new ServiceValidationException("Error: User with this matrikelNummer already exists!", ApiErrorResponseCodes.MATRIKELNUMMER_ALREADY_EXISTS);
         }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new UserException("Error: User with this username already exists!");
-        }
-        if (EUserRole.Admin.equals(signUpRequest.getRole())) {
-            throw new UserException("Error: Admin user role is not allowed!");
+            throw new ServiceValidationException("Error: User with this username already exists!",ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
         }
 
         String password = "password";//TODO should not be hardcoded
@@ -80,7 +78,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setForename(signUpRequest.getForename());
         user.setSurname(signUpRequest.getSurname());
         user.setPassword(password);
-        user.setRole(signUpRequest.getRole());
+        user.setAdmin(Boolean.FALSE);
         userRepository.save(user);
     }
 
@@ -100,7 +98,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             user.setMatrikelNumber(columns[1]);
             user.setSurname(columns[2]);
             user.setForename(columns[3]);
-            user.setRole(EUserRole.None);
+            user.setAdmin(Boolean.FALSE);
             user.setPassword(password);
             users.add(user);
         }
@@ -161,7 +159,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     public List<User> getAllUsers() throws UserException {
         List<User> allUsers = userRepository.findAll();
-        allUsers.removeIf(user -> EUserRole.Admin.equals(user.getRole()));
+        allUsers.removeIf(User::getAdmin);
 
         return allUsers;
     }
@@ -174,7 +172,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         {
             UserResponseObject responseObject= new UserResponseObject();
             fillResponseObject(user,responseObject);
-            responseObject.setUserRole(user.getRole());
+            //TODO set is admin
             userResponseObjectList.add(responseObject);
         }
 
@@ -212,7 +210,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(!optionalUser.isPresent())
             throw new UserException("User with the matrikelNummer:"+matrikelNummer+" does not exists");
 
-        if(EUserRole.Admin.equals(optionalUser.get().getRole()))
+        if(optionalUser.get().getAdmin())
             throw new UserException("Admin user cannot be deleted");
 
         userRepository.delete(optionalUser.get());

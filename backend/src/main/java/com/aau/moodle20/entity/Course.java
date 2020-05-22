@@ -22,6 +22,9 @@ public class Course {
     @OneToMany(mappedBy = "course")
     Set<UserInCourse> students; // TODO find better name
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner", referencedColumnName = "matrikelNummer")
+    User owner;
     public Course(Long id)
     {
         this.id = id;
@@ -84,5 +87,13 @@ public class Course {
 
     public void setStudents(Set<UserInCourse> students) {
         this.students = students;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

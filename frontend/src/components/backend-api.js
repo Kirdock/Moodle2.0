@@ -54,6 +54,9 @@ export default {
     getUsers({courseId}){
         return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
     },
+    getUser(){
+        return axios.get(`/users/${store.getters.userInfo.matrikelnummer}`);
+    },
     createUser(userData){
         return axios.put('/user',userData);
     },
@@ -70,6 +73,9 @@ export default {
     udpatePassword(data){
         return axios.post('/user/password', data);
     },
+    updateUser(userData){
+        return axios.post('/user', userData);
+    },
     deleteUser(matrikelNummer){
         return axios.delete(`/user/${matrikelNummer}`);
     },
@@ -83,13 +89,22 @@ export default {
         return axios.get(`/course/${courseData.id}/exerciseSheets`);
     },
     getExerciseSheet(sheedId){
-        return axios.get(`/exerciseSheets/${sheedId}`)
+        return axios.get(`/exerciseSheet/${sheedId}`)
     },
     updateExerciseSheet(sheetData){
-        return axios.post('/course/exerciseSheet', sheetData);
+        return axios.post('/exerciseSheet', sheetData);
     },
     deleteExerciseSheet(sheedId){
         return axios.delete(`/exerciseSheet/${sheedId}`);
+    },
+    createExample(exampleData){
+        return axios.put('/example', exampleData);
+    },
+    updateExample(exampleData){
+        return axios.post('/example', exampleData);
+    },
+    deleteExample(exampleId){
+        return axios.delete(`/example/${exampleId}`);
     }
 }
 

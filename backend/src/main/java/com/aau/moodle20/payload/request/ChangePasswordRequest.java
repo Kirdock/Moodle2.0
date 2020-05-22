@@ -1,9 +1,6 @@
 package com.aau.moodle20.payload.request;
 
-import com.aau.moodle20.constants.EUserRole;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 public class ChangePasswordRequest {
 

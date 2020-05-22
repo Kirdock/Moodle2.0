@@ -17,7 +17,7 @@
             </div>
           </div>
 
-          <b-button type="submit" variant="primary">{{$t('login')}}</b-button>
+          <button class="btn btn-primary" type="submit">{{$t('login')}}</button>
         </form>
     </div>
 </template>

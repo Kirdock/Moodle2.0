@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS USER
     password        VARCHAR(120) NOT NULL,
     username        VARCHAR(50)  NOT NULL,
     forename        VARCHAR(50),
-    role            CHAR(5),
+    is_Admin            CHAR(5),
     surname         VARCHAR(50)
 );
 
@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS COURSE
     name        VARCHAR(100) NOT NULL,
     min_Kreuzel Number(10),
     min_Points  Number(10),
-    CONSTRAINT FOREIGN_KEY_SEMESTER FOREIGN KEY (semester_id) references SEMESTER
+    owner       VARCHAR(20),
+    CONSTRAINT FOREIGN_KEY_SEMESTER FOREIGN KEY (semester_id) references SEMESTER on delete cascade ,
+    CONSTRAINT FOREIGN_KEY_OWNER FOREIGN KEY (owner) references USER on delete cascade
 );
 
 
@@ -42,11 +44,12 @@ CREATE TABLE IF NOT EXISTS EXERCISE_SHEET
 (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     course_id       INT,
-    sort_Order     INT ,
     name VARCHAR(100),
     min_Kreuzel Number(10),
     min_Points  Number(10),
     submission_Date datetime,
+    issue_Date datetime,
+    description CLOB,
     CONSTRAINT FOREIGN_KEY_COURSE_EXERCISE_SHEET FOREIGN KEY (course_id) references COURSE on delete cascade
 );
 

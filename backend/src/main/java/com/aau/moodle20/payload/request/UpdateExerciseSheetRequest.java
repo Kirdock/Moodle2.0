@@ -11,14 +11,17 @@ public class UpdateExerciseSheetRequest {
     private Long id;
     @NotNull
     private String name;
+    @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime submissionDate;
     @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime issueDate;
     private Integer minKreuzel;
-    @NotNull
     private Integer minPoints;
     @NotNull
-    private Integer order;
+    private String description;
+
 
     public Long getId() {
         return id;
@@ -60,11 +63,19 @@ public class UpdateExerciseSheetRequest {
         this.minPoints = minPoints;
     }
 
-    public Integer getOrder() {
-        return order;
+    public LocalDateTime getIssueDate() {
+        return issueDate;
     }
 
-    public void setOrder(Integer order) {
-        this.order = order;
+    public void setIssueDate(LocalDateTime issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

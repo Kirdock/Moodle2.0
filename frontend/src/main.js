@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/style.css';
 import i18n from '@/plugins/i18n';
-import {BVConfigPlugin, ToastPlugin, TabsPlugin, ModalPlugin, ButtonPlugin} from 'bootstrap-vue';
+import {BVConfigPlugin, ToastPlugin, TabsPlugin, ModalPlugin} from 'bootstrap-vue';
 import IntegerInput from './components/IntegerInput.vue';
 
 Vue.config.productionTip = true;
@@ -24,7 +24,6 @@ Vue.use(BVConfigPlugin, {
 Vue.use(ToastPlugin);
 Vue.use(TabsPlugin);
 Vue.use(ModalPlugin);
-Vue.use(ButtonPlugin);
 
 Vue.component('i-input', IntegerInput); //Global registration
 
@@ -42,3 +41,4 @@ const app = new Vue({
 }).$mount('#app');
 
 store.$app = app; //need it for logout-toast
+store.dispatch('checkToken');

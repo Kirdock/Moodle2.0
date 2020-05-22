@@ -1,10 +1,6 @@
 package com.aau.moodle20.payload.request;
 
-import com.aau.moodle20.constants.EUserRole;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 public class SignUpRequest {
 
@@ -18,8 +14,6 @@ public class SignUpRequest {
     private String forename;
     @NotBlank
     private String surname;
-    @NotNull
-    private EUserRole role;
 
     public String getUsername() {
         return username;
@@ -51,13 +45,5 @@ public class SignUpRequest {
 
     public void setSurname(String surname) {
         this.surname = surname;
-    }
-
-    public EUserRole getRole() {
-        return role;
-    }
-
-    public void setRole(EUserRole role) {
-        this.role = role;
     }
 }

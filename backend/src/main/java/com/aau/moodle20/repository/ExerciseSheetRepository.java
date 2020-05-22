@@ -7,9 +7,6 @@ import java.util.List;
 
 public interface ExerciseSheetRepository extends JpaRepository<ExerciseSheet,Long> {
 
-
-    Boolean existsByCourse_IdAndSortOrder(Long courseId, Integer sortOrder);
-
     List<ExerciseSheet> findByCourse_Id(Long courseId);
 }
 

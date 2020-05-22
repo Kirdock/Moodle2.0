@@ -46,7 +46,7 @@ const routes = [
     component: Admin,
     meta: {
       authentication: true,
-      isAdmin: true
+      isOwner: true
     }
   },
   {
@@ -73,16 +73,16 @@ const routes = [
     component: CourseManagement,
     meta: {
       authentication: true,
-      isAdmin: true
+      isOwner: true
     }
   },
   {
-    path: '/Admin/Course/{courseId}/SheetManagement/{sheetId}',
+    path: '/Admin/Course/:courseId/SheetManagement/:sheetId',
     name: 'SheetManagement',
     component: SheetManagement,
     meta: {
       authentication: true,
-      isAdmin: true
+      isOwner: true
     },
     props: true
   },
@@ -99,8 +99,8 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.authentication)) {
     if(store.getters.isLoggedIn){
-      if(to.matched.some(record => record.meta.isAdmin)){
-        if(store.getters.userInfo.isAdmin){
+      if(to.matched.some(record => record.meta.isOwner)){
+        if(store.getters.userInfo.isOwner){
           next();
         }
         else{

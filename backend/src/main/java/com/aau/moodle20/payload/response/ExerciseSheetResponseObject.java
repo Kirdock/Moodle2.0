@@ -8,12 +8,14 @@ public class ExerciseSheetResponseObject {
 
     private Long id;
     private Long courseId;
-    private Integer order;
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime submissionDate;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime issueDate;
+    private String description;
 
 
     public Long getId() {
@@ -30,14 +32,6 @@ public class ExerciseSheetResponseObject {
 
     public void setCourseId(Long courseId) {
         this.courseId = courseId;
-    }
-
-    public Integer getOrder() {
-        return order;
-    }
-
-    public void setOrder(Integer order) {
-        this.order = order;
     }
 
     public String getName() {
@@ -70,5 +64,21 @@ public class ExerciseSheetResponseObject {
 
     public void setSubmissionDate(LocalDateTime submissionDate) {
         this.submissionDate = submissionDate;
+    }
+
+    public LocalDateTime getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(LocalDateTime issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

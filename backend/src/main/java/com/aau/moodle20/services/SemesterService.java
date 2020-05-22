@@ -15,6 +15,7 @@ import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.ExerciseSheetRepository;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
+import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,9 @@ public class SemesterService {
     @Autowired
     UserInCourseRepository userInCourseRepository;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
 
     public void createSemester(CreateSemesterRequest createSemesterRequest) throws ServiceValidationException {
         if (semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear()))
@@ -52,6 +56,8 @@ public class SemesterService {
     public void createCourse(CreateCourseRequest createCourseRequest) throws SemesterException {
 
         checkIfSemesterExists(createCourseRequest.getSemesterId());
+        if(courseRepository.existsByNameAndNumberAndSemester_Id(createCourseRequest.getName(),createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
+            throw new ServiceValidationException("Course in Semester already exists",ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
         Course course = new Course();
         course.setMinKreuzel(createCourseRequest.getMinKreuzel());
@@ -59,6 +65,7 @@ public class SemesterService {
         course.setName(createCourseRequest.getName());
         course.setNumber(createCourseRequest.getNumber());
         course.setSemester(new Semester(createCourseRequest.getSemesterId()));
+        course.setOwner(new User(createCourseRequest.getOwner()));
         courseRepository.save(course);
     }
 
@@ -117,16 +124,20 @@ public class SemesterService {
         return semesterRepository.findAll();
     }
 
-    public List<CourseResponseObject> getCoursesFromSemester(Long semesterId)
-    {
-        //TODO add validation
+    public List<CourseResponseObject> getCoursesFromSemester(Long semesterId,String jwtToken) {
+        checkIfSemesterExists(semesterId);
+        Boolean isAdmin = jwtUtils.getAdminFromJwtToken(jwtToken.split(" ")[1].trim());
+        String matrikelNummer = jwtUtils.getMatrikelNummerFromJwtToken(jwtToken.split(" ")[1].trim());
         List<CourseResponseObject> responseObjects = new ArrayList<>();
-        List<Course> courses =  courseRepository.findCoursesBySemester(new Semester(semesterId));
+        List<Course> courses = null;
 
-        if(courses!=null && !courses.isEmpty())
-        {
-            for(Course course : courses)
-            {
+        if (isAdmin)
+            courses = courseRepository.findCoursesBySemester_Id(semesterId);
+        else
+            courses = courseRepository.findCoursesBySemester_IdAndOwner_MatrikelNummer(semesterId, matrikelNummer);
+
+        if (courses != null && !courses.isEmpty()) {
+            for (Course course : courses) {
                 CourseResponseObject responseObject = new CourseResponseObject();
                 responseObject.setId(course.getId());
                 responseObject.setName(course.getName());
@@ -134,7 +145,6 @@ public class SemesterService {
                 responseObjects.add(responseObject);
             }
         }
-
         return responseObjects;
     }
 
