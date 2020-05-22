@@ -3,6 +3,7 @@ package com.aau.moodle20.payload.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ExerciseSheetResponseObject {
 
@@ -16,6 +17,7 @@ public class ExerciseSheetResponseObject {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime issueDate;
     private String description;
+    private List<ExampleResponseObject> examples;
 
 
     public Long getId() {
@@ -80,5 +82,13 @@ public class ExerciseSheetResponseObject {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<ExampleResponseObject> getExamples() {
+        return examples;
+    }
+
+    public void setExamples(List<ExampleResponseObject> examples) {
+        this.examples = examples;
     }
 }

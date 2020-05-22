@@ -1,9 +1,12 @@
 package com.aau.moodle20.entity;
 
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name ="exercise_sheet")
@@ -23,6 +26,12 @@ public class ExerciseSheet {
     @Column(name = "issue_Date", columnDefinition="DATETIME")
     private LocalDateTime issueDate;
     private String description;
+    @OneToMany(
+            mappedBy = "exerciseSheet",
+            cascade = CascadeType.PERSIST,
+            fetch = FetchType.LAZY
+    )
+    private Set<Example> examples;
     public ExerciseSheet()
     {
     }
@@ -107,7 +116,17 @@ public class ExerciseSheet {
         responseObject.setSubmissionDate(getSubmissionDate());
         responseObject.setIssueDate(getIssueDate());
         responseObject.setDescription(getDescription());
+        if (getExamples() != null)
+            responseObject.setExamples(getExamples().stream().map(Example::createExampleResponseObject).collect(Collectors.toList()));
 
         return responseObject;
+    }
+
+    public Set<Example> getExamples() {
+        return examples;
+    }
+
+    public void setExamples(Set<Example> examples) {
+        this.examples = examples;
     }
 }

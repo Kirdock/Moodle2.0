@@ -1,5 +1,7 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.payload.response.FileTypeResponseObject;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -55,5 +57,14 @@ public class FileType {
 
     public void setAssignedExamples(Set<SupportFileType> assignedExamples) {
         this.assignedExamples = assignedExamples;
+    }
+
+    public FileTypeResponseObject createFileTypeResponseObject() {
+        FileTypeResponseObject responseObject = new FileTypeResponseObject();
+        responseObject.setId(getId());
+        responseObject.setName(getName());
+        responseObject.setValue(getValue());
+
+        return responseObject;
     }
 }

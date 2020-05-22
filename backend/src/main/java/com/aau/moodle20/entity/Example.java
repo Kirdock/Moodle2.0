@@ -1,16 +1,19 @@
 package com.aau.moodle20.entity;
 
 import com.aau.moodle20.payload.request.CreateExampleRequest;
+import com.aau.moodle20.payload.response.ExampleResponseObject;
+import com.aau.moodle20.payload.response.FileTypeResponseObject;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name ="example")
 public class Example {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -150,5 +153,28 @@ public class Example {
         setPoints(createExampleRequest.getPoints());
         setValidator(createExampleRequest.getValidator());
         setWeighting(createExampleRequest.getWeighting());
+    }
+    public ExampleResponseObject createExampleResponseObject()
+    {
+        ExampleResponseObject exampleResponseObject = new ExampleResponseObject();
+        exampleResponseObject.setId(getId());
+        exampleResponseObject.setDescription(getDescription());
+        exampleResponseObject.setMandatory(getMandatory());
+        exampleResponseObject.setName(getName());
+        exampleResponseObject.setPoints(getPoints());
+        exampleResponseObject.setWeighting(getWeighting());
+        exampleResponseObject.setOrder(getOrder());
+        exampleResponseObject.setValidator(getValidator());
+        if (getSupportFileTypes() != null)
+        {
+            List<FileTypeResponseObject> fileTypeResponseObjects = getSupportFileTypes().stream()
+                    .map(supportFileType -> supportFileType.getFileType().createFileTypeResponseObject())
+                    .collect(Collectors.toList());
+            exampleResponseObject.setSupportedFileTypes(fileTypeResponseObjects);
+        }
+        if (getSubExamples() != null)
+            exampleResponseObject.setSubExamples(getSubExamples().stream().map(Example::createExampleResponseObject).collect(Collectors.toList()));
+
+        return exampleResponseObject;
     }
 }
