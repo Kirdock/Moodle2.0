@@ -92,9 +92,9 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('Admin')")
-    @DeleteMapping(path = "/user/{matrikelnummer}")
-    public ResponseEntity<?> deleteUser(@PathVariable String matrikelnummer) {
-        userDetailsService.deleteUser(matrikelnummer);
+    @DeleteMapping(path = "/user/{matriculationNumber}")
+    public ResponseEntity<?> deleteUser(@PathVariable String matriculationNumber) {
+        userDetailsService.deleteUser(matriculationNumber);
         return ResponseEntity.ok(new MessageResponse("User was deleted!"));
     }
 }

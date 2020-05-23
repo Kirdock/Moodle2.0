@@ -10,7 +10,7 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
 
     List<Course> findCoursesBySemester_Id(Long  semesterId);
 
-    List<Course> findCoursesBySemester_IdAndOwner_MatrikelNummer(Long semesterId, String matrikelNummer);
+    List<Course> findCoursesBySemester_IdAndOwner_MatriculationNumber(Long semesterId, String matriculationNumber);
 
 
     Boolean existsByNameAndNumberAndSemester_Id(String name,String number, Long semesterId);

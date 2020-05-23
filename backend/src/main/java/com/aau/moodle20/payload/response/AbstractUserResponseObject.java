@@ -2,7 +2,7 @@ package com.aau.moodle20.payload.response;
 
 public class AbstractUserResponseObject {
 
-    private String matrikelNummer;
+    private String matriculationNumber;
     private String username;
     private String forename;
     private String surname;
@@ -11,12 +11,12 @@ public class AbstractUserResponseObject {
     {
     }
 
-    public String getMatrikelNummer() {
-        return matrikelNummer;
+    public String getMatriculationNumber() {
+        return matriculationNumber;
     }
 
-    public void setMatrikelNummer(String matrikelNummer) {
-        this.matrikelNummer = matrikelNummer;
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
     }
 
     public String getUsername() {

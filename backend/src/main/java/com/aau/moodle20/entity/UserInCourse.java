@@ -13,8 +13,8 @@ public class UserInCourse {
     UserCourseKey id;
 
     @ManyToOne
-    @MapsId("matrikelNummer")
-    @JoinColumn(name = "matrikelNummer")
+    @MapsId("matriculationNumber")
+    @JoinColumn(name = "matriculation_Number")
      User user;
 
     @ManyToOne

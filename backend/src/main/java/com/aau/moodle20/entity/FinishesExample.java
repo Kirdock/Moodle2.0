@@ -12,8 +12,8 @@ public class FinishesExample {
     private FinishesExampleKey id;
 
     @ManyToOne
-    @MapsId("matrikelNummer")
-    @JoinColumn(name = "matrikelNummer")
+    @MapsId("matriculationNumber")
+    @JoinColumn(name = "matriculation_Number")
      private User user;
 
     @ManyToOne

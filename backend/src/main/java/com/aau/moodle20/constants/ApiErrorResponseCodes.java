@@ -12,7 +12,7 @@ public class ApiErrorResponseCodes {
 
 
     public final static Integer USERNAME_ALREADY_EXISTS = 470;
-    public final static Integer MATRIKELNUMMER_ALREADY_EXISTS = 471;
+    public final static Integer MATRICULACTIONNUMBER_ALREADY_EXISTS = 471;
     public final static Integer SEMESTER_ALREADY_EXISTS = 472;
     public final static Integer COURSE_IN_SEMESTER_ALREADY_EXISTS = 473;
 

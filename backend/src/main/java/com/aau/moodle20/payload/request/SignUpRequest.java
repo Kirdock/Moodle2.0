@@ -8,7 +8,7 @@ public class SignUpRequest {
     private String username;
 
     @NotBlank
-    private String matrikelnummer;
+    private String matriculationNumber;
 
     @NotBlank
     private String forename;
@@ -23,12 +23,12 @@ public class SignUpRequest {
         this.username = username;
     }
 
-    public String getMatrikelnummer() {
-        return matrikelnummer;
+    public String getMatriculationNumber() {
+        return matriculationNumber;
     }
 
-    public void setMatrikelnummer(String matrikelnummer) {
-        this.matrikelnummer = matrikelnummer;
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
     }
 
     public String getForename() {

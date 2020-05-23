@@ -5,7 +5,7 @@ import com.aau.moodle20.constants.ECourseRole;
 public class AssignUserToCourseRequest {
 
     private Long courseId;
-    private String matrikelNummer;
+    private String matriculationNumber;
     private ECourseRole role;
 
     public Long getCourseId() {
@@ -16,12 +16,12 @@ public class AssignUserToCourseRequest {
         this.courseId = courseId;
     }
 
-    public String getMatrikelNummer() {
-        return matrikelNummer;
+    public String getMatriculationNumber() {
+        return matriculationNumber;
     }
 
-    public void setMatrikelNummer(String matrikelNummer) {
-        this.matrikelNummer = matrikelNummer;
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
     }
 
     public ECourseRole getRole() {

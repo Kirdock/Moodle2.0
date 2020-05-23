@@ -9,15 +9,15 @@ import java.util.Set;
 @Table(name ="user",
 uniqueConstraints = {
         @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "matrikelNummer")
+        @UniqueConstraint(columnNames = "matriculation_Number")
 })
 public class User {
 
     @Id
     @Size(max = 20)
-    @Column(name = "matrikelNummer", nullable = false)
+    @Column(name = "matriculation_Number", nullable = false)
     @Basic(optional = false)
-    private String matrikelNummer;
+    private String matriculationNumber;
     private Boolean isAdmin;
 
     @NotBlank
@@ -38,9 +38,9 @@ public class User {
 
     }
 
-    public User(String matrikelNummer)
+    public User(String matriculationNumber)
     {
-        this.matrikelNummer = matrikelNummer;
+        this.matriculationNumber = matriculationNumber;
     }
 
     public User(String username, String password, Boolean isAdmin)
@@ -49,22 +49,22 @@ public class User {
         this.password = password;
         this.isAdmin  = isAdmin;
     }
-    public User(String username, String matrikelNummer, String forename, String surename, String password, Boolean isAdmin)
+    public User(String username, String matriculationNumber, String forename, String surename, String password, Boolean isAdmin)
     {
         this.username = username;
-        this.matrikelNummer = matrikelNummer;
+        this.matriculationNumber = matriculationNumber;
         this.forename = forename;
         this.surname = surename;
         this.password = password;
         this.isAdmin = isAdmin;
     }
 
-    public String getMatrikelNumber() {
-        return matrikelNummer;
+    public String getMatriculationNumber() {
+        return matriculationNumber;
     }
 
-    public void setMatrikelNumber(String martikelNummer) {
-        this.matrikelNummer = martikelNummer;
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
     }
 
     public String getPassword() {
@@ -95,8 +95,8 @@ public class User {
         return surname;
     }
 
-    public void setSurname(String surename) {
-        this.surname = surename;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public Set<UserInCourse> getCourses() {

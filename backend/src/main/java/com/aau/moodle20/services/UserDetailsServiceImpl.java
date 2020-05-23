@@ -61,8 +61,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public void registerUser(SignUpRequest signUpRequest) throws ServiceValidationException
     {
-        if (userRepository.existsByMatrikelNummer(signUpRequest.getMatrikelnummer())) {
-           throw new ServiceValidationException("Error: User with this matrikelNummer already exists!", ApiErrorResponseCodes.MATRIKELNUMMER_ALREADY_EXISTS);
+        if (userRepository.existsByMatriculationNumber(signUpRequest.getMatriculationNumber())) {
+           throw new ServiceValidationException("Error: User with this matriculationNumber already exists!", ApiErrorResponseCodes.MATRICULACTIONNUMBER_ALREADY_EXISTS);
         }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             throw new ServiceValidationException("Error: User with this username already exists!",ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
@@ -74,7 +74,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         //username, matrikelNumber, forename, surename, password, isAdmin
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
-        user.setMatrikelNumber(signUpRequest.getMatrikelnummer());
+        user.setMatriculationNumber(signUpRequest.getMatriculationNumber());
         user.setForename(signUpRequest.getForename());
         user.setSurname(signUpRequest.getSurname());
         user.setPassword(password);
@@ -95,7 +95,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             String[] columns = line.split(";");
             User user = new User();
             user.setUsername(columns[0]);
-            user.setMatrikelNumber(columns[1]);
+            user.setMatriculationNumber(columns[1]);
             user.setSurname(columns[2]);
             user.setForename(columns[3]);
             user.setAdmin(Boolean.FALSE);
@@ -104,7 +104,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         // remove users which already exists
-        users.removeIf(user -> userRepository.existsByMatrikelNummer(user.getMatrikelNumber()));
+        users.removeIf(user -> userRepository.existsByMatriculationNumber(user.getMatriculationNumber()));
         userRepository.saveAll(users);
     }
 
@@ -120,7 +120,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             fillResponseObject(user,responseObject);
 
             Optional<ECourseRole> role = userInCourses.stream()
-                    .filter(userInCourse -> user.getMatrikelNumber().equals(userInCourse.getUser().getMatrikelNumber()))
+                    .filter(userInCourse -> user.getMatriculationNumber().equals(userInCourse.getUser().getMatriculationNumber()))
                     .map(UserInCourse::getRole)
                     .findFirst();
             if (role.isPresent())
@@ -187,15 +187,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     {
         responseObject.setForename(user.getForename());
         responseObject.setSurname(user.getSurname());
-        responseObject.setMatrikelNummer(user.getMatrikelNumber());
+        responseObject.setMatriculationNumber(user.getMatriculationNumber());
         responseObject.setUsername(user.getUsername());
     }
 
     public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)
     {
-        String matrikelNumber = jwtUtils.getMatrikelNummerFromJwtToken(jwtToken.split(" ")[1].trim());
+        String matrikelNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
 
-        Optional<User> optionalUser = userRepository.findByMatrikelNummer(matrikelNumber);
+        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matrikelNumber);
         if(!encoder.matches(changePasswordRequest.getOldPassword(), optionalUser.get().getPassword()))
             throw new UserException("Password for User not correct!");
 
@@ -204,11 +204,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void deleteUser(String matrikelNummer)
+    public void deleteUser(String matriculationNumber)
     {
-        Optional<User> optionalUser = userRepository.findByMatrikelNummer(matrikelNummer);
+        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
         if(!optionalUser.isPresent())
-            throw new UserException("User with the matrikelNummer:"+matrikelNummer+" does not exists");
+            throw new UserException("User with the matriculationNumber:"+matriculationNumber+" does not exists");
 
         if(optionalUser.get().getAdmin())
             throw new UserException("Admin user cannot be deleted");

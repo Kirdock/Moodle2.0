@@ -23,7 +23,7 @@ public class Course {
     Set<UserInCourse> students; // TODO find better name
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner", referencedColumnName = "matrikelNummer")
+    @JoinColumn(name = "owner", referencedColumnName = "matriculation_Number")
     User owner;
     public Course(Long id)
     {

@@ -8,8 +8,8 @@ import java.util.Objects;
 @Embeddable
 public class FinishesExampleKey implements Serializable {
 
-    @Column(name = "matrikelNummer")
-    String matrikelNummer;
+    @Column(name = "matriculation_Number")
+    String matriculationNumber;
 
     @Column(name = "example_id")
     Long exampleId;
@@ -18,18 +18,18 @@ public class FinishesExampleKey implements Serializable {
     {
     }
 
-    public FinishesExampleKey(String matrikelnummer, Long exampleId)
+    public FinishesExampleKey(String matriculationNumber, Long exampleId)
     {
         this.exampleId = exampleId;
-        this.matrikelNummer = matrikelnummer;
+        this.matriculationNumber = matriculationNumber;
     }
 
-    public String getMatrikelNummer() {
-        return matrikelNummer;
+    public String getMatriculationNumber() {
+        return matriculationNumber;
     }
 
-    public void setMatrikelNummer(String matrikelNummer) {
-        this.matrikelNummer = matrikelNummer;
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
     }
 
     public Long getExampleId() {
@@ -45,12 +45,12 @@ public class FinishesExampleKey implements Serializable {
         if (this == o) return true;
         if (!(o instanceof FinishesExampleKey)) return false;
         FinishesExampleKey that = (FinishesExampleKey) o;
-        return getMatrikelNummer().equals(that.getMatrikelNummer()) &&
+        return getMatriculationNumber().equals(that.getMatriculationNumber()) &&
                 getExampleId().equals(that.getExampleId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getMatrikelNummer(), getExampleId());
+        return Objects.hash(getMatriculationNumber(), getExampleId());
     }
 }

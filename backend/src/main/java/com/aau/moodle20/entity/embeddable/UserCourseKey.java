@@ -8,8 +8,8 @@ import java.util.Objects;
 @Embeddable
 public class UserCourseKey implements Serializable {
 
-    @Column(name = "matrikelNummer")
-    String matrikelNummer;
+    @Column(name = "matriculation_Number")
+    String matriculationNumber;
 
     @Column(name = "course_id")
     Long courseId;
@@ -18,18 +18,18 @@ public class UserCourseKey implements Serializable {
     {
     }
 
-    public UserCourseKey(String matrikelnummer, Long courseId)
+    public UserCourseKey(String matriculationNumber, Long courseId)
     {
         this.courseId= courseId;
-        this.matrikelNummer = matrikelnummer;
+        this.matriculationNumber = matriculationNumber;
     }
 
-    public String getMatrikelNummer() {
-        return matrikelNummer;
+    public String getMatriculationNumber() {
+        return matriculationNumber;
     }
 
-    public void setMatrikelNummer(String matrikelNummer) {
-        this.matrikelNummer = matrikelNummer;
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
     }
 
     public Long getCourseId() {
@@ -45,12 +45,12 @@ public class UserCourseKey implements Serializable {
         if (this == o) return true;
         if (!(o instanceof UserCourseKey)) return false;
         UserCourseKey that = (UserCourseKey) o;
-        return getMatrikelNummer().equals(that.getMatrikelNummer()) &&
+        return getMatriculationNumber().equals(that.getMatriculationNumber()) &&
                 getCourseId().equals(that.getCourseId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getMatrikelNummer(), getCourseId());
+        return Objects.hash(getMatriculationNumber(), getCourseId());
     }
 }

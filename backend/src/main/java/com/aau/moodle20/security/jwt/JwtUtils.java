@@ -16,7 +16,7 @@ public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     public static final String CLAIM_IS_ADMIN ="isAdmin";
-    public static final String CLAIM_MATRIKELNUMMER ="matrikelNumber";
+    public static final String CLAIM_MATRICULATION_NUMBER ="matriculationNumber";
     public static final String CLAIM_FORENAME ="forename";
     public static final String CLAIM_SURNAME ="surname";
 
@@ -36,7 +36,7 @@ public class JwtUtils {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .claim(CLAIM_IS_ADMIN,userPrincipal.getAdmin())
-                .claim(CLAIM_MATRIKELNUMMER, userPrincipal.getMatrikelNumber())
+                .claim(CLAIM_MATRICULATION_NUMBER, userPrincipal.getMatrikelNumber())
                 .claim(CLAIM_FORENAME,userPrincipal.getForename())
                 .claim(CLAIM_SURNAME,userPrincipal.getSurename())
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -47,8 +47,8 @@ public class JwtUtils {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String getMatrikelNummerFromJwtToken(String token) {
-        return (String) Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get(CLAIM_MATRIKELNUMMER);
+    public String getMatriculationNumberFromJwtToken(String token) {
+        return (String) Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get(CLAIM_MATRICULATION_NUMBER);
     }
 
     public Boolean getAdminFromJwtToken(String jwtToken)

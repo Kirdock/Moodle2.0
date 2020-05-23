@@ -105,9 +105,9 @@ public class SemesterService {
             Course course = new Course();
 
             userCourseKey.setCourseId(assignUserToCourseRequest.getCourseId());
-            userCourseKey.setMatrikelNummer(assignUserToCourseRequest.getMatrikelNummer());
+            userCourseKey.setMatriculationNumber(assignUserToCourseRequest.getMatriculationNumber());
 
-            user.setMatrikelNumber(assignUserToCourseRequest.getMatrikelNummer());
+            user.setMatriculationNumber(assignUserToCourseRequest.getMatriculationNumber());
             course.setId(assignUserToCourseRequest.getCourseId());
             userInCourse.setRole(assignUserToCourseRequest.getRole());
             userInCourse.setUser(user);
@@ -127,14 +127,14 @@ public class SemesterService {
     public List<CourseResponseObject> getCoursesFromSemester(Long semesterId,String jwtToken) {
         checkIfSemesterExists(semesterId);
         Boolean isAdmin = jwtUtils.getAdminFromJwtToken(jwtToken.split(" ")[1].trim());
-        String matrikelNummer = jwtUtils.getMatrikelNummerFromJwtToken(jwtToken.split(" ")[1].trim());
+        String matriculationNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
         List<CourseResponseObject> responseObjects = new ArrayList<>();
         List<Course> courses = null;
 
         if (isAdmin)
             courses = courseRepository.findCoursesBySemester_Id(semesterId);
         else
-            courses = courseRepository.findCoursesBySemester_IdAndOwner_MatrikelNummer(semesterId, matrikelNummer);
+            courses = courseRepository.findCoursesBySemester_IdAndOwner_MatriculationNumber(semesterId, matriculationNumber);
 
         if (courses != null && !courses.isEmpty()) {
             for (Course course : courses) {

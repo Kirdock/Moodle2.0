@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS USER
 (
-    matrikel_Nummer VARCHAR(20) PRIMARY KEY,
+    matriculation_Number VARCHAR(20) PRIMARY KEY,
     password        VARCHAR(120) NOT NULL,
     username        VARCHAR(50)  NOT NULL,
     forename        VARCHAR(50),

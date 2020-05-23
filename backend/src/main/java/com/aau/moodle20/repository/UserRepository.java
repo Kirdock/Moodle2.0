@@ -10,11 +10,11 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     Optional<User> findByUsername(String username);
 
-    Optional<User> findByMatrikelNummer(String matrikelNumber);
+    Optional<User> findByMatriculationNumber(String matriculationNumber);
 
     Boolean existsByUsername(String username);
 
-    Boolean existsByMatrikelNummer(String matrikelNummer);
+    Boolean existsByMatriculationNumber(String matriculationNumber);
 
 
     List<User> findByCourses_Course_Id(Long courseId);
