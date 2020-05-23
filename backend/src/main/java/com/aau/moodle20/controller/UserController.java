@@ -97,4 +97,9 @@ public class UserController {
         userDetailsService.deleteUser(matriculationNumber);
         return ResponseEntity.ok(new MessageResponse("User was deleted!"));
     }
+
+    @GetMapping(path = "/user/isOwner")
+    public Boolean getUsersWithCourseRoles(@RequestHeader("Authorization") String jwtToken) {
+        return userDetailsService.isOwner(jwtToken);
+    }
 }

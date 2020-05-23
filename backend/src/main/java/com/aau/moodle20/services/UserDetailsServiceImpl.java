@@ -11,6 +11,7 @@ import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.response.AbstractUserResponseObject;
 import com.aau.moodle20.payload.response.UserCourseResponseObject;
 import com.aau.moodle20.payload.response.UserResponseObject;
+import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
@@ -37,6 +38,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    CourseRepository courseRepository;
 
     @Autowired
     UserInCourseRepository userInCourseRepository;
@@ -193,9 +197,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)
     {
-        String matrikelNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
+        String matriculationNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
 
-        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matrikelNumber);
+        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
         if(!encoder.matches(changePasswordRequest.getOldPassword(), optionalUser.get().getPassword()))
             throw new UserException("Password for User not correct!");
 
@@ -214,5 +218,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UserException("Admin user cannot be deleted");
 
         userRepository.delete(optionalUser.get());
+    }
+
+    public Boolean isOwner(String jwtToken) {
+        String matriculationNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
+        return courseRepository.existsByOwner_MatriculationNumber(matriculationNumber);
     }
 }
