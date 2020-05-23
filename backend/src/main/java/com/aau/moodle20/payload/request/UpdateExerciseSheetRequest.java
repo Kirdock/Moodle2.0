@@ -19,7 +19,6 @@ public class UpdateExerciseSheetRequest {
     private LocalDateTime issueDate;
     private Integer minKreuzel;
     private Integer minPoints;
-    @NotNull
     private String description;
 
 
