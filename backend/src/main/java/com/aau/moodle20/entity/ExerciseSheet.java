@@ -122,6 +122,8 @@ public class ExerciseSheet {
                     .map(Example::createExampleResponseObject)
                     .collect(Collectors.toList()));
 
+        responseObject.setCourseName(course.getName());
+        responseObject.setCourseNumber(course.getNumber());
         return responseObject;
     }
 

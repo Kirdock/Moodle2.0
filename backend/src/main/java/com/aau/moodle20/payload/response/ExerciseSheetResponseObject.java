@@ -18,6 +18,8 @@ public class ExerciseSheetResponseObject {
     private LocalDateTime issueDate;
     private String description;
     private List<ExampleResponseObject> examples;
+    private String courseName;
+    private String courseNumber;
 
 
     public Long getId() {
@@ -90,5 +92,21 @@ public class ExerciseSheetResponseObject {
 
     public void setExamples(List<ExampleResponseObject> examples) {
         this.examples = examples;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public String getCourseNumber() {
+        return courseNumber;
+    }
+
+    public void setCourseNumber(String courseNumber) {
+        this.courseNumber = courseNumber;
     }
 }
