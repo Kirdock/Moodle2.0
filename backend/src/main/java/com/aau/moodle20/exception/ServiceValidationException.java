@@ -24,6 +24,11 @@ public class ServiceValidationException extends RuntimeException{
         super(message);
         this.errorResponseCode = errorResponseCode;
     }
+    public ServiceValidationException(String message,HttpStatus status)
+    {
+        super(message);
+        this.httpStatus = status;
+    }
     public ServiceValidationException(String message,Integer errorResponseCode,HttpStatus status)
     {
         super(message);

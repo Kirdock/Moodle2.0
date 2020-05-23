@@ -1,5 +1,6 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.payload.request.AbstractExampleRequest;
 import com.aau.moodle20.payload.request.CreateExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
@@ -143,16 +144,16 @@ public class Example {
         this.supportFileTypes = supportFileTypes;
     }
 
-    public void fillValuesFromRequestObject(CreateExampleRequest createExampleRequest)
+    public void fillValuesFromRequestObject(AbstractExampleRequest abstractExampleRequest)
     {
-        setExerciseSheet(new ExerciseSheet(createExampleRequest.getExerciseSheetId()));
-        setName(createExampleRequest.getName());
-        setDescription(createExampleRequest.getDescription());
-        setMandatory(createExampleRequest.getMandatory());
-        setOrder(createExampleRequest.getOrder());
-        setPoints(createExampleRequest.getPoints());
-        setValidator(createExampleRequest.getValidator());
-        setWeighting(createExampleRequest.getWeighting());
+        setExerciseSheet(new ExerciseSheet(abstractExampleRequest.getExerciseSheetId()));
+        setName(abstractExampleRequest.getName());
+        setDescription(abstractExampleRequest.getDescription());
+        setMandatory(abstractExampleRequest.getMandatory());
+        setOrder(abstractExampleRequest.getOrder());
+        setPoints(abstractExampleRequest.getPoints());
+        setValidator(abstractExampleRequest.getValidator());
+        setWeighting(abstractExampleRequest.getWeighting());
     }
     public ExampleResponseObject createExampleResponseObject()
     {

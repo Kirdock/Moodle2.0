@@ -117,7 +117,10 @@ public class ExerciseSheet {
         responseObject.setIssueDate(getIssueDate());
         responseObject.setDescription(getDescription());
         if (getExamples() != null)
-            responseObject.setExamples(getExamples().stream().map(Example::createExampleResponseObject).collect(Collectors.toList()));
+            responseObject.setExamples(getExamples().stream()
+                    .filter(example -> example.getParentExample()==null)
+                    .map(Example::createExampleResponseObject)
+                    .collect(Collectors.toList()));
 
         return responseObject;
     }

@@ -13,9 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -102,19 +100,10 @@ public class ExerciseSheetService {
     @Transactional
     public void createExample (CreateExampleRequest createExampleRequest) throws ServiceValidationException
     {
-        if (createExampleRequest.getSubExamples() == null || createExampleRequest.getSubExamples().isEmpty()) {
-            if (createExampleRequest.getPoints() == null)
-                throw new ServiceValidationException("Error: points must not be null");
-            if (createExampleRequest.getWeighting() == null)
-                throw new ServiceValidationException("Error: weighting must not be null");
-        } else {
-            if (createExampleRequest.getDescription() == null)
-                throw new ServiceValidationException("Error: Description must not be null");
-        }
-
-
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
+
+        validateExampleRequest(createExampleRequest);
         example.fillValuesFromRequestObject(createExampleRequest);
         exampleRepository.save(example);
         supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest);
@@ -137,10 +126,10 @@ public class ExerciseSheetService {
     }
 
 
-    protected List<SupportFileType> createSupportedFileTypesEntries(Example example, CreateExampleRequest createExampleRequest)
+    protected List<SupportFileType> createSupportedFileTypesEntries(Example example, AbstractExampleRequest abstractExampleRequest)
     {
         List<SupportFileType> supportFileTypes = new ArrayList<>();
-        for (Long fileTypeId : createExampleRequest.getSupportedFileTypes()) {
+        for (Long fileTypeId : abstractExampleRequest.getSupportedFileTypes()) {
             Optional<FileType> optionalFileType = fileTypeRepository.findById(fileTypeId);
             if (optionalFileType.isPresent()) {
                 SupportFileTypeKey supportFileTypeKey = new SupportFileTypeKey();
@@ -156,5 +145,63 @@ public class ExerciseSheetService {
             }
         }
         return supportFileTypes;
+    }
+
+    @Transactional
+    public void updateExample(UpdateExampleRequest updateExampleRequest) throws ServiceValidationException {
+
+        validateExampleRequest(updateExampleRequest);
+        Optional<Example> optionalExample = exampleRepository.findById(updateExampleRequest.getId());
+
+        if (!optionalExample.isPresent())
+            throw new ServiceValidationException("Error: example not found", HttpStatus.NOT_FOUND);
+
+        Example example = optionalExample.get();
+        List<SupportFileType> supportFileTypes;
+        example.fillValuesFromRequestObject(updateExampleRequest);
+        supportFileTypes = createSupportedFileTypesEntries(example, updateExampleRequest);
+        example.setSupportFileTypes(new HashSet<>(supportFileTypes));
+        exampleRepository.save(example);
+
+        if (updateExampleRequest.getSubExamples() != null && !updateExampleRequest.getSubExamples().isEmpty()) {
+            for (UpdateExampleRequest subExampleRequest : updateExampleRequest.getSubExamples()) {
+                // update subexample
+                if (subExampleRequest.getId() != null) {
+                    Optional<Example> optionalSubExample = exampleRepository.findById(subExampleRequest.getId());
+
+                    if (!optionalSubExample.isPresent())
+                        throw new ServiceValidationException("Error: subExample not found", HttpStatus.NOT_FOUND);
+
+                    Example subExample = optionalSubExample.get();
+                    subExample.fillValuesFromRequestObject(subExampleRequest);
+                    supportFileTypes = createSupportedFileTypesEntries(subExample, subExampleRequest);
+                    example.setSupportFileTypes(new HashSet<>(supportFileTypes));
+                    exampleRepository.save(subExample);
+                }
+                // create subexample
+                else {
+                    Example subExample = new Example();
+                    subExample.fillValuesFromRequestObject(subExampleRequest);
+                    subExample.setParentExample(example);
+                    exampleRepository.save(subExample);
+
+                    supportFileTypes = createSupportedFileTypesEntries(subExample, subExampleRequest);
+                    supportFileTypeRepository.saveAll(supportFileTypes);
+                }
+            }
+        }
+    }
+
+    protected void validateExampleRequest(AbstractExampleRequest abstractExampleRequest) throws ServiceValidationException
+    {
+        if (((IExampleRequest) abstractExampleRequest).getSubExamples() == null || ((IExampleRequest) abstractExampleRequest).getSubExamples().isEmpty()) {
+            if (abstractExampleRequest.getPoints() == null)
+                throw new ServiceValidationException("Error: points must not be null");
+            if (abstractExampleRequest.getWeighting() == null)
+                throw new ServiceValidationException("Error: weighting must not be null");
+        } else {
+            if (abstractExampleRequest.getDescription() == null)
+                throw new ServiceValidationException("Error: Description must not be null");
+        }
     }
 }
