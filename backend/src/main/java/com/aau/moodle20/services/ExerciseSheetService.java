@@ -102,8 +102,11 @@ public class ExerciseSheetService {
     {
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
+        if(createExampleRequest.getExerciseSheetId()==null)
+            throw new ServiceValidationException("error: exerciseSheet must not be null");
 
         validateExampleRequest(createExampleRequest);
+        example.setExerciseSheet(new ExerciseSheet(createExampleRequest.getExerciseSheetId()));
         example.fillValuesFromRequestObject(createExampleRequest);
         exampleRepository.save(example);
         supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest);
@@ -114,6 +117,7 @@ public class ExerciseSheetService {
             for(CreateExampleRequest subExampleRequest: createExampleRequest.getSubExamples())
             {
                 Example subExample = new Example();
+                subExample.setExerciseSheet(new ExerciseSheet(subExampleRequest.getExerciseSheetId()));
                 subExample.fillValuesFromRequestObject(subExampleRequest);
                 subExample.setParentExample(example);
                 exampleRepository.save(subExample);

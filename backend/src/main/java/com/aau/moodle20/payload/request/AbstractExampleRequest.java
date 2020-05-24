@@ -6,7 +6,6 @@ import java.util.List;
 
 public class AbstractExampleRequest{
 
-    @NotNull
     private Long exerciseSheetId;
     @NotBlank
     private String name;

@@ -146,7 +146,6 @@ public class Example {
 
     public void fillValuesFromRequestObject(AbstractExampleRequest abstractExampleRequest)
     {
-        setExerciseSheet(new ExerciseSheet(abstractExampleRequest.getExerciseSheetId()));
         setName(abstractExampleRequest.getName());
         setDescription(abstractExampleRequest.getDescription());
         setMandatory(abstractExampleRequest.getMandatory());
