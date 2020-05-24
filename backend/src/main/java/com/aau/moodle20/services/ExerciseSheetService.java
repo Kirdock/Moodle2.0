@@ -204,4 +204,11 @@ public class ExerciseSheetService {
                 throw new ServiceValidationException("Error: Description must not be null");
         }
     }
+
+    public void deleteExample(Long exampleId) throws ServiceValidationException
+    {
+        if (!exampleRepository.existsById(exampleId))
+            throw new ServiceValidationException("Example not found",HttpStatus.NOT_FOUND);
+        exampleRepository.deleteById(exampleId);
+    }
 }

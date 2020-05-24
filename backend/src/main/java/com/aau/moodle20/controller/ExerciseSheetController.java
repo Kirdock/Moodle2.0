@@ -62,4 +62,12 @@ public class ExerciseSheetController {
         exerciseSheetService.updateExample(updateExampleRequest);
         return ResponseEntity.ok(new MessageResponse("Example was successfully updated!"));
     }
+
+
+    @DeleteMapping(value = "/example/{id}")
+    public ResponseEntity<?> deleteExample(@PathVariable("id") long id) throws ServiceValidationException {
+        exerciseSheetService.deleteExample(id);
+        return ResponseEntity.ok(new MessageResponse("Example was successfully deleted!"));
+
+    }
 }
