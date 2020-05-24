@@ -1,5 +1,7 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.payload.response.UserResponseObject;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -113,5 +115,16 @@ public class User {
 
     public void setAdmin(Boolean admin) {
         isAdmin = admin;
+    }
+
+    public UserResponseObject createUserResponseObject()
+    {
+        UserResponseObject responseObject = new UserResponseObject();
+        responseObject.setUsername(getUsername());
+        responseObject.setSurname(getSurname());
+        responseObject.setForename(getForename());
+        responseObject.setMatriculationNumber(getMatriculationNumber());
+
+        return responseObject;
     }
 }

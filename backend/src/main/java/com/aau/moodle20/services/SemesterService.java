@@ -150,25 +150,27 @@ public class SemesterService {
         return responseObjects;
     }
 
-    public CourseResponseObject getCourse (long courseId) throws SemesterException
-    {
-       checkIfCourseExists(courseId);
-       Course course = courseRepository.findById(courseId).get();
-       List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
+    public CourseResponseObject getCourse(long courseId, String jwtToken) throws SemesterException {
+        Boolean isAdmin = jwtUtils.getAdminFromJwtToken(jwtToken.split(" ")[1].trim());
+        checkIfCourseExists(courseId);
+        Course course = courseRepository.findById(courseId).get();
+        List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
 
-       CourseResponseObject responseObject = new CourseResponseObject();
-       responseObject.setId(course.getId());
-       responseObject.setName(course.getName());
-       responseObject.setNumber(course.getNumber());
-       responseObject.setMinKreuzel(course.getMinKreuzel());
-       responseObject.setMinPoints(course.getMinPoints());
-       responseObject.setDescriptionTemplate(course.getDescriptionTemplate());
-       responseObject.setExerciseSheets(exerciseSheets.stream()
-               .map(ExerciseSheet::getResponseObject)
-               .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
-               .collect(Collectors.toList()));
+        CourseResponseObject responseObject = new CourseResponseObject();
+        responseObject.setId(course.getId());
+        responseObject.setName(course.getName());
+        responseObject.setNumber(course.getNumber());
+        responseObject.setMinKreuzel(course.getMinKreuzel());
+        responseObject.setMinPoints(course.getMinPoints());
+        responseObject.setDescriptionTemplate(course.getDescriptionTemplate());
+        responseObject.setExerciseSheets(exerciseSheets.stream()
+                .map(ExerciseSheet::getResponseObject)
+                .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
+                .collect(Collectors.toList()));
+        if(isAdmin)
+            responseObject.setOwner(course.getOwner().createUserResponseObject());
 
-       return responseObject;
+        return responseObject;
     }
 
     protected void checkIfCourseExists(Long courseId) throws EntityNotFoundException {

@@ -11,6 +11,7 @@ public class CourseResponseObject {
     private Integer minPoints;
     private List<ExerciseSheetResponseObject> exerciseSheets;
     private String descriptionTemplate;
+    private UserResponseObject owner;
 
     public CourseResponseObject()
     {
@@ -71,5 +72,13 @@ public class CourseResponseObject {
 
     public void setDescriptionTemplate(String descriptionTemplate) {
         this.descriptionTemplate = descriptionTemplate;
+    }
+
+    public UserResponseObject getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserResponseObject owner) {
+        this.owner = owner;
     }
 }
