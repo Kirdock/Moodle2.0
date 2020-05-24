@@ -16,7 +16,7 @@
         </ol>
         <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
         <b-tabs class="mt-3">
-            <b-tab :title="$t('information')" :active="activeTab === 0">
+            <b-tab :title="$t('information')" :active="activeTab === 0" @click="activeTab = 0">
                 <div class="form-horizontal col-md-4">
                     <form ref="exerciseSheet" @submit.prevent="updateInfo()">
                         <es-info v-model="sheetInfo"></es-info>
@@ -30,7 +30,7 @@
                     </form>
                 </div>
             </b-tab>
-            <b-tab v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" :active="activeTab === (index+1)" @click="setSelectedExample()">
+            <b-tab v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" :active="activeTab === (index+1)" @click="activeTab = index+1; setSelectedExample()">
                 <div style="margin-top: 10px; font-size: 30px" v-if="selectedExample">
                     <a href="javascript:void(0)" @click="setSelectedExample()">
                         {{example.name}}
@@ -93,7 +93,6 @@ export default {
     methods: {
         getSheet(sheedId){
             this.$store.dispatch('getExerciseSheet', sheedId).then(response =>{
-                response.data.examples = []; //remove later
                 this.sheetInfo = response.data;
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('exerciseSheet.error.get'), {
@@ -179,17 +178,20 @@ export default {
             return valid;
         },
         isExampleValid(example){
-            return example.name && example.description && example.points && example.weighting;
+            
+            return example.name && example.description && example.points !== undefined && example.weighting !== undefined;
         },
         buildExample(name, order){
             return {
                 name: `${name} ${order +1}`,
+                exerciseSheetId: this.sheetId,
                 weighting: 1,
                 points: 0,
                 subExamples: [],
                 order,
                 validator: '',
-                supportedFileTypes: []
+                supportedFileTypes: [],
+                mandatory: false
             }
         },
         newExample(){
