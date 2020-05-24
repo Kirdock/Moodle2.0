@@ -27,18 +27,16 @@ Vue.use(ModalPlugin);
 
 Vue.component('i-input', IntegerInput); //Global registration
 
-store.commit('initialiseStore');
-i18n.locale = store.getters.locale;
+store.dispatch('initialiseStore', true).then((response)=>{
+  i18n.locale = store.getters.locale;
 
-const app = new Vue({
-  // components:{ //not global
-  //   NoCommaInput
-  // },
-  i18n,
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app');
+  const app = new Vue({
+    i18n,
+    router,
+    store,
+    render: h => h(App)
+  }).$mount('#app');
 
-store.$app = app; //need it for logout-toast
-store.dispatch('checkToken');
+  store.$app = app; //need it for logout-toast
+  store.dispatch('checkToken');
+});

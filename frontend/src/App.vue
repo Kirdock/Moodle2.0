@@ -32,15 +32,8 @@ export default {
   },
   methods:{
     changeLocale(locale){
-      this.$store.dispatch('updateSettings', {locale}).then(()=>{
-        i18n.locale = locale;
-      }).catch(()=>{
-        this.$bvToast.toast(this.$t('changeLanguageError'), {
-          title: this.$t('error'),
-          appendToast: true,
-          variant: 'error'
-        })
-      });
+      this.$store.commit('updateSettings', {locale});
+      i18n.locale = locale;
     },
     logout(){
       this.$store.dispatch('logout');

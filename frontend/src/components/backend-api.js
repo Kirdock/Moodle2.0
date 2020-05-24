@@ -27,6 +27,9 @@ export default {
             password: password
         })
     },
+    getIsOwner(){
+        return axios.get('/user/isOwner');
+    },
     getSemesters(){
         return axios.get('/semesters');
     },
@@ -55,7 +58,7 @@ export default {
         return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
     },
     getUser(){
-        return axios.get(`/users/${store.getters.userInfo.matriculationNumber}`);
+        return axios.get(`/user/${store.getters.userInfo.matriculationNumber}`);
     },
     createUser(userData){
         return axios.put('/user',userData);
