@@ -1,5 +1,6 @@
 package com.aau.moodle20.controller;
 
+import com.aau.moodle20.entity.FileType;
 import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.CreateExampleRequest;
@@ -8,6 +9,7 @@ import com.aau.moodle20.payload.request.UpdateExampleRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
+import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.ExerciseSheetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,11 @@ public class ExerciseSheetController {
     @GetMapping(value = "/course/{id}/exerciseSheets")
     public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(@PathVariable("id") long id) throws EntityNotFoundException {
         return exerciseSheetService.getExerciseSheetsFromCourse(id);
+    }
+
+    @GetMapping(value = "/fileTypes")
+    public List<FileTypeResponseObject> getFileTypes()  {
+        return exerciseSheetService.getFileTypes();
     }
 
     @DeleteMapping(value = "/exerciseSheet/{id}")

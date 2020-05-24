@@ -8,6 +8,7 @@ import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
+import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import com.aau.moodle20.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -131,7 +132,7 @@ public class ExerciseSheetService {
             }
         }
 
-        return example.createExampleResponseObject(); 
+        return example.createExampleResponseObject();
     }
 
 
@@ -219,5 +220,10 @@ public class ExerciseSheetService {
         if (!exampleRepository.existsById(exampleId))
             throw new ServiceValidationException("Example not found",HttpStatus.NOT_FOUND);
         exampleRepository.deleteById(exampleId);
+    }
+
+    public List<FileTypeResponseObject> getFileTypes()
+    {
+        return fileTypeRepository.findAll().stream().map(FileType::createFileTypeResponseObject).collect(Collectors.toList());
     }
 }
