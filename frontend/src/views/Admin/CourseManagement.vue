@@ -39,7 +39,7 @@
                 <b-modal id="modal-new-course" :title="$t('course.title.create')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="createCourse">
                     <label class="control-label requiredField">{{ $t('requiredField') }}</label>
                     <form @submit.prevent="createCourse()" ref="createCourse">
-                        <course-info v-model="courseInfo_create"></course-info>
+                        <course-info v-model="courseInfo_create" :users="users"></course-info>
                     </form>
                 </b-modal>
                 <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId">
@@ -71,7 +71,7 @@
                 <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
                 <div class="form-horizontal col-md-4">
                     <form @submit.prevent="updateCourse()">
-                        <course-info v-model="selectedCourse"></course-info>
+                        <course-info v-model="selectedCourse" :users="users"></course-info>
                         
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">
@@ -85,6 +85,14 @@
             </b-tab>
             <b-tab :title="$t('user.assigned')" id="assignedUsers">
                 <div class="form-horizontal col-md-7">
+                    <div class="form-group">
+                        <label class="btn btn-primary finger">
+                            <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
+                            <span class="fas fa-upload" v-else></span>
+                            {{ $t('uploadCSV') }}
+                            <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitUsers()"/>
+                        </label>
+                    </div>
                     <div class="form-group">
                         <label for="searchUserText" class="control-label">
                             <span class="fas fa-search"></span>
@@ -195,6 +203,19 @@
                     </div>
                 </div>
             </b-tab>
+            <b-tab :title="$t('templates')">
+                <div class="form-horizontal col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="defaultDescription">{{$t('descriptionExerciseSheets')}}</label>
+                        <textarea class="form-control" id="defaultDescription" v-model="selectedCourseTemplate"></textarea>
+                    </div>
+                    <button class="btn btn-primary" type="button" @click="saveDefaultTemplate()">
+                        <span class="fa fa-sync fa-spin" v-if="loading_defaultTemplate"></span>
+                        <span class="fa fa-save" v-else></span>
+                        {{ $t('save') }}
+                    </button>
+                </div>
+            </b-tab>
         </b-tabs>
     </div>
 </template>
@@ -223,7 +244,11 @@ export default {
             showRoles: 'z',
             courseUsers: [],
             semesters: [],
-            exerciseSheet_create: {}
+            exerciseSheet_create: {},
+            users: [],
+            loadingFileUpload: false,
+            loading_defaultTemplate: false,
+            selectedCourseTemplate: undefined
         }
     },
     created(){
@@ -234,6 +259,7 @@ export default {
         //don't forget to set props: true; in router
         this.getSemesters();
         this.resetExerciseSheet();
+        this.getUsers();
     },
     computed: {
         roles(){
@@ -247,6 +273,39 @@ export default {
         }
     },
     methods:{
+        getUsers(){
+            this.$store.dispatch('getUsers').then(({data}) =>{
+                this.users = data;
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('users.error.get'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            });
+        },
+        submitUsers(){
+            this.loadingFileUpload = true;
+            const formData = new FormData();
+            formData.append('file',this.$refs.file.files[0]);
+            formData.append('isAdmin', false)
+            this.$refs.file.value = '';
+            this.$store.dispatch('assignCourseUsers', formData).then(response =>{
+                this.$bvToast.toast(this.$t('course.usersSaved'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('course.error.usersSave'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }).finally(()=>{
+                this.loadingFileUpload = false;
+            });
+        },
         resetExerciseSheet(){
             this.exerciseSheet_create = {
                 submissionDate: this.$store.getters.currentDateTime,
@@ -260,6 +319,7 @@ export default {
             }
             else{
                 this.exerciseSheet_create.courseId = this.selectedCourseId;
+                this.exerciseSheet_create.description = this.selectedCourse.descriptionTemplate;
                 this.$store.dispatch('createExerciseSheet', this.exerciseSheet_create).then(()=>{
                     this.$bvModal.hide('modal-new-exerciseSheet');
                     if(this.exerciseSheet_create.courseId === this.selectedCourseId){
@@ -390,6 +450,22 @@ export default {
                 this.loading_edit = false;
             });
         },
+        saveDefaultTemplate(){
+            this.$store.dispatch('updateCourseDefaultTemplate', {id: this.selectedCourse.id, description: this.selectedCourseTemplate}).then(()=>{
+                this.selectedCourse.descriptionTemplate = this.selectedCourseTemplate;
+                this.$bvToast.toast(this.$t('course.templateUpdated'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('course.error.templateUpdate'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            })
+        },
         copyCourse(courseId, semesterId){
             this.loading_delete = true;
             this.$store.dispatch('copyCourse', {courseId, semesterId}).then(response=>{
@@ -415,6 +491,7 @@ export default {
         getCourse(courseId){
             this.$store.dispatch('getCourse',{courseId}).then(response =>{
                 this.selectedCourse = response.data;
+                this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('course.error.get'), {
                     title: this.$t('error'),
@@ -470,8 +547,10 @@ export default {
         getSemesters(){
             this.$store.dispatch('getSemesters').then(response =>{
                 this.semesters = response.data;
-                this.courseInfo_create.semesterId = this.courseCopyId = this.selectedSemester_edit = this.semesters[0].id;
-                this.getCourses(this.selectedSemester_edit);
+                if(this.semesters.length !== 0){
+                    this.courseInfo_create.semesterId = this.courseCopyId = this.selectedSemester_edit = this.semesters[0].id;
+                    this.getCourses(this.selectedSemester_edit);
+                }
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('semester.error.get'), {
                     title: this.$t('error'),

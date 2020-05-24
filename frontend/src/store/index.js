@@ -29,15 +29,16 @@ export default new Vuex.Store({
     loggedIn: false
   },
   mutations: {
-    initialiseStore(state) {
+    fetchToken(state){
       state.token = getToken();
-      setUserInfo(state);
-      state.settings = getSettings();
     },
-    loginSuccess(state, payload){
-      state.token = payload.accessToken;
-      setUserInfo(state);
-      setToken(payload.accessToken);
+    initialiseStore(state, isOwner) {
+      state.settings = getSettings();
+      setUserInfo(state, isOwner);
+    },
+    setToken(state, token){
+      state.token = token;
+      setToken(token);
     },
     logout(state){
       state.token = undefined;
@@ -50,6 +51,18 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    initialiseStore({commit}, fetchToken){
+      if(fetchToken){
+        commit('fetchToken');
+      }
+      return new Promise((resolve, reject) =>{
+        this.dispatch('getIsOwner').then(isOwner =>{
+          commit('initialiseStore', isOwner);
+          resolve(isOwner);
+        }).catch(reject);
+      })
+      
+    },
     logout({commit}, isTokenExpired){
       deleteToken();
       commit('logout');
@@ -71,12 +84,10 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
           api.login(user, password)
               .then(response => {
-                commit('loginSuccess',response.data);
-                resolve(response);
+                commit('setToken',response.data.accessToken);
+                resolve(this.dispatch('initialiseStore'));
               })
-              .catch(error => {
-                reject(error);
-              });
+              .catch(reject);
       });
     },
     checkToken({state}){
@@ -84,8 +95,17 @@ export default new Vuex.Store({
         this.dispatch('logout', true);
       }
     },
-    updateSettings({commit}, data){
-      return commit('updateSettings', data);
+    getIsOwner({commit, state}){
+      return new Promise((resolve, reject) =>{
+        if(state.token){
+          api.getIsOwner().then(response => {
+            resolve(response.data);
+          }).catch(reject);
+        }
+        else{
+          resolve(false);
+        }
+      })
     },
     createUser({commit}, userData){
       return api.createUser(userData);
@@ -108,11 +128,17 @@ export default new Vuex.Store({
     updateCourse({commit}, courseData){
       return api.updateCourse(courseData)
     },
+    updateCourseDefaultTemplate({commit}, templateData){
+      return api.updateCourseDefaultTemplate(templateData);
+    },
     copyCourse({commit}, data){
       return api.copyCourse(data);
     },
     updateCourseUsers({commit}, data){
       return api.updateCourseUsers(data);
+    },
+    assignCourseUsers({commit}, formData){
+      return api.assignCourseUsers(formData);
     },
     getSemesters({commit}){
       return api.getSemesters();
@@ -236,11 +262,11 @@ export default new Vuex.Store({
   }
 });
 
-function setUserInfo(state){
-  state.userInfo = decodeToken(state.token);
-  if(state.userInfo.isAdmin){
-    state.userInfo.isOwner = true;
-  }
+function setUserInfo(state, isOwner){
+  const userInfo = decodeToken(state.token);
+  userInfo.isOwner = userInfo.isAdmin ? true : isOwner;
+  state.userInfo = userInfo;
+  
   state.loggedIn = !!state.token;
 }
 

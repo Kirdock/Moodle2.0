@@ -1,5 +1,26 @@
 <template>
     <div>
+        <div class="form-group" v-if="$store.getters.userInfo.isAdmin">
+            <label for="cInfoOwner" class="control-label required">{{ $t('owner') }}</label>
+            <multiselect v-model="owner" id="cInfoOwner" open-direction="bottom" @input="ownerChanged"
+                        :custom-label="userFomat"
+                        :placeholder="$t('typeToSearch')"
+                        track-by="matriculationNumber"
+                        selectLabel=""
+                        :selectedLabel="$t('selected')"
+                        :options="users"
+                        :searchable="true"
+                        :clear-on-select="true"
+                        :close-on-select="true"
+                        :options-limit="300"
+                        :allow-empty="false"
+                        :max-height="600"
+                        deselect-label=""
+                        :show-no-results="false"
+                        required
+                        >
+            </multiselect>
+        </div>
         <div class="form-group">
             <label for="cInfoNumber" class="control-label required">{{ $t('number') }} ({{$t('format')}} : 123.456)</label>
             <input id="cInfoNumber" type="text" class="form-control"  pattern="[0-9]{3}\.[0-9]{3}" :title="$t('format') +': 123.456'" v-model="value.number" required>
@@ -23,8 +44,29 @@
     </div>
 </template>
 <script>
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
 export default {
     name: 'course-info',
-    props: ['value']
+    props: ['value', 'users'],
+    components: {
+        Multiselect
+    },
+    created(){
+        this.owner = this.users.find(user => user.matriculationNumber == this.value.owner);
+    },
+    data(){
+        return {
+            owner: undefined
+        }
+    },
+    methods: {
+        userFomat(user){
+            return `${user.matriculationNumber} ${user.surname} ${user.forename}`
+        },
+        ownerChanged(ownerUser){
+            this.value.owner = ownerUser.matriculationNumber;
+        }
+    }
 }
 </script>

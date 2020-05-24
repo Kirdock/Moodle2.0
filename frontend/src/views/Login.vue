@@ -38,7 +38,7 @@ export default {
         .then(() => {
           this.$router.push('Courses');
         })
-        .catch(error => {
+        .catch(() => {
           this.$bvToast.toast(this.$t('userPwdInvalid'), {
             title: this.$t('error'),
             appendToast: true,

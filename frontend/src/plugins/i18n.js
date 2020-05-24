@@ -23,14 +23,15 @@ const messages = {
             usersSaved: 'Die Rollen wurden gespeichert',
             courses: 'Lehrveranstaltungen',
             saved: 'Lehrveranstaltung wurde gespeichert',
-            
+            templateUpdated: 'Vorlage wurde gespeichert',
             error: {
                 copy: 'Die Lehrveranstaltung konnte nicht kopiert werden',
                 create: 'Lehrveranstaltung konnte nicht angelegt werden',
                 delete: 'Lehrveranstaltung konnte nicht gelöscht werden',
                 get: 'Lehrveranstaltung konnte nicht geladen werden',
                 save: 'Lehrveranstaltung konnte nicht gespeichert werden',
-                usersSave: 'Die Rollen konnten nicht gespeichert werden'
+                templateUpdate: 'Vorlage konnte nicht gespeichert werden',
+                usersSave: 'Die Rollen konnten nicht gespeichert werden',
             },
             errors: {
                 get: 'Lehrveranstaltungen konnten nicht geladen werden',
@@ -46,6 +47,7 @@ const messages = {
         create: 'Anlegen',
         delete: 'Löschen',
         description: 'Beschreibung',
+        descriptionExerciseSheets: 'Standardbeschreibung für Übungsblätter',
         edit: 'Bearbeiten',
         eightDigitNumber: 'Achtstellige Nummer',
         email: 'Email',
@@ -111,6 +113,7 @@ const messages = {
         new: 'Neu',
         no: 'Nein',
         number: 'Nummer',
+        owner: 'Besitzer',
         password: 'Passwort',
         passwordDontMatch: 'Passwörter stimmen nicht überein',
         passwordNew: 'Neues Passwort',
@@ -124,6 +127,7 @@ const messages = {
         save: 'Speichern',
         search: 'Suche',
         security: 'Sicherheit',
+        selected: 'Ausgewählt',
         semester: {
             create: 'Semester anlegen',
             semester: 'Semester',
@@ -147,6 +151,7 @@ const messages = {
         success: 'Erfolg',
         supportedFileTypes: 'Unterstützte Dateiformate',
         surname: 'Nachname',
+        templates: 'Volagen',
         tutor: 'Tutor',
         typeToSearch: 'Tippen um zu suchen',
         uploadCSV: 'CSV Datei hochladen',
@@ -209,6 +214,7 @@ const messages = {
             created: 'Course created',
             deleted: 'Course deleted',
             saved: 'Course saved',
+            templateUpdated: 'Template saved',
             question:{
                 delete: 'Do you really want to delete this course?',
                 copy: 'In which semester should the course be copied?'
@@ -218,8 +224,9 @@ const messages = {
                 create: 'Course could not be created',
                 delete: 'Course could not be deleted',
                 get: 'Course could not be loaded',
+                save: 'Course could not be saved',
+                templateUpdate: 'Template could not be saved',
                 usersSave: 'Roles could not be saved',
-                save: 'Course could not be saved'
             },
             errors: {
                 get: 'Courses could not be loaded',
@@ -231,6 +238,7 @@ const messages = {
         create: 'Create',
         delete: 'Delete',
         description: 'Description',
+        descriptionExerciseSheets: 'Default description for example sheets',
         edit: 'Edit',
         eightDigitNumber: 'Eight-digit number',
         email: 'Email',
@@ -296,6 +304,7 @@ const messages = {
         new: 'New',
         no: 'No',
         number: 'Number',
+        owner: 'Owner',
         password: 'Password',
         passwordDontMatch: 'Passwords do not match',
         passwordNew: 'New password',
@@ -309,6 +318,7 @@ const messages = {
         save: 'Save',
         search: 'Search',
         security: 'Security',
+        selected: 'Selected',
         semester: {
             create: 'Create Semester',
             semester: 'Semester',
@@ -332,6 +342,7 @@ const messages = {
         success: 'Success',
         supportedFileTypes: 'Supported file types',
         surname: 'Surname',
+        templates: 'Templates',
         tutor: 'Tutor',
         typeToSearch: 'Type to search',
         uploadCSV: 'Upload CSV file',

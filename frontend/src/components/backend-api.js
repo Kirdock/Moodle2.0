@@ -27,6 +27,9 @@ export default {
             password: password
         })
     },
+    getIsOwner(){
+        return axios.get('/user/isOwner');
+    },
     getSemesters(){
         return axios.get('/semesters');
     },
@@ -42,6 +45,9 @@ export default {
     updateCourse(data){
         return axios.post('/course',data);
     },
+    updateCourseDefaultTemplate(templateData){
+        return axios.post('/course', templateData);
+    },
     copyCourse(data){
         return axios.put(`/course/copy`, data);
     },
@@ -55,7 +61,7 @@ export default {
         return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
     },
     getUser(){
-        return axios.get(`/users/${store.getters.userInfo.matriculationNumber}`);
+        return axios.get(`/user/${store.getters.userInfo.matriculationNumber}`);
     },
     createUser(userData){
         return axios.put('/user',userData);
@@ -69,6 +75,16 @@ export default {
                 }
             }
         );
+    },
+    assignCourseUsers(formData){
+        return axios.post('/course/assignFile',
+            formData,
+            {
+                headers: {
+                    'Content-Type': undefined
+                }
+            }
+        )
     },
     udpatePassword(data){
         return axios.post('/user/password', data);
