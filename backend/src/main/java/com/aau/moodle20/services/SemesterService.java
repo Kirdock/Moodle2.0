@@ -8,6 +8,7 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.CourseResponseObject;
+import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.ExerciseSheetRepository;
 import com.aau.moodle20.repository.SemesterRepository;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -158,7 +160,10 @@ public class SemesterService {
        responseObject.setNumber(course.getNumber());
        responseObject.setMinKreuzel(course.getMinKreuzel());
        responseObject.setMinPoints(course.getMinPoints());
-       responseObject.setExerciseSheets(exerciseSheets.stream().map(ExerciseSheet::getResponseObject).collect(Collectors.toList()));
+       responseObject.setExerciseSheets(exerciseSheets.stream()
+               .map(ExerciseSheet::getResponseObject)
+               .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
+               .collect(Collectors.toList()));
 
        return responseObject;
     }
