@@ -7,7 +7,7 @@
             </div>
             <div class="form-group">
                 <label for="eInfoDescription" class="control-label" :class="value.subExamples.length === 0 ? 'required' : ''">{{ $t('description') }}</label>
-                <textarea id="eInfoDescription" type="text" class="form-control"  v-model="value.description" :required="value.subExamples.length === 0">
+                <textarea id="eInfoDescription" class="form-control"  v-model="value.description" :required="value.subExamples.length === 0">
                 </textarea>
             </div>
             <div v-if="value.subExamples.length === 0">

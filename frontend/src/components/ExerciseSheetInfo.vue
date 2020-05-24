@@ -13,6 +13,10 @@
             <input id="esInfoSubmissionDate" type="datetime-local" class="form-control" :min="minDate" v-model="value.submissionDate" required>
         </div>
         <div class="form-group">
+            <label for="esInfoDescription" class="control-label">{{ $t('description') }}</label>
+            <textarea id="esInfoDescription" class="form-control" v-model="value.description"></textarea>
+        </div>
+        <div class="form-group">
             <label for="esInfoMinKreuzel" class="control-label">{{ $t('minRequireKreuzel') }}</label>
             <div class="col-md-4" style="padding-left: 0px">
                 <i-input id="esInfoMinKreuzel" class="form-control" v-model="value.minKreuzel"></i-input>

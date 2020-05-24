@@ -203,6 +203,19 @@
                     </div>
                 </div>
             </b-tab>
+            <b-tab :title="$t('templates')">
+                <div class="form-horizontal col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="defaultDescription">{{$t('descriptionExerciseSheets')}}</label>
+                        <textarea class="form-control" id="defaultDescription" v-model="selectedCourseTemplate"></textarea>
+                    </div>
+                    <button class="btn btn-primary" type="button" @click="saveDefaultTemplate()">
+                        <span class="fa fa-sync fa-spin" v-if="loading_defaultTemplate"></span>
+                        <span class="fa fa-save" v-else></span>
+                        {{ $t('save') }}
+                    </button>
+                </div>
+            </b-tab>
         </b-tabs>
     </div>
 </template>
@@ -233,7 +246,9 @@ export default {
             semesters: [],
             exerciseSheet_create: {},
             users: [],
-            loadingFileUpload: false
+            loadingFileUpload: false,
+            loading_defaultTemplate: false,
+            selectedCourseTemplate: undefined
         }
     },
     created(){
@@ -304,6 +319,7 @@ export default {
             }
             else{
                 this.exerciseSheet_create.courseId = this.selectedCourseId;
+                this.exerciseSheet_create.description = this.selectedCourse.descriptionTemplate;
                 this.$store.dispatch('createExerciseSheet', this.exerciseSheet_create).then(()=>{
                     this.$bvModal.hide('modal-new-exerciseSheet');
                     if(this.exerciseSheet_create.courseId === this.selectedCourseId){
@@ -434,6 +450,22 @@ export default {
                 this.loading_edit = false;
             });
         },
+        saveDefaultTemplate(){
+            this.$store.dispatch('updateCourseDefaultTemplate', {id: this.selectedCourse.id, description: this.selectedCourseTemplate}).then(()=>{
+                this.selectedCourse.descriptionTemplate = this.selectedCourseTemplate;
+                this.$bvToast.toast(this.$t('course.templateUpdated'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('course.error.templateUpdate'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            })
+        },
         copyCourse(courseId, semesterId){
             this.loading_delete = true;
             this.$store.dispatch('copyCourse', {courseId, semesterId}).then(response=>{
@@ -459,6 +491,7 @@ export default {
         getCourse(courseId){
             this.$store.dispatch('getCourse',{courseId}).then(response =>{
                 this.selectedCourse = response.data;
+                this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('course.error.get'), {
                     title: this.$t('error'),
