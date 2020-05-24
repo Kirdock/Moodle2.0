@@ -16,6 +16,7 @@ import com.aau.moodle20.repository.UserInCourseRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -223,5 +224,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public Boolean isOwner(String jwtToken) {
         String matriculationNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
         return courseRepository.existsByOwner_MatriculationNumber(matriculationNumber);
+    }
+
+    public UserResponseObject getUser(String matriculationNumber)
+    {
+        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
+        if(!optionalUser.isPresent())
+         throw new ServiceValidationException("Error: user with given matriculationNumber not found", HttpStatus.NOT_FOUND);
+        UserResponseObject responseObject = new UserResponseObject();
+        fillResponseObject(optionalUser.get(),responseObject);
+
+        return responseObject;
     }
 }

@@ -102,4 +102,9 @@ public class UserController {
     public Boolean getUsersWithCourseRoles(@RequestHeader("Authorization") String jwtToken) {
         return userDetailsService.isOwner(jwtToken);
     }
+
+    @GetMapping(path = "/user/{matriculationNumber}")
+    public UserResponseObject getUser(@PathVariable String matriculationNumber) {
+        return userDetailsService.getUser(matriculationNumber);
+    }
 }
