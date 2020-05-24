@@ -2,10 +2,8 @@ package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.exception.SemesterException;
-import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
-import com.aau.moodle20.payload.request.CreateCourseRequest;
-import com.aau.moodle20.payload.request.CreateSemesterRequest;
-import com.aau.moodle20.payload.request.UpdateCourseRequest;
+import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.repository.SemesterRepository;
@@ -87,5 +85,12 @@ public class SemesterController {
 
         semesterService.assignCourse(assignUserToCourseRequests);
         return ResponseEntity.ok(new MessageResponse("User were sucessfully assigned to courses!"));
+    }
+
+    @PostMapping(value = "/course/copy")
+    public ResponseEntity<?> assignCourseToSemester(  @RequestBody CopyCourseRequest copyCourseRequest)  throws ServiceValidationException {
+
+        semesterService.copyCourse(copyCourseRequest);
+        return ResponseEntity.ok(new MessageResponse("Course was successfully copied!"));
     }
 }

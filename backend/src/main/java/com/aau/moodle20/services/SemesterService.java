@@ -6,10 +6,7 @@ import com.aau.moodle20.entity.embeddable.UserCourseKey;
 import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceValidationException;
-import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
-import com.aau.moodle20.payload.request.CreateCourseRequest;
-import com.aau.moodle20.payload.request.CreateSemesterRequest;
-import com.aau.moodle20.payload.request.UpdateCourseRequest;
+import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.ExerciseSheetRepository;
@@ -17,6 +14,7 @@ import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -171,5 +169,17 @@ public class SemesterService {
 
     protected void checkIfSemesterExists(Long semesterId) throws EntityNotFoundException {
         if (!semesterRepository.existsById(semesterId)) throw new EntityNotFoundException("Error: Semester not found");
+    }
+
+    public void copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException {
+        Optional<Course> optionalCourse = courseRepository.findById(copyCourseRequest.getCourseId());
+        if (!optionalCourse.isPresent())
+            throw new ServiceValidationException("Error: Course not found", HttpStatus.NOT_FOUND);
+        if (!semesterRepository.existsById(copyCourseRequest.getSemesterId()))
+            throw new ServiceValidationException("Error: Semester not found", HttpStatus.NOT_FOUND);
+
+        Course copiedCourse =optionalCourse.get().copyCourse();
+        copiedCourse.setSemester(new Semester(copyCourseRequest.getSemesterId()));
+        courseRepository.save(copiedCourse);
     }
 }

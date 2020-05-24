@@ -96,4 +96,16 @@ public class Course {
     public void setOwner(User owner) {
         this.owner = owner;
     }
+
+    public Course copyCourse()
+    {
+        Course course = new Course();
+        course.setMinKreuzel(getMinKreuzel());
+        course.setName(getName());
+        course.setMinPoints(getMinPoints());
+        course.setNumber(getNumber());
+        course.setOwner(getOwner());
+
+        return course;
+    }
 }
