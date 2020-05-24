@@ -163,21 +163,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @throws UserException
      */
     public List<User> getAllUsers() throws UserException {
-        List<User> allUsers = userRepository.findAll();
-        allUsers.removeIf(User::getAdmin);
-
-        return allUsers;
+        return userRepository.findAll();
     }
 
-    public List<UserResponseObject> getAllUserResponseObjects() throws UserException
+    public List<UserResponseObject> getAllUserResponseObjects(String jwtToken) throws UserException
     {
+        Boolean isAdmin = jwtUtils.getAdminFromJwtToken(jwtToken.split(" ")[1].trim());
+
         List<UserResponseObject> userResponseObjectList = new ArrayList<>();
         List<User> allUsers = getAllUsers();
         for(User user: allUsers)
         {
             UserResponseObject responseObject= new UserResponseObject();
             fillResponseObject(user,responseObject);
-
+            if(isAdmin)
+              responseObject.setAdmin(user.getAdmin());
             userResponseObjectList.add(responseObject);
         }
 
@@ -194,7 +194,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         responseObject.setSurname(user.getSurname());
         responseObject.setMatriculationNumber(user.getMatriculationNumber());
         responseObject.setUsername(user.getUsername());
-        responseObject.setAdmin(user.getAdmin());
     }
 
     public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)

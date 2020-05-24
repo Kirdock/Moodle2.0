@@ -48,8 +48,8 @@ public class UserController {
     // get api--------------------------------------------------------------------
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(path = "/users")
-    public List<UserResponseObject> getUsers() {
-        return userDetailsService.getAllUserResponseObjects();
+    public List<UserResponseObject> getUsers(@RequestHeader("Authorization") String jwtToken) {
+        return userDetailsService.getAllUserResponseObjects(jwtToken);
     }
 
     @GetMapping(path = "/users/course/{courseId}")

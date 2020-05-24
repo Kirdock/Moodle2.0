@@ -1,5 +1,8 @@
 package com.aau.moodle20.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AbstractUserResponseObject {
 
     private String matriculationNumber;
