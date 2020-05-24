@@ -107,6 +107,14 @@ router.beforeEach((to, from, next) => {
           next('/');
         }
       }
+      else if(to.matched.some(record => record.meta.isAdmin)){
+        if(store.getters.userInfo.isAdmin){
+          next();
+        }
+        else{
+          next('/');
+        }
+      }
       else{
         next();
       }

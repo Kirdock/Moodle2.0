@@ -49,7 +49,7 @@ export default {
         return axios.post('/course', templateData);
     },
     copyCourse(data){
-        return axios.put(`/course/copy`, data);
+        return axios.post(`/course/copy`, data);
     },
     updateCourseUsers(data){
         return axios.post('/course/assign', data);

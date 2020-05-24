@@ -67,7 +67,7 @@ export default new Vuex.Store({
       deleteToken();
       commit('logout');
       if(isTokenExpired){
-        if(router.name !== 'Login'){
+        if(router.currentRoute.name !== 'Login'){
           router.push('/Login');
         }
         this.$app.$bvToast.toast(this.$app.$t('sessionExpired'), {
@@ -76,7 +76,7 @@ export default new Vuex.Store({
             appendToast: true
         });
       }
-      else if(router.path !== '/'){
+      else if(router.currentRoute.path !== '/'){
         router.push('/');
       }
     },

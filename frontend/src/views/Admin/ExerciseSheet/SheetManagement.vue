@@ -15,9 +15,9 @@
             <li class="breadcrumb-item active">{{sheetInfo.name}}</li>
         </ol>
         <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
-        <b-tabs class="mt-3">
-            <b-tab :title="$t('information')" :active="activeTab === 0" @click="activeTab = 0">
-                <div class="form-horizontal col-md-4">
+        <b-tabs class="mt-3" v-model="activeTab">
+            <b-tab :title="$t('information')">
+                <div class="form-horizontal col-md-5">
                     <form ref="exerciseSheet" @submit.prevent="updateInfo()">
                         <es-info v-model="sheetInfo"></es-info>
                         <div class="form-inline">
@@ -30,7 +30,7 @@
                     </form>
                 </div>
             </b-tab>
-            <b-tab v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" :active="activeTab === (index+1)" @click="activeTab = index+1; setSelectedExample()">
+            <b-tab v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()">
                 <div style="margin-top: 10px; font-size: 30px" v-if="selectedExample">
                     <a href="javascript:void(0)" @click="setSelectedExample()">
                         {{example.name}}
@@ -46,13 +46,10 @@
                             <span class="fa fa-save" v-else></span>
                             {{ $t('save') }}
                         </button>
-                        <button class="btn btn-danger" style="margin-left: 10px" v-b-modal="'modal-delete-example'">
+                        <button class="btn btn-danger" style="margin-left: 10px" v-b-modal="'modal-delete-example'" type="button" @click="selectedDeleteExample = {id: example.id, index}">
                             <span class="fa fa-trash"></span>
                             {{$t('delete')}}
                         </button>
-                        <b-modal id="modal-delete-example" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteExample(example.id, index)">
-                            {{$t('example.question.delete')}}
-                        </b-modal>
                     </div>
                 </form>
             </b-tab>
@@ -65,6 +62,9 @@
                 </li>
             </template>
         </b-tabs>
+        <b-modal id="modal-delete-example" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteExample(selectedDeleteExample.id, selectedDeleteExample.index)">
+            {{$t('example.question.delete')}}
+        </b-modal>
     </div>
 </template>
 
@@ -73,6 +73,7 @@
 <script>
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
 import ExampleInfo from '@/components/ExampleInfo.vue';
+
 export default {
     props: ['courseId', 'sheetId', 'name'],
     components: {
@@ -87,7 +88,8 @@ export default {
             sheetInfo: {},
             selectedExample: undefined,
             loading_updateInformation: false,
-            activeTab: 0
+            activeTab: 0,
+            selectedDeleteExample: undefined
         }
     },
     methods: {
@@ -126,7 +128,8 @@ export default {
                 example.loading = true;
                 const {loading, ...data} = example;
                 if(example.id){
-                    this.$store.dispatch('updateExample', data).then(()=>{
+                    this.$store.dispatch('updateExample', data).then(({data})=>{
+                        // Object.assign(example,data);
                         this.$bvToast.toast(this.$t('example.saved'), {
                             title: this.$t('success'),
                             variant: 'success',
@@ -143,7 +146,8 @@ export default {
                     });
                 }
                 else{
-                    this.$store.dispatch('createExample', data).then(()=>{
+                    this.$store.dispatch('createExample', data).then(({data})=>{
+                        Object.assign(example,data);
                         this.$bvToast.toast(this.$t('example.created'), {
                             title: this.$t('success'),
                             variant: 'success',
@@ -196,7 +200,13 @@ export default {
         },
         newExample(){
             this.sheetInfo.examples.push(this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length));
-            this.activeTab = this.sheetInfo.examples.length;
+            this.$nextTick(()=>{
+                this.$nextTick(() => {
+                    requestAnimationFrame(() => {
+                        this.activeTab = this.sheetInfo.examples.length;
+                    })
+                })
+            });
         },
         deleteExample(id, index){
             this.sheetInfo.examples.splice(index, 1);

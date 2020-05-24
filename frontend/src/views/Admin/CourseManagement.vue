@@ -13,7 +13,7 @@
         <div class="row col-md-12">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="courseSemester_edit" class="control-label">{{ $t('semester.semester') }}</label>
+                    <label for="courseSemester_edit" class="control-label">{{ $t('semester.name') }}</label>
                     <select class="form-control" v-model="selectedSemester_edit" id="courseSemester_edit" @change="getCourses(selectedSemester_edit)">
                         <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
                             {{semester.year}} {{semester.type === 'w' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
@@ -42,14 +42,14 @@
                         <course-info v-model="courseInfo_create" :users="users"></course-info>
                     </form>
                 </b-modal>
-                <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId">
+                <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId" @click="courseCopyId = semestersWithoutSelected[0].id">
                     <span class="fa fa-copy"></span>
                     {{ $t('copy') }}
                 </button>
                 <b-modal id="modal-copy-course" :title="$t('course.question.copy')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="copyCourse(selectedSemester_edit, courseCopyId)">
-                    <label for="selectedSemester_copy_course" class="control-label">{{ $t('semester') }}</label>
+                    <label for="selectedSemester_copy_course" class="control-label">{{ $t('semester.name') }}</label>
                     <select class="form-control" v-model="courseCopyId" id="selectedSemester_copy_course">
-                        <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
+                        <option v-for="semester in semestersWithoutSelected" :value="semester.id" :key="semester.id">
                             {{semester.year}} {{semester.type === 'w' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
                         </option>
                     </select>
@@ -270,6 +270,9 @@ export default {
         },
         filteredUsers(){
             return this.$store.getters.filteredUsers({users: this.courseUsers, role: this.showRoles, searchText: this.searchUserText});
+        },
+        semestersWithoutSelected(){
+            return this.semesters.filter(semester => semester.id != this.selectedSemester_edit);
         }
     },
     methods:{
@@ -469,8 +472,8 @@ export default {
         copyCourse(courseId, semesterId){
             this.loading_delete = true;
             this.$store.dispatch('copyCourse', {courseId, semesterId}).then(response=>{
-                if(id === selectedSemester_edit){
-                    this.getCourses(id);
+                if(semesterId === this.selectedSemester_edit){
+                    this.getCourses(semesterId);
                 }
                 this.$bvToast.toast(this.$t('course.copied'), {
                     title: this.$t('success'),

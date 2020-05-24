@@ -20,7 +20,7 @@
         methods: {
             getSemesters(){
                 this.$store.dispatch("getSemesters").then(response=>{
-                    this.semesters = response.semesters;
+                    this.semesters = response.data;
                     this.selectedSemester = this.semesters[this.semesters.length - 1].id; //this.$store.selectedSemester
                     this.getCourses(this.selectedSemester);
                 }).catch(()=>{

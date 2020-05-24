@@ -130,7 +130,7 @@ const messages = {
         selected: 'Ausgewählt',
         semester: {
             create: 'Semester anlegen',
-            semester: 'Semester',
+            name: 'Semester',
             created: 'Semester wurde angelegt',
             management: 'Semesterverwaltung',
             summer: 'Sommersemester',
@@ -321,7 +321,7 @@ const messages = {
         selected: 'Selected',
         semester: {
             create: 'Create Semester',
-            semester: 'Semester',
+            name: 'Semester',
             created: 'Semester created',
             management: 'Semester management',
             summer: 'Summer semester',
