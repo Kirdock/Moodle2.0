@@ -111,6 +111,7 @@ const messages = {
         new: 'Neu',
         no: 'Nein',
         number: 'Nummer',
+        owner: 'Besitzer',
         password: 'Passwort',
         passwordDontMatch: 'Passwörter stimmen nicht überein',
         passwordNew: 'Neues Passwort',
@@ -124,6 +125,7 @@ const messages = {
         save: 'Speichern',
         search: 'Suche',
         security: 'Sicherheit',
+        selected: 'Ausgewählt',
         semester: {
             create: 'Semester anlegen',
             semester: 'Semester',
@@ -296,6 +298,7 @@ const messages = {
         new: 'New',
         no: 'No',
         number: 'Number',
+        owner: 'Owner',
         password: 'Password',
         passwordDontMatch: 'Passwords do not match',
         passwordNew: 'New password',
@@ -309,6 +312,7 @@ const messages = {
         save: 'Save',
         search: 'Search',
         security: 'Security',
+        selected: 'Selected',
         semester: {
             create: 'Create Semester',
             semester: 'Semester',

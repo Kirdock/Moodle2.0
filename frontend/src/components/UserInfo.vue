@@ -1,6 +1,6 @@
 <template>
     <div class="form-horizontal">
-        <div class="form-check">
+        <div class="form-check" v-if="$store.getters.userInfo.isAdmin">
             <label for="uInfoIsAdmin"   class="form-check-label">
                 <input id="uInfoIsAdmin" type="checkbox" class="form-check-input" v-model="value.isAdmin">
                 {{$t('admin')}}

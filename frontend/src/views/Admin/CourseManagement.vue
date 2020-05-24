@@ -39,7 +39,7 @@
                 <b-modal id="modal-new-course" :title="$t('course.title.create')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="createCourse">
                     <label class="control-label requiredField">{{ $t('requiredField') }}</label>
                     <form @submit.prevent="createCourse()" ref="createCourse">
-                        <course-info v-model="courseInfo_create"></course-info>
+                        <course-info v-model="courseInfo_create" :users="users"></course-info>
                     </form>
                 </b-modal>
                 <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId">
@@ -71,7 +71,7 @@
                 <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
                 <div class="form-horizontal col-md-4">
                     <form @submit.prevent="updateCourse()">
-                        <course-info v-model="selectedCourse"></course-info>
+                        <course-info v-model="selectedCourse" :users="users"></course-info>
                         
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">
@@ -223,7 +223,8 @@ export default {
             showRoles: 'z',
             courseUsers: [],
             semesters: [],
-            exerciseSheet_create: {}
+            exerciseSheet_create: {},
+            users: []
         }
     },
     created(){
@@ -234,6 +235,7 @@ export default {
         //don't forget to set props: true; in router
         this.getSemesters();
         this.resetExerciseSheet();
+        this.getUsers();
     },
     computed: {
         roles(){
@@ -247,6 +249,17 @@ export default {
         }
     },
     methods:{
+        getUsers(){
+            this.$store.dispatch('getUsers').then(({data}) =>{
+                this.users = data;
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('users.error.get'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            });
+        },
         resetExerciseSheet(){
             this.exerciseSheet_create = {
                 submissionDate: this.$store.getters.currentDateTime,
@@ -470,8 +483,10 @@ export default {
         getSemesters(){
             this.$store.dispatch('getSemesters').then(response =>{
                 this.semesters = response.data;
-                this.courseInfo_create.semesterId = this.courseCopyId = this.selectedSemester_edit = this.semesters[0].id;
-                this.getCourses(this.selectedSemester_edit);
+                if(this.semesters.length !== 0){
+                    this.courseInfo_create.semesterId = this.courseCopyId = this.selectedSemester_edit = this.semesters[0].id;
+                    this.getCourses(this.selectedSemester_edit);
+                }
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('semester.error.get'), {
                     title: this.$t('error'),
