@@ -45,6 +45,28 @@ public class UserController {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    // get api--------------------------------------------------------------------
+    @PreAuthorize("hasAuthority('Admin')")
+    @GetMapping(path = "/users")
+    public List<UserResponseObject> getUsers() {
+        return userDetailsService.getAllUserResponseObjects();
+    }
+
+    @GetMapping(path = "/users/course/{courseId}")
+    public List<UserCourseResponseObject> getUsersWithCourseRoles(@PathVariable("courseId") long courseId) {
+        return userDetailsService.getUsersWithCourseRoles(courseId);
+    }
+    @GetMapping(path = "/user/isOwner")
+    public Boolean getUsersWithCourseRoles(@RequestHeader("Authorization") String jwtToken) {
+        return userDetailsService.isOwner(jwtToken);
+    }
+
+    @GetMapping(path = "/user/{matriculationNumber}")
+    public UserResponseObject getUser(@PathVariable String matriculationNumber) {
+        return userDetailsService.getUser(matriculationNumber);
+    }
+
+    // post api----------------------------------------------------------------
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -56,6 +78,14 @@ public class UserController {
 
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
+
+    @PostMapping(path = "/user/password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, @RequestHeader("Authorization") String jwtToken) {
+        userDetailsService.changePassword(changePasswordRequest, jwtToken);
+        return ResponseEntity.ok(new MessageResponse("User password changed!"));
+    }
+
+    // put api---------------------------------------------------------------------
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/user")
@@ -74,23 +104,7 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
     }
 
-    @PreAuthorize("hasAuthority('Admin')")
-    @GetMapping(path = "/users")
-    public List<UserResponseObject> getUsers() {
-        return userDetailsService.getAllUserResponseObjects();
-     }
-
-    @GetMapping(path = "/users/course/{courseId}")
-    public List<UserCourseResponseObject> getUsersWithCourseRoles(@PathVariable("courseId") long courseId) {
-        return userDetailsService.getUsersWithCourseRoles(courseId);
-    }
-
-    @PostMapping(path = "/user/password")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, @RequestHeader("Authorization") String jwtToken) {
-        userDetailsService.changePassword(changePasswordRequest, jwtToken);
-        return ResponseEntity.ok(new MessageResponse("User password changed!"));
-    }
-
+    // delete api -------------------------------------------------------------------------
     @PreAuthorize("hasAuthority('Admin')")
     @DeleteMapping(path = "/user/{matriculationNumber}")
     public ResponseEntity<?> deleteUser(@PathVariable String matriculationNumber) {
@@ -98,13 +112,5 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("User was deleted!"));
     }
 
-    @GetMapping(path = "/user/isOwner")
-    public Boolean getUsersWithCourseRoles(@RequestHeader("Authorization") String jwtToken) {
-        return userDetailsService.isOwner(jwtToken);
-    }
 
-    @GetMapping(path = "/user/{matriculationNumber}")
-    public UserResponseObject getUser(@PathVariable String matriculationNumber) {
-        return userDetailsService.getUser(matriculationNumber);
-    }
 }
