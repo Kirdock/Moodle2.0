@@ -134,6 +134,9 @@ export default new Vuex.Store({
     updateCourseUsers({commit}, data){
       return api.updateCourseUsers(data);
     },
+    assignCourseUsers({commit}, formData){
+      return api.assignCourseUsers(formData);
+    },
     getSemesters({commit}){
       return api.getSemesters();
     },

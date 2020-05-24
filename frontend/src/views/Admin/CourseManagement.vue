@@ -86,6 +86,14 @@
             <b-tab :title="$t('user.assigned')" id="assignedUsers">
                 <div class="form-horizontal col-md-7">
                     <div class="form-group">
+                        <label class="btn btn-primary finger">
+                            <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
+                            <span class="fas fa-upload" v-else></span>
+                            {{ $t('uploadCSV') }}
+                            <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitUsers()"/>
+                        </label>
+                    </div>
+                    <div class="form-group">
                         <label for="searchUserText" class="control-label">
                             <span class="fas fa-search"></span>
                             {{ $t('search') }}
@@ -224,7 +232,8 @@ export default {
             courseUsers: [],
             semesters: [],
             exerciseSheet_create: {},
-            users: []
+            users: [],
+            loadingFileUpload: false
         }
     },
     created(){
@@ -258,6 +267,28 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
+            });
+        },
+        submitUsers(){
+            this.loadingFileUpload = true;
+            const formData = new FormData();
+            formData.append('file',this.$refs.file.files[0]);
+            formData.append('isAdmin', false)
+            this.$refs.file.value = '';
+            this.$store.dispatch('assignCourseUsers', formData).then(response =>{
+                this.$bvToast.toast(this.$t('course.usersSaved'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('course.error.usersSave'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }).finally(()=>{
+                this.loadingFileUpload = false;
             });
         },
         resetExerciseSheet(){

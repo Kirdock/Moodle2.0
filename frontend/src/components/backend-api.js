@@ -73,6 +73,16 @@ export default {
             }
         );
     },
+    assignCourseUsers(formData){
+        return axios.post('/course/assignFile',
+            formData,
+            {
+                headers: {
+                    'Content-Type': undefined
+                }
+            }
+        )
+    },
     udpatePassword(data){
         return axios.post('/user/password', data);
     },
