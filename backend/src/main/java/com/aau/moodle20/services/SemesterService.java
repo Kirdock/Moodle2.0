@@ -66,6 +66,7 @@ public class SemesterService {
         course.setNumber(createCourseRequest.getNumber());
         course.setSemester(new Semester(createCourseRequest.getSemesterId()));
         course.setOwner(new User(createCourseRequest.getOwner()));
+        course.setDescriptionTemplate(createCourseRequest.getDescriptionTemplate());
         courseRepository.save(course);
     }
 
@@ -80,6 +81,7 @@ public class SemesterService {
             course.setMinPoints(updateCourseRequest.getMinPoints());
             course.setName(updateCourseRequest.getName());
             course.setNumber(updateCourseRequest.getNumber());
+            course.setDescriptionTemplate(updateCourseRequest.getDescriptionTemplate());
         }
         courseRepository.save(course);
     }
@@ -160,6 +162,7 @@ public class SemesterService {
        responseObject.setNumber(course.getNumber());
        responseObject.setMinKreuzel(course.getMinKreuzel());
        responseObject.setMinPoints(course.getMinPoints());
+       responseObject.setDescriptionTemplate(course.getDescriptionTemplate());
        responseObject.setExerciseSheets(exerciseSheets.stream()
                .map(ExerciseSheet::getResponseObject)
                .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))

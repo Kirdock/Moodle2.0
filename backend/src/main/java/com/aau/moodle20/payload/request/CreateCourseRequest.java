@@ -12,6 +12,7 @@ public class CreateCourseRequest {
     private Integer minKreuzel;
     private Integer minPoints;
     private String owner;
+    private String descriptionTemplate;
 
     public Long getSemesterId() {
         return semesterId;
@@ -59,5 +60,13 @@ public class CreateCourseRequest {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getDescriptionTemplate() {
+        return descriptionTemplate;
+    }
+
+    public void setDescriptionTemplate(String descriptionTemplate) {
+        this.descriptionTemplate = descriptionTemplate;
     }
 }

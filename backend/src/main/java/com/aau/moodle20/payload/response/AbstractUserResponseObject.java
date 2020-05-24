@@ -6,6 +6,7 @@ public class AbstractUserResponseObject {
     private String username;
     private String forename;
     private String surname;
+    private Boolean isAdmin;
 
     public AbstractUserResponseObject()
     {
@@ -43,4 +44,11 @@ public class AbstractUserResponseObject {
         this.surname = surname;
     }
 
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
 }

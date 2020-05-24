@@ -18,6 +18,7 @@ public class Course {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
+    private String descriptionTemplate;
 
     @OneToMany(mappedBy = "course")
     Set<UserInCourse> students; // TODO find better name
@@ -97,6 +98,14 @@ public class Course {
         this.owner = owner;
     }
 
+    public String getDescriptionTemplate() {
+        return descriptionTemplate;
+    }
+
+    public void setDescriptionTemplate(String descriptionTemplate) {
+        this.descriptionTemplate = descriptionTemplate;
+    }
+
     public Course copyCourse()
     {
         Course course = new Course();
@@ -105,6 +114,7 @@ public class Course {
         course.setMinPoints(getMinPoints());
         course.setNumber(getNumber());
         course.setOwner(getOwner());
+        course.setDescriptionTemplate(getDescriptionTemplate());
 
         return course;
     }

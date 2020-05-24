@@ -13,6 +13,7 @@ public class UpdateCourseRequest {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
+    private String descriptionTemplate;
 
     public Long getId() {
         return id;
@@ -52,5 +53,13 @@ public class UpdateCourseRequest {
 
     public void setMinPoints(Integer minPoints) {
         this.minPoints = minPoints;
+    }
+
+    public String getDescriptionTemplate() {
+        return descriptionTemplate;
+    }
+
+    public void setDescriptionTemplate(String descriptionTemplate) {
+        this.descriptionTemplate = descriptionTemplate;
     }
 }

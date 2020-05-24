@@ -10,6 +10,7 @@ public class CourseResponseObject {
     private Integer minKreuzel;
     private Integer minPoints;
     private List<ExerciseSheetResponseObject> exerciseSheets;
+    private String descriptionTemplate;
 
     public CourseResponseObject()
     {
@@ -62,5 +63,13 @@ public class CourseResponseObject {
 
     public void setExerciseSheets(List<ExerciseSheetResponseObject> exerciseSheets) {
         this.exerciseSheets = exerciseSheets;
+    }
+
+    public String getDescriptionTemplate() {
+        return descriptionTemplate;
+    }
+
+    public void setDescriptionTemplate(String descriptionTemplate) {
+        this.descriptionTemplate = descriptionTemplate;
     }
 }

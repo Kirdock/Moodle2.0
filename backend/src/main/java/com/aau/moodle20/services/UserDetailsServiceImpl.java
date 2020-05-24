@@ -177,7 +177,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         {
             UserResponseObject responseObject= new UserResponseObject();
             fillResponseObject(user,responseObject);
-            //TODO set is admin
+
             userResponseObjectList.add(responseObject);
         }
 
@@ -194,6 +194,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         responseObject.setSurname(user.getSurname());
         responseObject.setMatriculationNumber(user.getMatriculationNumber());
         responseObject.setUsername(user.getUsername());
+        responseObject.setAdmin(user.getAdmin());
     }
 
     public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)
