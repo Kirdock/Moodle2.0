@@ -6,6 +6,7 @@ import com.aau.moodle20.payload.request.CreateExampleRequest;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExampleRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
+import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.ExerciseSheetService;
@@ -52,9 +53,9 @@ public class ExerciseSheetController {
 
     }
     @PutMapping(value = "/example")
-    public ResponseEntity<?> createExample(@Valid @RequestBody CreateExampleRequest createExampleRequest) throws ServiceValidationException {
-        exerciseSheetService.createExample(createExampleRequest);
-        return ResponseEntity.ok(new MessageResponse("Example was successfully created!"));
+    public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody CreateExampleRequest createExampleRequest) throws ServiceValidationException {
+        ExampleResponseObject exampleResponseObject = exerciseSheetService.createExample(createExampleRequest);
+        return ResponseEntity.ok(exampleResponseObject);
     }
 
     @PostMapping(value = "/example")

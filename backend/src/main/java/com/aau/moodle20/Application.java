@@ -50,10 +50,10 @@ public class Application implements ApplicationRunner, ErrorController {
 			fileTypeRepository.save(new FileType("Word", "application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
 		}
 		if (!fileTypeRepository.existsByName("Excel")) {
-			fileTypeRepository.save(new FileType("Word", "application/msexcel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+			fileTypeRepository.save(new FileType("Excel", "application/msexcel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
 		}
 		if (!fileTypeRepository.existsByName("Archiv-Dateien")) {
-			fileTypeRepository.save(new FileType("Word", "*.zip, *.rar"));
+			fileTypeRepository.save(new FileType("Archiv-Dateien", "*.zip, *.rar"));
 		}
 	}
 

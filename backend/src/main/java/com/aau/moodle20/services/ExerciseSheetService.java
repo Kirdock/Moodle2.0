@@ -6,6 +6,7 @@ import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
+import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +99,7 @@ public class ExerciseSheetService {
     }
 
     @Transactional
-    public void createExample (CreateExampleRequest createExampleRequest) throws ServiceValidationException
+    public ExampleResponseObject createExample (CreateExampleRequest createExampleRequest) throws ServiceValidationException
     {
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
@@ -111,6 +112,7 @@ public class ExerciseSheetService {
         exampleRepository.save(example);
         supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest);
         supportFileTypeRepository.saveAll(supportFileTypes);
+        example.setSupportFileTypes(new HashSet<>(supportFileTypes));
 
         if(createExampleRequest.getSubExamples()!=null && !createExampleRequest.getSubExamples().isEmpty())
         {
@@ -124,9 +126,12 @@ public class ExerciseSheetService {
 
                 supportFileTypes = createSupportedFileTypesEntries(subExample,subExampleRequest);
                 supportFileTypeRepository.saveAll(supportFileTypes);
+                subExample.setSupportFileTypes(new HashSet<>(supportFileTypes));
 
             }
         }
+
+        return example.createExampleResponseObject(); 
     }
 
 
