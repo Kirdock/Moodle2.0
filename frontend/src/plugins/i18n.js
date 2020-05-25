@@ -71,6 +71,9 @@ const messages = {
             name: 'Unterbeispiel',
             new: 'Neues Unterbeispiel'
         },
+        subExamples: {
+            name: 'Unterbeispiele',
+        },
         exerciseSheet: {
             name: 'Übungsblatt',
             created: 'Übungsblatt wurde angelegt',
@@ -93,6 +96,11 @@ const messages = {
             name: 'Übungsblätter',
             error: {
                 get: 'Übungsblätter konnten nicht geladen werden',
+            }
+        },
+        fileTypes: {
+            error: {
+                get: 'Dateiformate konnten nicht geladen werden'
             }
         },
         forename: 'Vorname',
@@ -122,6 +130,7 @@ const messages = {
         passwordUpdated: 'Passwort wurde aktualisiert',
         passwordUpdatedError: 'Passwort konnte nicht aktualisiert werden',
         points: 'Punkte',
+        remove: 'Entfernen',
         requiredField: 'Pflichtfeld',
         role: 'Rolle',
         save: 'Speichern',
@@ -265,6 +274,9 @@ const messages = {
             name: 'Sub example',
             new: 'New sub example'
         },
+        subExamples: {
+            name: 'Sub examples',
+        },
         exerciseSheet: {
             name: 'Exercise sheet',
             create: 'Exercise sheet created',
@@ -287,6 +299,11 @@ const messages = {
             name: 'Exercise sheets',
             error: {
                 get: 'Exercise sheets could not be loaded',
+            }
+        },
+        fileTypes: {
+            error: {
+                get: 'File types could not be loaded'
             }
         },
         forename: 'Forename',
@@ -316,6 +333,7 @@ const messages = {
         passwordUpdated: 'Password updated',
         passwordUpdatedError: 'Password could not be updated',
         points: 'Points',
+        remove: 'Remove',
         requiredField: 'Required field',
         role: 'Role',
         save: 'Save',

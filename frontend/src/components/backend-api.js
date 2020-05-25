@@ -98,6 +98,9 @@ export default {
     createSemester(data){
         return axios.put('/semester',data);
     },
+    getFileTypes(){
+        return axios.get('/fileTypes');
+    },
     createExerciseSheet(data){
         return axios.put('/exerciseSheet', data);
     },

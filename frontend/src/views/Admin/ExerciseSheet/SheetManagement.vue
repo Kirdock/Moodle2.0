@@ -30,7 +30,7 @@
                     </form>
                 </div>
             </b-tab>
-            <b-tab v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()">
+            <b-tab v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()" lazy>
                 <div style="margin-top: 10px; font-size: 30px" v-if="selectedExample">
                     <a href="javascript:void(0)" @click="setSelectedExample()">
                         {{example.name}}
@@ -54,12 +54,7 @@
                 </form>
             </b-tab>
             <template v-slot:tabs-end>
-                <li role="presentation" class="nav-item">
-                    <a href="javascript:void(0)" class="nav-link" @click="newExample()">
-                        <span class="fa fa-plus"></span>
-                        {{$t('example.new')}}
-                    </a>
-                </li>
+                <b-nav-item role="presentation" @click="newExample()" href="javascript:void(0)"><span class="fa fa-plus"></span> {{$t('example.new')}}</b-nav-item>
             </template>
         </b-tabs>
         <b-modal id="modal-delete-example" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteExample(selectedDeleteExample.id, selectedDeleteExample.index)">

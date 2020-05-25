@@ -48,6 +48,9 @@ export default new Vuex.Store({
     updateSettings(state, settings){
       Object.assign(state.settings, settings);
       saveSettings(state.settings);
+    },
+    fileTypes(state, fileTypes){
+      state.fileTypes = fileTypes;
     }
   },
   actions: {
@@ -170,6 +173,19 @@ export default new Vuex.Store({
     },
     deleteCourse({commit}, data){
       return api.deleteCourse(data);
+    },
+    getFileTypes({commit, state}, data){
+      return new Promise((resolve, reject) =>{
+        if(state.fileTypes){
+          resolve({data: state.fileTypes});
+        }
+        else{
+          api.getFileTypes().then(response =>{
+            commit('fileTypes', response.data);
+            resolve(response);
+          }).catch(reject);
+        }
+      })
     },
     createExerciseSheet({commit}, data){
       return api.createExerciseSheet(data);
