@@ -20,6 +20,7 @@ public class AbstractExampleRequest{
     private String validator;
     @NotNull
     private List<Long> supportedFileTypes;
+    private Boolean submitFile;
 
     public Long getExerciseSheetId() {
         return exerciseSheetId;
@@ -91,5 +92,13 @@ public class AbstractExampleRequest{
 
     public void setSupportedFileTypes(List<Long> supportedFileTypes) {
         this.supportedFileTypes = supportedFileTypes;
+    }
+
+    public Boolean getSubmitFile() {
+        return submitFile;
+    }
+
+    public void setSubmitFile(Boolean submitFile) {
+        this.submitFile = submitFile;
     }
 }

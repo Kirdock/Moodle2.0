@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface ExampleRepository extends JpaRepository<Example,Long> {
 
-}
+    List<Example> findByParentExample_id(Long parentExampleId);
+
+    void deleteByIdIn(List<Long> ids);}
 
 

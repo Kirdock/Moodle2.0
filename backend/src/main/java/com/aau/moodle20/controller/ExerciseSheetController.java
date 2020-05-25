@@ -66,9 +66,9 @@ public class ExerciseSheetController {
     }
 
     @PostMapping(value = "/example")
-    public ResponseEntity<?> updateExerciseSheet(@Valid @RequestBody UpdateExampleRequest updateExampleRequest) throws ServiceValidationException {
-        exerciseSheetService.updateExample(updateExampleRequest);
-        return ResponseEntity.ok(new MessageResponse("Example was successfully updated!"));
+    public ResponseEntity<ExampleResponseObject> updateExerciseSheet(@Valid @RequestBody UpdateExampleRequest updateExampleRequest) throws ServiceValidationException {
+        ExampleResponseObject responseObject =  exerciseSheetService.updateExample(updateExampleRequest);
+        return ResponseEntity.ok(responseObject);
     }
 
 
@@ -77,5 +77,10 @@ public class ExerciseSheetController {
         exerciseSheetService.deleteExample(id);
         return ResponseEntity.ok(new MessageResponse("Example was successfully deleted!"));
 
+    }
+
+    @GetMapping(value = "/example/{id}")
+    public ExampleResponseObject getExample(@PathVariable("id") long id) throws ServiceValidationException {
+        return exerciseSheetService.getExample(id);
     }
 }

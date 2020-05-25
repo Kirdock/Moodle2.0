@@ -9,12 +9,16 @@ import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
+import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -158,20 +162,28 @@ public class ExerciseSheetService {
     }
 
     @Transactional
-    public void updateExample(UpdateExampleRequest updateExampleRequest) throws ServiceValidationException {
-
+    public ExampleResponseObject updateExample(UpdateExampleRequest updateExampleRequest) throws ServiceValidationException {
+        List<SupportFileType> supportFileTypes;
         validateExampleRequest(updateExampleRequest);
+        List<Long> currentSubExamplesIds =new ArrayList<>();
+        if (updateExampleRequest.getSubmitFile()) {
+            if (updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty())
+                throw new ServiceValidationException("Error: supported file types must not be null!");
+            if (updateExampleRequest.getValidator() == null || updateExampleRequest.getValidator().isEmpty())
+                throw new ServiceValidationException("Error: validator must not be null!");
+        }
+
         Optional<Example> optionalExample = exampleRepository.findById(updateExampleRequest.getId());
 
         if (!optionalExample.isPresent())
             throw new ServiceValidationException("Error: example not found", HttpStatus.NOT_FOUND);
 
         Example example = optionalExample.get();
-        List<SupportFileType> supportFileTypes;
         example.fillValuesFromRequestObject(updateExampleRequest);
         supportFileTypes = createSupportedFileTypesEntries(example, updateExampleRequest);
+        supportFileTypeRepository.saveAll(supportFileTypes);
         example.setSupportFileTypes(new HashSet<>(supportFileTypes));
-        exampleRepository.save(example);
+        exampleRepository.saveAndFlush(example);
 
         if (updateExampleRequest.getSubExamples() != null && !updateExampleRequest.getSubExamples().isEmpty()) {
             for (UpdateExampleRequest subExampleRequest : updateExampleRequest.getSubExamples()) {
@@ -185,21 +197,41 @@ public class ExerciseSheetService {
                     Example subExample = optionalSubExample.get();
                     subExample.fillValuesFromRequestObject(subExampleRequest);
                     supportFileTypes = createSupportedFileTypesEntries(subExample, subExampleRequest);
-                    example.setSupportFileTypes(new HashSet<>(supportFileTypes));
-                    exampleRepository.save(subExample);
+                    supportFileTypeRepository.saveAll(supportFileTypes);
+                    subExample.setSupportFileTypes(new HashSet<>(supportFileTypes));
+                    subExample.setExerciseSheet(example.getExerciseSheet());
+                    exampleRepository.saveAndFlush(subExample);
+                    currentSubExamplesIds.add(subExample.getId());
                 }
                 // create subexample
                 else {
                     Example subExample = new Example();
                     subExample.fillValuesFromRequestObject(subExampleRequest);
                     subExample.setParentExample(example);
-                    exampleRepository.save(subExample);
+                    subExample.setExerciseSheet(example.getExerciseSheet());
+                    exampleRepository.saveAndFlush(subExample);
 
                     supportFileTypes = createSupportedFileTypesEntries(subExample, subExampleRequest);
                     supportFileTypeRepository.saveAll(supportFileTypes);
+                    currentSubExamplesIds.add(subExample.getId());
                 }
             }
         }
+
+        // delete sub examples
+        List<Example> allSubExample = exampleRepository.findByParentExample_id(example.getId());
+        List<Long> allSubExamplesInDatabaseIds = allSubExample.stream().map(Example::getId).collect(Collectors.toList());
+        allSubExamplesInDatabaseIds.removeIf(currentSubExamplesIds::contains);
+
+        for (Long id : allSubExamplesInDatabaseIds) {
+            example.getSubExamples().stream()
+                    .filter(example1 -> id.equals(example1.getId()))
+                    .forEach(example1 -> example1.setParentExample(null));
+            exampleRepository.deleteById(id);
+        }
+
+
+        return exampleRepository.findById(example.getId()).get().createExampleResponseObject();
     }
 
     protected void validateExampleRequest(AbstractExampleRequest abstractExampleRequest) throws ServiceValidationException
@@ -225,5 +257,12 @@ public class ExerciseSheetService {
     public List<FileTypeResponseObject> getFileTypes()
     {
         return fileTypeRepository.findAll().stream().map(FileType::createFileTypeResponseObject).collect(Collectors.toList());
+    }
+
+    public ExampleResponseObject getExample(Long id) throws ServiceValidationException
+    {
+        if(!exampleRepository.existsById(id))
+            throw new ServiceValidationException("Error: example not found!",HttpStatus.NOT_FOUND);
+        return exampleRepository.findById(id).get().createExampleResponseObject();
     }
 }

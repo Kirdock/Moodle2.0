@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS EXAMPLE
     weighting  Number(10),
     mandatory char(5),
     description CLOB,
+    submit_File char(5),
     name varchar(100),
     validator VARCHAR(1000),
     CONSTRAINT FOREIGN_KEY_EXERCISE_SHEET FOREIGN KEY (exercise_Sheet_id) references EXERCISE_SHEET on delete cascade,

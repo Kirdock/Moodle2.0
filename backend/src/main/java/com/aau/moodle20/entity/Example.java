@@ -20,11 +20,11 @@ public class Example {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "exercise_Sheet_id", referencedColumnName = "id")
     private ExerciseSheet exerciseSheet;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parentExample_id", referencedColumnName = "id")
     private Example parentExample;
     @OneToMany(mappedBy="parentExample", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true)
@@ -37,8 +37,9 @@ public class Example {
     private Boolean mandatory;
     @Column(name = "sort_order")
     private Integer order;
+    private Boolean submitFile;
     private String validator;
-    @OneToMany(mappedBy = "example")
+    @OneToMany(mappedBy = "example", fetch = FetchType.LAZY)
     Set<SupportFileType> supportFileTypes;
 
 
@@ -144,6 +145,14 @@ public class Example {
         this.supportFileTypes = supportFileTypes;
     }
 
+    public Boolean getSubmitFile() {
+        return submitFile;
+    }
+
+    public void setSubmitFile(Boolean submitFile) {
+        this.submitFile = submitFile;
+    }
+
     public void fillValuesFromRequestObject(AbstractExampleRequest abstractExampleRequest)
     {
         setName(abstractExampleRequest.getName());
@@ -153,6 +162,7 @@ public class Example {
         setPoints(abstractExampleRequest.getPoints());
         setValidator(abstractExampleRequest.getValidator());
         setWeighting(abstractExampleRequest.getWeighting());
+        setSubmitFile(abstractExampleRequest.getSubmitFile());
     }
     public ExampleResponseObject createExampleResponseObject()
     {
@@ -165,10 +175,12 @@ public class Example {
         exampleResponseObject.setWeighting(getWeighting());
         exampleResponseObject.setOrder(getOrder());
         exampleResponseObject.setValidator(getValidator());
+        exampleResponseObject.setSubmitFile(getSubmitFile());
+        exampleResponseObject.setExerciseSheetId(getExerciseSheet()!=null?getExerciseSheet().getId():null);
         if (getSupportFileTypes() != null)
         {
             List<FileTypeResponseObject> fileTypeResponseObjects = getSupportFileTypes().stream()
-                    .map(supportFileType -> supportFileType.getFileType().createFileTypeResponseObject())
+                    .map(supportFileType -> supportFileType.getFileType().createFileTypeResponseObjectOnlyId())
                     .collect(Collectors.toList());
             exampleResponseObject.setSupportedFileTypes(fileTypeResponseObjects);
         }

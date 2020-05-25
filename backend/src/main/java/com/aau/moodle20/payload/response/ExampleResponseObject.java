@@ -14,6 +14,7 @@ public class ExampleResponseObject {
 
 
     private Long id;
+    private Long exerciseSheetId;
     private String name;
     private String description;
     private Integer points;
@@ -23,6 +24,7 @@ public class ExampleResponseObject {
     private String validator;
     List<FileTypeResponseObject> supportedFileTypes;
     private List<ExampleResponseObject> subExamples;
+    private Boolean submitFile;
 
     public Long getId() {
         return id;
@@ -102,5 +104,21 @@ public class ExampleResponseObject {
 
     public void setSubExamples(List<ExampleResponseObject> subExamples) {
         this.subExamples = subExamples;
+    }
+
+    public Long getExerciseSheetId() {
+        return exerciseSheetId;
+    }
+
+    public void setExerciseSheetId(Long exerciseSheetId) {
+        this.exerciseSheetId = exerciseSheetId;
+    }
+
+    public Boolean getSubmitFile() {
+        return submitFile;
+    }
+
+    public void setSubmitFile(Boolean submitFile) {
+        this.submitFile = submitFile;
     }
 }

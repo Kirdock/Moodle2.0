@@ -67,4 +67,10 @@ public class FileType {
 
         return responseObject;
     }
+
+    public FileTypeResponseObject createFileTypeResponseObjectOnlyId() {
+        FileTypeResponseObject responseObject = new FileTypeResponseObject();
+        responseObject.setId(getId());
+        return responseObject;
+    }
 }
