@@ -64,8 +64,16 @@ export default {
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
-                this.$bvToast.toast(this.$t('semester.error.create'), {
+            }).catch(error=>{
+                const status = error.response.data.errorResponseCode;
+                let message;
+                if(status === 472){
+                    message = this.$t('semester.error.alreadyExists');
+                }
+                else{
+                    message = this.$t('semester.error.create');
+                }
+                this.$bvToast.toast(message, {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true

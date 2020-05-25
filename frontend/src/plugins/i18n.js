@@ -138,8 +138,9 @@ const messages = {
             winter: 'Wintersemester',
             winterShortcut: 'WS',
             error: {
-                created: 'Semester konnte nicht angelegt werden',
-                get: 'Semester konnten nicht geladen werden',
+                alreadyExists: 'Dieses Semester existiert bereits',
+                create: 'Semester konnte nicht angelegt werden',
+                get: 'Semester konnten nicht geladen werden'
             }
         },
         sessionExpired: 'Sitzung ist abgelaufen',
@@ -168,7 +169,9 @@ const messages = {
                 create: 'Benutzer konnte nicht angelegt werden',
                 delete: 'Benutzer konnte nicht gelöscht werden',
                 get: 'Benutzer konnte nicht geladen werden',
-                save: 'Benutzer konnte nicht gespeichert werden'
+                matriculationNumberExists: 'Die Matrikelnummer ist bereits vergeben',
+                save: 'Benutzer konnte nicht gespeichert werden',
+                usernameExists: 'Der Benutzername ist bereits vergeben'
             },
             question: {
                 delete: 'Wollen Sie den Benutzer wirklich löschen?'
@@ -329,8 +332,9 @@ const messages = {
             winter: 'Winter semester',
             winterShortcut: 'WS',
             error:{
+                alreadyExists: 'Semester already exists',
                 get: 'Semester could not be loaded',
-                create: 'Semester could not be created',
+                create: 'Semester could not be created'
             }
         },
         sessionExpired: 'Session expired',
@@ -359,7 +363,9 @@ const messages = {
                 create: 'User could not be created',
                 delete: 'User could not be deleted',
                 get: 'User could not be loaded',
-                save: 'User could not be saved'
+                matriculationNumberExists: 'Matriculation number is already taken',
+                save: 'User could not be saved',
+                usernameExists: 'Username is already taken'
             },
             question: {
                 delete: 'Do you really want to delete this user?',

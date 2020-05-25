@@ -161,8 +161,19 @@ export default {
                         appendToast: true
                     });
                     this.getUsers();
-                }).catch(()=>{
-                    this.$bvToast.toast(this.$t('user.error.create'), {
+                }).catch(error=>{
+                    const status = error.response.data.errorResponseCode;
+                    let message;
+                    if(status === 470){
+                        message = this.$t('user.error.usernameExists');
+                    }
+                    else if(status === 471){
+                        message = this.$t('user.error.matriculationNumberExists');
+                    }
+                    else{
+                        message = this.$t('user.error.create');
+                    }
+                    this.$bvToast.toast(message, {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true
