@@ -33,10 +33,10 @@ CREATE TABLE IF NOT EXISTS COURSE
 CREATE TABLE IF NOT EXISTS USER_IN_COURSE
 (
     course_id       INT,
-    matrikel_Nummer VARCHAR(20),
+    matriculation_Number VARCHAR(20),
     role            VARCHAR(20),
-    PRIMARY KEY (course_id, matrikel_Nummer),
-    CONSTRAINT FOREIGN_KEY_USER FOREIGN KEY (matrikel_Nummer) references USER on delete cascade,
+    PRIMARY KEY (course_id, matriculation_Number),
+    CONSTRAINT FOREIGN_KEY_USER FOREIGN KEY (matriculation_Number) references USER on delete cascade,
     CONSTRAINT FOREIGN_KEY_COURSE FOREIGN KEY (course_id) references COURSE on delete cascade
 );
 
@@ -75,13 +75,13 @@ CREATE TABLE IF NOT EXISTS EXAMPLE
 CREATE TABLE IF NOT EXISTS FINISHES_EXAMPLE
 (
     example_id       INT,
-    matrikel_Nummer VARCHAR(20),
+    matriculation_Number VARCHAR(20),
     state            VARCHAR(5),
     reason  TEXT,
     valid   CHAR(1),
     attachment CLOB,
-    PRIMARY KEY (example_id, matrikel_Nummer),
-    CONSTRAINT FOREIGN_KEY_USER_FINISHES_EXAMPLE FOREIGN KEY (matrikel_Nummer) references USER on delete cascade,
+    PRIMARY KEY (example_id, matriculation_Number),
+    CONSTRAINT FOREIGN_KEY_USER_FINISHES_EXAMPLE FOREIGN KEY (matriculation_Number) references USER on delete cascade,
     CONSTRAINT FOREIGN_KEY_EXAMPLE_FINISHES_EXAMPLE FOREIGN KEY (example_id) references EXAMPLE on delete cascade
 );
 
