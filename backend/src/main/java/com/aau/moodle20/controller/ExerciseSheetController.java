@@ -48,39 +48,10 @@ public class ExerciseSheetController {
         return exerciseSheetService.getExerciseSheetsFromCourse(id);
     }
 
-    @GetMapping(value = "/fileTypes")
-    public List<FileTypeResponseObject> getFileTypes()  {
-        return exerciseSheetService.getFileTypes();
-    }
-
     @DeleteMapping(value = "/exerciseSheet/{id}")
     public ResponseEntity<?> deleteExerciseSheet(@PathVariable("id") long id) {
         exerciseSheetService.deleteExerciseSheet(id);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was successfully deleted!"));
 
-    }
-    @PutMapping(value = "/example")
-    public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody CreateExampleRequest createExampleRequest) throws ServiceValidationException {
-        ExampleResponseObject exampleResponseObject = exerciseSheetService.createExample(createExampleRequest);
-        return ResponseEntity.ok(exampleResponseObject);
-    }
-
-    @PostMapping(value = "/example")
-    public ResponseEntity<ExampleResponseObject> updateExerciseSheet(@Valid @RequestBody UpdateExampleRequest updateExampleRequest) throws ServiceValidationException {
-        ExampleResponseObject responseObject =  exerciseSheetService.updateExample(updateExampleRequest);
-        return ResponseEntity.ok(responseObject);
-    }
-
-
-    @DeleteMapping(value = "/example/{id}")
-    public ResponseEntity<?> deleteExample(@PathVariable("id") long id) throws ServiceValidationException {
-        exerciseSheetService.deleteExample(id);
-        return ResponseEntity.ok(new MessageResponse("Example was successfully deleted!"));
-
-    }
-
-    @GetMapping(value = "/example/{id}")
-    public ExampleResponseObject getExample(@PathVariable("id") long id) throws ServiceValidationException {
-        return exerciseSheetService.getExample(id);
     }
 }
