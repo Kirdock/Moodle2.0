@@ -16,6 +16,7 @@ import com.aau.moodle20.repository.UserInCourseRepository;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,6 +55,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     JwtUtils jwtUtils;
+
+    @Value("${adminMatriculationNumber}")
+    private String adminMatriculationNumber;
 
     @Override
     @Transactional
@@ -209,14 +213,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void deleteUser(String matriculationNumber)
+    public void deleteUser(String matriculationNumber) throws ServiceValidationException
     {
         Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
         if(!optionalUser.isPresent())
-            throw new UserException("User with the matriculationNumber:"+matriculationNumber+" does not exists");
+            throw new ServiceValidationException("User not found",HttpStatus.NOT_FOUND);
 
-        if(optionalUser.get().getAdmin())
-            throw new UserException("Admin user cannot be deleted");
+        if(optionalUser.get().getMatriculationNumber().equals(adminMatriculationNumber))
+            throw new ServiceValidationException("Super Admin user cannot be deleted!");
 
         userRepository.delete(optionalUser.get());
     }

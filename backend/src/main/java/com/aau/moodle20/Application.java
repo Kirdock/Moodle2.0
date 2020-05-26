@@ -35,6 +35,8 @@ public class Application implements ApplicationRunner, ErrorController {
 	private String adminUserName;
 	@Value("${adminPassword}")
 	private String adminPassword;
+	@Value("${adminMatriculationNumber}")
+	private String adminMatriculationNumber;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -44,7 +46,7 @@ public class Application implements ApplicationRunner, ErrorController {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		if (!userRepository.existsByUsername(adminUserName)) {
-			userRepository.save(new User(adminUserName,"123",adminUserName, adminPassword, encoder.encode(adminPassword), Boolean.TRUE) );
+			userRepository.save(new User(adminUserName,adminMatriculationNumber,adminUserName, adminPassword, encoder.encode(adminPassword), Boolean.TRUE) );
 		}
 		if (!fileTypeRepository.existsByName("Word")) {
 			fileTypeRepository.save(new FileType("Word", "application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
