@@ -2,10 +2,15 @@ package com.aau.moodle20.payload.request;
 
 import com.aau.moodle20.constants.ECourseRole;
 
+import javax.validation.constraints.NotNull;
+
 public class AssignUserToCourseRequest {
 
+    @NotNull
     private Long courseId;
+    @NotNull
     private String matriculationNumber;
+    @NotNull
     private ECourseRole role;
 
     public Long getCourseId() {

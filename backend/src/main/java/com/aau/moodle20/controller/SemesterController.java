@@ -88,10 +88,10 @@ public class SemesterController {
 
 
     @PostMapping(value = "/course/assign")
-    public ResponseEntity<?> assignCourseToSemester(  @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests)  throws SemesterException {
+    public ResponseEntity<?> assignCourseToSemester(@Valid  @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests)  throws SemesterException {
 
         semesterService.assignCourse(assignUserToCourseRequests);
-        return ResponseEntity.ok(new MessageResponse("User were sucessfully assigned to courses!"));
+        return ResponseEntity.ok(new MessageResponse("User were successfully assigned to courses!"));
     }
 
     @PostMapping(value = "/course/copy")

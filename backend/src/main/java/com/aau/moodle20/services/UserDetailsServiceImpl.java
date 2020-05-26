@@ -117,13 +117,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
 
-    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws UserException {
-        //TODO add validation
+    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws ServiceValidationException {
+
+        if(!courseRepository.existsById(courseId))
+            throw new ServiceValidationException("Error: course not found",HttpStatus.NOT_FOUND);
+
         List<UserResponseObject> userResponseObjectList = new ArrayList<>();
         List<UserInCourse> userInCourses = userInCourseRepository.findByCourse_Id(courseId);
-        List<User> allUser = getAllUsers();
+        List<User> allUsers = getAllUsers();
+        allUsers.removeIf(User::getAdmin);
 
-        for (User user : allUser) {
+        for (User user : allUsers) {
             UserResponseObject responseObject =  user.createUserResponseObject();
             Optional<ECourseRole> role = userInCourses.stream()
                     .filter(userInCourse -> user.getMatriculationNumber().equals(userInCourse.getUser().getMatriculationNumber()))
