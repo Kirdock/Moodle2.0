@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS USER
     username        VARCHAR(50)  NOT NULL,
     forename        VARCHAR(50),
     is_Admin            CHAR(5),
+    email           VARCHAR(200),
     surname         VARCHAR(50)
 );
 
