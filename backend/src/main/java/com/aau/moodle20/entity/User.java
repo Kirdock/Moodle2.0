@@ -31,6 +31,7 @@ public class User {
 
     private String forename;
     private String surname;
+    private String email;
 
     @OneToMany(mappedBy = "user")
     private Set<UserInCourse> courses;
@@ -117,6 +118,14 @@ public class User {
         isAdmin = admin;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public UserResponseObject createUserResponseObject()
     {
         UserResponseObject responseObject = new UserResponseObject();
@@ -124,6 +133,8 @@ public class User {
         responseObject.setSurname(getSurname());
         responseObject.setForename(getForename());
         responseObject.setMatriculationNumber(getMatriculationNumber());
+        responseObject.setEmail(getEmail());
+        responseObject.setAdmin(getAdmin());
 
         return responseObject;
     }

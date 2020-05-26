@@ -8,8 +8,6 @@ import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
-import com.aau.moodle20.payload.response.AbstractUserResponseObject;
-import com.aau.moodle20.payload.response.UserCourseResponseObject;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
@@ -34,6 +32,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -118,16 +117,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
 
-    public List<UserCourseResponseObject> getUsersWithCourseRoles(Long courseId) throws UserException {
+    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws UserException {
         //TODO add validation
-        List<UserCourseResponseObject> userResponseObjectList = new ArrayList<>();
+        List<UserResponseObject> userResponseObjectList = new ArrayList<>();
         List<UserInCourse> userInCourses = userInCourseRepository.findByCourse_Id(courseId);
         List<User> allUser = getAllUsers();
 
         for (User user : allUser) {
-            UserCourseResponseObject responseObject = new UserCourseResponseObject();
-            fillResponseObject(user,responseObject);
-
+            UserResponseObject responseObject =  user.createUserResponseObject();
             Optional<ECourseRole> role = userInCourses.stream()
                     .filter(userInCourse -> user.getMatriculationNumber().equals(userInCourse.getUser().getMatriculationNumber()))
                     .map(UserInCourse::getRole)
@@ -170,34 +167,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public List<UserResponseObject> getAllUserResponseObjects(String jwtToken) throws UserException
+    public List<UserResponseObject> getAllUses() throws UserException
     {
-        Boolean isAdmin = jwtUtils.getAdminFromJwtToken(jwtToken.split(" ")[1].trim());
-
-        List<UserResponseObject> userResponseObjectList = new ArrayList<>();
-        List<User> allUsers = getAllUsers();
-        for(User user: allUsers)
-        {
-            UserResponseObject responseObject= new UserResponseObject();
-            fillResponseObject(user,responseObject);
-            if(isAdmin)
-              responseObject.setAdmin(user.getAdmin());
-            userResponseObjectList.add(responseObject);
-        }
-
+        List<UserResponseObject> userResponseObjectList = getAllUsers().stream().map(User::createUserResponseObject).collect(Collectors.toList());
         return userResponseObjectList;
-    }
-
-    /**
-     * creates a user response object from the given user entity object
-     * @param user
-     */
-    protected void fillResponseObject(User user,AbstractUserResponseObject responseObject)
-    {
-        responseObject.setForename(user.getForename());
-        responseObject.setSurname(user.getSurname());
-        responseObject.setMatriculationNumber(user.getMatriculationNumber());
-        responseObject.setUsername(user.getUsername());
     }
 
     public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)
@@ -235,9 +208,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
         if(!optionalUser.isPresent())
          throw new ServiceValidationException("Error: user with given matriculationNumber not found", HttpStatus.NOT_FOUND);
-        UserResponseObject responseObject = new UserResponseObject();
-        fillResponseObject(optionalUser.get(),responseObject);
-
-        return responseObject;
+       return optionalUser.get().createUserResponseObject();
     }
 }
