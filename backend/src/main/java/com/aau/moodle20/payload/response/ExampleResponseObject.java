@@ -15,6 +15,7 @@ public class ExampleResponseObject {
 
     private Long id;
     private Long exerciseSheetId;
+    private Long parentId;
     private String name;
     private String description;
     private Integer points;
@@ -25,6 +26,7 @@ public class ExampleResponseObject {
     List<FileTypeResponseObject> supportedFileTypes;
     private List<ExampleResponseObject> subExamples;
     private Boolean submitFile;
+
 
     public Long getId() {
         return id;
@@ -120,5 +122,13 @@ public class ExampleResponseObject {
 
     public void setSubmitFile(Boolean submitFile) {
         this.submitFile = submitFile;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 }

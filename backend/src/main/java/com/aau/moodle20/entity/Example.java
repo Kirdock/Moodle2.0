@@ -1,12 +1,10 @@
 package com.aau.moodle20.entity;
 
-import com.aau.moodle20.payload.request.AbstractExampleRequest;
-import com.aau.moodle20.payload.request.CreateExampleRequest;
+import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -153,21 +151,26 @@ public class Example {
         this.submitFile = submitFile;
     }
 
-    public void fillValuesFromRequestObject(AbstractExampleRequest abstractExampleRequest)
-    {
-        setName(abstractExampleRequest.getName());
-        setDescription(abstractExampleRequest.getDescription());
-        setMandatory(abstractExampleRequest.getMandatory());
-        setOrder(abstractExampleRequest.getOrder());
-        setPoints(abstractExampleRequest.getPoints());
-        setValidator(abstractExampleRequest.getValidator());
-        setWeighting(abstractExampleRequest.getWeighting());
-        setSubmitFile(abstractExampleRequest.getSubmitFile());
+    public void fillValuesFromRequestObject(ExampleRequest exampleRequest) {
+        setName(exampleRequest.getName());
+        setDescription(exampleRequest.getDescription());
+        setMandatory(exampleRequest.getMandatory());
+        setOrder(exampleRequest.getOrder());
+        setPoints(exampleRequest.getPoints());
+        setValidator(exampleRequest.getValidator());
+        setWeighting(exampleRequest.getWeighting());
+        setSubmitFile(exampleRequest.getSubmitFile());
+        if (exampleRequest.getParentId() != null)
+            setParentExample(new Example(exampleRequest.getParentId()));
+        if (exampleRequest.getExerciseSheetId() != null)
+            setExerciseSheet(new ExerciseSheet(exampleRequest.getExerciseSheetId()));
     }
-    public ExampleResponseObject createExampleResponseObject()
-    {
+
+    public ExampleResponseObject createExampleResponseObject() {
         ExampleResponseObject exampleResponseObject = new ExampleResponseObject();
         exampleResponseObject.setId(getId());
+        if (getParentExample() != null)
+            exampleResponseObject.setParentId(getParentExample().getId());
         exampleResponseObject.setDescription(getDescription());
         exampleResponseObject.setMandatory(getMandatory());
         exampleResponseObject.setName(getName());
@@ -176,16 +179,15 @@ public class Example {
         exampleResponseObject.setOrder(getOrder());
         exampleResponseObject.setValidator(getValidator());
         exampleResponseObject.setSubmitFile(getSubmitFile());
-        exampleResponseObject.setExerciseSheetId(getExerciseSheet()!=null?getExerciseSheet().getId():null);
-        if (getSupportFileTypes() != null)
-        {
+
+        if (getExerciseSheet() != null)
+            exampleResponseObject.setExerciseSheetId(getExerciseSheet().getId());
+        if (getSupportFileTypes() != null) {
             List<FileTypeResponseObject> fileTypeResponseObjects = getSupportFileTypes().stream()
                     .map(supportFileType -> supportFileType.getFileType().createFileTypeResponseObjectOnlyId())
                     .collect(Collectors.toList());
             exampleResponseObject.setSupportedFileTypes(fileTypeResponseObjects);
         }
-        if (getSubExamples() != null)
-            exampleResponseObject.setSubExamples(getSubExamples().stream().map(Example::createExampleResponseObject).collect(Collectors.toList()));
 
         return exampleResponseObject;
     }
