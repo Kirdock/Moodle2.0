@@ -36,9 +36,9 @@ public class JwtUtils {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .claim(CLAIM_IS_ADMIN,userPrincipal.getAdmin())
-                .claim(CLAIM_MATRICULATION_NUMBER, userPrincipal.getMatrikelNumber())
+                .claim(CLAIM_MATRICULATION_NUMBER, userPrincipal.getMatriculationNumber())
                 .claim(CLAIM_FORENAME,userPrincipal.getForename())
-                .claim(CLAIM_SURNAME,userPrincipal.getSurename())
+                .claim(CLAIM_SURNAME,userPrincipal.getSurname())
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }

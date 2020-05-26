@@ -17,22 +17,22 @@ public class UserDetailsImpl implements UserDetails {
 
     private String username;
     private Boolean isAdmin;
-    private String matrikelNumber;
+    private String matriculationNumber;
     private String forename;
-    private String surename;
+    private String surname;
 
     @JsonIgnore
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(String username, String password, Boolean isAdmin, String matrikelNumber, String forename, String surename) {
+    public UserDetailsImpl(String username, String password, Boolean isAdmin, String matriculationNumber, String forename, String surname) {
         this.username = username;
         this.password = password;
         this.isAdmin = isAdmin;
-        this.matrikelNumber = matrikelNumber;
+        this.matriculationNumber = matriculationNumber;
         this.forename = forename;
-        this.surename = surename;
+        this.surname = surname;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -97,12 +97,12 @@ public class UserDetailsImpl implements UserDetails {
         isAdmin = admin;
     }
 
-    public String getMatrikelNumber() {
-        return matrikelNumber;
+    public String getMatriculationNumber() {
+        return matriculationNumber;
     }
 
-    public void setMatrikelNumber(String matrikelNumber) {
-        this.matrikelNumber = matrikelNumber;
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
     }
 
     public String getForename() {
@@ -113,12 +113,12 @@ public class UserDetailsImpl implements UserDetails {
         this.forename = forename;
     }
 
-    public String getSurename() {
-        return surename;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setSurename(String surename) {
-        this.surename = surename;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
@@ -133,6 +133,6 @@ public class UserDetailsImpl implements UserDetails {
             return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
         return
-                Objects.equals(matrikelNumber, user.matrikelNumber);
+                Objects.equals(matriculationNumber, user.matriculationNumber);
     }
 }

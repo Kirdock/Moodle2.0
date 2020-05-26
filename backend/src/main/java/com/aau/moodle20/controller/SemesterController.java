@@ -71,6 +71,13 @@ public class SemesterController {
         return ResponseEntity.ok(new MessageResponse("Course was sucessfully updated!"));
     }
 
+    @PostMapping(value = "/course/template")
+    public ResponseEntity<?> updateCourseDescriptionTemplate(@Valid  @RequestBody UpdateCourseDescriptionTemplate updateCourseDescriptionTemplate)  throws SemesterException {
+
+        semesterService.updateCourseDescriptionTemplate(updateCourseDescriptionTemplate);
+        return ResponseEntity.ok(new MessageResponse("Course Description Template was sucessfully updated!"));
+    }
+
     @PreAuthorize("hasAuthority('Admin')")
     @DeleteMapping(value = "/course/{courseId}")
     public ResponseEntity<?> deleteCourse(@PathVariable("courseId") long courseId)  throws SemesterException {

@@ -16,6 +16,7 @@ import com.aau.moodle20.repository.UserInCourseRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class SemesterService {
         semesterRepository.save(semester);
     }
 
-    public void createCourse(CreateCourseRequest createCourseRequest) throws SemesterException {
+    public void createCourse(CreateCourseRequest createCourseRequest) throws ServiceValidationException {
 
         checkIfSemesterExists(createCourseRequest.getSemesterId());
         if(courseRepository.existsByNameAndNumberAndSemester_Id(createCourseRequest.getName(),createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
@@ -66,11 +67,10 @@ public class SemesterService {
         course.setNumber(createCourseRequest.getNumber());
         course.setSemester(new Semester(createCourseRequest.getSemesterId()));
         course.setOwner(new User(createCourseRequest.getOwner()));
-        course.setDescriptionTemplate(createCourseRequest.getDescriptionTemplate());
         courseRepository.save(course);
     }
 
-    public void updateCourse(UpdateCourseRequest updateCourseRequest) throws SemesterException {
+    public void updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceValidationException {
         checkIfCourseExists(updateCourseRequest.getId());
 
         Course course = null;
@@ -81,8 +81,21 @@ public class SemesterService {
             course.setMinPoints(updateCourseRequest.getMinPoints());
             course.setName(updateCourseRequest.getName());
             course.setNumber(updateCourseRequest.getNumber());
-            course.setDescriptionTemplate(updateCourseRequest.getDescriptionTemplate());
         }
+        courseRepository.save(course);
+    }
+
+    public void updateCourseDescriptionTemplate(UpdateCourseDescriptionTemplate updateCourseDescriptionTemplate) throws ServiceValidationException
+    {
+        if(!courseRepository.existsById(updateCourseDescriptionTemplate.getId()))
+            throw new ServiceValidationException("Error: course not found",HttpStatus.NOT_FOUND);
+
+        Course course = courseRepository.findById(updateCourseDescriptionTemplate.getId()).get();
+        UserDetailsImpl userDetails = getUserDetails();
+        if(!userDetails.getAdmin() || !userDetails.getMatriculationNumber().equals(course.getOwner().getMatriculationNumber()))
+            throw new ServiceValidationException("Error: not authorized to update course",HttpStatus.UNAUTHORIZED);
+
+        course.setDescriptionTemplate(updateCourseDescriptionTemplate.getDescription());
         courseRepository.save(course);
     }
 
@@ -173,12 +186,12 @@ public class SemesterService {
         return responseObject;
     }
 
-    protected void checkIfCourseExists(Long courseId) throws EntityNotFoundException {
-        if (!courseRepository.existsById(courseId)) throw new EntityNotFoundException("Error: Course not found");
+    protected void checkIfCourseExists(Long courseId) throws ServiceValidationException {
+        if (!courseRepository.existsById(courseId)) throw new ServiceValidationException("Error: Course not found",HttpStatus.NOT_FOUND);
     }
 
-    protected void checkIfSemesterExists(Long semesterId) throws EntityNotFoundException {
-        if (!semesterRepository.existsById(semesterId)) throw new EntityNotFoundException("Error: Semester not found");
+    protected void checkIfSemesterExists(Long semesterId) throws ServiceValidationException {
+        if (!semesterRepository.existsById(semesterId)) throw new ServiceValidationException("Error: Semester not found",HttpStatus.NOT_FOUND);
     }
 
     public void copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException {
@@ -191,5 +204,9 @@ public class SemesterService {
         Course copiedCourse =optionalCourse.get().copyCourse();
         copiedCourse.setSemester(new Semester(copyCourseRequest.getSemesterId()));
         courseRepository.save(copiedCourse);
+    }
+
+    public UserDetailsImpl getUserDetails() {
+        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
