@@ -51,7 +51,7 @@ public class UserResponseObject {
         this.surname = surname;
     }
 
-    public Boolean getAdmin() {
+    public Boolean getIsAdmin() {
         return isAdmin;
     }
 
