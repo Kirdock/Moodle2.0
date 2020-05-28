@@ -181,6 +181,10 @@ public class Example {
         exampleResponseObject.setValidator(getValidator());
         exampleResponseObject.setSubmitFile(getSubmitFile());
 
+        if(getSubExamples()!=null)
+            exampleResponseObject.setSubExamples(getSubExamples().stream()
+                    .map(Example::createExampleResponseObject).collect(Collectors.toList()));
+
         if (getExerciseSheet() != null)
             exampleResponseObject.setExerciseSheetId(getExerciseSheet().getId());
         if (getSupportFileTypes() != null) {

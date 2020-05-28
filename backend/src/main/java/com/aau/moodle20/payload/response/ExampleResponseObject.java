@@ -6,6 +6,7 @@ import com.aau.moodle20.entity.FileType;
 import com.aau.moodle20.entity.SupportFileType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class ExampleResponseObject {
     private Integer order;
     private String validator;
     List<FileTypeResponseObject> supportedFileTypes;
-    private List<ExampleResponseObject> subExamples;
+    private List<ExampleResponseObject> subExamples = new ArrayList<>();
     private Boolean submitFile;
 
 
