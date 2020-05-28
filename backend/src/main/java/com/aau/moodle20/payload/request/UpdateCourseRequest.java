@@ -13,6 +13,7 @@ public class UpdateCourseRequest {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
+    private Boolean includeThird;
 
     public Long getId() {
         return id;
@@ -54,4 +55,11 @@ public class UpdateCourseRequest {
         this.minPoints = minPoints;
     }
 
+    public Boolean getIncludeThird() {
+        return includeThird;
+    }
+
+    public void setIncludeThird(Boolean includeThird) {
+        this.includeThird = includeThird;
+    }
 }

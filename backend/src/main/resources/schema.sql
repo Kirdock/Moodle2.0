@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS COURSE
     min_Points  Number(10),
     owner       VARCHAR(20),
     description_Template CLOB,
+    include_Third            CHAR(5),
     CONSTRAINT FOREIGN_KEY_SEMESTER FOREIGN KEY (semester_id) references SEMESTER on delete cascade ,
     CONSTRAINT FOREIGN_KEY_OWNER FOREIGN KEY (owner) references USER on delete cascade
 );

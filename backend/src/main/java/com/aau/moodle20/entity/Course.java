@@ -23,6 +23,7 @@ public class Course {
     private Integer minKreuzel;
     private Integer minPoints;
     private String descriptionTemplate;
+    private Boolean includeThird;
 
     @OneToMany(
             mappedBy = "course",
@@ -126,6 +127,14 @@ public class Course {
         this.exerciseSheets = exerciseSheets;
     }
 
+    public Boolean getIncludeThird() {
+        return includeThird;
+    }
+
+    public void setIncludeThird(Boolean includeThird) {
+        this.includeThird = includeThird;
+    }
+
     public Course copy()
     {
         Course course = new Course();
@@ -135,6 +144,7 @@ public class Course {
         course.setNumber(getNumber());
         course.setOwner(getOwner());
         course.setDescriptionTemplate(getDescriptionTemplate());
+        course.setIncludeThird(getIncludeThird());
 
         return course;
     }

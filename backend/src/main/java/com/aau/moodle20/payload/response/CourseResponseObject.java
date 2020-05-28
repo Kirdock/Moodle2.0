@@ -12,6 +12,7 @@ public class CourseResponseObject {
     private List<ExerciseSheetResponseObject> exerciseSheets;
     private String descriptionTemplate;
     private String owner;
+    private Boolean includeThird;
 
     public CourseResponseObject()
     {
@@ -80,5 +81,13 @@ public class CourseResponseObject {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public Boolean getIncludeThird() {
+        return includeThird;
+    }
+
+    public void setIncludeThird(Boolean includeThird) {
+        this.includeThird = includeThird;
     }
 }

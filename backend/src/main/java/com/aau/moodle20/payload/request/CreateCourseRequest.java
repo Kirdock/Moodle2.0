@@ -12,6 +12,7 @@ public class CreateCourseRequest {
     private Integer minKreuzel;
     private Integer minPoints;
     private String owner;
+    private Boolean includeThird;
 
     public Long getSemesterId() {
         return semesterId;
@@ -61,4 +62,11 @@ public class CreateCourseRequest {
         this.owner = owner;
     }
 
+    public Boolean getIncludeThird() {
+        return includeThird;
+    }
+
+    public void setIncludeThird(Boolean includeThird) {
+        this.includeThird = includeThird;
+    }
 }
