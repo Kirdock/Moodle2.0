@@ -1,6 +1,7 @@
 package com.aau.moodle20.payload.request;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class SignUpRequest {
 
@@ -14,7 +15,7 @@ public class SignUpRequest {
     private String forename;
     @NotBlank
     private String surname;
-    private String admin;
+    @NotNull
     private Boolean isAdmin;
 
     public String getUsername() {
@@ -49,15 +50,11 @@ public class SignUpRequest {
         this.surname = surname;
     }
 
-    public String getAdmin() {
-        return admin;
+    public Boolean getIsAdmin() {
+        return isAdmin;
     }
 
-    public void setAdmin(Boolean admin) {
-        isAdmin = admin;
-    }
-
-    public void setAdmin(String admin) {
-        this.admin = admin;
+    public void setIsAdmin(Boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

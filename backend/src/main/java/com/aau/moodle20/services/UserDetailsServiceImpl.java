@@ -86,8 +86,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setForename(signUpRequest.getForename());
         user.setSurname(signUpRequest.getSurname());
         user.setPassword(password);
-        user.setAdmin(Boolean.FALSE);
-        userRepository.save(user);
+        user.setAdmin(signUpRequest.getIsAdmin());
+         userRepository.save(user);
     }
 
 
