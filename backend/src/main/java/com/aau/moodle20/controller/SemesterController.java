@@ -34,7 +34,6 @@ public class SemesterController {
         return ResponseEntity.ok(new MessageResponse("Semester was sucessfully created!"));
     }
 
-    @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(value = "/semesters")
     public List<Semester> getSemesters()  {
         return semesterService.getSemesters();

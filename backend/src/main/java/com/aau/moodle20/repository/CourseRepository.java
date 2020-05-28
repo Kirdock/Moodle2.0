@@ -15,6 +15,9 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
     Boolean existsByNameAndNumberAndSemester_Id(String name,String number, Long semesterId);
 
     Boolean existsByOwner_MatriculationNumber(String matriculationNumber);
+
+    List<Course> findByOwner_MatriculationNumber(String matriculationNumber);
+
 }
 
 
