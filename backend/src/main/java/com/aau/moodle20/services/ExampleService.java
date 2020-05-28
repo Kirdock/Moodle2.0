@@ -52,8 +52,12 @@ public class ExampleService {
         exampleRepository.save(example);
         supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest);
         supportFileTypeRepository.saveAll(supportFileTypes);
-        example.setSupportFileTypes(new HashSet<>(supportFileTypes));
-        return example.createExampleResponseObject();
+
+        ExampleResponseObject responseObject = new ExampleResponseObject();
+        responseObject.setId(example.getId());
+        responseObject.setSubExamples(null);
+
+        return responseObject;
     }
 
 

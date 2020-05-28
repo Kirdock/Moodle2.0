@@ -1,16 +1,12 @@
 package com.aau.moodle20.payload.response;
 
 import com.aau.moodle20.entity.Example;
-import com.aau.moodle20.entity.ExerciseSheet;
-import com.aau.moodle20.entity.FileType;
-import com.aau.moodle20.entity.SupportFileType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExampleResponseObject {
 
 
@@ -28,6 +24,13 @@ public class ExampleResponseObject {
     private List<ExampleResponseObject> subExamples = new ArrayList<>();
     private Boolean submitFile;
 
+
+    public ExampleResponseObject(){
+    }
+
+    public ExampleResponseObject(Long id){
+        this.id = id;
+    }
 
     public Long getId() {
         return id;
