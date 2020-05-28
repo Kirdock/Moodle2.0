@@ -184,8 +184,10 @@ public class SemesterService {
         return responseObjects;
     }
 
-    public CourseResponseObject getCourse(long courseId, String jwtToken) throws SemesterException {
-        Boolean isAdmin = jwtUtils.getAdminFromJwtToken(jwtToken.split(" ")[1].trim());
+    public CourseResponseObject getCourse(long courseId) throws SemesterException {
+
+        UserDetailsImpl userDetails = getUserDetails();
+
         checkIfCourseExists(courseId);
         Course course = courseRepository.findById(courseId).get();
         List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
@@ -201,8 +203,8 @@ public class SemesterService {
                 .map(ExerciseSheet::getResponseObject)
                 .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
                 .collect(Collectors.toList()));
-        if(isAdmin)
-            responseObject.setOwner(course.getOwner().createUserResponseObject());
+        if(userDetails.getAdmin())
+            responseObject.setOwner(course.getOwner().getMatriculationNumber());
 
         return responseObject;
     }
