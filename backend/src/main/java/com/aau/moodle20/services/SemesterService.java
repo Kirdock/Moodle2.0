@@ -2,6 +2,7 @@ package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.entity.*;
+import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import com.aau.moodle20.entity.embeddable.UserCourseKey;
 import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.SemesterException;
@@ -9,20 +10,15 @@ import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
-import com.aau.moodle20.repository.CourseRepository;
-import com.aau.moodle20.repository.ExerciseSheetRepository;
-import com.aau.moodle20.repository.SemesterRepository;
-import com.aau.moodle20.repository.UserInCourseRepository;
+import com.aau.moodle20.repository.*;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +38,17 @@ public class SemesterService {
 
     @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    FileTypeRepository fileTypeRepository;
+    @Autowired
+    SupportFileTypeRepository supportFileTypeRepository;
+
+    @Autowired
+    ExampleRepository exampleRepository;
+
+
+
 
 
     public void createSemester(CreateSemesterRequest createSemesterRequest) throws ServiceValidationException {
@@ -194,6 +201,7 @@ public class SemesterService {
         if (!semesterRepository.existsById(semesterId)) throw new ServiceValidationException("Error: Semester not found",HttpStatus.NOT_FOUND);
     }
 
+    @Transactional
     public void copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException {
         Optional<Course> optionalCourse = courseRepository.findById(copyCourseRequest.getCourseId());
         if (!optionalCourse.isPresent())
@@ -201,9 +209,70 @@ public class SemesterService {
         if (!semesterRepository.existsById(copyCourseRequest.getSemesterId()))
             throw new ServiceValidationException("Error: Semester not found", HttpStatus.NOT_FOUND);
 
-        Course copiedCourse =optionalCourse.get().copyCourse();
+        Course originalCourse = optionalCourse.get();
+
+        // first copy course
+        Course copiedCourse = originalCourse.copy();
         copiedCourse.setSemester(new Semester(copyCourseRequest.getSemesterId()));
         courseRepository.save(copiedCourse);
+
+        if (originalCourse.getExerciseSheets() == null || originalCourse.getExerciseSheets().isEmpty())
+            return;
+
+        for (ExerciseSheet exerciseSheet : originalCourse.getExerciseSheets()) {
+            // second copy exercise sheet
+            ExerciseSheet copiedExerciseSheet = exerciseSheet.copy();
+            copiedExerciseSheet.setCourse(copiedCourse);
+            exerciseSheetRepository.save(copiedExerciseSheet);
+
+            if (exerciseSheet.getExamples() == null)
+                continue;
+
+            for (Example example : exerciseSheet.getExamples()) {
+
+                // if true example is subExample and this is handled below
+                if (example.getParentExample() != null)
+                    continue;
+
+                Example copiedExample = example.copy();
+                copiedExample.setExerciseSheet(copiedExerciseSheet);
+                exampleRepository.save(copiedExample);
+
+                if (example.getSubExamples() != null) {
+                    for (Example subExample : example.getSubExamples()) {
+                        Example copiedSubExample = subExample.copy();
+                        copiedSubExample.setExerciseSheet(copiedExerciseSheet);
+                        copiedSubExample.setParentExample(copiedExample);
+                        exampleRepository.save(copiedSubExample);
+                        if (subExample.getSupportFileTypes() != null) {
+                            copySupportFileType(subExample.getSupportFileTypes(), copiedSubExample);
+                        }
+                    }
+                }
+
+                if (example.getSupportFileTypes() == null)
+                    continue;
+
+                copySupportFileType(example.getSupportFileTypes(), copiedExample);
+            }
+        }
+    }
+
+    protected  void copySupportFileType(Set<SupportFileType> supportFileTypes, Example copiedExample)
+    {
+        for (SupportFileType supportFileType : supportFileTypes) {
+
+            SupportFileType copiedSupportFileType = new SupportFileType();
+
+            SupportFileTypeKey supportFileTypeKey = new SupportFileTypeKey();
+            supportFileTypeKey.setExampleId(copiedExample.getId());
+            supportFileTypeKey.setFileTypeId(supportFileType.getFileType().getId());
+
+            copiedSupportFileType.setExample(copiedExample);
+            copiedSupportFileType.setId(supportFileTypeKey);
+            copiedSupportFileType.setFileType(supportFileType.getFileType());
+            supportFileTypeRepository.save(copiedSupportFileType);
+        }
     }
 
     public UserDetailsImpl getUserDetails() {

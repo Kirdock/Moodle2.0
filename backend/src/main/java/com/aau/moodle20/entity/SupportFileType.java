@@ -50,4 +50,12 @@ public class SupportFileType {
     public void setFileType(FileType fileType) {
         this.fileType = fileType;
     }
+
+    public SupportFileType copy()
+    {
+        SupportFileType supportFileType = new SupportFileType();
+        supportFileType.setFileType(getFileType());
+        supportFileType.setExample(getExample());
+        return supportFileType;
+    }
 }

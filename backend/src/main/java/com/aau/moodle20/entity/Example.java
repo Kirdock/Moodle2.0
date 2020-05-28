@@ -3,6 +3,7 @@ package com.aau.moodle20.entity;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -25,7 +26,7 @@ public class Example {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parentExample_id", referencedColumnName = "id")
     private Example parentExample;
-    @OneToMany(mappedBy="parentExample", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(mappedBy="parentExample", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval=true)
     private Set<Example> subExamples = new HashSet<Example>();
 
     private String name;
@@ -190,5 +191,21 @@ public class Example {
         }
 
         return exampleResponseObject;
+    }
+
+    public Example copy()
+    {
+        Example example = new Example();
+        example.setSubmitFile(getSubmitFile());
+        example.setWeighting(getWeighting());
+        example.setValidator(getValidator());
+        example.setPoints(getPoints());
+        example.setOrder(getOrder());
+        example.setMandatory(getMandatory());
+        example.setName(getName());
+        example.setDescription(getDescription());
+
+
+        return example;
     }
 }

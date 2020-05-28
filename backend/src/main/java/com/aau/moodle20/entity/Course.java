@@ -1,7 +1,11 @@
 package com.aau.moodle20.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name ="course")
@@ -19,6 +23,14 @@ public class Course {
     private Integer minKreuzel;
     private Integer minPoints;
     private String descriptionTemplate;
+
+    @OneToMany(
+            mappedBy = "course",
+            cascade = CascadeType.PERSIST,
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    private Set<ExerciseSheet> exerciseSheets;
 
     @OneToMany(mappedBy = "course")
     Set<UserInCourse> students; // TODO find better name
@@ -106,7 +118,15 @@ public class Course {
         this.descriptionTemplate = descriptionTemplate;
     }
 
-    public Course copyCourse()
+    public Set<ExerciseSheet> getExerciseSheets() {
+        return exerciseSheets;
+    }
+
+    public void setExerciseSheets(Set<ExerciseSheet> exerciseSheets) {
+        this.exerciseSheets = exerciseSheets;
+    }
+
+    public Course copy()
     {
         Course course = new Course();
         course.setMinKreuzel(getMinKreuzel());

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -133,5 +134,18 @@ public class ExerciseSheet {
 
     public void setExamples(Set<Example> examples) {
         this.examples = examples;
+    }
+
+    public ExerciseSheet copy()
+    {
+        ExerciseSheet exerciseSheet = new ExerciseSheet();
+        exerciseSheet.setDescription(getDescription());
+        exerciseSheet.setIssueDate(getIssueDate());
+        exerciseSheet.setMinKreuzel(getMinKreuzel());
+        exerciseSheet.setMinPoints(getMinPoints());
+        exerciseSheet.setSubmissionDate(getSubmissionDate());
+        exerciseSheet.setName(getName());
+
+        return exerciseSheet;
     }
 }
