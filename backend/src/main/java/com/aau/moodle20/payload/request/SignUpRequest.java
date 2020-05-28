@@ -17,6 +17,7 @@ public class SignUpRequest {
     private String surname;
     @NotNull
     private Boolean isAdmin;
+    private String email;
 
     public String getUsername() {
         return username;
@@ -56,5 +57,13 @@ public class SignUpRequest {
 
     public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
