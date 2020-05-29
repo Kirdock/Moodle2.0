@@ -6,10 +6,7 @@ import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -202,9 +199,12 @@ public class Example {
         exampleResponseObject.setCustomFileTypes(getCustomFileTypesList());
         exampleResponseObject.setSubmitFile(getSubmitFile());
 
-        if(getSubExamples()!=null)
+        if(getSubExamples()!=null) {
             exampleResponseObject.setSubExamples(getSubExamples().stream()
                     .map(Example::createExampleResponseObject).collect(Collectors.toList()));
+            exampleResponseObject.getSubExamples().sort(Comparator.comparing(ExampleResponseObject::getOrder));
+
+        }
 
         if (getExerciseSheet() != null)
             exampleResponseObject.setExerciseSheetId(getExerciseSheet().getId());

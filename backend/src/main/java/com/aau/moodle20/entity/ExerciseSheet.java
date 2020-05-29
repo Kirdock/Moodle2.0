@@ -1,10 +1,12 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -117,11 +119,14 @@ public class ExerciseSheet {
         responseObject.setSubmissionDate(getSubmissionDate());
         responseObject.setIssueDate(getIssueDate());
         responseObject.setDescription(getDescription());
-        if (getExamples() != null)
+        if (getExamples() != null) {
             responseObject.setExamples(getExamples().stream()
-                    .filter(example -> example.getParentExample()==null)
+                    .filter(example -> example.getParentExample() == null)
                     .map(Example::createExampleResponseObject)
                     .collect(Collectors.toList()));
+
+            responseObject.getExamples().sort(Comparator.comparing(ExampleResponseObject::getOrder));
+        }
 
         responseObject.setCourseName(course.getName());
         responseObject.setCourseNumber(course.getNumber());
