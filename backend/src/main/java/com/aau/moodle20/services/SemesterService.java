@@ -234,7 +234,7 @@ public class SemesterService {
     }
 
     @Transactional
-    public void copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException {
+    public CourseResponseObject copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException {
         Optional<Course> optionalCourse = courseRepository.findById(copyCourseRequest.getCourseId());
         if (!optionalCourse.isPresent())
             throw new ServiceValidationException("Error: Course not found", HttpStatus.NOT_FOUND);
@@ -249,7 +249,11 @@ public class SemesterService {
         courseRepository.save(copiedCourse);
 
         if (originalCourse.getExerciseSheets() == null || originalCourse.getExerciseSheets().isEmpty())
-            return;
+        {
+            CourseResponseObject courseResponseObject = new CourseResponseObject();
+            courseResponseObject.setId(copiedCourse.getId());
+            return courseResponseObject;
+        }
 
         for (ExerciseSheet exerciseSheet : originalCourse.getExerciseSheets()) {
             // second copy exercise sheet
@@ -288,6 +292,9 @@ public class SemesterService {
                 copySupportFileType(example.getSupportFileTypes(), copiedExample);
             }
         }
+        CourseResponseObject responseObject = new CourseResponseObject();
+        responseObject.setId(copiedCourse.getId());
+        return responseObject;
     }
 
     protected  void copySupportFileType(Set<SupportFileType> supportFileTypes, Example copiedExample)

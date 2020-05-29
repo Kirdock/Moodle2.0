@@ -95,7 +95,7 @@ public class SemesterController {
     @PostMapping(value = "/course/copy")
     public ResponseEntity<?> assignCourseToSemester(@Valid  @RequestBody CopyCourseRequest copyCourseRequest)  throws ServiceValidationException {
 
-        semesterService.copyCourse(copyCourseRequest);
-        return ResponseEntity.ok(new MessageResponse("Course was successfully copied!"));
+        CourseResponseObject responseObject = semesterService.copyCourse(copyCourseRequest);
+        return ResponseEntity.ok(responseObject);
     }
 }
