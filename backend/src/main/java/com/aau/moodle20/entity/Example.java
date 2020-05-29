@@ -152,7 +152,7 @@ public class Example {
 
     public List<String> getCustomFileTypesList() {
         List<String> list = new ArrayList<>();
-        if (customFileTypes != null) {
+        if (customFileTypes != null && customFileTypes.length()>0) {
             String[] array = customFileTypes.split(",");
             if (array != null && array.length > 0) {
                 for (int i = 0; i < array.length; i++)
@@ -164,7 +164,7 @@ public class Example {
 
     public void setCustomFileTypesList(List<String> customFileTypesList)
     {
-        if(customFileTypesList!=null)
+        if(customFileTypesList!=null && !customFileTypesList.isEmpty())
         {
            this.customFileTypes = customFileTypesList.stream().collect(Collectors.joining(","));
         }
