@@ -108,7 +108,7 @@ public class SemesterService {
 
         Course course = courseRepository.findById(updateCourseDescriptionTemplate.getId()).get();
         UserDetailsImpl userDetails = getUserDetails();
-        if(!userDetails.getAdmin() || !userDetails.getMatriculationNumber().equals(course.getOwner().getMatriculationNumber()))
+        if(!userDetails.getAdmin() && !userDetails.getMatriculationNumber().equals(course.getOwner().getMatriculationNumber()))
             throw new ServiceValidationException("Error: not authorized to update course",HttpStatus.UNAUTHORIZED);
 
         course.setDescriptionTemplate(updateCourseDescriptionTemplate.getDescription());
