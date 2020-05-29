@@ -14,7 +14,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="courseSemester_edit" class="control-label">{{ $t('semester.name') }}</label>
-                    <select class="form-control" v-model="selectedSemester_edit" id="courseSemester_edit" @change="getCourses(selectedSemester_edit)">
+                    <select class="form-control" v-model="selectedSemester_edit" id="courseSemester_edit" @change="getCourses(selectedSemester_edit); selectedCourse = selectedCourseId = undefined">
                         <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
                             {{semester.year}} {{semester.type === 'w' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
                         </option>
@@ -260,7 +260,9 @@ export default {
         //don't forget to set props: true; in router
         this.getSemesters();
         this.resetExerciseSheet();
-        this.getUsers();
+        if(this.$store.getters.userInfo.isAdmin){
+            this.getUsers();
+        }
     },
     computed: {
         roles(){
