@@ -13,7 +13,6 @@ public class UpdateCourseRequest {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
-    @NotBlank
     private String owner;
     private Boolean includeThird;
 

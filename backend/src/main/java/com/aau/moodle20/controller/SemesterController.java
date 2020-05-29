@@ -62,7 +62,6 @@ public class SemesterController {
     }
 
 
-    @PreAuthorize("hasAuthority('Admin')")
     @PostMapping(value = "/course")
     public ResponseEntity<?> updateCourse(@Valid  @RequestBody UpdateCourseRequest updateCourseRequest)  throws SemesterException {
 

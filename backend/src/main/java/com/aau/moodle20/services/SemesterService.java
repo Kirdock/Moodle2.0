@@ -83,21 +83,25 @@ public class SemesterService {
 
     public void updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceValidationException {
 
+        UserDetailsImpl userDetails = getUserDetails();
         checkIfCourseExists(updateCourseRequest.getId());
-        if(!userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
-            throw new ServiceValidationException("Error: User with this matriculationNumber those not exists!",HttpStatus.NOT_FOUND);
+        if (!userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
+            throw new ServiceValidationException("Error: User with this matriculationNumber those not exists!", HttpStatus.NOT_FOUND);
 
         Course course = null;
         Optional<Course> optionalCourse = courseRepository.findById(updateCourseRequest.getId());
-        if (optionalCourse.isPresent()) {
-            course = optionalCourse.get();
-            course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
-            course.setMinPoints(updateCourseRequest.getMinPoints());
-            course.setName(updateCourseRequest.getName());
-            course.setNumber(updateCourseRequest.getNumber());
-            course.setIncludeThird(updateCourseRequest.getIncludeThird());
+        if (!userDetails.getAdmin() &&  !userDetails.getMatriculationNumber().equals(optionalCourse.get().getOwner().getMatriculationNumber()))
+            throw new ServiceValidationException("Error: User is not owner of this course and thus cannot update this course!", HttpStatus.UNAUTHORIZED);
+
+        course = optionalCourse.get();
+        course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
+        course.setMinPoints(updateCourseRequest.getMinPoints());
+        course.setName(updateCourseRequest.getName());
+        course.setNumber(updateCourseRequest.getNumber());
+        course.setIncludeThird(updateCourseRequest.getIncludeThird());
+        if (userDetails.getAdmin())
             course.setOwner(new User(updateCourseRequest.getOwner()));
-        }
+
         courseRepository.save(course);
     }
 
