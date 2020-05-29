@@ -24,7 +24,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="selectedCourse" class="control-label">{{ $t('course.name') }}</label>
-                    <select class="form-control" v-model="selectedCourseId" id="selectedCourse" @change="getCourseUsers(selectedCourseId); getCourse(selectedCourseId)">
+                    <select class="form-control" v-model="selectedCourseId" id="selectedCourse" @change="getCourse(selectedCourseId)">
                         <option v-for="course in courses" :value="course.id" :key="course.id">
                             {{course.number}} {{course.name}}
                         </option>
@@ -46,7 +46,7 @@
                     <span class="fa fa-copy"></span>
                     {{ $t('copy') }}
                 </button>
-                <b-modal id="modal-copy-course" :title="$t('course.question.copy')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="copyCourse(selectedSemester_edit, courseCopyId)">
+                <b-modal id="modal-copy-course" :title="$t('course.question.copy')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="copyCourse(selectedCourseId, courseCopyId)">
                     <label for="selectedSemester_copy_course" class="control-label">{{ $t('semester.name') }}</label>
                     <select class="form-control" v-model="courseCopyId" id="selectedSemester_copy_course">
                         <option v-for="semester in semestersWithoutSelected" :value="semester.id" :key="semester.id">
@@ -423,8 +423,11 @@ export default {
                     });
                     const {semesterId} = this.courseInfo_create;
                     this.courseInfo_create = {semesterId};
+
                     if(semesterId === this.selectedSemester_edit){
                         this.getCourses(this.selectedSemester_edit);
+                        this.selectedCourseId = response.data.id;
+                        this.getCourse(response.data.id);
                     }
                 }).catch(()=>{
                     this.$bvToast.toast(this.$t('course.error.create'), {
@@ -475,9 +478,11 @@ export default {
         copyCourse(courseId, semesterId){
             this.loading_delete = true;
             this.$store.dispatch('copyCourse', {courseId, semesterId}).then(response=>{
-                if(semesterId === this.selectedSemester_edit){
-                    this.getCourses(semesterId);
-                }
+                this.selectedSemester_edit = semesterId;
+                this.getCourses(semesterId);
+                this.selectedCourseId = response.data.id;
+                this.getCourse(response.data.id);
+                
                 this.$bvToast.toast(this.$t('course.copied'), {
                     title: this.$t('success'),
                     variant: 'success',
@@ -495,6 +500,7 @@ export default {
             
         },
         getCourse(courseId){
+            this.getCourseUsers(courseId);
             this.$store.dispatch('getCourse',{courseId}).then(response =>{
                 this.selectedCourse = response.data;
                 this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
