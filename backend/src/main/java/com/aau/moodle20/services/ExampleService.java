@@ -81,7 +81,7 @@ public class ExampleService {
     }
 
     @Transactional
-    public ExampleResponseObject updateExample(ExampleRequest updateExampleRequest) throws ServiceValidationException {
+    public void updateExample(ExampleRequest updateExampleRequest) throws ServiceValidationException {
 
         List<SupportFileType> supportFileTypes;
 
@@ -102,7 +102,6 @@ public class ExampleService {
         example.setSupportFileTypes(new HashSet<>(supportFileTypes));
         exampleRepository.saveAndFlush(example);
 
-        return example.createExampleResponseObject();
     }
 
 

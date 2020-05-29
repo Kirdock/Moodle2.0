@@ -35,9 +35,9 @@ public class ExampleController {
     }
 
     @PostMapping(value = "/example")
-    public ResponseEntity<ExampleResponseObject> updateExample(@Valid @RequestBody ExampleRequest updateExampleRequest) throws ServiceValidationException {
-        ExampleResponseObject responseObject =  exampleService.updateExample(updateExampleRequest);
-        return ResponseEntity.ok(responseObject);
+    public ResponseEntity<?> updateExample(@Valid @RequestBody ExampleRequest updateExampleRequest) throws ServiceValidationException {
+        exampleService.updateExample(updateExampleRequest);
+        return ResponseEntity.ok("Example successfully updated");
     }
 
     @PostMapping(value = "/examples/order")
