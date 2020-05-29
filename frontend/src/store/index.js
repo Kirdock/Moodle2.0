@@ -160,7 +160,7 @@ export default new Vuex.Store({
         api.getUsers(data).then(response =>{
           if(data.courseId){
             response.data.forEach(user =>{
-              user.oldRole = user.role;
+              user.oldRole = user.courseRole;
             });
           }
           resolve({data: response.data});
@@ -210,6 +210,9 @@ export default new Vuex.Store({
     },
     deleteExample({commit}, exampleId){
       return api.deleteExample(exampleId);
+    },
+    updateExampleOrder({commit}, changedOrders){
+      return api.updateExampleOrder(changedOrders);
     }
   },
   modules: {
@@ -219,62 +222,7 @@ export default new Vuex.Store({
     locale: state => state.settings.locale,
     isLoggedIn: state => state.loggedIn,
     decodedToken: state => state.userInfo,
-    token: state=> state.token,
-    currentDateTime: ()=>{
-      const date = new Date();
-      return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split(/ *:..\..../)[0];
-    },
-    roles: () => {
-      return [
-        {
-            key: 'l',
-            value: i18n.t('lecturer'),
-        },
-        {
-            key: 't',
-            value: i18n.t('tutor'),
-        },
-        {
-            key: 's',
-            value: i18n.t('student'),
-        },
-      ];
-    },
-    rolesWithAll: (state, getters) =>{
-      return [
-        {
-            key: 'a',
-            value: i18n.t('all')
-        }
-      ].concat(getters.roles);
-    },
-    rolesAllAssign: (state, getters) =>{
-      return getters.rolesWithAll.concat([
-        {
-          key: 'z',
-          value: i18n.t('assigned')
-        }
-      ]);
-    },
-    filteredUsers: () => {
-      return ({users, role = 'a', searchText}) =>{
-        let result = users;
-
-        if(role === 'z'){
-            result = result.filter(user => user.role !== 'n');
-        }
-        else if(role !== 'a'){
-            result = result.filter(user => role === user.role)
-        }
-        
-        if(searchText){
-            result = result.filter(user => user.matriculationNumber.indexOf(searchText) !== -1
-                                        || user.surname.indexOf(searchText) !== -1
-                                        || user.forename.indexOf(searchText) !== -1);
-        }
-        return result;
-      }
-    }
+    token: state=> state.token
   }
 });
 

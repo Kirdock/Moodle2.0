@@ -89,6 +89,8 @@
 
 <script>
 import UserInfo from '@/components/UserInfo.vue';
+import {userManagement} from '@/plugins/global';
+
 export default {
     components:{
         'user-info': UserInfo
@@ -109,13 +111,13 @@ export default {
     },
     computed: {
         roles(){
-            return this.$store.getters.roles;
+            return userManagement.roles();
         },
         rolesWithAll(){
-            return this.$store.getters.rolesWithAll;
+            return userManagement.rolesWithAll;
         },
         filteredUsers(){
-            return this.$store.getters.filteredUsers({users: this.users, searchText: this.searchText});
+            return userManagement.filteredUsers({users: this.users, searchText: this.searchText});
         }
     },
     methods:{

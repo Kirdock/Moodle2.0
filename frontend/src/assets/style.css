@@ -6,3 +6,7 @@
 table td a span.fa{
   margin-right: 5px;
 }
+
+.handle {
+  cursor: grab;
+}

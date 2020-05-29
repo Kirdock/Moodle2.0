@@ -6,6 +6,7 @@ const messages = {
     'de': {
         account: 'Konto',
         actions: 'Aktionen',
+        addTag: 'Neuen Dateityp hinzufügen',
         admin: 'Admin',
         all: 'Alle',
         assigned: 'Zugeteilt',
@@ -65,6 +66,9 @@ const messages = {
             },
             question: {
                 delete: 'Wollen Sie das Beispiel wirklich löschen?'
+            },
+            warning: {
+                createSubExample: 'Das Beispiel muss zuvor gespeichert werden, um Unterbeispiele anlegen zu können'
             }
         },
         subExample: {
@@ -135,6 +139,7 @@ const messages = {
         role: 'Rolle',
         save: 'Speichern',
         search: 'Suche',
+        searchOrAddFileType: 'Suchen oder Dateityp hinzufügen',
         security: 'Sicherheit',
         selected: 'Ausgewählt',
         semester: {
@@ -155,6 +160,7 @@ const messages = {
         sessionExpired: 'Sitzung ist abgelaufen',
         settings: 'Einstellungen',
         show: 'Anzeigen',
+        sortError: 'Die Reihenfolge konnte nicht gespeichert werden',
         student: 'Student',
         submissionDate: 'Abgabedatum',
         submitFile: 'Dateiabgabe',
@@ -210,6 +216,7 @@ const messages = {
     'en': {
         account: 'Account',
         actions: 'Actions',
+        addTag: 'Add this as new tag',
         admin: 'Admin',
         all: 'All',
         assigned: 'Assigned',
@@ -268,6 +275,9 @@ const messages = {
             },
             question: {
                 delete: 'Do you really want to delete this example?'
+            },
+            warning: {
+                createSubExample: 'The example must be saved before sub examples can be created'
             }
         },
         subExample: {
@@ -338,6 +348,7 @@ const messages = {
         role: 'Role',
         save: 'Save',
         search: 'Search',
+        searchOrAddFileType: 'Search or add a file type',
         security: 'Security',
         selected: 'Selected',
         semester: {
@@ -358,6 +369,7 @@ const messages = {
         sessionExpired: 'Session expired',
         settings: 'Settings',
         show: 'Show',
+        sortError: 'Order could not be updated',
         student: 'Student',
         submissionDate: 'Submission date',
         submitFile: 'File submission',

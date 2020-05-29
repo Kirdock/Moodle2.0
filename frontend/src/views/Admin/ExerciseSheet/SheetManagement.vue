@@ -15,48 +15,53 @@
             <li class="breadcrumb-item active">{{sheetInfo.name}}</li>
         </ol>
         <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
-        <b-tabs class="mt-3" v-model="activeTab">
-            <b-tab :title="$t('information')">
-                <div class="form-horizontal col-md-5">
-                    <form ref="exerciseSheet" @submit.prevent="updateInfo()">
-                        <es-info v-model="sheetInfo"></es-info>
-                        <div class="form-inline">
+            <b-tabs class="mt-3" v-model="activeTab" id="exerciseSheetTab">
+                <b-tab :title="$t('information')" :class="'fixed'">
+                    
+                    <div class="form-horizontal col-md-5 fixed">
+                        <form ref="exerciseSheet" @submit.prevent="updateInfo()">
+                            <es-info v-model="sheetInfo"></es-info>
+                            <div class="form-inline">
+                                <button class="btn btn-primary" type="submit">
+                                    <span class="fa fa-sync fa-spin" v-if="loading_updateInformation"></span>
+                                    <span class="fa fa-save" v-else></span>
+                                    {{ $t('save') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </b-tab>
+                
+                <b-tab class="item" v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()" lazy>
+                    <div style="margin-top: 10px; font-size: 30px" v-if="isSubExample">
+                        <a href="javascript:void(0)" @click="setSelectedExample()">
+                            {{example.name}}
+                        </a>
+                        <span class="fas fa-chevron-right"></span>
+                        <span>{{selectedExample.name}}</span>
+                    </div>
+                    <form @submit.prevent="updateExample(selectedExample || example)" :ref="'formExample'+index.toString()">
+                        <example-info :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
+                        <div class="form-inline" style="margin-left: 10px; margin-top: 10px" v-if="!isSubExample">
                             <button class="btn btn-primary" type="submit">
-                                <span class="fa fa-sync fa-spin" v-if="loading_updateInformation"></span>
+                                <span class="fa fa-sync fa-spin"  v-if="example.loading"></span>
                                 <span class="fa fa-save" v-else></span>
                                 {{ $t('save') }}
                             </button>
+                            <button class="btn btn-danger" style="margin-left: 10px" v-b-modal="'modal-delete-example'" type="button" @click="setDeleteExample(example.id, index)">
+                                <span class="fa fa-trash"></span>
+                                {{$t('delete')}}
+                            </button>
                         </div>
                     </form>
-                </div>
-            </b-tab>
-            <b-tab v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()" lazy>
-                <div style="margin-top: 10px; font-size: 30px" v-if="selectedExample">
-                    <a href="javascript:void(0)" @click="setSelectedExample()">
-                        {{example.name}}
-                    </a>
-                    <span class="fas fa-chevron-right"></span>
-                    <span>{{selectedExample.name}}</span>
-                </div>
-                <form @submit.prevent="updateExample(example)" :ref="'formExample'+index.toString()">
-                    <example-info :adjustOrder="adjustSubExampleOrder" :buildExample="buildExample" :hasSubExamples="!selectedExample" :setSelectedExample="setSelectedExample" :value="selectedExample ? selectedExample : sheetInfo.examples[index]"></example-info>
-                    <div class="form-inline" style="margin-left: 10px; margin-top: 10px">
-                        <button class="btn btn-primary" type="submit">
-                            <span class="fa fa-sync fa-spin"  v-if="example.loading"></span>
-                            <span class="fa fa-save" v-else></span>
-                            {{ $t('save') }}
-                        </button>
-                        <button class="btn btn-danger" style="margin-left: 10px" v-b-modal="'modal-delete-example'" type="button" @click="selectedDeleteExample = {id: example.id, index}">
-                            <span class="fa fa-trash"></span>
-                            {{$t('delete')}}
-                        </button>
-                    </div>
-                </form>
-            </b-tab>
-            <template v-slot:tabs-end>
-                <b-nav-item role="presentation" @click="newExample()" href="javascript:void(0)"><span class="fa fa-plus"></span> {{$t('example.new')}}</b-nav-item>
-            </template>
-        </b-tabs>
+                </b-tab>
+                
+                <template v-slot:tabs-end class="fixed">
+                    <b-nav-item role="presentation" @click="newExample()" href="javascript:void(0)"><span class="fa fa-plus"></span> {{$t('example.new')}}</b-nav-item>
+                </template>
+            </b-tabs>
+        
+        
         <b-modal id="modal-delete-example" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteExample(selectedDeleteExample.id, selectedDeleteExample.index)">
             {{$t('example.question.delete')}}
         </b-modal>
@@ -68,6 +73,8 @@
 <script>
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
 import ExampleInfo from '@/components/ExampleInfo.vue';
+import {orderManagement} from '@/plugins/global';
+import Sortable from "sortablejs";
 
 export default {
     props: ['courseId', 'sheetId', 'name'],
@@ -75,8 +82,45 @@ export default {
         'es-info': ExerciseSheetInfo,
         'example-info': ExampleInfo
     },
+    mounted(){
+        const el = document.querySelector('.nav-tabs');
+        const sortable = Sortable.create(el, {
+            animation: 200,
+            // filter: '.fixed', //does not work because b-tabs discards defined classes
+            onMove: evt => {
+                const lastIndex = (this.sheetInfo.examples.length + 1);
+                const oldIndex = Sortable.utils.index(evt.dragged, '>*');
+                const newIndex = Sortable.utils.index(evt.related, '>*')
+                return oldIndex !== 0 && oldIndex !== lastIndex && newIndex !== 0 && newIndex !== lastIndex; //exclude "Information" and "new example" tab
+            },
+            onEnd: evt =>{
+                if(evt.oldIndex !== evt.newIndex){
+                    const changedOrders = orderManagement.moveTo(this.sheetInfo.examples, evt.oldIndex-1, evt.newIndex-1); //-1 because "Information"-Tab is before
+                    this.$store.dispatch('updateExampleOrder', changedOrders).then(()=>{
+                        orderManagement.sort(this.sheetInfo.examples);
+                    }).catch(()=>{
+                        orderManagement.revertSort(this.sheetInfo.examples);
+                        const array = sortable.toArray();
+                        orderManagement.move(array, evt.newIndex, evt.oldIndex);
+                        sortable.sort(array);
+                        
+                        this.$bvToast.toast(this.$t('sortError'), {
+                            title: this.$t('error'),
+                            variant: 'danger',
+                            appendToast: true
+                        });
+                    })
+                }
+            }
+        });
+    },
     created(){
         this.getSheet(this.sheetId);
+    },
+    computed:{
+        isSubExample(){
+            return !!this.selectedExample;
+        }
     },
     data(){
         return {
@@ -84,7 +128,7 @@ export default {
             selectedExample: undefined,
             loading_updateInformation: false,
             activeTab: 0,
-            selectedDeleteExample: undefined
+            selectedDeleteExample: {}
         }
     },
     methods: {
@@ -118,83 +162,51 @@ export default {
                 this.loading_updateInformation = false;
             });
         },
+        setDeleteExample(id, index){
+            this.selectedDeleteExample.id = id;
+            this.selectedDeleteExample.index = index;
+        },
         updateExample(example){
-            if(this.areSubExamplesValid(example)){
-                example.loading = true;
-                const {loading, ...data} = example;
-                if(example.id){
-                    this.$store.dispatch('updateExample', data).then(({data})=>{
-                        // Object.assign(example,data);
-                        this.$bvToast.toast(this.$t('example.saved'), {
-                            title: this.$t('success'),
-                            variant: 'success',
-                            appendToast: true
-                        });
-                    }).catch(()=>{
-                        this.$bvToast.toast(this.$t('example.error.save'), {
-                            title: this.$t('error'),
-                            variant: 'danger',
-                            appendToast: true
-                        });
-                    }).finally(()=>{
-                        example.loading = false;
+            example.loading = true;
+            const {loading, subExamples, ...data} = example;
+            if(example.id){
+                this.$store.dispatch('updateExample', data).then(response=>{
+                    this.$bvToast.toast(this.$t('example.saved'), {
+                        title: this.$t('success'),
+                        variant: 'success',
+                        appendToast: true
                     });
-                }
-                else{
-                    this.$store.dispatch('createExample', data).then(({data})=>{
-                        Object.assign(example,data);
-                        this.$bvToast.toast(this.$t('example.created'), {
-                            title: this.$t('success'),
-                            variant: 'success',
-                            appendToast: true
-                        });
-                    }).catch(()=>{
-                        this.$bvToast.toast(this.$t('example.error.create'), {
-                            title: this.$t('error'),
-                            variant: 'danger',
-                            appendToast: true
-                        });
-                    }).finally(()=>{
-                        example.loading = false;
+                }).catch(()=>{
+                    this.$bvToast.toast(this.$t('example.error.save'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
                     });
-                }
+                }).finally(()=>{
+                    example.loading = false;
+                });
             }
-        },
-        areSubExamplesValid(parentExample){
-            let valid = true;
-            if(parentExample.subExamples){
-                for(const example of parentExample.subExamples){
-                    if(!this.isExampleValid(example)){
-                        valid = false;
-                        this.setSelectedExample(example);
-                        this.$nextTick(()=>{
-                            this.$refs[`formExample${this.activeTab-1}`][0].reportValidity();
-                        });
-                        break;
-                    }
-                }
-            }
-            return valid;
-        },
-        isExampleValid(example){
-            
-            return example.name && example.description && example.points !== undefined && example.weighting !== undefined;
-        },
-        buildExample(name, order){
-            return {
-                name: `${name} ${order +1}`,
-                exerciseSheetId: this.sheetId,
-                weighting: 1,
-                points: 0,
-                subExamples: [],
-                order,
-                validator: '',
-                supportedFileTypes: [],
-                mandatory: false
+            else{
+                this.$store.dispatch('createExample', data).then(response=>{
+                    example.id = response.data.id;
+                    this.$bvToast.toast(this.$t('example.created'), {
+                        title: this.$t('success'),
+                        variant: 'success',
+                        appendToast: true
+                    });
+                }).catch(()=>{
+                    this.$bvToast.toast(this.$t('example.error.create'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }).finally(()=>{
+                    example.loading = false;
+                });
             }
         },
         newExample(){
-            this.sheetInfo.examples.push(this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length));
+            this.sheetInfo.examples.push(this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length, true));
             this.$nextTick(()=>{
                 this.$nextTick(() => {
                     requestAnimationFrame(() => {
@@ -203,13 +215,28 @@ export default {
                 })
             });
         },
+        buildExample(name, order, isParent){
+            return {
+                name: `${name} ${order+1}`,
+                parentId: isParent ? undefined : this.sheetInfo.examples[this.activeTab -1].id,
+                exerciseSheetId: this.sheetId,
+                weighting: 1,
+                points: 0,
+                subExamples: [],
+                order,
+                supportedFileTypes: [],
+                customFileTypes: [],
+                mandatory: false,
+                validator: ''
+            }
+        },
         deleteExample(id, index){
-            this.sheetInfo.examples.splice(index, 1);
-            this.adjustSubExampleOrder(this.sheetInfo.examples, index);
-            //server needs to adjust/update all orders
+            const array = this.isSubExample ? this.selectedExample.subExamples : this.sheetInfo.examples;
             if(id){
+                //server needs to adjust/update all orders
                 this.$store.dispatch('deleteExample', id).then(()=>{
-                  this.$bvToast.toast(this.$t('example.deleted'), {
+                    orderManagement.deletedAt(array, index);
+                    this.$bvToast.toast(this.$t('example.deleted'), {
                         title: this.$t('success'),
                         variant: 'success',
                         appendToast: true
@@ -223,18 +250,12 @@ export default {
                 })
             }
             else{
+                orderManagement.deletedAt(array, index);
                 this.$bvToast.toast(this.$t('example.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }
-        },
-        adjustSubExampleOrder(examples, index){
-            if(index < examples.length){
-                for(let i = index; i < examples.length; i++){
-                    examples[i].order--;
-                }
             }
         },
         setSelectedExample(example){
