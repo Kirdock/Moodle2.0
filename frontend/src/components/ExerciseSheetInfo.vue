@@ -14,7 +14,9 @@
         </div>
         <div class="form-group">
             <label :for="`esInfoDescription${_uid}`" class="control-label">{{ $t('description') }}</label>
-            <textarea :id="`esInfoDescription${_uid}`" class="form-control" v-model="value.description"></textarea>
+            <div class="document-editor__editable-container">
+                <ckeditor :id="`esInfoDescription${_uid}`" v-model="value.description" :editor="editor"  :config="editorConfig" @ready="onReady"></ckeditor>
+            </div>
         </div>
         <div class="form-group">
             <label :for="`esInfoMinKreuzel${_uid}`" class="control-label">{{ $t('minRequireKreuzel') }}</label>
@@ -33,12 +35,27 @@
 
 <script>
 import {dateManagement} from '@/plugins/global';
+import Editor from '@/components/ckeditor';
+import i18n from '@/plugins/i18n';
+
 export default {
     name: 'es-info',
     props: ['value'],
     data(){
         return {
+            editor: Editor,
+            editorConfig: {
+	            language: 'de'
+            },
             minDate: dateManagement.currentDateTime()
+        }
+    },
+    methods:{
+        onReady(editor) {
+          editor.ui.getEditableElement().parentElement.insertBefore(
+                editor.ui.view.toolbar.element,
+                editor.ui.getEditableElement()
+            );
         }
     }
 }

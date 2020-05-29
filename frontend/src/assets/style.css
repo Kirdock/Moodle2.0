@@ -20,3 +20,7 @@ a:not([href]){
   color: #007bff;
 }
 /*href.prevent*/
+
+.document-editor__editable-container{
+  border: 1px solid #ced4da;
+}

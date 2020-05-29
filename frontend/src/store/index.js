@@ -15,7 +15,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '@/components/backend-api';
 import router from '@/router';
-import i18n from '@/plugins/i18n';
 
 const tokenName = 'Token';
 const settingName = 'Settings';
