@@ -6,6 +6,7 @@ import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class Example {
     @Column(name = "sort_order")
     private Integer order;
     private Boolean submitFile;
-    private String validator;
+    private String customFileTypes;
     @OneToMany(mappedBy = "example", fetch = FetchType.LAZY)
     Set<SupportFileType> supportFileTypes;
 
@@ -128,12 +129,12 @@ public class Example {
         this.order = order;
     }
 
-    public String getValidator() {
-        return validator;
+    public String getCustomFileTypes() {
+        return customFileTypes;
     }
 
-    public void setValidator(String validator) {
-        this.validator = validator;
+    public void setCustomFileTypes(String customFileTypes) {
+        this.customFileTypes = customFileTypes;
     }
 
     public Set<SupportFileType> getSupportFileTypes() {
@@ -152,15 +153,35 @@ public class Example {
         this.submitFile = submitFile;
     }
 
+    public List<String> getCustomFileTypesList() {
+        List<String> list = new ArrayList<>();
+        if (customFileTypes != null) {
+            String[] array = customFileTypes.split(",");
+            if (array != null && array.length > 0) {
+                for (int i = 0; i < array.length; i++)
+                    list.add(array[i]);
+            }
+        }
+        return list;
+    }
+
+    public void setCustomFileTypesList(List<String> customFileTypesList)
+    {
+        if(customFileTypesList!=null)
+        {
+           this.customFileTypes = customFileTypesList.stream().collect(Collectors.joining(","));
+        }
+    }
+
     public void fillValuesFromRequestObject(ExampleRequest exampleRequest) {
         setName(exampleRequest.getName());
         setDescription(exampleRequest.getDescription());
         setMandatory(exampleRequest.getMandatory());
         setOrder(exampleRequest.getOrder());
         setPoints(exampleRequest.getPoints());
-        setValidator(exampleRequest.getValidator());
         setWeighting(exampleRequest.getWeighting());
         setSubmitFile(exampleRequest.getSubmitFile());
+        setCustomFileTypesList(exampleRequest.getCustomFileTypes());
         if (exampleRequest.getParentId() != null)
             setParentExample(new Example(exampleRequest.getParentId()));
         if (exampleRequest.getExerciseSheetId() != null)
@@ -178,7 +199,7 @@ public class Example {
         exampleResponseObject.setPoints(getPoints());
         exampleResponseObject.setWeighting(getWeighting());
         exampleResponseObject.setOrder(getOrder());
-        exampleResponseObject.setValidator(getValidator());
+        exampleResponseObject.setCustomFileTypes(getCustomFileTypesList());
         exampleResponseObject.setSubmitFile(getSubmitFile());
 
         if(getSubExamples()!=null)
@@ -202,9 +223,9 @@ public class Example {
         Example example = new Example();
         example.setSubmitFile(getSubmitFile());
         example.setWeighting(getWeighting());
-        example.setValidator(getValidator());
         example.setPoints(getPoints());
         example.setOrder(getOrder());
+        example.setCustomFileTypes(getCustomFileTypes());
         example.setMandatory(getMandatory());
         example.setName(getName());
         example.setDescription(getDescription());

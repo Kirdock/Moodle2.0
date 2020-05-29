@@ -88,8 +88,6 @@ public class ExampleService {
         if (updateExampleRequest.getSubmitFile()) {
             if (updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty())
                 throw new ServiceValidationException("Error: supported file types must not be null!");
-            if (updateExampleRequest.getValidator() == null || updateExampleRequest.getValidator().isEmpty())
-                throw new ServiceValidationException("Error: validator must not be null!");
         }
 
         Optional<Example> optionalExample = exampleRepository.findById(updateExampleRequest.getId());

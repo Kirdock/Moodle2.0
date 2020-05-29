@@ -19,10 +19,9 @@ public class ExampleRequest {
     @NotNull
     private Integer order;
     @NotNull
-    private String validator;
-    @NotNull
     private List<Long> supportedFileTypes;
     private Boolean submitFile;
+    private List<String> customFileTypes;
 
     public Long getExerciseSheetId() {
         return exerciseSheetId;
@@ -80,14 +79,6 @@ public class ExampleRequest {
         this.order = order;
     }
 
-    public String getValidator() {
-        return validator;
-    }
-
-    public void setValidator(String validator) {
-        this.validator = validator;
-    }
-
     public List<Long> getSupportedFileTypes() {
         return supportedFileTypes;
     }
@@ -118,5 +109,13 @@ public class ExampleRequest {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public List<String> getCustomFileTypes() {
+        return customFileTypes;
+    }
+
+    public void setCustomFileTypes(List<String> customFileTypes) {
+        this.customFileTypes = customFileTypes;
     }
 }

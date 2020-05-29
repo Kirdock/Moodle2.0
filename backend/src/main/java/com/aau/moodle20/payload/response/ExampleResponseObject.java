@@ -23,6 +23,7 @@ public class ExampleResponseObject {
     List<FileTypeResponseObject> supportedFileTypes;
     private List<ExampleResponseObject> subExamples = new ArrayList<>();
     private Boolean submitFile;
+    private List<String> customFileTypes;
 
 
     public ExampleResponseObject(){
@@ -134,5 +135,13 @@ public class ExampleResponseObject {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public List<String> getCustomFileTypes() {
+        return customFileTypes;
+    }
+
+    public void setCustomFileTypes(List<String> customFileTypes) {
+        this.customFileTypes = customFileTypes;
     }
 }
