@@ -13,6 +13,8 @@ public class UpdateCourseRequest {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
+    @NotBlank
+    private String owner;
     private Boolean includeThird;
 
     public Long getId() {
@@ -61,5 +63,13 @@ public class UpdateCourseRequest {
 
     public void setIncludeThird(Boolean includeThird) {
         this.includeThird = includeThird;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }

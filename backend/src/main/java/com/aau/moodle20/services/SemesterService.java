@@ -37,6 +37,9 @@ public class SemesterService {
     UserInCourseRepository userInCourseRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     JwtUtils jwtUtils;
 
     @Autowired
@@ -79,7 +82,10 @@ public class SemesterService {
     }
 
     public void updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceValidationException {
+
         checkIfCourseExists(updateCourseRequest.getId());
+        if(!userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
+            throw new ServiceValidationException("Error: User with this matriculationNumber those not exists!",HttpStatus.NOT_FOUND);
 
         Course course = null;
         Optional<Course> optionalCourse = courseRepository.findById(updateCourseRequest.getId());
@@ -90,6 +96,7 @@ public class SemesterService {
             course.setName(updateCourseRequest.getName());
             course.setNumber(updateCourseRequest.getNumber());
             course.setIncludeThird(updateCourseRequest.getIncludeThird());
+            course.setOwner(new User(updateCourseRequest.getOwner()));
         }
         courseRepository.save(course);
     }
