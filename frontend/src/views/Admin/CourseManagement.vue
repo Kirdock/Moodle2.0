@@ -190,7 +190,7 @@
                                         }">
                                             <span class="fa fa-edit fa-2x"></span>
                                         </router-link>
-                                        <a href="javascript:void(0)" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'">
+                                        <a href.prevent="#" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'">
                                             <span class="fa fa-trash fa-2x"></span>
                                         </a>
                                         <b-modal id="modal-delete-exerciseSheet" :title="$t('title.delete')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="deleteExerciseSheet(sheet.id)">

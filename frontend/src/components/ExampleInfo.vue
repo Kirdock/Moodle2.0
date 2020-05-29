@@ -85,10 +85,10 @@
                                 {{subExample.points}}
                             </td>
                             <td>
-                                <a href="javascript:void(0)" :title="$t('edit')" @click="setSelectedExample(subExample)">
+                                <a href="#" :title="$t('edit')" @click.prevent="setSelectedExample(subExample); setFileTypes()">
                                     <span class="fa fa-edit fa-2x"></span>
                                 </a>
-                                <a href="javascript:void(0)" :title="$t('delete')" v-b-modal="'modal-delete-example'" type="button" @click="setDeleteExample(subExample.id, exampleIndex)">
+                                <a href="#" :title="$t('delete')" v-b-modal="'modal-delete-example'" type="button" @click.prevent="setDeleteExample(subExample.id, exampleIndex, value.subExamples)">
                                     <span class="fa fa-trash fa-2x"></span>
                                 </a>
                             </td>
@@ -147,7 +147,7 @@ export default {
             });
         }
     },
-    created(){
+    created(){ //created is not triggered, when a subExample is being selected; because it is already created
         this.getFileTypes();
     },
     data(){
@@ -161,8 +161,7 @@ export default {
         getFileTypes(){
             this.$store.dispatch('getFileTypes').then(response =>{
                 this.fileTypes = response.data;
-                const types = this.fileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType.id === fileType.id));
-                this.selectedfileTypes = types.concat(this.value.customFileTypes.map(type => {return {value: type, name: type}}));
+                this.setFileTypes();
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('fileTypes.error.get'), {
                     title: this.$t('error'),
@@ -171,8 +170,9 @@ export default {
                 });
             })
         },
-        removeSubExample(index){
-            orderManagement.deletedAt(this.value.subExamples, index);
+        setFileTypes(){
+            let types = this.fileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType.id === fileType.id));
+            this.selectedfileTypes = types.concat(this.value.customFileTypes.map(type => {return {value: type, name: type}}));
         },
         submitFile_changed(){
             if(!this.value.submitFile){
@@ -180,6 +180,12 @@ export default {
             }
         },
         newSubExample(){
+            if(this.value.subExamples.length === 0){
+                this.value.mandatory = this.value.submitFile = false;
+                this.value.customFileTypes = [];
+                this.value.supportedFileTypes = [];
+                this.setFileTypes();
+            }
             if(this.value.id){
                 this.value.subExamples.push(this.buildExample(this.$t('subExample.name'), this.value.subExamples.length));
             }

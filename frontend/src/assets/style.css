@@ -10,3 +10,13 @@ table td a span.fa{
 .handle {
   cursor: grab;
 }
+
+/*href.prevent*/
+a:not([href]):hover{
+  color: #0056b3;
+}
+
+a:not([href]){
+  color: #007bff;
+}
+/*href.prevent*/

@@ -11,8 +11,8 @@
       </div>
       <div class="navbar-collapse order-2">
         <ul class="navbar-nav ml-auto">
-          <a href="javascriot:void(0)" class="nav-link" @click="changeLocale('en')" v-if="locale !== 'en'">English</a>
-          <a href="javascriot:void(0)" class="nav-link" @click="changeLocale('de')" v-if="locale !== 'de'">Deutsch</a>
+          <a href="#" class="nav-link" @click.prevent="changeLocale('en')" v-if="locale !== 'en'">English</a>
+          <a href="#" class="nav-link" @click.prevent="changeLocale('de')" v-if="locale !== 'de'">Deutsch</a>
           <span v-if="$store.getters.isLoggedIn" style="margin-top: 8px">{{ $t('loggedInAs') }}
             <router-link to="/Account" > {{$store.getters.userInfo.forename}} {{$store.getters.userInfo.surname}} </router-link>
           </span>

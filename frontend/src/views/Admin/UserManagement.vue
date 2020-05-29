@@ -65,10 +65,10 @@
                             {{user.isAdmin}}
                         </td>
                         <td>
-                            <a href="javascript:void(0)" v-b-modal="'modal-edit-user'" :title="$t('edit')" @click="userInfo = {...user}; selectedUser = user" >
+                            <a href="#" v-b-modal="'modal-edit-user'" :title="$t('edit')" @click.prevent="userInfo = {...user}; selectedUser = user" >
                                 <span class="fa fa-edit fa-2x"></span>
                             </a>
-                            <a href="javascript:void(0)" v-b-modal="'modal-delete-user'" :title="$t('delete')" @click="selectedUser = user">
+                            <a href="#" v-b-modal="'modal-delete-user'" :title="$t('delete')" @click.prevent="selectedUser = user">
                                 <span class="fa fa-trash fa-2x"></span>
                             </a>
                         </td>
@@ -114,7 +114,7 @@ export default {
             return userManagement.roles();
         },
         rolesWithAll(){
-            return userManagement.rolesWithAll;
+            return userManagement.rolesWithAll();
         },
         filteredUsers(){
             return userManagement.filteredUsers({users: this.users, searchText: this.searchText});

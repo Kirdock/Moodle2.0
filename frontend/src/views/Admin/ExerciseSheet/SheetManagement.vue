@@ -34,21 +34,21 @@
                 
                 <b-tab class="item" v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()" lazy>
                     <div style="margin-top: 10px; font-size: 30px" v-if="isSubExample">
-                        <a href="javascript:void(0)" @click="setSelectedExample()">
+                        <a href="#" @click.prevent="setSelectedExample()">
                             {{example.name}}
                         </a>
                         <span class="fas fa-chevron-right"></span>
                         <span>{{selectedExample.name}}</span>
                     </div>
                     <form @submit.prevent="updateExample(selectedExample || example)" :ref="'formExample'+index.toString()">
-                        <example-info :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
+                        <example-info :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
                         <div class="form-inline" style="margin-left: 10px; margin-top: 10px" v-if="!isSubExample">
                             <button class="btn btn-primary" type="submit">
                                 <span class="fa fa-sync fa-spin"  v-if="example.loading"></span>
                                 <span class="fa fa-save" v-else></span>
                                 {{ $t('save') }}
                             </button>
-                            <button class="btn btn-danger" style="margin-left: 10px" v-b-modal="'modal-delete-example'" type="button" @click="setDeleteExample(example.id, index)">
+                            <button class="btn btn-danger" style="margin-left: 10px" v-b-modal="'modal-delete-example'" type="button" @click="setDeleteExample(example.id, index, sheetInfo.examples)">
                                 <span class="fa fa-trash"></span>
                                 {{$t('delete')}}
                             </button>
@@ -57,7 +57,7 @@
                 </b-tab>
                 
                 <template v-slot:tabs-end class="fixed">
-                    <b-nav-item role="presentation" @click="newExample()" href="javascript:void(0)"><span class="fa fa-plus"></span> {{$t('example.new')}}</b-nav-item>
+                    <b-nav-item role="presentation" @click.prevent="newExample()" href="#"><span class="fa fa-plus"></span> {{$t('example.new')}}</b-nav-item>
                 </template>
             </b-tabs>
         
@@ -162,9 +162,10 @@ export default {
                 this.loading_updateInformation = false;
             });
         },
-        setDeleteExample(id, index){
+        setDeleteExample(id, index, array){
             this.selectedDeleteExample.id = id;
             this.selectedDeleteExample.index = index;
+            this.selectedDeleteExample.array = array;
         },
         updateExample(example){
             example.loading = true;
@@ -231,11 +232,10 @@ export default {
             }
         },
         deleteExample(id, index){
-            const array = this.isSubExample ? this.selectedExample.subExamples : this.sheetInfo.examples;
             if(id){
                 //server needs to adjust/update all orders
                 this.$store.dispatch('deleteExample', id).then(()=>{
-                    orderManagement.deletedAt(array, index);
+                    orderManagement.deletedAt(this.selectedDeleteExample.array, index);
                     this.$bvToast.toast(this.$t('example.deleted'), {
                         title: this.$t('success'),
                         variant: 'success',
@@ -250,7 +250,7 @@ export default {
                 })
             }
             else{
-                orderManagement.deletedAt(array, index);
+                orderManagement.deletedAt(this.selectedDeleteExample.array, index);
                 this.$bvToast.toast(this.$t('example.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',

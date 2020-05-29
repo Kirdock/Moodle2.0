@@ -97,38 +97,40 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.authentication)) {
-    if(store.getters.isLoggedIn){
-      if(to.matched.some(record => record.meta.isOwner)){
-        if(store.getters.userInfo.isOwner){
-          next();
+  store.dispatch('initialiseStore').finally(()=>{
+    if (to.matched.some(record => record.meta.authentication)) {
+      if(store.getters.isLoggedIn){
+        if(to.matched.some(record => record.meta.isOwner)){
+          if(store.getters.userInfo.isOwner){
+            next();
+          }
+          else{
+            next('/');
+          }
+        }
+        else if(to.matched.some(record => record.meta.isAdmin)){
+          if(store.getters.userInfo.isAdmin){
+            next();
+          }
+          else{
+            next('/');
+          }
         }
         else{
-          next('/');
-        }
-      }
-      else if(to.matched.some(record => record.meta.isAdmin)){
-        if(store.getters.userInfo.isAdmin){
           next();
-        }
-        else{
-          next('/');
         }
       }
       else{
-        next();
+        next('/Login');
       }
     }
-    else{
-      next('/Login');
+    else if(to.matched.some(record => record.name === 'Login') && store.getters.isLoggedIn){
+      next('/');
     }
-  }
-  else if(to.matched.some(record => record.name === 'Login') && store.getters.isLoggedIn){
-    next('/');
-  }
-  else{
-    next();
-  }
+    else{
+      next();
+    }
+  })
 });
 
 export default router

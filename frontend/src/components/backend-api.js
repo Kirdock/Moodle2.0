@@ -46,7 +46,7 @@ export default {
         return axios.post('/course',data);
     },
     updateCourseDefaultTemplate(templateData){
-        return axios.post('/course', templateData);
+        return axios.post('/course/template', templateData);
     },
     copyCourse(data){
         return axios.post(`/course/copy`, data);
