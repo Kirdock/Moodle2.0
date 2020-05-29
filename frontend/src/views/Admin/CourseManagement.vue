@@ -122,7 +122,7 @@
                         <tbody>
                             <tr v-for="user in filteredUsers" :key="user.matriculationNumber">
                                 <td>
-                                    <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="user.role !== 'n'" @click="user.role = user.role === 'n' ? 's' : 'n'" style="margin-left: 0px">
+                                    <input type="checkbox" class="form-check-input" id="showCheckedUsers" :checked="user.courseRole !== 'n'" @click="user.courseRole = user.courseRole === 'n' ? 's' : 'n'" style="margin-left: 0px">
                                 </td>
                                 <td>
                                     {{user.matriculationNumber}}
@@ -134,7 +134,7 @@
                                     {{user.forename}}
                                 </td>
                                 <td>
-                                    <select class="form-control" v-model="user.role">
+                                    <select class="form-control" v-model="user.courseRole">
                                         <option v-for="role in roles" :value="role.key" :key="role.key">
                                             {{role.value}}
                                         </option>
@@ -223,6 +223,7 @@
 <script>
 import CourseInfo from '@/components/CourseInfo.vue';
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
+import {userManagement, dateManagement} from '@/plugins/global';
 export default {
     components: {
         'course-info': CourseInfo,
@@ -263,16 +264,16 @@ export default {
     },
     computed: {
         roles(){
-            return this.$store.getters.roles;
+            return userManagement.roles();
         },
         rolesWithAll(){
-            return this.$store.getters.rolesAllAssign;
+            return userManagement.rolesAllAssign();
         },
         filteredUsers(){
-            return this.$store.getters.filteredUsers({users: this.courseUsers, role: this.showRoles, searchText: this.searchUserText});
+            return userManagement.filteredUsers({users: this.courseUsers, role: this.showRoles, searchText: this.searchUserText});
         },
         semestersWithoutSelected(){
-            return this.semesters.filter(semester => semester.id != this.selectedSemester_edit);
+            return this.semesters.filter(semester => semester.id !== this.selectedSemester_edit);
         }
     },
     methods:{
@@ -311,8 +312,8 @@ export default {
         },
         resetExerciseSheet(){
             this.exerciseSheet_create = {
-                submissionDate: this.$store.getters.currentDateTime,
-                issueDate: this.$store.getters.currentDateTime
+                submissionDate: dateManagement.currentDateTime(),
+                issueDate: dateManagement.currentDateTime()
             }
         },
         createExerciseSheet(modal){
@@ -381,11 +382,11 @@ export default {
         updateCourseUsers(){
             this.loading_edit_updateUsers = true;
             const id = this.selectedCourse.id;
-            const data = this.courseUsers.filter(user => user.role !== user.oldRole).map(user =>{
+            const data = this.courseUsers.filter(user => user.courseRole !== user.oldRole).map(user =>{
                 return {
                     courseId: id,
                     matriculationNumber: user.matriculationNumber,
-                    role: user.role
+                    role: user.courseRole
                 };
             });
             this.$store.dispatch('updateCourseUsers', data).then(response=>{

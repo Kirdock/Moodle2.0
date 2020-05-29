@@ -10,7 +10,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/style.css';
 import i18n from '@/plugins/i18n';
 import {BVConfigPlugin, ToastPlugin, TabsPlugin, ModalPlugin, BNavItem} from 'bootstrap-vue';
-import IntegerInput from './components/IntegerInput.vue';
+import IntegerInput from '@/components/IntegerInput.vue';
 
 Vue.config.productionTip = true;
 Vue.use(BVConfigPlugin, {

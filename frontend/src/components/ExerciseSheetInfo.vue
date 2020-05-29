@@ -32,12 +32,13 @@
 </template>
 
 <script>
+import {dateManagement} from '@/plugins/global';
 export default {
     name: 'es-info',
     props: ['value'],
     data(){
         return {
-            minDate: this.$store.getters.currentDateTime
+            minDate: dateManagement.currentDateTime()
         }
     }
 }

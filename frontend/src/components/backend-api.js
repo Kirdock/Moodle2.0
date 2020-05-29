@@ -124,6 +124,9 @@ export default {
     },
     deleteExample(exampleId){
         return axios.delete(`/example/${exampleId}`);
+    },
+    updateExampleOrder(changedOrders){
+        return axios.post('/examples/order', changedOrders);
     }
 }
 
