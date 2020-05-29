@@ -41,8 +41,8 @@ public class SemesterController {
 
 
     @GetMapping(value = "/semester/{semesterId}/courses")
-    public ResponseEntity<List<CourseResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId, @RequestHeader("Authorization") String jwtToken)  {
-        return ResponseEntity.ok(semesterService.getCoursesFromSemester(semesterId,jwtToken));
+    public ResponseEntity<List<CourseResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
+        return ResponseEntity.ok(semesterService.getCoursesFromSemester(semesterId));
     }
 
 

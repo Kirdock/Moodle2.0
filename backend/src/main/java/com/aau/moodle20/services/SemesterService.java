@@ -169,17 +169,18 @@ public class SemesterService {
         return semestersToBeReturned;
     }
 
-    public List<CourseResponseObject> getCoursesFromSemester(Long semesterId,String jwtToken) {
+    public List<CourseResponseObject> getCoursesFromSemester(Long semesterId) {
         checkIfSemesterExists(semesterId);
-        Boolean isAdmin = jwtUtils.getAdminFromJwtToken(jwtToken.split(" ")[1].trim());
-        String matriculationNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
+
+        UserDetailsImpl userDetails = getUserDetails();
+
         List<CourseResponseObject> responseObjects = new ArrayList<>();
         List<Course> courses = null;
 
-        if (isAdmin)
+        if (userDetails.getAdmin())
             courses = courseRepository.findCoursesBySemester_Id(semesterId);
         else
-            courses = courseRepository.findCoursesBySemester_IdAndOwner_MatriculationNumber(semesterId, matriculationNumber);
+            courses = courseRepository.findCoursesBySemester_IdAndOwner_MatriculationNumber(semesterId, userDetails.getMatriculationNumber());
 
         if (courses != null && !courses.isEmpty()) {
             for (Course course : courses) {
@@ -187,6 +188,7 @@ public class SemesterService {
                 responseObject.setId(course.getId());
                 responseObject.setName(course.getName());
                 responseObject.setNumber(course.getNumber());
+                responseObject.setOwner(course.getOwner().getMatriculationNumber());
                 responseObjects.add(responseObject);
             }
         }
