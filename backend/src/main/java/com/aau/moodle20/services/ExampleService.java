@@ -123,4 +123,24 @@ public class ExampleService {
             throw new ServiceValidationException("Error: example not found!", HttpStatus.NOT_FOUND);
         return exampleRepository.findById(id).get().createExampleResponseObject();
     }
+
+    public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) throws ServiceValidationException
+    {
+        for(ExampleOrderRequest exampleOrderRequest: exampleOrderRequests)
+        {
+            if(!exampleRepository.existsById(exampleOrderRequest.getId()))
+                throw new ServiceValidationException("Error: Example with id:"+exampleOrderRequest.getId()+" not found!",HttpStatus.NOT_FOUND);
+        }
+
+        for(ExampleOrderRequest exampleOrderRequest: exampleOrderRequests)
+        {
+           Optional<Example> optionalExample = exampleRepository.findById(exampleOrderRequest.getId());
+           if(optionalExample.isPresent())
+           {
+               Example example = optionalExample.get();
+               example.setOrder(exampleOrderRequest.getOrder());
+               exampleRepository.save(example);
+           }
+        }
+    }
 }

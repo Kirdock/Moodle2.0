@@ -1,6 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
@@ -37,6 +38,12 @@ public class ExampleController {
     public ResponseEntity<ExampleResponseObject> updateExample(@Valid @RequestBody ExampleRequest updateExampleRequest) throws ServiceValidationException {
         ExampleResponseObject responseObject =  exampleService.updateExample(updateExampleRequest);
         return ResponseEntity.ok(responseObject);
+    }
+
+    @PostMapping(value = "/examples/order")
+    public ResponseEntity<?> updateExampleOrder(@Valid @RequestBody List<ExampleOrderRequest> exampleOrderRequests) throws ServiceValidationException {
+        exampleService.updateExampleOrder(exampleOrderRequests);
+        return ResponseEntity.ok("Example order updated successfully");
     }
 
     // TODO refactor make own controller
