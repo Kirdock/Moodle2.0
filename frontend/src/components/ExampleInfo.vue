@@ -85,7 +85,7 @@
                                 {{subExample.points}}
                             </td>
                             <td>
-                                <a href="#" :title="$t('edit')" @click.prevent="setSelectedExample(subExample); setFileTypes()">
+                                <a href="#" :title="$t('edit')" @click.prevent="setExample(subExample)">
                                     <span class="fa fa-edit fa-2x"></span>
                                 </a>
                                 <a href="#" :title="$t('delete')" v-b-modal="'modal-delete-example'" type="button" @click.prevent="setDeleteExample(subExample.id, exampleIndex, value.subExamples)">
@@ -158,6 +158,13 @@ export default {
         }
     },
     methods:{
+        setExample(example){
+            this.setSelectedExample(example);
+            this.$nextTick(()=>{ //else selectedExample isn't changed in time and file types of selectedExample before are being used
+                this.setFileTypes();
+            });
+            
+        },
         getFileTypes(){
             this.$store.dispatch('getFileTypes').then(response =>{
                 this.fileTypes = response.data;
