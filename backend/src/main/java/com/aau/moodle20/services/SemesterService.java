@@ -218,7 +218,7 @@ public class SemesterService {
         responseObject.setDescriptionTemplate(course.getDescriptionTemplate());
         responseObject.setIncludeThird(course.getIncludeThird());
         responseObject.setExerciseSheets(exerciseSheets.stream()
-                .map(ExerciseSheet::getResponseObject)
+                .map(ExerciseSheet::getResponseObjectLessInfo)
                 .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
                 .collect(Collectors.toList()));
         if(userDetails.getAdmin())

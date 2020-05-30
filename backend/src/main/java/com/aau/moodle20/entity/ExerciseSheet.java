@@ -133,6 +133,16 @@ public class ExerciseSheet {
         return responseObject;
     }
 
+    public ExerciseSheetResponseObject getResponseObjectLessInfo()
+    {
+        ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
+        responseObject.setId(getId());
+        responseObject.setName(getName());
+        responseObject.setSubmissionDate(getSubmissionDate());
+
+        return responseObject;
+    }
+
     public Set<Example> getExamples() {
         return examples;
     }
