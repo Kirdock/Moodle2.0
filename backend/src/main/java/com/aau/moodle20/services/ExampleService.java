@@ -85,7 +85,7 @@ public class ExampleService {
 
         List<SupportFileType> supportFileTypes;
 
-        if (updateExampleRequest.getSubmitFile()) {
+        if (updateExampleRequest.getSubmitFile()!=null &&updateExampleRequest.getSubmitFile()) {
             if (updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty())
                 throw new ServiceValidationException("Error: supported file types must not be null!");
         }

@@ -14,7 +14,6 @@ public class ExampleRequest {
     private String description;
     private Integer points;
     private Integer weighting;
-    @NotNull
     private Boolean mandatory;
     @NotNull
     private Integer order;
