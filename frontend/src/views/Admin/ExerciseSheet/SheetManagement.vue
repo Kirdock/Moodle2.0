@@ -32,7 +32,7 @@
                     </div>
                 </b-tab>
                 
-                <b-tab class="item" v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()" lazy>
+                <b-tab class="item" v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()">
                     <div style="margin-top: 10px; font-size: 30px" v-if="isSubExample">
                         <a href="#" @click.prevent="setSelectedExample()">
                             {{example.name}}

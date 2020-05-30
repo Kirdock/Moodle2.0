@@ -15,7 +15,7 @@
         <div class="form-group">
             <label :for="`esInfoDescription${_uid}`" class="control-label">{{ $t('description') }}</label>
             <div class="document-editor__editable-container">
-                <ckeditor :id="`esInfoDescription${_uid}`" v-model="value.description" :editor="editor"  :config="editorConfig" @ready="onReady"></ckeditor>
+                <ckeditor :id="`esInfoDescription${_uid}`" v-model="value.description" :editor="editor" @ready="onReady" :config="editorConfig" ></ckeditor>
             </div>
         </div>
         <div class="form-group">
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import {dateManagement} from '@/plugins/global';
+import {dateManagement, editorManagement} from '@/plugins/global';
 import Editor from '@/components/ckeditor';
 import i18n from '@/plugins/i18n';
 
@@ -45,18 +45,13 @@ export default {
         return {
             editor: Editor,
             editorConfig: {
-	            language: 'de'
+	            language: i18n.locale
             },
             minDate: dateManagement.currentDateTime()
         }
     },
     methods:{
-        onReady(editor) {
-          editor.ui.getEditableElement().parentElement.insertBefore(
-                editor.ui.view.toolbar.element,
-                editor.ui.getEditableElement()
-            );
-        }
+        onReady: editorManagement.onReady
     }
 }
 </script>

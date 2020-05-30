@@ -50,6 +50,9 @@ export default new Vuex.Store({
     },
     fileTypes(state, fileTypes){
       state.fileTypes = fileTypes;
+    },
+    fileTypePromise(state, promise){
+      state.fileTypesPromise = promise;
     }
   },
   actions: {
@@ -173,16 +176,21 @@ export default new Vuex.Store({
     deleteCourse({commit}, data){
       return api.deleteCourse(data);
     },
-    getFileTypes({commit, state}, data){
+    getFileTypes({commit, state}){
       return new Promise((resolve, reject) =>{
         if(state.fileTypes){
-          resolve({data: state.fileTypes});
+          resolve({data: state.fileTypes})
+        }
+        else if(state.fileTypesPromise){
+          resolve(state.fileTypesPromise);
         }
         else{
-          api.getFileTypes().then(response =>{
+          const promise = api.getFileTypes().then(response =>{
             commit('fileTypes', response.data);
-            resolve(response);
-          }).catch(reject);
+            return response;
+          });
+          commit('fileTypePromise', promise);
+          resolve(promise);
         }
       })
     },

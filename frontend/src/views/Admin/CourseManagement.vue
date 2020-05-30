@@ -207,7 +207,9 @@
                 <div class="form-horizontal col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="defaultDescription">{{$t('descriptionExerciseSheets')}}</label>
-                        <textarea class="form-control" id="defaultDescription" v-model="selectedCourseTemplate"></textarea>
+                        <div class="document-editor__editable-container">
+                            <ckeditor :id="`defaultDescription`" v-model="selectedCourseTemplate" :editor="editor" @ready="onReady" :config="editorConfig" ></ckeditor>
+                        </div>
                     </div>
                     <button class="btn btn-primary" type="button" @click="saveDefaultTemplate()">
                         <span class="fa fa-sync fa-spin" v-if="loading_defaultTemplate"></span>
@@ -223,7 +225,10 @@
 <script>
 import CourseInfo from '@/components/CourseInfo.vue';
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
-import {userManagement, dateManagement} from '@/plugins/global';
+import {userManagement, dateManagement, editorManagement} from '@/plugins/global';
+import Editor from '@/components/ckeditor';
+import i18n from '@/plugins/i18n';
+
 export default {
     components: {
         'course-info': CourseInfo,
@@ -249,7 +254,11 @@ export default {
             users: [],
             loadingFileUpload: false,
             loading_defaultTemplate: false,
-            selectedCourseTemplate: undefined
+            selectedCourseTemplate: undefined,
+            editor: Editor,
+            editorConfig: {
+	            language: i18n.locale
+            },
         }
     },
     created(){
@@ -279,6 +288,7 @@ export default {
         }
     },
     methods:{
+        onReady: editorManagement.onReady,
         getUsers(){
             this.$store.dispatch('getUsers').then(({data}) =>{
                 this.users = data;

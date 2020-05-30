@@ -8,8 +8,9 @@
                 </div>
                 <div class="form-group">
                     <label :for="`eInfoDescription${_uid}`" class="control-label" :class="value.subExamples.length === 0 ? 'required' : ''">{{ $t('description') }}</label>
-                    <textarea :id="`eInfoDescription${_uid}`" class="form-control"  v-model="value.description" :required="value.subExamples.length === 0">
-                    </textarea>
+                    <div class="document-editor__editable-container">
+                        <ckeditor :id="`eInfoDescription${_uid}`" v-model="value.description" :editor="editor" @ready="onReady" :config="editorConfig" :required="value.subExamples.length === 0" ></ckeditor>
+                    </div>
                 </div>
                 <div v-if="value.subExamples.length === 0">
                     <div class="form-group">
@@ -110,8 +111,10 @@
 <script>
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import {orderManagement} from '@/plugins/global';
+import {orderManagement, editorManagement} from '@/plugins/global';
 import Sortable from "sortablejs";
+import Editor from '@/components/ckeditor';
+import i18n from '@/plugins/i18n';
 
 export default {
     name: 'example-info',
@@ -152,12 +155,18 @@ export default {
     },
     data(){
         return {
+            editor: Editor,
+            editorConfig: {
+	            language: i18n.locale
+            },
             selectedExample_delete: undefined,
             selectedfileTypes: [],
-            fileTypes: []
+            fileTypes: [],
+
         }
     },
     methods:{
+        onReady: editorManagement.onReady,
         setExample(example){
             this.setSelectedExample(example);
             this.$nextTick(()=>{ //else selectedExample isn't changed in time and file types of selectedExample before are being used
