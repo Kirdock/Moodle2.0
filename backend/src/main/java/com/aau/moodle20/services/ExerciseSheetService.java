@@ -1,6 +1,7 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
+import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.ExerciseSheet;
 import com.aau.moodle20.exception.EntityNotFoundException;
@@ -14,8 +15,10 @@ import com.aau.moodle20.repository.SupportFileTypeRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -92,7 +95,29 @@ public class ExerciseSheetService {
     public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) throws ServiceValidationException {
         if (!courseRepository.existsById(courseId))
             throw new EntityNotFoundException("Course not found");
+        UserDetailsImpl userDetails = getUserDetails();
+        Course course = courseRepository.findById(courseId).get();
+        if (!userDetails.getAdmin()) {
+            boolean isOwner = course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber());
+            boolean isStudentInCourse = course.getStudents().stream()
+                    .anyMatch(userInCourse -> userInCourse.getRole().equals(ECourseRole.Student) && userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
+            if (!isOwner && !isStudentInCourse)
+                throw new ServiceValidationException("Error: not authorized to access exerciseSheets", HttpStatus.UNAUTHORIZED);
+        }
+
         List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
-        return exerciseSheets.stream().map(ExerciseSheet::getResponseObject).collect(Collectors.toList());
+        List<ExerciseSheetResponseObject> responseObjects = new ArrayList<>();
+        for (ExerciseSheet sheet : exerciseSheets) {
+            ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
+            responseObject.setName(sheet.getName());
+            responseObject.setSubmissionDate(sheet.getSubmissionDate());
+            responseObject.setId(sheet.getId());
+            responseObjects.add(responseObject);
+        }
+        return responseObjects;
+    }
+
+    public UserDetailsImpl getUserDetails() {
+        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
