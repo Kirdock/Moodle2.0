@@ -22,7 +22,7 @@
                     <div class="form-group">
                         <label :for="`eInfoPoints${_uid}`" class="control-label required">{{ $t('points') }}</label>
                         <div class="col-md-4" style="padding-left: 0px">
-                            <i-input :id="`eInfoPoints${_uid}`" type="number" class="form-control"  v-model="value.points" required> </i-input>
+                            <i-input :id="`eInfoPoints${_uid}`" type="number" class="form-control" min="0"  v-model="value.points" required> </i-input>
                         </div>
                     </div>
                     <div class="form-check" style="margin-top: 20px">

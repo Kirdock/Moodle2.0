@@ -23,11 +23,11 @@
         </div>
         <div class="form-group">
             <label :for="`cInfoNumber${_uid}`" class="control-label required">{{ $t('number') }} ({{$t('format')}} : 123.456)</label>
-            <input :id="`cInfoNumber${_uid}`" type="text" class="form-control"  pattern="[0-9]{3}\.[0-9]{3}" :title="$t('format') +': 123.456'" v-model="value.number" required>
+            <input :id="`cInfoNumber${_uid}`" type="text" class="form-control" :disabled="!$store.getters.userInfo.isAdmin" pattern="[0-9]{3}\.[0-9]{3}" :title="$t('format') +': 123.456'" v-model="value.number" required>
         </div>
         <div class="form-group">
             <label :for="`cInfoName${_uid}`" class="control-label required">{{ $t('name') }}</label>
-            <input :id="`cInfoName${_uid}`" type="text" class="form-control" v-model="value.name" required>
+            <input :id="`cInfoName${_uid}`" type="text" class="form-control" v-model="value.name" :disabled="!$store.getters.userInfo.isAdmin" required>
         </div>
         <div class="form-group">
             <label :for="`cInfoMinKreuzel${_uid}`" class="control-label">{{$t('minRequireKreuzel')}}</label>
