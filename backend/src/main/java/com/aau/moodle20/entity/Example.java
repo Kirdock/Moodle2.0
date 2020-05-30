@@ -162,11 +162,11 @@ public class Example {
         return list;
     }
 
-    public void setCustomFileTypesList(List<String> customFileTypesList)
-    {
-        if(customFileTypesList!=null && !customFileTypesList.isEmpty())
-        {
-           this.customFileTypes = customFileTypesList.stream().collect(Collectors.joining(","));
+    public void setCustomFileTypesList(List<String> customFileTypesList) {
+        if (customFileTypesList != null && !customFileTypesList.isEmpty()) {
+            this.customFileTypes = customFileTypesList.stream().collect(Collectors.joining(","));
+        } else {
+            this.customFileTypes = null;
         }
     }
 
