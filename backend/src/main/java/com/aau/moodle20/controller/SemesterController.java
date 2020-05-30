@@ -56,9 +56,7 @@ public class SemesterController {
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/course")
     public ResponseEntity<?> createCourse(@Valid  @RequestBody CreateCourseRequest createCourseRequest)  throws SemesterException {
-
-        semesterService.createCourse(createCourseRequest);
-        return ResponseEntity.ok(new MessageResponse("Course was sucessfully created!"));
+        return ResponseEntity.ok(semesterService.createCourse(createCourseRequest));
     }
 
 

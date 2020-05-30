@@ -64,7 +64,7 @@ public class SemesterService {
         semesterRepository.save(semester);
     }
 
-    public void createCourse(CreateCourseRequest createCourseRequest) throws ServiceValidationException {
+    public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceValidationException {
 
         checkIfSemesterExists(createCourseRequest.getSemesterId());
         if(courseRepository.existsByNameAndNumberAndSemester_Id(createCourseRequest.getName(),createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
@@ -79,6 +79,8 @@ public class SemesterService {
         course.setOwner(new User(createCourseRequest.getOwner()));
         course.setIncludeThird(createCourseRequest.getIncludeThird()!=null?createCourseRequest.getIncludeThird():Boolean.FALSE);
         courseRepository.save(course);
+
+        return new CourseResponseObject(course.getId());
     }
 
     public void updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceValidationException {
