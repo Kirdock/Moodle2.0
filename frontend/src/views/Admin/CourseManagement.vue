@@ -304,7 +304,7 @@ export default {
             this.loadingFileUpload = true;
             const formData = new FormData();
             formData.append('file',this.$refs.file.files[0]);
-            formData.append('isAdmin', false)
+            formData.append('id', this.selectedCourseId)
             this.$refs.file.value = '';
             this.$store.dispatch('assignCourseUsers', formData).then(response =>{
                 this.$bvToast.toast(this.$t('course.usersSaved'), {
