@@ -61,6 +61,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Value("${adminMatriculationNumber}")
     private String adminMatriculationNumber;
 
+    @Value("${studentEmailPostfix}")
+    private String studentEmailPostFix;
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -112,6 +115,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             user.setForename(columns[3]);
             user.setAdmin(Boolean.FALSE);
             user.setPassword(password);
+            user.setEmail(user.getUsername()+"@"+studentEmailPostFix);
             users.add(user);
         }
 
