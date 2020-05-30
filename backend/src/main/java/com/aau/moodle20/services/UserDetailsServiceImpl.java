@@ -8,6 +8,8 @@ import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
+import com.aau.moodle20.payload.request.UpdateCourseDescriptionTemplate;
+import com.aau.moodle20.payload.request.UpdateUserRequest;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -191,6 +194,35 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.save(user);
     }
 
+    public void updateUser(UpdateUserRequest updateUserRequest) throws ServiceValidationException {
+        String matriculationNumber = null;
+        UserDetailsImpl userDetails = getUserDetails();
+        if (updateUserRequest.getMatriculationNumber() != null && updateUserRequest.getMatriculationNumber().length() > 0) {
+            matriculationNumber = updateUserRequest.getMatriculationNumber();
+            if (!userRepository.existsByMatriculationNumber(matriculationNumber))
+                throw new ServiceValidationException("Error: user with matriculationNumber:" + matriculationNumber + " does not exists", HttpStatus.NOT_FOUND);
+        } else {
+            matriculationNumber = userDetails.getMatriculationNumber();
+        }
+        if(!userDetails.getAdmin() && !userDetails.getMatriculationNumber().equals(matriculationNumber))
+            throw new ServiceValidationException("Error: User is not admin and therefore not allowed to edit other users than himself ", HttpStatus.UNAUTHORIZED);
+
+
+        if(adminMatriculationNumber.equals(matriculationNumber))
+            throw new ServiceValidationException("Error: Root admin cannot be updated!");
+
+
+
+        User user = userRepository.findByMatriculationNumber(matriculationNumber).get();
+        user.setEmail(updateUserRequest.getEmail());
+        user.setSurname(updateUserRequest.getSurname());
+        user.setForename(updateUserRequest.getForename());
+        if(userDetails.getAdmin() && updateUserRequest.getIsAdmin()!=null)
+            user.setAdmin(updateUserRequest.getIsAdmin());
+
+        userRepository.save(user);
+    }
+
     public void deleteUser(String matriculationNumber) throws ServiceValidationException
     {
         Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
@@ -214,5 +246,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(!optionalUser.isPresent())
          throw new ServiceValidationException("Error: user with given matriculationNumber not found", HttpStatus.NOT_FOUND);
        return optionalUser.get().createUserResponseObject();
+    }
+
+    public UserDetailsImpl getUserDetails() {
+        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

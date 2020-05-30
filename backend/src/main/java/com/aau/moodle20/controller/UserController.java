@@ -4,6 +4,7 @@ import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
+import com.aau.moodle20.payload.request.UpdateUserRequest;
 import com.aau.moodle20.payload.response.*;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
@@ -83,6 +84,12 @@ public class UserController {
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, @RequestHeader("Authorization") String jwtToken) {
         userDetailsService.changePassword(changePasswordRequest, jwtToken);
         return ResponseEntity.ok(new MessageResponse("User password changed!"));
+    }
+
+    @PostMapping(path = "/user")
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
+        userDetailsService.updateUser(updateUserRequest);
+        return ResponseEntity.ok(new MessageResponse("User was successfully updated!"));
     }
 
     // put api---------------------------------------------------------------------
