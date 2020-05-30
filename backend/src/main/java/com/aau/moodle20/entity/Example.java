@@ -34,7 +34,7 @@ public class Example {
     private Boolean mandatory;
     @Column(name = "sort_order")
     private Integer order;
-    private Boolean submitFile;
+    private Boolean submitFile ;
     private String customFileTypes;
     @OneToMany(mappedBy = "example", fetch = FetchType.LAZY)
     Set<SupportFileType> supportFileTypes;
@@ -173,11 +173,13 @@ public class Example {
     public void fillValuesFromRequestObject(ExampleRequest exampleRequest) {
         setName(exampleRequest.getName());
         setDescription(exampleRequest.getDescription());
-        setMandatory(exampleRequest.getMandatory());
         setOrder(exampleRequest.getOrder());
         setPoints(exampleRequest.getPoints());
         setWeighting(exampleRequest.getWeighting());
-        setSubmitFile(exampleRequest.getSubmitFile());
+
+        setSubmitFile(exampleRequest.getSubmitFile() != null ? exampleRequest.getSubmitFile() : Boolean.FALSE);
+        setMandatory(exampleRequest.getMandatory() != null ? exampleRequest.getMandatory() : Boolean.FALSE);
+
         setCustomFileTypesList(exampleRequest.getCustomFileTypes());
         if (exampleRequest.getParentId() != null)
             setParentExample(new Example(exampleRequest.getParentId()));

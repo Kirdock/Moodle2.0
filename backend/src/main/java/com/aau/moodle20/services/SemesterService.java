@@ -77,7 +77,7 @@ public class SemesterService {
         course.setNumber(createCourseRequest.getNumber());
         course.setSemester(new Semester(createCourseRequest.getSemesterId()));
         course.setOwner(new User(createCourseRequest.getOwner()));
-        course.setIncludeThird(createCourseRequest.getIncludeThird());
+        course.setIncludeThird(createCourseRequest.getIncludeThird()!=null?createCourseRequest.getIncludeThird():Boolean.FALSE);
         courseRepository.save(course);
     }
 
