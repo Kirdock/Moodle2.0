@@ -14,6 +14,12 @@ import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.UserPresentedResponse;
 import com.aau.moodle20.repository.*;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +62,7 @@ public class SemesterService {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
+    private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
 
 
 
@@ -287,6 +297,99 @@ public class SemesterService {
 
         return responseObject;
     }
+
+    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceValidationException {
+        checkIfCourseExists(courseId);
+        Course course = courseRepository.findById(courseId).get();
+        Document document = new Document();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try{
+            Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+
+            PdfPTable table = createAttendanceTable(course);
+            PdfPTable headerTable = createAttendanceHeaderTable();
+            PdfWriter.getInstance(document, out);
+            document.open();
+            document.add(headerTable);
+            document.add(table);
+
+            document.close();
+
+        } catch (DocumentException ex) {
+            logger.error("Error occurred: {0}", ex);
+            throw new ServiceValidationException(ex.getMessage());
+        }
+
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    protected PdfPTable createAttendanceHeaderTable() throws DocumentException {
+        PdfPTable table = new PdfPTable(1);
+        table.setWidthPercentage(95);
+        table.setWidths(new int[]{1});
+
+        Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+
+        table.setHeaderRows(1);
+
+        PdfPCell hcell;
+        hcell = new PdfPCell(new Phrase("AnwesenheitsListe", headFont));
+        hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(hcell);
+
+        return table;
+    }
+
+    protected PdfPTable createAttendanceTable(Course course) throws DocumentException {
+        PdfPTable table = new PdfPTable(3);
+        table.setWidthPercentage(95);
+        table.setWidths(new int[]{3, 3, 4});
+
+        Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+
+        table.setHeaderRows(1);
+
+        PdfPCell hcell;
+        hcell = new PdfPCell(new Phrase("Name", headFont));
+        hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(hcell);
+
+        hcell = new PdfPCell(new Phrase("MatrikelNummer", headFont));
+        hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(hcell);
+
+        hcell = new PdfPCell(new Phrase("Unterschrift", headFont));
+        hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(hcell);
+
+        for (UserInCourse userInCourse : course.getStudents()) {
+
+            if (!ECourseRole.Student.equals(userInCourse.getRole()))
+                continue;
+
+            PdfPCell cell;
+
+            cell = new PdfPCell(new Phrase(userInCourse.getUser().getForename() + " " + userInCourse.getUser().getSurname()));
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Phrase(userInCourse.getUser().getMatriculationNumber()));
+            cell.setPaddingLeft(5);
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Phrase(""));
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            cell.setPaddingRight(5);
+            table.addCell(cell);
+        }
+
+        return table;
+    }
+
 
     protected void checkIfCourseExists(Long courseId) throws ServiceValidationException {
         if (!courseRepository.existsById(courseId)) throw new ServiceValidationException("Error: Course not found",HttpStatus.NOT_FOUND);

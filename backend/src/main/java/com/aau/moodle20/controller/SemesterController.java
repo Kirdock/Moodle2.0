@@ -9,12 +9,16 @@ import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.services.SemesterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @RestController()
@@ -50,6 +54,20 @@ public class SemesterController {
     @GetMapping(value = "/course/{courseId}")
     public ResponseEntity<CourseResponseObject> getCourse(@PathVariable("courseId") long courseId)  {
         return ResponseEntity.ok(semesterService.getCourse(courseId));
+    }
+
+    @GetMapping(value = "/course/{courseId}/attendanceList")
+    public ResponseEntity<InputStreamResource> getAttendanceList(@PathVariable("courseId") long courseId)  {
+
+        ByteArrayInputStream bis = semesterService.generateCourseAttendanceList(courseId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename="+courseId+"_attendanceList.pdf");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
     }
 
 
