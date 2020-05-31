@@ -244,9 +244,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.delete(optionalUser.get());
     }
 
-    public Boolean isOwner(String jwtToken) {
-        String matriculationNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
-        return courseRepository.existsByOwner_MatriculationNumber(matriculationNumber);
+    public Boolean isOwner() {
+        UserDetailsImpl userDetails = getUserDetails();
+        return courseRepository.existsByOwner_MatriculationNumber(userDetails.getMatriculationNumber());
     }
 
     public UserResponseObject getUser(String matriculationNumber)
@@ -260,4 +260,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetailsImpl getUserDetails() {
         return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+
 }

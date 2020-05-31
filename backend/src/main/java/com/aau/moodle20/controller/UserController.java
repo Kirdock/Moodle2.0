@@ -1,10 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.UserException;
-import com.aau.moodle20.payload.request.ChangePasswordRequest;
-import com.aau.moodle20.payload.request.LoginRequest;
-import com.aau.moodle20.payload.request.SignUpRequest;
-import com.aau.moodle20.payload.request.UpdateUserRequest;
+import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.*;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
@@ -58,8 +55,8 @@ public class UserController {
         return userDetailsService.getUsersWithCourseRoles(courseId);
     }
     @GetMapping(path = "/user/isOwner")
-    public Boolean getUsersWithCourseRoles(@RequestHeader("Authorization") String jwtToken) {
-        return userDetailsService.isOwner(jwtToken);
+    public Boolean isOwner() {
+        return userDetailsService.isOwner();
     }
 
     @GetMapping(path = "/user/{matriculationNumber}")
@@ -92,6 +89,8 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("User was successfully updated!"));
     }
 
+
+
     // put api---------------------------------------------------------------------
 
     @PreAuthorize("hasAuthority('Admin')")
@@ -109,6 +108,12 @@ public class UserController {
 
         userDetailsService.registerUsers(file);
         return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
+    }
+
+    @PutMapping(path = "/user/kreuzel")
+    public ResponseEntity<?> setKreuzelUser(@Valid @RequestBody UserKreuzelRequest userKreuzelRequest) {
+        userDetailsService.setKreuzelUser(userKreuzelRequest);
+        return ResponseEntity.ok(new MessageResponse("Kreuzel was successfully set!"));
     }
 
     // delete api -------------------------------------------------------------------------
