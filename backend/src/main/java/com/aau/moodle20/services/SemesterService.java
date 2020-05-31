@@ -9,10 +9,11 @@ import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
+import com.aau.moodle20.payload.response.AssignedStudent;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
+import com.aau.moodle20.payload.response.UserPresentedResponse;
 import com.aau.moodle20.repository.*;
-import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -232,12 +233,15 @@ public class SemesterService {
         return responseObjects;
     }
 
-    public CourseResponseObject getCourse(long courseId) throws SemesterException {
+    public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
 
+        List<AssignedStudent> assignedUsers = new ArrayList<>();
         UserDetailsImpl userDetails = getUserDetails();
-
         checkIfCourseExists(courseId);
         Course course = courseRepository.findById(courseId).get();
+        if(!userDetails.getAdmin() && !course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
+            throw new ServiceValidationException("Error: neither admin or user",HttpStatus.UNAUTHORIZED);
+
         List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
 
         CourseResponseObject responseObject = new CourseResponseObject();
@@ -252,6 +256,32 @@ public class SemesterService {
                 .map(ExerciseSheet::getResponseObjectLessInfo)
                 .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
                 .collect(Collectors.toList()));
+        for(UserInCourse userInCourse : course.getStudents())
+        {
+            if(userInCourse.getRole().equals(ECourseRole.Student) && userInCourse.getUser().getFinishedExamples()!=null)
+            {
+                AssignedStudent assignedUser = new AssignedStudent();
+                List<UserPresentedResponse> userPresentedResponseList = new ArrayList<>();
+                for(FinishesExample finishesExample: userInCourse.getUser().getFinishedExamples())
+                {
+                    if(!finishesExample.getHasPresented())
+                        continue;
+
+                    UserPresentedResponse userPresentedResponse = new UserPresentedResponse();
+                    userPresentedResponse.setExampleId(finishesExample.getExample().getId());
+                    userPresentedResponse.setExampleName(finishesExample.getExample().getName());
+                    userPresentedResponse.setOrder(finishesExample.getExample().getOrder());
+                    if(finishesExample.getExample().getParentExample()!=null)
+                        userPresentedResponse.setParentOrder(finishesExample.getExample().getParentExample().getOrder());
+                    userPresentedResponseList.add(userPresentedResponse);
+                }
+                assignedUser.setPresentedExamples(userPresentedResponseList);
+                assignedUser.setMatriculationNumber(userInCourse.getUser().getMatriculationNumber());
+                assignedUsers.add(assignedUser);
+            }
+        }
+        responseObject.setAssignedStudents(assignedUsers);
+
         if(userDetails.getAdmin())
             responseObject.setOwner(course.getOwner().getMatriculationNumber());
 
