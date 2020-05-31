@@ -127,6 +127,11 @@ export default {
     },
     updateExampleOrder(changedOrders){
         return axios.post('/examples/order', changedOrders);
+    },
+    getAttendanceList(courseId){
+        return axios.get(`/course/${courseId}/attendanceList`,{
+            responseType: 'blob'
+        });
     }
 }
 

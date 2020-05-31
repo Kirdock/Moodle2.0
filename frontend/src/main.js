@@ -30,7 +30,7 @@ Vue.use( CKEditor );
 Vue.component('b-nav-item', BNavItem);
 Vue.component('i-input', IntegerInput); //Global registration
 
-store.dispatch('initialiseStore', true).then((response)=>{
+store.dispatch('initialiseStore', true).finally(()=>{
   i18n.locale = store.getters.locale;
 
   const app = new Vue({

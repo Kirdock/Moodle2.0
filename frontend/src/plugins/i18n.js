@@ -10,6 +10,12 @@ const messages = {
         admin: 'Admin',
         all: 'Alle',
         assigned: 'Zugeteilt',
+        attendance: {
+            list: 'Anwesenheitsliste',
+            error: {
+                get: 'Die Anwesenheitsliste konnte nicht geladen werden'
+            }
+        },
         cancel: 'Abbrechen',
         change: 'Änderung',
         changeLanguageError: 'Die Sprache konnte nicht geändert werden',
@@ -220,6 +226,12 @@ const messages = {
         admin: 'Admin',
         all: 'All',
         assigned: 'Assigned',
+        attendance: {
+            list: 'Attendance list',
+            error: {
+                get: 'Could not get attendance list'
+            }
+        },
         cancel: 'cancel',
         change: 'Change',
         changeLanguageError: 'Language could not be changed',

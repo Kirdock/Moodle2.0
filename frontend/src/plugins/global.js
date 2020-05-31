@@ -120,3 +120,18 @@ export const editorManagement = {
         );
     }
 }
+
+export const fileManagement = {
+    getFileNameOutOfHeader(headers){
+        let fileName = '';
+        const disposition = headers['content-disposition'];
+        if (disposition && disposition.indexOf('filename') !== -1) {
+            var reg = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            var matches = reg.exec(disposition);
+            if (matches != null && matches[1]) { 
+              fileName = matches[1].replace(/['"]/g, '');
+            }
+        }
+        return fileName;
+      }
+}

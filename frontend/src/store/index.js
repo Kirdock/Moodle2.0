@@ -64,7 +64,10 @@ export default new Vuex.Store({
         this.dispatch('getIsOwner').then(isOwner =>{
           commit('initialiseStore', isOwner);
           resolve(isOwner);
-        }).catch(reject);
+        }).catch((error)=>{
+          commit('initialiseStore', false);
+          reject(error);
+        });
       })
       
     },
@@ -220,6 +223,9 @@ export default new Vuex.Store({
     },
     updateExampleOrder({commit}, changedOrders){
       return api.updateExampleOrder(changedOrders);
+    },
+    getAttendanceList({commit}, courseId){
+      return api.getAttendanceList(courseId);
     }
   },
   modules: {

@@ -86,6 +86,13 @@
             <b-tab :title="$t('user.assigned')" id="assignedUsers">
                 <div class="form-horizontal col-md-7">
                     <div class="form-group">
+                        <button class="btn btn-primary" type="button" @click="getAttendanceList(selectedCourseId)">
+                            <span class="fa fa-sync fa-spin" v-if="loading_attendanceList"></span>
+                            <span class="fas fa-download" v-else></span>
+                            {{$t('attendance.list')}}
+                        </button>
+                    </div>
+                    <div class="form-group">
                         <label class="btn btn-primary finger">
                             <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
                             <span class="fas fa-upload" v-else></span>
@@ -225,7 +232,7 @@
 <script>
 import CourseInfo from '@/components/CourseInfo.vue';
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
-import {userManagement, dateManagement, editorManagement} from '@/plugins/global';
+import {userManagement, dateManagement, editorManagement, fileManagement} from '@/plugins/global';
 import Editor from '@/components/ckeditor';
 import i18n from '@/plugins/i18n';
 
@@ -259,6 +266,7 @@ export default {
             editorConfig: {
 	            language: i18n.locale
             },
+            loading_attendanceList: false
         }
     },
     created(){
@@ -289,6 +297,25 @@ export default {
     },
     methods:{
         onReady: editorManagement.onReady,
+        getAttendanceList(courseId){
+            this.loading_attendanceList = true;
+            this.$store.dispatch('getAttendanceList', courseId).then(response => {
+                const url = window.URL.createObjectURL(response.data);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', fileManagement.getFileNameOutOfHeader(response.headers));
+                document.body.appendChild(link);
+                link.click();
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('attendance.error.get'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }).finally(()=>{
+                this.loading_attendanceList = false;
+            });
+        },
         getUsers(){
             this.$store.dispatch('getUsers').then(({data}) =>{
                 this.users = data;
