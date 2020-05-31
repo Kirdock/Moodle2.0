@@ -11,7 +11,7 @@ public class UserKreuzelRequest {
     private Long exampleId;
     @NotNull
     private EFinishesExampleState type;
-    
+
     private String description;
 
     public Long getExampleId() {

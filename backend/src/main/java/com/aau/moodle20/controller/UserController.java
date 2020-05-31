@@ -93,7 +93,11 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("User was successfully updated!"));
     }
 
-
+    @PostMapping(path = "/user/examplePresented")
+    public ResponseEntity<?> setUserExamplePresented(@Valid @RequestBody UserExamplePresentedRequest userExamplePresentedRequest) {
+        finishesExampleService.setUserExamplePresented(userExamplePresentedRequest);
+        return ResponseEntity.ok(new MessageResponse("Presented flag was successfully updated!"));
+    }
 
     // put api---------------------------------------------------------------------
 
