@@ -9,6 +9,8 @@ public class UserExamplePresentedRequest {
     private Long exampleId;
     @NotBlank
     private String matriculationNumber;
+    @NotNull
+    private Boolean hasPresented;
 
     public Long getExampleId() {
         return exampleId;
@@ -24,5 +26,13 @@ public class UserExamplePresentedRequest {
 
     public void setMatriculationNumber(String matriculationNumber) {
         this.matriculationNumber = matriculationNumber;
+    }
+
+    public Boolean getHasPresented() {
+        return hasPresented;
+    }
+
+    public void setHasPresented(Boolean hasPresented) {
+        this.hasPresented = hasPresented;
     }
 }

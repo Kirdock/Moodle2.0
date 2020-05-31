@@ -61,7 +61,7 @@ public class FinishesExampleService {
             throw new ServiceValidationException("Error: user did not check this example");
 
         FinishesExample finishesExample = optionalFinishesExample.get();
-        finishesExample.setHasPresented(Boolean.TRUE);
+        finishesExample.setHasPresented(userExamplePresented.getHasPresented());
         finishesExampleRepository.save(finishesExample);
     }
 
