@@ -1,6 +1,7 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
+import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import com.aau.moodle20.entity.embeddable.UserCourseKey;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,15 +42,15 @@ public class SemesterService {
     UserRepository userRepository;
 
     @Autowired
-    JwtUtils jwtUtils;
-
-    @Autowired
     FileTypeRepository fileTypeRepository;
     @Autowired
     SupportFileTypeRepository supportFileTypeRepository;
 
     @Autowired
     ExampleRepository exampleRepository;
+
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
 
 
 
@@ -128,7 +130,7 @@ public class SemesterService {
 
 
 
-    public void assignCourse(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws SemesterException
+    public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws SemesterException
     {
         //TODO add validation
 
@@ -152,6 +154,35 @@ public class SemesterService {
             userInCourse.setId(userCourseKey);
             userInCourses.add(userInCourse);
 
+        }
+        userInCourseRepository.saveAll(userInCourses);
+    }
+
+
+    @Transactional
+    public void assignFile(MultipartFile file, Long courseId) throws ServiceValidationException {
+        if (file == null)
+            throw new ServiceValidationException("Error: file is null");
+        if (courseId == null)
+            throw new ServiceValidationException("Error: file is null");
+        checkIfCourseExists(courseId);
+        List<User> allGivenUsers = userDetailsService.registerUsers(file);
+        List<UserInCourse> userInCourses = new ArrayList<>();
+
+        for (User user : allGivenUsers) {
+
+            UserCourseKey userCourseKey = new UserCourseKey();
+            UserInCourse userInCourse = new UserInCourse();
+            Course course = new Course(courseId);
+
+            userCourseKey.setCourseId(courseId);
+            userCourseKey.setMatriculationNumber(user.getMatriculationNumber());
+
+            userInCourse.setRole(ECourseRole.Student);
+            userInCourse.setUser(user);
+            userInCourse.setCourse(course);
+            userInCourse.setId(userCourseKey);
+            userInCourses.add(userInCourse);
         }
         userInCourseRepository.saveAll(userInCourses);
     }

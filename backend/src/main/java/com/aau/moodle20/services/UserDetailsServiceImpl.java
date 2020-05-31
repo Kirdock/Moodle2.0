@@ -98,9 +98,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
 
-    public void registerUsers(MultipartFile file) throws UserException {
+    public List<User> registerUsers(MultipartFile file) throws UserException {
         //TODO add validation
         List<User> users = new ArrayList<>();
+        List<User> allGivenUsers = new ArrayList<>();
         List<String> lines = readLinesFromFile(file);
 
         String password = encoder.encode("password");//TODO should not be hardcoded
@@ -119,9 +120,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             users.add(user);
         }
 
+        allGivenUsers.addAll(users);
+
         // remove users which already exists
         users.removeIf(user -> userRepository.existsByMatriculationNumber(user.getMatriculationNumber()));
         userRepository.saveAll(users);
+
+        return allGivenUsers;
     }
 
 

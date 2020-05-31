@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -86,7 +87,7 @@ public class SemesterController {
     @PostMapping(value = "/course/assign")
     public ResponseEntity<?> assignCourseToSemester(@Valid  @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests)  throws SemesterException {
 
-        semesterService.assignCourse(assignUserToCourseRequests);
+        semesterService.assignUsers(assignUserToCourseRequests);
         return ResponseEntity.ok(new MessageResponse("User were successfully assigned to courses!"));
     }
 
@@ -95,5 +96,11 @@ public class SemesterController {
 
         CourseResponseObject responseObject = semesterService.copyCourse(copyCourseRequest);
         return ResponseEntity.ok(responseObject);
+    }
+
+    @PostMapping(value = "/course/assignFile")
+    public ResponseEntity<?> assignFile(@Valid  @RequestParam("file") MultipartFile file, @Valid  @RequestParam("id") Long courseId)  throws ServiceValidationException {
+        semesterService.assignFile(file,courseId);
+        return ResponseEntity.ok("Users successfully assigned to course");
     }
 }
