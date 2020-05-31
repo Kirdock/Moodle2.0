@@ -44,6 +44,10 @@ public class SemesterController {
         return semesterService.getSemesters();
     }
 
+    @GetMapping(value = "/semesters/assigned")
+    public List<Semester> getSemestersAssigned()  {
+        return semesterService.getSemestersAssigned();
+    }
 
     @GetMapping(value = "/semester/{semesterId}/courses")
     public ResponseEntity<List<CourseResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {

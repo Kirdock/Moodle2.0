@@ -10,6 +10,8 @@ public interface UserInCourseRepository extends JpaRepository<UserInCourse, User
 
     List<UserInCourse> findByCourse_Id(Long courseId);
 
+    List<UserInCourse> findByUser_MatriculationNumber(String matriculationNumber);
+
 }
 
 

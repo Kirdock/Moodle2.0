@@ -217,6 +217,20 @@ public class SemesterService {
         return semestersToBeReturned;
     }
 
+    public List<Semester> getSemestersAssigned() {
+        List<Semester> semestersToBeReturned = new ArrayList<>();
+        UserDetailsImpl userDetails = getUserDetails();
+
+        List<UserInCourse> userInCourses = userInCourseRepository.findByUser_MatriculationNumber(userDetails.getMatriculationNumber());
+        List<Semester> semesters = userInCourses.stream().map(userInCourse -> userInCourse.getCourse().getSemester()).collect(Collectors.toList());
+        for (Semester semester : semesters) {
+            if (!semestersToBeReturned.contains(semester))
+                semestersToBeReturned.add(semester);
+        }
+
+        return semestersToBeReturned;
+    }
+
     public List<CourseResponseObject> getCoursesFromSemester(Long semesterId) {
         checkIfSemesterExists(semesterId);
 
