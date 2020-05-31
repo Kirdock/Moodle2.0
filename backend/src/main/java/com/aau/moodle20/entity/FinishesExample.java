@@ -1,5 +1,6 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
 
 import javax.persistence.*;
@@ -21,12 +22,14 @@ public class FinishesExample {
     @JoinColumn(name = "example_id")
     private Example example;
 
-    private String reason;
+    private String description;
     @Lob
     @Column(name = "attachment", columnDefinition="CLOB")
     private byte [] attachment;
 
-    private Boolean valid;
+    private Boolean valid = false;
+    private Boolean hasPresented = false;
+    private EFinishesExampleState state ;
 
     public FinishesExample()
     {
@@ -56,12 +59,12 @@ public class FinishesExample {
         this.example = example;
     }
 
-    public String getReason() {
-        return reason;
+    public String getDescription() {
+        return description;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setDescription(String reason) {
+        this.description = reason;
     }
 
     public byte[] getAttachment() {
@@ -78,5 +81,21 @@ public class FinishesExample {
 
     public void setValid(Boolean valid) {
         this.valid = valid;
+    }
+
+    public Boolean getHasPresented() {
+        return hasPresented;
+    }
+
+    public void setHasPresented(Boolean hasPresented) {
+        this.hasPresented = hasPresented;
+    }
+
+    public EFinishesExampleState getState() {
+        return state;
+    }
+
+    public void setState(EFinishesExampleState state) {
+        this.state = state;
     }
 }

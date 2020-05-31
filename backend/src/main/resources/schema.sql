@@ -78,9 +78,10 @@ CREATE TABLE IF NOT EXISTS FINISHES_EXAMPLE
 (
     example_id       INT,
     matriculation_Number VARCHAR(20),
-    state            VARCHAR(5),
-    reason  TEXT,
-    valid   CHAR(1),
+    state            VARCHAR(20),
+    description  CLOB,
+    valid   CHAR(5),
+    has_Presented CHAR(5),
     attachment CLOB,
     PRIMARY KEY (example_id, matriculation_Number),
     CONSTRAINT FOREIGN_KEY_USER_FINISHES_EXAMPLE FOREIGN KEY (matriculation_Number) references USER on delete cascade,

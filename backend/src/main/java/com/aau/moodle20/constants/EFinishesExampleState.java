@@ -6,8 +6,7 @@ public enum EFinishesExampleState {
 
     YES("y"),
     NO("n"),
-    NOT_SURE("t"),
-    None("n");
+    MAYBE("m");
 
     private String role;
 

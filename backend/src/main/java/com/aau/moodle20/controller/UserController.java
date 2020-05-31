@@ -5,6 +5,7 @@ import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.*;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
+import com.aau.moodle20.services.FinishesExampleService;
 import com.aau.moodle20.services.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class UserController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private FinishesExampleService finishesExampleService;
 
     // get api--------------------------------------------------------------------
     @PreAuthorize("hasAuthority('Admin')")
@@ -112,7 +116,7 @@ public class UserController {
 
     @PutMapping(path = "/user/kreuzel")
     public ResponseEntity<?> setKreuzelUser(@Valid @RequestBody UserKreuzelRequest userKreuzelRequest) {
-        userDetailsService.setKreuzelUser(userKreuzelRequest);
+        finishesExampleService.setKreuzelUser(userKreuzelRequest);
         return ResponseEntity.ok(new MessageResponse("Kreuzel was successfully set!"));
     }
 
