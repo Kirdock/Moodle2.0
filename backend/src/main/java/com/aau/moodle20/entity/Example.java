@@ -3,6 +3,7 @@ package com.aau.moodle20.entity;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
+import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
@@ -38,6 +39,9 @@ public class Example {
     private String customFileTypes;
     @OneToMany(mappedBy = "example", fetch = FetchType.LAZY)
     Set<SupportFileType> supportFileTypes;
+
+    @OneToMany(mappedBy = "example", fetch = FetchType.LAZY)
+    Set<FinishesExample> examplesFinishedByUser;
 
 
     public Example() {
@@ -150,6 +154,14 @@ public class Example {
         this.submitFile = submitFile;
     }
 
+    public Set<FinishesExample> getExamplesFinishedByUser() {
+        return examplesFinishedByUser;
+    }
+
+    public void setExamplesFinishedByUser(Set<FinishesExample> examplesFinishedByUser) {
+        this.examplesFinishedByUser = examplesFinishedByUser;
+    }
+
     public List<String> getCustomFileTypesList() {
         List<String> list = new ArrayList<>();
         if (customFileTypes != null && customFileTypes.length()>0) {
@@ -187,7 +199,7 @@ public class Example {
             setExerciseSheet(new ExerciseSheet(exampleRequest.getExerciseSheetId()));
     }
 
-    public ExampleResponseObject createExampleResponseObject() {
+    public ExampleResponseObject createExampleResponseObject(String assignedUserMatriculationNumber) {
         ExampleResponseObject exampleResponseObject = new ExampleResponseObject();
         exampleResponseObject.setId(getId());
         if (getParentExample() != null)
@@ -203,7 +215,8 @@ public class Example {
 
         if(getSubExamples()!=null) {
             exampleResponseObject.setSubExamples(getSubExamples().stream()
-                    .map(Example::createExampleResponseObject).collect(Collectors.toList()));
+                    .map(example -> example.createExampleResponseObject(assignedUserMatriculationNumber))
+                    .collect(Collectors.toList()));
             exampleResponseObject.getSubExamples().sort(Comparator.comparing(ExampleResponseObject::getOrder));
 
         }
@@ -215,6 +228,14 @@ public class Example {
                     .map(supportFileType -> supportFileType.getFileType().createFileTypeResponseObjectOnlyId())
                     .collect(Collectors.toList());
             exampleResponseObject.setSupportedFileTypes(fileTypeResponseObjects);
+        }
+        if(assignedUserMatriculationNumber!=null && getExamplesFinishedByUser()!=null)
+        {
+            List<FinishesExampleResponse> finishesExampleResponses = getExamplesFinishedByUser().stream()
+                    .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(assignedUserMatriculationNumber))
+                    .map(FinishesExample::getFinishesExampleResponse)
+                    .collect(Collectors.toList());
+            exampleResponseObject.setFinishesExampleResponses(finishesExampleResponses);
         }
 
         return exampleResponseObject;

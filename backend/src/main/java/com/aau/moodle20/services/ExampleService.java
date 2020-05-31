@@ -120,7 +120,7 @@ public class ExampleService {
     public ExampleResponseObject getExample(Long id) throws ServiceValidationException {
         if (!exampleRepository.existsById(id))
             throw new ServiceValidationException("Error: example not found!", HttpStatus.NOT_FOUND);
-        return exampleRepository.findById(id).get().createExampleResponseObject();
+        return exampleRepository.findById(id).get().createExampleResponseObject(null);
     }
 
     public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) throws ServiceValidationException

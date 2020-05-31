@@ -82,7 +82,15 @@ public class ExerciseSheetService {
         if (!exerciseSheetRepository.existsById(id))
             throw new EntityNotFoundException("Exercise Sheet not found");
         Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(id);
-        return exerciseSheetOptional.get().getResponseObject();
+        UserDetailsImpl userDetails = getUserDetails();
+
+        Boolean isAssignedUser =  exerciseSheetOptional.get().getCourse().getStudents().stream()
+                .anyMatch(userInCourse -> userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
+        String matriculationNumber = null;
+        if(isAssignedUser)
+            matriculationNumber = userDetails.getMatriculationNumber();
+
+        return exerciseSheetOptional.get().getResponseObject(matriculationNumber);
     }
 
     public void deleteExerciseSheet(Long id) throws EntityNotFoundException {

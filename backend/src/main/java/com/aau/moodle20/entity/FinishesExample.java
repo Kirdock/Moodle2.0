@@ -2,6 +2,7 @@ package com.aau.moodle20.entity;
 
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
+import com.aau.moodle20.payload.response.FinishesExampleResponse;
 
 import javax.persistence.*;
 
@@ -97,5 +98,15 @@ public class FinishesExample {
 
     public void setState(EFinishesExampleState state) {
         this.state = state;
+    }
+
+    public FinishesExampleResponse getFinishesExampleResponse()
+    {
+        FinishesExampleResponse response = new FinishesExampleResponse();
+        response.setDescription(getDescription());
+        response.setExampleId(getExample().getId());
+        response.setState(getState());
+
+        return response;
     }
 }

@@ -36,6 +36,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<UserInCourse> courses;
 
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    private Set<FinishesExample> finishedExamples;
+
     public User()
     {
 
@@ -124,6 +127,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Set<FinishesExample> getFinishedExamples() {
+        return finishedExamples;
+    }
+
+    public void setFinishedExamples(Set<FinishesExample> finishedExamples) {
+        this.finishedExamples = finishedExamples;
     }
 
     public UserResponseObject createUserResponseObject()

@@ -108,7 +108,7 @@ public class ExerciseSheet {
         this.description = description;
     }
 
-    public ExerciseSheetResponseObject getResponseObject()
+    public ExerciseSheetResponseObject getResponseObject(String assignedUserMatriculationNumber)
     {
         ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
         responseObject.setId(getId());
@@ -122,7 +122,7 @@ public class ExerciseSheet {
         if (getExamples() != null) {
             responseObject.setExamples(getExamples().stream()
                     .filter(example -> example.getParentExample() == null)
-                    .map(Example::createExampleResponseObject)
+                    .map(example -> example.createExampleResponseObject(assignedUserMatriculationNumber))
                     .collect(Collectors.toList()));
 
             responseObject.getExamples().sort(Comparator.comparing(ExampleResponseObject::getOrder));

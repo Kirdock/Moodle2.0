@@ -24,6 +24,7 @@ public class ExampleResponseObject {
     private List<ExampleResponseObject> subExamples = new ArrayList<>();
     private Boolean submitFile;
     private List<String> customFileTypes;
+    private List<FinishesExampleResponse> finishesExampleResponses;
 
 
     public ExampleResponseObject(){
@@ -143,5 +144,13 @@ public class ExampleResponseObject {
 
     public void setCustomFileTypes(List<String> customFileTypes) {
         this.customFileTypes = customFileTypes;
+    }
+
+    public List<FinishesExampleResponse> getFinishesExampleResponses() {
+        return finishesExampleResponses;
+    }
+
+    public void setFinishesExampleResponses(List<FinishesExampleResponse> finishesExampleResponses) {
+        this.finishesExampleResponses = finishesExampleResponses;
     }
 }
