@@ -151,8 +151,14 @@ export default new Vuex.Store({
     getSemesters({commit}){
       return api.getSemesters();
     },
+    getSemestersAssigned({commit}){
+      return api.getSemestersAssigned();
+    },
     getCourses({commit}, semesterData){
       return api.getCourses(semesterData);
+    },
+    getCoursesAssigned({commit}, semesterData){
+      return api.getCoursesAssigned(semesterData);
     },
     getCourse({commit}, data){
       return api.getCourse(data);
@@ -226,6 +232,9 @@ export default new Vuex.Store({
     },
     getAttendanceList({commit}, courseId){
       return api.getAttendanceList(courseId);
+    },
+    saveKreuzel({commit}, examples){
+      return api.saveKreuzel(examples);
     }
   },
   modules: {

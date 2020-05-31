@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
 import Courses from '@/views/Courses.vue';
+import Course from '@/views/Course.vue';
+import ExerciseSheet from '@/views/ExerciseSheet.vue';
 import Login from '@/views/Login.vue';
 import Account from '@/views/Account.vue';
 import Admin from '@/views/Admin.vue';
@@ -31,6 +33,24 @@ const routes = [
     meta:{
       authentication: true
     }
+  },
+  {
+    path: '/Course/:id',
+    name: 'Course',
+    component: Course,
+    meta:{
+      authentication: true
+    },
+    props: true
+  },
+  {
+    path: '/Course/:courseId/ExerciseSheet/:exerciseSheetId',
+    name: 'ExerciseSheet',
+    component: ExerciseSheet,
+    meta:{
+      authentication: true
+    },
+    props: true
   },
   {
     path: '/Account',

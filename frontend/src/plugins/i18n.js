@@ -28,7 +28,6 @@ const messages = {
             created: 'Lehrveranstaltung wurde angelegt',
             deleted: 'Lehrveranstaltung gelöscht',
             usersSaved: 'Die Rollen wurden gespeichert',
-            courses: 'Lehrveranstaltungen',
             saved: 'Lehrveranstaltung wurde gespeichert',
             templateUpdated: 'Vorlage wurde gespeichert',
             error: {
@@ -40,15 +39,18 @@ const messages = {
                 templateUpdate: 'Vorlage konnte nicht gespeichert werden',
                 usersSave: 'Die Rollen konnten nicht gespeichert werden',
             },
-            errors: {
-                get: 'Lehrveranstaltungen konnten nicht geladen werden',
-            },
             question: {
                 copy: 'In welches Semester soll die Lehrveranstaltung kopiert werden?',
                 delete: 'Wollen Sie die Lehrveranstaltung wirklich löschen?'
             },
             title: {
                 create: 'Neue Lehrveranstaltung'
+            }
+        },
+        courses: {
+            name: 'Lehrveranstaltungen',
+            error: {
+                get: 'Lehrveranstaltungen konnten nicht geladen werden'
             }
         },
         create: 'Anlegen',
@@ -118,6 +120,12 @@ const messages = {
         home: 'Home',
         information: 'Information',
         issueDate: 'Ausgabedatum',
+        kreuzel: {
+            save: 'Kreuzel wurden gespeichert',
+            error: {
+                save: 'Kreuzel konnten nicht gespeichert werden'
+            }
+        },
         lecturer: 'Lehrende/r',
         loading: 'Laden',
         login: 'Anmelden',
@@ -210,6 +218,7 @@ const messages = {
         userPwdInvalid: 'Benutzername oder Passwort stimmt nicht überein',
         username: 'Benutzername',
         validator: 'Validator',
+        view: 'Ansehen',
         warning: 'Warnung',
         weighting: 'Gewichtung',
         welcome: 'Willkommen',
@@ -240,7 +249,6 @@ const messages = {
         course:{
             copied: 'Course copied',
             name: 'Course',
-            courses: 'Courses',
             management: 'Course Management',
             created: 'Course created',
             deleted: 'Course deleted',
@@ -259,11 +267,14 @@ const messages = {
                 templateUpdate: 'Template could not be saved',
                 usersSave: 'Roles could not be saved',
             },
-            errors: {
-                get: 'Courses could not be loaded',
-            },
             title: {
                 create: 'New course'
+            }
+        },
+        courses: {
+            name: 'Courses',
+            error: {
+                get: 'Courses could not be loaded'
             }
         },
         create: 'Create',
@@ -333,6 +344,12 @@ const messages = {
         home: 'Home',
         information: 'Information',
         issueDate: 'Date of issue',
+        kreuzel: {
+            save: 'Kreuzel saved',
+            error: {
+                save: 'Kreuzel could not be saved'
+            }
+        },
         lecturer: 'Lecturer',
         loading: 'Loading',
         login: 'Login',
@@ -420,6 +437,7 @@ const messages = {
         userPwdInvalid: 'Username or password do not match',
         username: 'Username',
         validator: 'Validator',
+        view: 'View',
         warning: 'Warning',
         weighting: 'Weighting',
         welcome: "Welcome",

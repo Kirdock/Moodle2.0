@@ -33,11 +33,17 @@ export default {
     getSemesters(){
         return axios.get('/semesters');
     },
+    getSemestersAssigned(){
+        return axios.get('/semesters/assigned');
+    },
     getCourse(data){
         return axios.get(`/course/${data.courseId}`); //all data
     },
     getCourses(semesterData){
         return axios.get(`/semester/${semesterData.id}/courses`); //only id, name, number
+    },
+    getCoursesAssigned(semesterData){
+        return axios.get(`/semester/${semesterData.id}/coursesAssigned`);
     },
     createCourse(data){
         return axios.put('/course', data);
@@ -132,6 +138,9 @@ export default {
         return axios.get(`/course/${courseId}/attendanceList`,{
             responseType: 'blob'
         });
+    },
+    saveKreuzel(examples){
+        return axios.put('user/kreuzel', examples);
     }
 }
 

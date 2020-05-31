@@ -334,6 +334,7 @@ export default {
             formData.append('id', this.selectedCourseId)
             this.$refs.file.value = '';
             this.$store.dispatch('assignCourseUsers', formData).then(response =>{
+                this.getCourseUsers(this.selectedCourseId);
                 this.$bvToast.toast(this.$t('course.usersSaved'), {
                     title: this.$t('success'),
                     variant: 'success',
@@ -553,7 +554,7 @@ export default {
             this.$store.dispatch('getCourses',{id}).then(response =>{
                 this.courses = response.data;
             }).catch(()=>{
-                this.$bvToast.toast(this.$t('course.errors.get'), {
+                this.$bvToast.toast(this.$t('courses.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
