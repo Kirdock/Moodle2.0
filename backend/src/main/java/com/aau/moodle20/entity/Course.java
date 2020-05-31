@@ -1,5 +1,6 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -133,6 +134,16 @@ public class Course {
 
     public void setIncludeThird(Boolean includeThird) {
         this.includeThird = includeThird;
+    }
+
+    public CourseResponseObject createCourseResponseObject()
+    {
+        CourseResponseObject responseObject = new CourseResponseObject();
+        responseObject.setId(getId());
+        responseObject.setName(getName());
+        responseObject.setNumber(getNumber());
+        responseObject.setOwner(getOwner().getMatriculationNumber());
+        return responseObject;
     }
 
     public Course copy()

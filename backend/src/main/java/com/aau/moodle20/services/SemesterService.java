@@ -246,13 +246,26 @@ public class SemesterService {
 
         if (courses != null && !courses.isEmpty()) {
             for (Course course : courses) {
-                CourseResponseObject responseObject = new CourseResponseObject();
-                responseObject.setId(course.getId());
-                responseObject.setName(course.getName());
-                responseObject.setNumber(course.getNumber());
-                responseObject.setOwner(course.getOwner().getMatriculationNumber());
-                responseObjects.add(responseObject);
+                responseObjects.add(course.createCourseResponseObject());
             }
+        }
+        return responseObjects;
+    }
+
+    public List<CourseResponseObject> getAssignedCoursesFromSemester(Long semesterId) {
+        checkIfSemesterExists(semesterId);
+        UserDetailsImpl userDetails = getUserDetails();
+
+        List<CourseResponseObject> responseObjects = new ArrayList<>();
+
+        List<UserInCourse> userInCourses = userInCourseRepository.findByUser_MatriculationNumber(userDetails.getMatriculationNumber());
+
+        if (userInCourses != null) {
+            responseObjects.addAll(userInCourses.stream()
+                    .filter(userInCourse -> userInCourse.getCourse().getSemester().getId().equals(semesterId))
+                    .map(userInCourse -> userInCourse.getCourse().createCourseResponseObject())
+                    .collect(Collectors.toList())
+            );
         }
         return responseObjects;
     }
