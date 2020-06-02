@@ -118,10 +118,10 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
     }
 
-    @PutMapping(path = "/user/kreuzel")
-    public ResponseEntity<?> setKreuzelUser(@Valid @RequestBody UserKreuzelRequest userKreuzelRequest) {
-        finishesExampleService.setKreuzelUser(userKreuzelRequest);
-        return ResponseEntity.ok(new MessageResponse("Kreuzel was successfully set!"));
+    @PostMapping(path = "/user/kreuzel")
+    public ResponseEntity<?> setKreuzelUser(@Valid @RequestBody List<UserKreuzelRequest> userKreuzelRequests) {
+        finishesExampleService.setKreuzelUser(userKreuzelRequests);
+        return ResponseEntity.ok(new MessageResponse("Kreuzel were successfully set!"));
     }
 
     // delete api -------------------------------------------------------------------------

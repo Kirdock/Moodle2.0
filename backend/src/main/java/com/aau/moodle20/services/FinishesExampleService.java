@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,21 +33,40 @@ public class FinishesExampleService {
 
 
 
-    public void setKreuzelUser(UserKreuzelRequest userKreuzelRequest) throws ServiceValidationException
+    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceValidationException
     {
-        if(!exampleRepository.existsById(userKreuzelRequest.getExampleId()))
-            throw new ServiceValidationException("Error: Example does not exists!", HttpStatus.NOT_FOUND);
        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+       List<FinishesExample> finishesExampleList = new ArrayList<>();
+       for(UserKreuzelRequest userKreuzelRequest: userKreuzelRequests)
+       {
+           if(!exampleRepository.existsById(userKreuzelRequest.getExampleId()))
+               throw new ServiceValidationException("Error: Example with id:"+userKreuzelRequest.getExampleId()+"does not exists!", HttpStatus.NOT_FOUND);
 
-        FinishesExampleKey finishesExampleKey = new FinishesExampleKey(userDetails.getMatriculationNumber(),userKreuzelRequest.getExampleId());
-        FinishesExample finishesExample = new FinishesExample();
-        finishesExample.setId(finishesExampleKey);
-        finishesExample.setExample(new Example(userKreuzelRequest.getExampleId()));
-        finishesExample.setUser(new User(userDetails.getMatriculationNumber()));
-        finishesExample.setDescription(userKreuzelRequest.getDescription());
-        finishesExample.setState(userKreuzelRequest.getType());
-
-        finishesExampleRepository.save(finishesExample);
+           Optional<FinishesExample> optionalFinishesExample =  finishesExampleRepository
+                   .findByExample_IdAndUser_MatriculationNumber(userKreuzelRequest.getExampleId(),
+                           userDetails.getMatriculationNumber());
+           //update
+           if(optionalFinishesExample.isPresent())
+           {
+               FinishesExample finishesExample = optionalFinishesExample.get();
+               finishesExample.setState(userKreuzelRequest.getType());
+               finishesExample.setDescription(userKreuzelRequest.getDescription());
+               finishesExampleList.add(finishesExample);
+           }
+           //Create
+           else
+           {
+               FinishesExampleKey finishesExampleKey = new FinishesExampleKey(userDetails.getMatriculationNumber(),userKreuzelRequest.getExampleId());
+               FinishesExample finishesExample = new FinishesExample();
+               finishesExample.setId(finishesExampleKey);
+               finishesExample.setExample(new Example(userKreuzelRequest.getExampleId()));
+               finishesExample.setUser(new User(userDetails.getMatriculationNumber()));
+               finishesExample.setDescription(userKreuzelRequest.getDescription());
+               finishesExample.setState(userKreuzelRequest.getType());
+               finishesExampleList.add(finishesExample);
+           }
+       }
+        finishesExampleRepository.saveAll(finishesExampleList);
     }
 
     public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceValidationException
