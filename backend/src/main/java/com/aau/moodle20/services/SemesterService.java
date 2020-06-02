@@ -270,6 +270,17 @@ public class SemesterService {
         return responseObjects;
     }
 
+    public Boolean isCourseAssigned(Long courseId) throws ServiceValidationException {
+        Boolean isCourseAssigned = Boolean.FALSE;
+        checkIfCourseExists(courseId);
+        UserDetailsImpl userDetails = getUserDetails();
+        Optional<User> user = userRepository.findByMatriculationNumber(userDetails.getMatriculationNumber());
+        if (user.isPresent()) {
+            isCourseAssigned = user.get().getCourses().stream().anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
+        }
+        return isCourseAssigned;
+    }
+
     public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
 
         List<AssignedStudent> assignedUsers = new ArrayList<>();
