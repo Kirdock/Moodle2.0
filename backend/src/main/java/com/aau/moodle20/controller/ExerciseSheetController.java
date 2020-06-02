@@ -32,6 +32,11 @@ public class ExerciseSheetController {
         return exerciseSheetService.getExerciseSheet(id);
     }
 
+    @GetMapping(value = "/exerciseSheetAssigned/{id}")
+    public ExerciseSheetResponseObject getExerciseSheetAssigned(@PathVariable("id") long id) {
+        return exerciseSheetService.getExerciseSheetAssigned(id);
+    }
+
     @PostMapping(value = "/exerciseSheet")
     public ResponseEntity<?> updateExerciseSheet(@Valid @RequestBody UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceValidationException, EntityNotFoundException {
         exerciseSheetService.updateExerciseSheet(updateExerciseSheetRequest);

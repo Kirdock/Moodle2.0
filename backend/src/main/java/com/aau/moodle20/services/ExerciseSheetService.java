@@ -79,9 +79,11 @@ public class ExerciseSheetService {
     }
 
     public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceValidationException {
-        if (!exerciseSheetRepository.existsById(id))
-            throw new EntityNotFoundException("Exercise Sheet not found");
+
         Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(id);
+        if(!exerciseSheetOptional.isPresent())
+            throw new ServiceValidationException("Error: ExerciseSheet not found!",HttpStatus.NOT_FOUND);
+
         UserDetailsImpl userDetails = getUserDetails();
 
         Boolean isAssignedUser =  exerciseSheetOptional.get().getCourse().getStudents().stream()
@@ -91,6 +93,22 @@ public class ExerciseSheetService {
             matriculationNumber = userDetails.getMatriculationNumber();
 
         return exerciseSheetOptional.get().getResponseObject(matriculationNumber);
+    }
+
+    public ExerciseSheetResponseObject getExerciseSheetAssigned(Long exerciseSheetId) throws ServiceValidationException
+    {
+        Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(exerciseSheetId);
+        if(!exerciseSheetOptional.isPresent())
+            throw new ServiceValidationException("Error: ExerciseSheet not found!",HttpStatus.NOT_FOUND);
+
+        UserDetailsImpl userDetails = getUserDetails();
+        Boolean isAssignedUser =  exerciseSheetOptional.get().getCourse().getStudents().stream()
+                .anyMatch(userInCourse -> userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
+        ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
+        if(isAssignedUser)
+           responseObject = exerciseSheetOptional.get().getResponseObject(userDetails.getMatriculationNumber());
+
+        return responseObject;
     }
 
     public void deleteExerciseSheet(Long id) throws EntityNotFoundException {
