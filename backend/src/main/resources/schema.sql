@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS EXERCISE_SHEET
     submission_Date datetime,
     issue_Date datetime,
     description CLOB,
+    include_Third char(5),
     CONSTRAINT FOREIGN_KEY_COURSE_EXERCISE_SHEET FOREIGN KEY (course_id) references COURSE on delete cascade
 );
 

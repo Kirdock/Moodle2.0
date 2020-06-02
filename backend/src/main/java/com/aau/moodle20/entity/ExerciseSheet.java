@@ -29,6 +29,7 @@ public class ExerciseSheet {
     @Column(name = "issue_Date", columnDefinition="DATETIME")
     private LocalDateTime issueDate;
     private String description;
+    private Boolean includeThird;
     @OneToMany(
             mappedBy = "exerciseSheet",
             cascade = CascadeType.PERSIST,
@@ -106,6 +107,14 @@ public class ExerciseSheet {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getIncludeThird() {
+        return includeThird;
+    }
+
+    public void setIncludeThird(Boolean includeThird) {
+        this.includeThird = includeThird;
     }
 
     public ExerciseSheetResponseObject getResponseObject(String assignedUserMatriculationNumber)

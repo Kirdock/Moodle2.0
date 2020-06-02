@@ -20,6 +20,7 @@ public class UpdateExerciseSheetRequest {
     private Integer minKreuzel;
     private Integer minPoints;
     private String description;
+    private Boolean includeThird;
 
 
     public Long getId() {
@@ -76,5 +77,13 @@ public class UpdateExerciseSheetRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getIncludeThird() {
+        return includeThird;
+    }
+
+    public void setIncludeThird(Boolean includeThird) {
+        this.includeThird = includeThird;
     }
 }
