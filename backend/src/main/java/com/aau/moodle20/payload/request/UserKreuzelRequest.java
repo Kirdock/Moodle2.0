@@ -9,7 +9,7 @@ public class UserKreuzelRequest {
     @NotNull
     private Long exampleId;
     @NotNull
-    private EFinishesExampleState type;
+    private EFinishesExampleState state;
 
     private String description;
 
@@ -21,12 +21,12 @@ public class UserKreuzelRequest {
         this.exampleId = exampleId;
     }
 
-    public EFinishesExampleState getType() {
-        return type;
+    public EFinishesExampleState getState() {
+        return state;
     }
 
-    public void setType(EFinishesExampleState type) {
-        this.type = type;
+    public void setState(EFinishesExampleState state) {
+        this.state = state;
     }
 
     public String getDescription() {

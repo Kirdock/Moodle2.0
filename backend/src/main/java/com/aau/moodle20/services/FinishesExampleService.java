@@ -49,7 +49,7 @@ public class FinishesExampleService {
            if(optionalFinishesExample.isPresent())
            {
                FinishesExample finishesExample = optionalFinishesExample.get();
-               finishesExample.setState(userKreuzelRequest.getType());
+               finishesExample.setState(userKreuzelRequest.getState());
                finishesExample.setDescription(userKreuzelRequest.getDescription());
                finishesExampleList.add(finishesExample);
            }
@@ -62,7 +62,7 @@ public class FinishesExampleService {
                finishesExample.setExample(new Example(userKreuzelRequest.getExampleId()));
                finishesExample.setUser(new User(userDetails.getMatriculationNumber()));
                finishesExample.setDescription(userKreuzelRequest.getDescription());
-               finishesExample.setState(userKreuzelRequest.getType());
+               finishesExample.setState(userKreuzelRequest.getState());
                finishesExampleList.add(finishesExample);
            }
        }
