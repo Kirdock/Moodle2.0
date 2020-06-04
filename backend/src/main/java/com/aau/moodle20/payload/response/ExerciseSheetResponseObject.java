@@ -22,6 +22,7 @@ public class ExerciseSheetResponseObject {
     private List<ExampleResponseObject> examples;
     private String courseName;
     private String courseNumber;
+    private Boolean includeThird;
 
 
     public Long getId() {
@@ -110,5 +111,13 @@ public class ExerciseSheetResponseObject {
 
     public void setCourseNumber(String courseNumber) {
         this.courseNumber = courseNumber;
+    }
+
+    public Boolean getIncludeThird() {
+        return includeThird;
+    }
+
+    public void setIncludeThird(Boolean includeThird) {
+        this.includeThird = includeThird;
     }
 }

@@ -128,6 +128,7 @@ public class ExerciseSheet {
         responseObject.setSubmissionDate(getSubmissionDate());
         responseObject.setIssueDate(getIssueDate());
         responseObject.setDescription(getDescription());
+        responseObject.setIncludeThird(getIncludeThird());
         if (getExamples() != null) {
             responseObject.setExamples(getExamples().stream()
                     .filter(example -> example.getParentExample() == null)
