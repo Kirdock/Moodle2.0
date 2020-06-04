@@ -300,6 +300,7 @@ public class SemesterService {
         responseObject.setMinPoints(course.getMinPoints());
         responseObject.setDescriptionTemplate(course.getDescriptionTemplate());
         responseObject.setIncludeThird(course.getIncludeThird());
+        responseObject.setSemesterId(course.getSemester().getId());
         responseObject.setExerciseSheets(exerciseSheets.stream()
                 .map(ExerciseSheet::getResponseObjectLessInfo)
                 .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))

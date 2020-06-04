@@ -17,6 +17,7 @@ public class CourseResponseObject {
     private String owner;
     private Boolean includeThird;
     private List<AssignedStudent> assignedStudents;
+    private Long semesterId;
 
     public CourseResponseObject()
     {
@@ -107,5 +108,13 @@ public class CourseResponseObject {
 
     public void setAssignedStudents(List<AssignedStudent> assignedStudents) {
         this.assignedStudents = assignedStudents;
+    }
+
+    public Long getSemesterId() {
+        return semesterId;
+    }
+
+    public void setSemesterId(Long semesterId) {
+        this.semesterId = semesterId;
     }
 }
