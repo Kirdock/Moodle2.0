@@ -6,11 +6,21 @@
                 <router-link to="/">{{ $t('home') }}</router-link>
             </li>
             <li class="breadcrumb-item">
-                <router-link to="/Admin" >{{ $t('admin') }}</router-link>
+                <router-link :to="{name:'Admin'}" >{{ $t('admin') }}</router-link>
             </li>
-            <li class="breadcrumb-item active">
-                <router-link to="/Admin/CourseManagement" >{{$t('course.management')}}</router-link></li>
-            <li class="breadcrumb-item active">{{sheetInfo.courseNumber}} {{sheetInfo.courseName}}</li>
+            <li class="breadcrumb-item">
+                <router-link :to="{name:'CourseManagement'}">{{$t('course.management')}}</router-link>
+            </li>
+            <li class="breadcrumb-item">
+                <router-link :to="{
+                                name: 'CourseManagement',
+                                query: {
+                                    courseId: sheetInfo.courseId,
+                                }
+                            }">
+                    {{sheetInfo.courseNumber}} {{sheetInfo.courseName}}
+                </router-link>
+            </li>
             <li class="breadcrumb-item active">{{$t('exerciseSheet.name')}}</li>
             <li class="breadcrumb-item active">{{sheetInfo.name}}</li>
         </ol>
@@ -21,7 +31,7 @@
                     <div class="form-horizontal col-md-5 fixed">
                         <form ref="exerciseSheet" @submit.prevent="updateInfo()">
                             <es-info v-model="sheetInfo"></es-info>
-                            <div class="form-inline">
+                            <div class="form-inline" style="margin-top: 10px">
                                 <button class="btn btn-primary" type="submit">
                                     <span class="fa fa-sync fa-spin" v-if="loading_updateInformation"></span>
                                     <span class="fa fa-save" v-else></span>
@@ -57,7 +67,11 @@
                 </b-tab>
                 
                 <template v-slot:tabs-end class="fixed">
-                    <b-nav-item role="presentation" @click.prevent="newExample()" href="#"><span class="fa fa-plus"></span> {{$t('example.new')}}</b-nav-item>
+                    <b-nav-item role="presentation" @click.prevent="createExample()" href="#">
+                        <span class="fa fa-sync fa-spin" v-if="loading_createExample"></span>
+                        <span class="fa fa-plus" v-else></span>
+                        {{$t('example.new')}}
+                    </b-nav-item>
                 </template>
             </b-tabs>
         
@@ -127,11 +141,21 @@ export default {
             sheetInfo: {},
             selectedExample: undefined,
             loading_updateInformation: false,
+            loading_createExample: false,
             activeTab: 0,
             selectedDeleteExample: {}
         }
     },
     methods: {
+        setActiveTab(index){
+            this.$nextTick(()=>{
+                this.$nextTick(() => {
+                    requestAnimationFrame(() => {
+                        this.activeTab = index;
+                    })
+                })
+            });
+        },
         getSheet(sheedId){
             this.$store.dispatch('getExerciseSheet', sheedId).then(response =>{
                 this.sheetInfo = response.data;
@@ -170,50 +194,37 @@ export default {
         updateExample(example){
             example.loading = true;
             const {loading, subExamples, ...data} = example;
-            if(example.id){
-                this.$store.dispatch('updateExample', data).then(response=>{
-                    this.$bvToast.toast(this.$t('example.saved'), {
-                        title: this.$t('success'),
-                        variant: 'success',
-                        appendToast: true
-                    });
-                }).catch(()=>{
-                    this.$bvToast.toast(this.$t('example.error.save'), {
-                        title: this.$t('error'),
-                        variant: 'danger',
-                        appendToast: true
-                    });
-                }).finally(()=>{
-                    example.loading = false;
+            this.$store.dispatch('updateExample', data).then(response=>{
+                this.$bvToast.toast(this.$t('example.saved'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
                 });
-            }
-            else{
-                this.$store.dispatch('createExample', data).then(response=>{
-                    example.id = response.data.id;
-                    this.$bvToast.toast(this.$t('example.created'), {
-                        title: this.$t('success'),
-                        variant: 'success',
-                        appendToast: true
-                    });
-                }).catch(()=>{
-                    this.$bvToast.toast(this.$t('example.error.create'), {
-                        title: this.$t('error'),
-                        variant: 'danger',
-                        appendToast: true
-                    });
-                }).finally(()=>{
-                    example.loading = false;
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('example.error.save'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
                 });
-            }
+            }).finally(()=>{
+                example.loading = false;
+            });
         },
-        newExample(){
-            this.sheetInfo.examples.push(this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length, true));
-            this.$nextTick(()=>{
-                this.$nextTick(() => {
-                    requestAnimationFrame(() => {
-                        this.activeTab = this.sheetInfo.examples.length;
-                    })
-                })
+        createExample(){
+            this.loading_createExample = true;
+            const example = this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length, true);
+            this.$store.dispatch('createExample', example).then(response=>{
+                example.id = response.data.id;
+                this.sheetInfo.examples.push(example);
+                this.setActiveTab(this.sheetInfo.examples.length);
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('example.error.create'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }).finally(()=>{
+                this.loading_createExample = false;
             });
         },
         buildExample(name, order, isParent){
@@ -226,37 +237,27 @@ export default {
                 subExamples: [],
                 order,
                 supportedFileTypes: [],
-                customFileTypes: [],
-                mandatory: false,
-                validator: ''
+                customFileTypes: []
             }
         },
         deleteExample(id, index){
-            if(id){
-                //server needs to adjust/update all orders
-                this.$store.dispatch('deleteExample', id).then(()=>{
-                    orderManagement.deletedAt(this.selectedDeleteExample.array, index);
-                    this.$bvToast.toast(this.$t('example.deleted'), {
-                        title: this.$t('success'),
-                        variant: 'success',
-                        appendToast: true
-                    });
-                }).catch(()=>{
-                    this.$bvToast.toast(this.$t('example.error.delete'), {
-                        title: this.$t('error'),
-                        variant: 'danger',
-                        appendToast: true
-                    });
-                })
-            }
-            else{
-                orderManagement.deletedAt(this.selectedDeleteExample.array, index);
+            this.$store.dispatch('deleteExample', id).then(()=>{
+                const changedOrders = orderManagement.deletedAt(this.selectedDeleteExample.array, index);
+                if(changedOrders.length > 0){
+                    this.$store.dispatch('updateExampleOrder', changedOrders); //... should be done on server on delete?
+                }
                 this.$bvToast.toast(this.$t('example.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }
+            }).catch(()=>{
+                this.$bvToast.toast(this.$t('example.error.delete'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            })
         },
         setSelectedExample(example){
             this.selectedExample = example;

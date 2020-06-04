@@ -6,7 +6,7 @@
                 <router-link to="/">{{ $t('home') }}</router-link>
             </li>
             <li class="breadcrumb-item">
-                <router-link to="/Admin" >{{ $t('admin') }}</router-link>
+                <router-link :to="{name:'Admin'}" >{{ $t('admin') }}</router-link>
             </li>
             <li class="breadcrumb-item active">{{$t('user.management')}}</li>
         </ol>

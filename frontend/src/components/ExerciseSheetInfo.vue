@@ -30,6 +30,23 @@
                 <i-input :id="`esInfoMinPoints${_uid}`" class="form-control" v-model="value.minPoints"></i-input>
             </div>
         </div>
+        <div class="form-group">
+            <label :for="`esInfoKreuzelType${_uid}`" class="control-label">{{ $t('kreuzel.type') }}</label>
+            <div :id="`esInfoKreuzelType${_uid}`" class="form-inline">
+                <div class="form-check">
+                    <input :id="`esInfoIncludeThirdYes${_uid}`" type="radio" :value="false" class="form-check-input"  v-model="value.includeThird">
+                    <label :for="`esInfoIncludeThirdYes${_uid}`" class="form-check-label">
+                        {{$t('kreuzel.option.1')}}
+                    </label>
+                </div>
+                <div class="form-check" style="margin-left:15px">
+                    <input :id="`esInfoIncludeThirdNo${_uid}`" type="radio" :value="true" class="form-check-input"  v-model="value.includeThird">
+                    <label :for="`esInfoIncludeThirdNo${_uid}`" class="form-check-label">
+                        {{$t('kreuzel.option.2')}}
+                    </label>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 

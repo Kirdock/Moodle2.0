@@ -140,7 +140,17 @@ export default {
         });
     },
     saveKreuzel(examples){
-        return axios.put('user/kreuzel', examples);
+        return axios.post('/user/kreuzel', examples);
+    },
+    addExampleAttachement(formData){
+        return axios.post('/user/kreuzel/attachement',
+            formData,
+            {
+                headers: {
+                    'Content-Type': undefined
+                }
+            }
+        )
     }
 }
 

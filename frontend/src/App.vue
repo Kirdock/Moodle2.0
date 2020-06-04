@@ -3,18 +3,18 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="navbar-collapse order-1">
         <router-link class="navbar-brand" to="/">{{ $t('home') }}</router-link>
-        <router-link class="nav-link" to="/Courses" v-if="$store.getters.isLoggedIn">{{ $t('courses.name') }}</router-link>
-        <router-link to="/Account" class="nav-link" v-if="$store.getters.isLoggedIn">{{ $t('account') }}</router-link>
-        <router-link to="/Admin" class="nav-link" v-if="$store.getters.userInfo.isOwner">{{ $t('admin') }}</router-link>
+        <router-link class="nav-link" :to="{name:'Courses'}" v-if="$store.getters.isLoggedIn">{{ $t('courses.name') }}</router-link>
+        <router-link :to="{name:'Account'}" class="nav-link" v-if="$store.getters.isLoggedIn">{{ $t('account') }}</router-link>
+        <router-link :to="{name:'Admin'}" class="nav-link" v-if="$store.getters.userInfo.isOwner">{{ $t('admin') }}</router-link>
         <a href="#" class="nav-link" @click.prevent="logout" v-if="$store.getters.isLoggedIn">{{ $t('logout') }}</a>
-        <router-link to="/Login" class="nav-link" v-else >{{ $t('login') }}</router-link>
+        <router-link :to="{name:'Login'}" class="nav-link" v-else >{{ $t('login') }}</router-link>
       </div>
       <div class="navbar-collapse order-2">
         <ul class="navbar-nav ml-auto">
           <a href="#" class="nav-link" @click.prevent="changeLocale('en')" v-if="locale !== 'en'">English</a>
           <a href="#" class="nav-link" @click.prevent="changeLocale('de')" v-if="locale !== 'de'">Deutsch</a>
           <span v-if="$store.getters.isLoggedIn" style="margin-top: 8px">{{ $t('loggedInAs') }}
-            <router-link to="/Account" > {{$store.getters.userInfo.forename}} {{$store.getters.userInfo.surname}} </router-link>
+            <router-link :to="{name:'Account'}" > {{$store.getters.userInfo.forename}} {{$store.getters.userInfo.surname}} </router-link>
           </span>
         </ul>
       </div>

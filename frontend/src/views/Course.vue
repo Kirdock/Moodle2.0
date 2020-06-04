@@ -47,9 +47,10 @@ export default {
     methods: {
         async getCourse(courseId){
             try{
-                this.courseInfo =  await this.$store.dispatch('getCourse', {courseId}).data;
+                const response = await this.$store.dispatch('getCourse', {courseId});
+                this.courseInfo = response.data;
             }
-            catch(error){
+            catch{
                 this.$bvToast.toast(this.$t('course.error.get'), {
                         title: 'Fehler',
                         variant: 'danger',

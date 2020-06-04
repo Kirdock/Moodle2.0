@@ -10,6 +10,12 @@ const messages = {
         admin: 'Admin',
         all: 'Alle',
         assigned: 'Zugeteilt',
+        attachement: {
+            saved: 'Anhang wurde gespeichert',
+            error: {
+                save: 'Anhang konnte nicht gespeichert werden'
+            }
+        },
         attendance: {
             list: 'Anwesenheitsliste',
             error: {
@@ -74,11 +80,9 @@ const messages = {
             },
             question: {
                 delete: 'Wollen Sie das Beispiel wirklich löschen?'
-            },
-            warning: {
-                createSubExample: 'Das Beispiel muss zuvor gespeichert werden, um Unterbeispiele anlegen zu können'
             }
         },
+        reason: 'Begründung',
         subExample: {
             name: 'Unterbeispiel',
             new: 'Neues Unterbeispiel'
@@ -121,9 +125,15 @@ const messages = {
         information: 'Information',
         issueDate: 'Ausgabedatum',
         kreuzel: {
+            name: 'Kreuzel',
             save: 'Kreuzel wurden gespeichert',
+            type: 'Kreuzeltyp',
             error: {
                 save: 'Kreuzel konnten nicht gespeichert werden'
+            },
+            option:{
+                1: 'Ja/Nein',
+                2: 'Ja/Nein/Vielleicht'
             }
         },
         lecturer: 'Lehrende/r',
@@ -133,6 +143,7 @@ const messages = {
         logout: 'Abmelden',
         mandatory: 'Verpflichtend',
         matriculationNumber: 'Matrikelnummer',
+        maybe: 'Vielleicht',
         minRequireKreuzel: 'Mindestanforderung Kreuzel (in %)',
         minRequirePoints: 'Mindestanforderung Punkte (in %)',
         name: 'Name',
@@ -235,6 +246,12 @@ const messages = {
         admin: 'Admin',
         all: 'All',
         assigned: 'Assigned',
+        attachement: {
+            saved: 'Attachtment saved',
+            error: {
+                save: 'Attachtment could not be saved'
+            }
+        },
         attendance: {
             list: 'Attendance list',
             error: {
@@ -298,11 +315,9 @@ const messages = {
             },
             question: {
                 delete: 'Do you really want to delete this example?'
-            },
-            warning: {
-                createSubExample: 'The example must be saved before sub examples can be created'
             }
         },
+        reason: 'Reason',
         subExample: {
             name: 'Sub example',
             new: 'New sub example'
@@ -345,9 +360,15 @@ const messages = {
         information: 'Information',
         issueDate: 'Date of issue',
         kreuzel: {
+            name: 'Kreuzel',
             save: 'Kreuzel saved',
+            type: 'Kreuzel type',
             error: {
                 save: 'Kreuzel could not be saved'
+            },
+            option:{
+                1: 'Yes/No',
+                2: 'Yes/No/Maybe'
             }
         },
         lecturer: 'Lecturer',
@@ -357,6 +378,7 @@ const messages = {
         logout: 'Logout',
         mandatory: 'Mandatory',
         matriculationNumber: 'Matriculation number',
+        maybe: 'Maybe',
         minRequireKreuzel: 'Minimum requirement of kreuzel (in %)',
         minRequirePoints: 'Minimum requirement of points (in %)',
         name: 'Name',

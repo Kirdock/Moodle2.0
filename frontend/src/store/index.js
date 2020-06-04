@@ -76,7 +76,7 @@ export default new Vuex.Store({
       commit('logout');
       if(isTokenExpired){
         if(router.currentRoute.name !== 'Login'){
-          router.push('/Login');
+          router.push('Login');
         }
         this.$app.$bvToast.toast(this.$app.$t('sessionExpired'), {
             title: this.$app.$t('warning'),
@@ -235,6 +235,9 @@ export default new Vuex.Store({
     },
     saveKreuzel({commit}, examples){
       return api.saveKreuzel(examples);
+    },
+    addExampleAttachement({commit}, formData){
+      return api.addExampleAttachement(formData);
     }
   },
   modules: {

@@ -54,9 +54,14 @@ export const orderManagement = {
 }
 
 export const dateManagement = {
-    currentDateTime(){
-        const date = new Date();
+    currentDateTime(customDate){
+        const date = customDate || new Date();
         return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split(/ *:..\..../)[0];
+    },
+    midnightDateTime(){
+        const date = new Date();
+        date.setHours(23,59);
+        return this.currentDateTime(date);
     }
 }
 
@@ -134,4 +139,29 @@ export const fileManagement = {
         }
         return fileName;
       }
+}
+
+export const exampleManagement = {
+    selectMany(array){
+        let result = [];
+        for(const example of array){
+            if(example.subExamples.length === 0){
+                result.push({
+                    exampleId: example.id,
+                    state: example.state,
+                    description: example.state === 'm' ? example.description : undefined
+                });
+            }
+            else{
+                result = result.concat(example.subExamples.map(subExample => {
+                    return {
+                        exampleId: subExample.id,
+                        state: subExample.state,
+                        description: subExample.state === 'm' ? subExample.description : undefined
+                    }
+                }));
+            }
+        }
+        return result;
+    }
 }

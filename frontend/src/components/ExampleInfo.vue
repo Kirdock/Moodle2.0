@@ -195,20 +195,23 @@ export default {
                 this.value.supportedFileTypes = [];
             }
         },
-        newSubExample(){
+        async newSubExample(){
             if(this.value.subExamples.length === 0){
                 this.value.mandatory = this.value.submitFile = false;
                 this.value.customFileTypes = [];
                 this.value.supportedFileTypes = [];
                 this.setFileTypes();
             }
-            if(this.value.id){
-                this.value.subExamples.push(this.buildExample(this.$t('subExample.name'), this.value.subExamples.length));
+            const example = this.buildExample(this.$t('subExample.name'), this.value.subExamples.length);
+            try{
+                const response = await this.$store.dispatch('createExample', example)
+                example.id = response.data.id;
+                this.value.subExamples.push(example);
             }
-            else{
-                this.$bvToast.toast(this.$t('example.warning.createSubExample'), {
-                    title: this.$t('warning'),
-                    variant: 'warning',
+            catch{
+                this.$bvToast.toast(this.$t('example.error.create'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
                     appendToast: true
                 });
             }

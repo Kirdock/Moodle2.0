@@ -6,7 +6,7 @@
                 <router-link to="/">{{ $t('home') }}</router-link>
             </li>
             <li class="breadcrumb-item">
-                <router-link to="/Admin" >{{ $t('admin') }}</router-link>
+                <router-link :to="{name:'Admin'}" >{{ $t('admin') }}</router-link>
             </li>
             <li class="breadcrumb-item active">{{$t('course.management')}}</li>
         </ol>
@@ -270,13 +270,14 @@ export default {
         }
     },
     created(){
-        //TO-DO: props['courseId']
-        //Query or property?
-        //if there are props then getCourse(courseId) is called
-        //with the response you also have the semesterId for selecting the right semester in Dropdown
-        //don't forget to set props: true; in router
-        this.getSemesters();
         this.resetExerciseSheet();
+        if(this.$route.query.courseId){
+            this.selectedCourseId = this.$route.query.courseId;
+            this.getCourse(this.selectedCourseId)
+        }
+        else{
+            this.getSemesters();
+        }
         if(this.$store.getters.userInfo.isAdmin){
             this.getUsers();
         }
@@ -297,6 +298,11 @@ export default {
     },
     methods:{
         onReady: editorManagement.onReady,
+        setCourseQuery(courseId){
+            if(this.$route.query.courseId !== courseId){
+                this.$router.push({ query: { courseId }})
+            }
+        },
         getAttendanceList(courseId){
             this.loading_attendanceList = true;
             this.$store.dispatch('getAttendanceList', courseId).then(response => {
@@ -352,8 +358,9 @@ export default {
         },
         resetExerciseSheet(){
             this.exerciseSheet_create = {
-                submissionDate: dateManagement.currentDateTime(),
-                issueDate: dateManagement.currentDateTime()
+                submissionDate: dateManagement.midnightDateTime(),
+                issueDate: dateManagement.currentDateTime(),
+                includeThird: false
             }
         },
         createExerciseSheet(modal){
@@ -541,6 +548,9 @@ export default {
             this.getCourseUsers(courseId);
             this.$store.dispatch('getCourse',{courseId}).then(response =>{
                 this.selectedCourse = response.data;
+                if(this.semesters.length === 0){
+                    this.getSemesters(this.selectedCourse.semesterId || 0); //change after backend sends right response
+                }
                 this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('course.error.get'), {
@@ -594,11 +604,12 @@ export default {
                 });
             });
         },
-        getSemesters(){
+        getSemesters(selectSemesterId){
             this.$store.dispatch('getSemesters').then(response =>{
                 this.semesters = response.data;
                 if(this.semesters.length !== 0){
-                    this.courseInfo_create.semesterId = this.courseCopyId = this.selectedSemester_edit = this.semesters[0].id;
+                    this.courseInfo_create.semesterId = this.courseCopyId = this.semesters[0].id;
+                    this.selectedSemester_edit = selectSemesterId || this.semesters[0].id;
                     this.getCourses(this.selectedSemester_edit);
                 }
             }).catch(()=>{
@@ -608,6 +619,11 @@ export default {
                     appendToast: true
                 });
             });
+        }
+    },
+    watch:{
+        selectedCourseId: function (newValue, oldValue) {
+            this.setCourseQuery(newValue);
         }
     }
 }
