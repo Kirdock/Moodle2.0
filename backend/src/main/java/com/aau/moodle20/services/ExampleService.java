@@ -12,10 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,11 +103,33 @@ public class ExampleService {
 
 
 
-    public void deleteExample(Long exampleId) throws ServiceValidationException
-    {
-        if (!exampleRepository.existsById(exampleId))
-            throw new ServiceValidationException("Example not found",HttpStatus.NOT_FOUND);
+    @Transactional
+    public void deleteExample(Long exampleId) throws ServiceValidationException {
+        Optional<Example> optionalExample = exampleRepository.findById(exampleId);
+        if (!optionalExample.isPresent())
+            throw new ServiceValidationException("Example not found", HttpStatus.NOT_FOUND);
+        ExerciseSheet exerciseSheet = optionalExample.get().getExerciseSheet();
+        Example parentExample = optionalExample.get().getParentExample();
         exampleRepository.deleteById(exampleId);
+        exampleRepository.flush();
+
+        // remove order gap caused by delete of example
+        List<Example> examples = null;
+        if(parentExample!=null)
+        {
+            examples =  new ArrayList<>(parentExample.getSubExamples());
+
+        }else
+        {
+            examples =  exerciseSheet.getExamples().stream()
+                    .filter(example -> example.getParentExample()==null).collect(Collectors.toList());
+        }
+        examples.sort(Comparator.comparing(Example::getOrder));
+        for (int i = 1; i <= examples.size(); i++)
+            examples.get(i-1).setOrder(i);
+
+        exampleRepository.saveAll(examples);
+        exampleRepository.flush();
     }
 
     public List<FileTypeResponseObject> getFileTypes() {
