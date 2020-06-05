@@ -2,14 +2,16 @@ package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
+import com.aau.moodle20.entity.Course;
+import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.entity.UserInCourse;
 import com.aau.moodle20.entity.User;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
-import com.aau.moodle20.payload.request.UpdateCourseDescriptionTemplate;
 import com.aau.moodle20.payload.request.UpdateUserRequest;
+import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.UserInCourseRepository;
@@ -129,7 +131,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return allGivenUsers;
     }
 
-
+    /**
+     * returns all users. If user is assigned to course, add course role
+     * also join with finishe example and returns all presented examples
+     * @param courseId
+     * @return
+     * @throws ServiceValidationException
+     */
     public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws ServiceValidationException {
 
         if(!courseRepository.existsById(courseId))
@@ -142,18 +150,45 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         for (User user : allUsers) {
             UserResponseObject responseObject =  user.createUserResponseObject();
-            Optional<ECourseRole> role = userInCourses.stream()
+            Optional<UserInCourse> optionalUserInCourse = userInCourses.stream()
                     .filter(userInCourse -> user.getMatriculationNumber().equals(userInCourse.getUser().getMatriculationNumber()))
-                    .map(UserInCourse::getRole)
                     .findFirst();
-            if (role.isPresent())
-                responseObject.setCourseRole(role.get());
+            if (optionalUserInCourse.isPresent()) {
+                responseObject.setCourseRole(optionalUserInCourse.get().getRole());
+                // add presented examples of user
+                if(ECourseRole.Student.equals(optionalUserInCourse.get().getRole())) {
+
+                    List<FinishesExampleResponse> presentedExampleResponses = getPresentedExamplesInCourse(user,optionalUserInCourse.get().getCourse());
+                    responseObject.getPresentedExamples().addAll(presentedExampleResponses);
+                }
+            }
             else
                 responseObject.setCourseRole(ECourseRole.None);
             userResponseObjectList.add(responseObject);
         }
-
         return userResponseObjectList;
+    }
+
+    protected List<FinishesExampleResponse> getPresentedExamplesInCourse(User user, Course course)
+    {
+        List<FinishesExample> presentedExamples = user.getFinishedExamples().stream()
+                .filter(FinishesExample::getHasPresented)
+                .collect(Collectors.toList());
+
+        // filter example who related to given course
+        List<FinishesExample> presentedExamplesInCourse = new ArrayList<>();
+        for(FinishesExample finishesExample: presentedExamples)
+        {
+            Course finishedExampleCourse = finishesExample.getExample().getExerciseSheet().getCourse();
+            if(finishedExampleCourse.getId().equals(course.getId()))
+                presentedExamplesInCourse.add(finishesExample);
+        }
+
+        // build response list
+        List<FinishesExampleResponse> presentedExampleResponses = presentedExamplesInCourse.stream().
+                map(FinishesExample::getFinishesExampleResponse).collect(Collectors.toList());
+
+        return presentedExampleResponses;
     }
 
     protected List<String> readLinesFromFile(MultipartFile file) throws UserException {

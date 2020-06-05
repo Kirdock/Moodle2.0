@@ -1,12 +1,15 @@
 package com.aau.moodle20.payload.response;
 
 import com.aau.moodle20.constants.EFinishesExampleState;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FinishesExampleResponse {
 
     private Long exampleId;
-    private EFinishesExampleState state;
-    private String description;
+    private Integer parentOrder;
+    private Integer order;
+    private String exampleName;
 
     public Long getExampleId() {
         return exampleId;
@@ -16,19 +19,27 @@ public class FinishesExampleResponse {
         this.exampleId = exampleId;
     }
 
-    public EFinishesExampleState getState() {
-        return state;
+    public Integer getParentOrder() {
+        return parentOrder;
     }
 
-    public void setState(EFinishesExampleState state) {
-        this.state = state;
+    public void setParentOrder(Integer parentOrder) {
+        this.parentOrder = parentOrder;
     }
 
-    public String getDescription() {
-        return description;
+    public Integer getOrder() {
+        return order;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setOrder(Integer order) {
+        this.order = order;
+    }
+
+    public String getExampleName() {
+        return exampleName;
+    }
+
+    public void setExampleName(String exampleName) {
+        this.exampleName = exampleName;
     }
 }

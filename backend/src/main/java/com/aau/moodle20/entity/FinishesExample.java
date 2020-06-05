@@ -109,13 +109,14 @@ public class FinishesExample {
         this.fileName = fileName;
     }
 
-    //TODO check later if need -> if no remove
-    public FinishesExampleResponse getFinishesExampleResponse()
-    {
+
+    public FinishesExampleResponse getFinishesExampleResponse() {
         FinishesExampleResponse response = new FinishesExampleResponse();
-        response.setDescription(getDescription());
+        response.setExampleName(getExample().getName());
         response.setExampleId(getExample().getId());
-        response.setState(getState());
+        response.setOrder(getExample().getOrder());
+        if (getExample().getParentExample() != null)
+            response.setParentOrder(getExample().getParentExample().getOrder());
 
         return response;
     }

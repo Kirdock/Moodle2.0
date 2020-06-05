@@ -3,6 +3,9 @@ package com.aau.moodle20.payload.response;
 import com.aau.moodle20.constants.ECourseRole;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseObject {
 
@@ -13,7 +16,7 @@ public class UserResponseObject {
     private String email;
     private Boolean isAdmin;
     private ECourseRole courseRole;
-
+    private List<FinishesExampleResponse> presentedExamples = new ArrayList<>();
 
     public UserResponseObject()
     {
@@ -73,5 +76,13 @@ public class UserResponseObject {
 
     public void setCourseRole(ECourseRole courseRole) {
         this.courseRole = courseRole;
+    }
+
+    public List<FinishesExampleResponse> getPresentedExamples() {
+        return presentedExamples;
+    }
+
+    public void setPresentedExamples(List<FinishesExampleResponse> presentedExamples) {
+        this.presentedExamples = presentedExamples;
     }
 }
