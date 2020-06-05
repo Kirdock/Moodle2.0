@@ -10,7 +10,7 @@ const messages = {
         admin: 'Admin',
         all: 'Alle',
         assigned: 'Zugeteilt',
-        attachement: {
+        attachment: {
             saved: 'Anhang wurde gespeichert',
             error: {
                 get: 'Ahnang konnte nicht geladen werden',
@@ -65,6 +65,7 @@ const messages = {
         delete: 'Löschen',
         description: 'Beschreibung',
         descriptionExerciseSheets: 'Standardbeschreibung für Übungsblätter',
+        download: 'Herunterladen',
         edit: 'Bearbeiten',
         eightDigitNumber: 'Achtstellige Nummer',
         email: 'Email',
@@ -260,10 +261,10 @@ const messages = {
         admin: 'Admin',
         all: 'All',
         assigned: 'Assigned',
-        attachement: {
+        attachment: {
             saved: 'Attachtment saved',
             error: {
-                get: 'Attachement could not be loaded',
+                get: 'attachment could not be loaded',
                 save: 'Attachtment could not be saved'
             }
         },
@@ -314,6 +315,7 @@ const messages = {
         delete: 'Delete',
         description: 'Description',
         descriptionExerciseSheets: 'Default description for example sheets',
+        download: 'Download',
         edit: 'Edit',
         eightDigitNumber: 'Eight-digit number',
         email: 'Email',

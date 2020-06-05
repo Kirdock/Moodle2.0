@@ -39,8 +39,8 @@
                     {{$t('submitFile')}}
                     <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached"/>
                 </label>
-                <a href="#" @click.prevent="downloadFile(value.id)" :title="$t('download')" v-if="value.hasAttachement">
-                    <span class="fa fa-download"></span>
+                <a href="#" @click.prevent="downloadFile(value.id)" :title="$t('download')" v-if="value.hasAttachment">
+                    <span class="fa fa-download fa-2x"></span>
                 </a>
             </template>
         </template>
@@ -79,16 +79,16 @@ export default {
                 formData.append('id', this.value.id);
                 this.$refs[`file${this._uid}`].value = '';
                 try{
-                    const response = await this.$store.dispatch('addExampleAttachement', formData);
-                    this.value.hasAttachement = true;
-                    this.$bvToast.toast(this.$t('attachement.saved'), {
+                    const response = await this.$store.dispatch('addExampleattachment', formData);
+                    this.value.hasAttachment = true;
+                    this.$bvToast.toast(this.$t('attachment.saved'), {
                         title: this.$t('success'),
                         variant: 'success',
                         appendToast: true
                     });
                 }
                 catch{
-                    this.$bvToast.toast(this.$t('attachement.error.save'), {
+                    this.$bvToast.toast(this.$t('attachment.error.save'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true
@@ -101,11 +101,11 @@ export default {
         },
         async downloadFile(id){
             try{
-                const response = await this.$store.dispatch('getExampleAttachement', id);
+                const response = await this.$store.dispatch('getExampleattachment', id);
                 fileManagement.downloadFile(response.data, response.headers);
             }
             catch{
-                this.$bvToast.toast(this.$t('attachement.error.get'), {
+                this.$bvToast.toast(this.$t('attachment.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true

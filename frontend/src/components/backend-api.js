@@ -152,8 +152,8 @@ export default {
     saveKreuzel(examples){
         return axios.post('/user/kreuzel', examples);
     },
-    addExampleAttachement(formData){
-        return axios.post('/user/kreuzel/attachement',
+    addExampleattachment(formData){
+        return axios.post('/user/kreuzel/attachment',
             formData,
             {
                 headers: {
@@ -162,8 +162,8 @@ export default {
             }
         )
     },
-    getExampleAttachement(id){
-        return axios.get(`/user/kreuzel/attachement/${id}`,{
+    getExampleattachment(id){
+        return axios.get(`/user/kreuzel/attachment/${id}`,{
             responseType: 'blob'
         });
     },
