@@ -117,14 +117,17 @@ export default {
     getExerciseSheets(courseData){
         return axios.get(`/course/${courseData.id}/exerciseSheets`);
     },
-    getExerciseSheet(sheedId){
-        return axios.get(`/exerciseSheet/${sheedId}`)
+    getExerciseSheet(sheetId){
+        return axios.get(`/exerciseSheet/${sheetId}`)
+    },
+    getExerciseSheetAssigned(sheetId){
+        return axios.get(`/exerciseSheetAssigned/${sheetId}`);
     },
     updateExerciseSheet(sheetData){
         return axios.post('/exerciseSheet', sheetData);
     },
-    deleteExerciseSheet(sheedId){
-        return axios.delete(`/exerciseSheet/${sheedId}`);
+    deleteExerciseSheet(sheetId){
+        return axios.delete(`/exerciseSheet/${sheetId}`);
     },
     createExample(exampleData){
         return axios.put('/example', exampleData);
@@ -158,6 +161,11 @@ export default {
                 }
             }
         )
+    },
+    getExampleAttachement(id){
+        return axios.get(`/user/kreuzel/attachement/${id}`,{
+            responseType: 'blob'
+        });
     },
     getUserKreuzel({matriculationNumber, courseId}){
         return axios.get(`/user/${matriculationNumber}/kreuzel/${courseId}`);

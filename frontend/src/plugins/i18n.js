@@ -13,6 +13,7 @@ const messages = {
         attachement: {
             saved: 'Anhang wurde gespeichert',
             error: {
+                get: 'Ahnang konnte nicht geladen werden',
                 save: 'Anhang konnte nicht gespeichert werden'
             }
         },
@@ -262,6 +263,7 @@ const messages = {
         attachement: {
             saved: 'Attachtment saved',
             error: {
+                get: 'Attachement could not be loaded',
                 save: 'Attachtment could not be saved'
             }
         },

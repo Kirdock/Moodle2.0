@@ -101,7 +101,7 @@ export default {
         async getExerciseSheet(id){
             try{
                 await this.getFileTypes();
-                const response = await this.$store.dispatch('getExerciseSheet', id);
+                const response = await this.$store.dispatch('getExerciseSheetAssigned', id);
                 this.sheetInfo = response.data;
                 this.hasSubExamples = this.sheetInfo.examples.some(example => example.subExamples.length > 0);
                 this.isDeadlineReached();

@@ -33,20 +33,22 @@
                 <input :true-value="'y'" :false-value="'n'" type="checkbox" class="form-check-input" v-model="value.state" :disabled="deadlineReached">
             </template>
             <template v-if="value.submitFile">
-                <div class="form-group">
-                    <label class="btn btn-primary">
-                        <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
-                        <span class="fas fa-upload" v-else></span>
-                        {{$t('submitFile')}}
-                        <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached"/>
-                    </label>
-                </div>
+                <label class="btn btn-primary">
+                    <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
+                    <span class="fas fa-upload" v-else></span>
+                    {{$t('submitFile')}}
+                    <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached"/>
+                </label>
+                <a href="#" @click.prevent="downloadFile(value.id)" :title="$t('download')" v-if="value.hasAttachement">
+                    <span class="fa fa-download"></span>
+                </a>
             </template>
         </template>
     </td>
 </template>
 
 <script>
+import {fileManagement} from '@/plugins/global';
 export default {
     name: 'kreuzel-info',
     props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached'],
@@ -61,7 +63,7 @@ export default {
         this.supportedTypes = allTypes.join(',');
     },
     methods:{
-        submitFile(){
+        async submitFile(){
             if(this.isDeadlineReached()){
                 this.$bvToast.toast(this.$t('deadlineReached'), {
                     title: this.$t('error'),
@@ -76,20 +78,37 @@ export default {
                 formData.append('file',this.$refs[`file${this._uid}`].files[0]);
                 formData.append('id', this.value.id);
                 this.$refs[`file${this._uid}`].value = '';
-                this.$store.dispatch('addExampleAttachement', formData).then(response =>{
+                try{
+                    const response = await this.$store.dispatch('addExampleAttachement', formData);
+                    this.value.hasAttachement = true;
                     this.$bvToast.toast(this.$t('attachement.saved'), {
                         title: this.$t('success'),
                         variant: 'success',
                         appendToast: true
                     });
-                }).catch(()=>{
+                }
+                catch{
                     this.$bvToast.toast(this.$t('attachement.error.save'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true
                     });
-                }).finally(()=>{
+                }
+                finally{
                     this.loadingFileUpload = false;
+                }
+            }
+        },
+        async downloadFile(id){
+            try{
+                const response = await this.$store.dispatch('getExampleAttachement', id);
+                fileManagement.downloadFile(response.data, response.headers);
+            }
+            catch{
+                this.$bvToast.toast(this.$t('attachement.error.get'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
                 });
             }
         }

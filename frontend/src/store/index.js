@@ -215,6 +215,9 @@ export default new Vuex.Store({
     getExerciseSheet({commit}, sheedId){
       return api.getExerciseSheet(sheedId);
     },
+    getExerciseSheetAssigned({commit}, sheetId){
+      return api.getExerciseSheetAssigned(sheetId);
+    },
     updateExerciseSheet({commit}, sheetData){
       return api.updateExerciseSheet(sheetData);
     },
@@ -241,6 +244,9 @@ export default new Vuex.Store({
     },
     addExampleAttachement({commit}, formData){
       return api.addExampleAttachement(formData);
+    },
+    getExampleAttachement({commit}, id){
+      return api.getExampleAttachement(id);
     },
     getUserKreuzel({commit}, kreuzelData){
       return api.getUserKreuzel(kreuzelData);

@@ -512,12 +512,7 @@ export default {
         getAttendanceList(courseId){
             this.loading_attendanceList = true;
             this.$store.dispatch('getAttendanceList', courseId).then(response => {
-                const url = window.URL.createObjectURL(response.data);
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', fileManagement.getFileNameOutOfHeader(response.headers));
-                document.body.appendChild(link);
-                link.click();
+                fileManagement.downloadFile(response.data, response.headers);
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('attendance.error.get'), {
                     title: this.$t('error'),
