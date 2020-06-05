@@ -244,7 +244,9 @@ public class SemesterService {
 
         if (courses != null && !courses.isEmpty()) {
             for (Course course : courses) {
-                responseObjects.add(course.createCourseResponseObject());
+                CourseResponseObject courseResponseObject = course.createCourseResponseObject();
+                courseResponseObject.setOwner(null);
+                responseObjects.add(courseResponseObject);
             }
         }
         return responseObjects;
