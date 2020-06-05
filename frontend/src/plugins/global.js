@@ -138,7 +138,15 @@ export const fileManagement = {
             }
         }
         return fileName;
-      }
+    },
+    downloadFile(data, headers){
+        const url = window.URL.createObjectURL(data);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', this.getFileNameOutOfHeader(headers));
+        document.body.appendChild(link);
+        link.click();
+    }
 }
 
 export const exampleManagement = {
@@ -149,7 +157,7 @@ export const exampleManagement = {
                 result.push({
                     exampleId: example.id,
                     state: example.state,
-                    description: example.state === 'm' ? example.description : undefined
+                    description: example.state === 'm' ? example.submitDescription : undefined
                 });
             }
             else{
@@ -157,7 +165,7 @@ export const exampleManagement = {
                     return {
                         exampleId: subExample.id,
                         state: subExample.state,
-                        description: subExample.state === 'm' ? subExample.description : undefined
+                        description: subExample.state === 'm' ? subExample.submitDescription : undefined
                     }
                 }));
             }
