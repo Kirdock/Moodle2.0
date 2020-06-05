@@ -52,13 +52,13 @@ export default {
     components: {
         Multiselect
     },
-    created(){
-        this.owner = this.users.find(user => user.matriculationNumber == this.value.owner);
-    },
     data(){
         return {
             owner: undefined
         }
+    },
+    created(){
+        this.setOwner();
     },
     methods: {
         userFormat(user){
@@ -66,6 +66,14 @@ export default {
         },
         ownerChanged(ownerUser){
             this.value.owner = ownerUser.matriculationNumber;
+        },
+        setOwner(){
+            this.owner = this.users.find(user => user.matriculationNumber == this.value.owner);
+        }
+    },
+    watch:{
+        'value.id': function(){
+            this.setOwner();
         }
     }
 }

@@ -400,7 +400,7 @@ export default {
         this.resetExerciseSheet();
         if(this.$route.query.courseId){
             this.selectedCourseId = this.$route.query.courseId;
-            this.getCourse(this.selectedCourseId)
+            this.getCourse(this.selectedCourseId);
         }
         else{
             this.getSemesters();
@@ -825,6 +825,12 @@ export default {
     watch:{
         selectedCourseId: function (newValue, oldValue) {
             this.setCourseQuery(newValue);
+        },
+        '$route.query.courseId': function(newValue, oldValue){
+            if(newValue !== this.selectedCourseId){
+                this.selectedCourseId = newValue;
+                this.getCourse(this.selectedCourseId)
+            }
         }
     }
 }
