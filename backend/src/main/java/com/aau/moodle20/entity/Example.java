@@ -224,10 +224,10 @@ public class Example {
         if (getExerciseSheet() != null)
             exampleResponseObject.setExerciseSheetId(getExerciseSheet().getId());
         if (getSupportFileTypes() != null) {
-            List<FileTypeResponseObject> fileTypeResponseObjects = getSupportFileTypes().stream()
-                    .map(supportFileType -> supportFileType.getFileType().createFileTypeResponseObjectOnlyId())
+            List<Long> fileTypes = getSupportFileTypes().stream()
+                    .map(supportFileType -> supportFileType.getFileType().getId())
                     .collect(Collectors.toList());
-            exampleResponseObject.setSupportedFileTypes(fileTypeResponseObjects);
+            exampleResponseObject.setSupportedFileTypes(fileTypes);
         }
         if(assignedUserMatriculationNumber!=null && getExamplesFinishedByUser()!=null)
         {

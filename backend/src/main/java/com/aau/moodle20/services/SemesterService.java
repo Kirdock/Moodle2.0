@@ -286,7 +286,7 @@ public class SemesterService {
         UserDetailsImpl userDetails = getUserDetails();
         List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
         List<FinishesExample> finishesExamples = new ArrayList<>();
-        
+
         Course course = checkIfCourseExists(courseId);
         if (!userDetails.getAdmin() && !course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
             throw new ServiceValidationException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);

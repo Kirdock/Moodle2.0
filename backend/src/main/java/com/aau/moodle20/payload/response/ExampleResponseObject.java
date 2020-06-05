@@ -21,7 +21,7 @@ public class ExampleResponseObject {
     private Boolean mandatory;
     private Integer order;
     private String validator;
-    List<FileTypeResponseObject> supportedFileTypes;
+    List<Long> supportedFileTypes;
     private List<ExampleResponseObject> subExamples = new ArrayList<>();
     private Boolean submitFile;
     private List<String> customFileTypes;
@@ -101,11 +101,11 @@ public class ExampleResponseObject {
         this.validator = validator;
     }
 
-    public List<FileTypeResponseObject> getSupportedFileTypes() {
+    public List<Long> getSupportedFileTypes() {
         return supportedFileTypes;
     }
 
-    public void setSupportedFileTypes(List<FileTypeResponseObject> supportedFileTypes) {
+    public void setSupportedFileTypes(List<Long> supportedFileTypes) {
         this.supportedFileTypes = supportedFileTypes;
     }
 
