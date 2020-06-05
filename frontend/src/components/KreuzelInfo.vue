@@ -4,19 +4,19 @@
             <template v-if="includeThird">
                 <div class="form-inline">
                     <div class="form-check">
-                        <input :id="`kInfoYes${_uid}`" type="radio" value="y" class="form-check-input"  v-model="value.state">
+                        <input :id="`kInfoYes${_uid}`" type="radio" value="y" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
                         <label :id="`kInfoYes${_uid}`" class="form-check-label">
                             {{$t('yes')}}
                         </label>
                     </div>
                     <div class="form-check" style="margin-left:15px">
-                        <input :id="`kInfoNo${_uid}`" type="radio" value="n" class="form-check-input"  v-model="value.state">
+                        <input :id="`kInfoNo${_uid}`" type="radio" value="n" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
                         <label :for="`kInfoNo${_uid}`" class="form-check-label">
                             {{$t('no')}}
                         </label>
                     </div>
                     <div class="form-check" style="margin-left:15px">
-                        <input :id="`kInfoMaybe${_uid}`" type="radio" value="m" class="form-check-input"  v-model="value.state">
+                        <input :id="`kInfoMaybe${_uid}`" type="radio" value="m" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
                         <label :for="`kInfoMaybe${_uid}`" class="form-check-label">
                             {{$t('maybe')}}
                         </label>
@@ -25,20 +25,20 @@
                         <label :for="`kInfoDescription${_uid}`" class="control-label">
                             {{$t('reason')}}:
                         </label>
-                        <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.description">
+                        <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.description" :disabled="deadlineReached">
                     </div>
                 </div>
             </template>
             <template v-else style="margin-right: 20px">
-                <input :true-value="'y'" :false-value="'n'" type="checkbox" class="form-check-input" v-model="value.state">
+                <input :true-value="'y'" :false-value="'n'" type="checkbox" class="form-check-input" v-model="value.state" :disabled="deadlineReached">
             </template>
             <template v-if="value.submitFile">
                 <div class="form-group">
-                    <label class="btn btn-primary finger">
+                    <label class="btn btn-primary finger" :disabled="deadlineReached">
                         <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
                         <span class="fas fa-upload" v-else></span>
                         {{$t('submitFile')}}
-                        <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()"/>
+                        <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached"/>
                     </label>
                 </div>
             </template>
@@ -49,7 +49,7 @@
 <script>
 export default {
     name: 'kreuzel-info',
-    props: ['value','includeThird', 'supportedFileTypes'],
+    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached'],
     data(){
         return {
             loadingFileUpload: false
@@ -62,26 +62,36 @@ export default {
     },
     methods:{
         submitFile(){
-            this.loadingFileUpload = true;
-            const formData = new FormData();
-            formData.append('file',this.$refs[`file${this._uid}`].files[0]);
-            formData.append('id', this.value.id);
-            this.$refs[`file${this._uid}`].value = '';
-            this.$store.dispatch('addExampleAttachement', formData).then(response =>{
-                this.$bvToast.toast(this.$t('attachement.saved'), {
-                    title: this.$t('success'),
-                    variant: 'success',
-                    appendToast: true
-                });
-            }).catch(()=>{
-                this.$bvToast.toast(this.$t('attachement.error.save'), {
+            if(this.isDeadlineReached()){
+                this.$bvToast.toast(this.$t('deadlineReached'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
-                this.loadingFileUpload = false;
-            });
+                this.deadlineReached = true;
+            }
+            else{
+                this.loadingFileUpload = true;
+                const formData = new FormData();
+                formData.append('file',this.$refs[`file${this._uid}`].files[0]);
+                formData.append('id', this.value.id);
+                this.$refs[`file${this._uid}`].value = '';
+                this.$store.dispatch('addExampleAttachement', formData).then(response =>{
+                    this.$bvToast.toast(this.$t('attachement.saved'), {
+                        title: this.$t('success'),
+                        variant: 'success',
+                        appendToast: true
+                    });
+                }).catch(()=>{
+                    this.$bvToast.toast(this.$t('attachement.error.save'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }).finally(()=>{
+                    this.loadingFileUpload = false;
+                });
+            }
         }
     }
 }

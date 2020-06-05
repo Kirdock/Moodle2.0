@@ -1,6 +1,8 @@
 <template>
     <div class="exerciseSheet">
-        <table class="table" aria-describedby="assignedUsers" v-if="sheetInfo.id">
+        <h1 id="sheetName">{{sheetInfo.name}}</h1>
+        <h2>{{$t('submissionDate')}}: {{new Date(sheetInfo.submissionDate).toLocaleString()}}</h2>
+        <table class="table" aria-describedby="sheetName" v-if="sheetInfo.id">
             <thead>
                 <th scope="col">{{$t('example.name')}}</th>
                 <th scope="col" v-if="hasSubExamples">{{$t('subExample.name')}}</th>
@@ -34,7 +36,7 @@
                             <td></td>
                             <td></td>
                         </template>
-                        <kreuzel-info :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird"> </kreuzel-info>
+                        <kreuzel-info :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
                         <td>
                         </td>
                     </tr>
@@ -53,7 +55,7 @@
                         <td>
                             {{subExample.points}}
                         </td>
-                        <kreuzel-info :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird"> </kreuzel-info>
+                        <kreuzel-info :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
                         <td>
                         </td>
                     </tr>
@@ -61,7 +63,7 @@
             </tbody>
         </table>
         <div class="form-group">
-            <button type="button" class="btn btn-primary" @click="saveKreuzel()">
+            <button type="button" class="btn btn-primary" @click="saveKreuzel()" :disabled="deadlineReached">
                 <span class="fa fa-sync fa-spin" v-if="loading"></span>
                 <span class="fa fa-save" v-else></span>
                 {{$t('save')}}
@@ -84,19 +86,25 @@ export default {
             sheetInfo: {},
             loading: false,
             supportedFileTypes: undefined,
-            hasSubExamples: false
+            hasSubExamples: false,
+            deadlineReached: false
         }
     },
     created(){
         this.getExerciseSheet(this.exerciseSheetId);
     },
     methods: {
+        isDeadlineReached(){
+            this.deadlineReached = new Date() >= new Date(this.sheetInfo.submissionDate);
+            return this.deadlineReached;
+        },
         async getExerciseSheet(id){
             try{
                 await this.getFileTypes();
                 const response = await this.$store.dispatch('getExerciseSheet', id);
                 this.sheetInfo = response.data;
                 this.hasSubExamples = this.sheetInfo.examples.some(example => example.subExamples.length > 0);
+                this.isDeadlineReached();
             }
             catch{
                 this.$bvToast.toast(this.$t('exerciseSheet.error.get'), {
@@ -121,24 +129,33 @@ export default {
         },
         async saveKreuzel(){
             if(this.sheetInfo.examples){
-                this.loading = true;
-                try{
-                    await this.$store.dispatch('saveKreuzel', exampleManagement.selectMany(this.sheetInfo.examples));
-                    this.$bvToast.toast(this.$t('kreuzel.save'), {
-                        title: this.$t('success'),
-                        variant: 'success',
-                        appendToast: true
-                    });
-                }
-                catch{
-                    this.$bvToast.toast(this.$t('kreuzel.error.save'), {
+                if(this.isDeadlineReached()){
+                    this.$bvToast.toast(this.$t('deadlineReached'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true
                     });
                 }
-                finally{
-                    this.loading = false;
+                else{
+                    this.loading = true;
+                    try{
+                        await this.$store.dispatch('saveKreuzel', exampleManagement.selectMany(this.sheetInfo.examples));
+                        this.$bvToast.toast(this.$t('kreuzel.save'), {
+                            title: this.$t('success'),
+                            variant: 'success',
+                            appendToast: true
+                        });
+                    }
+                    catch{
+                        this.$bvToast.toast(this.$t('kreuzel.error.save'), {
+                            title: this.$t('error'),
+                            variant: 'danger',
+                            appendToast: true
+                        });
+                    }
+                    finally{
+                        this.loading = false;
+                    }
                 }
             }
         }

@@ -131,8 +131,8 @@ export const fileManagement = {
         let fileName = '';
         const disposition = headers['content-disposition'];
         if (disposition && disposition.indexOf('filename') !== -1) {
-            var reg = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-            var matches = reg.exec(disposition);
+            const reg = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            const matches = reg.exec(disposition);
             if (matches != null && matches[1]) { 
               fileName = matches[1].replace(/['"]/g, '');
             }

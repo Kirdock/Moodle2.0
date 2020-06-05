@@ -242,10 +242,7 @@ export default {
         },
         deleteExample(id, index){
             this.$store.dispatch('deleteExample', id).then(()=>{
-                const changedOrders = orderManagement.deletedAt(this.selectedDeleteExample.array, index);
-                if(changedOrders.length > 0){
-                    this.$store.dispatch('updateExampleOrder', changedOrders); //... should be done on server on delete?
-                }
+                orderManagement.deletedAt(this.selectedDeleteExample.array, index);
                 this.$bvToast.toast(this.$t('example.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',

@@ -549,7 +549,7 @@ export default {
             this.$store.dispatch('getCourse',{courseId}).then(response =>{
                 this.selectedCourse = response.data;
                 if(this.semesters.length === 0){
-                    this.getSemesters(this.selectedCourse.semesterId || 0); //change after backend sends right response
+                    this.getSemesters(this.selectedCourse.semesterId);
                 }
                 this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
             }).catch(()=>{

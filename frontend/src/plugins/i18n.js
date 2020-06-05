@@ -60,6 +60,7 @@ const messages = {
             }
         },
         create: 'Anlegen',
+        deadlineReached: 'Das Abgabeende wurde bereits überschritten',
         delete: 'Löschen',
         description: 'Beschreibung',
         descriptionExerciseSheets: 'Standardbeschreibung für Übungsblätter',
@@ -295,6 +296,7 @@ const messages = {
             }
         },
         create: 'Create',
+        deadlineReached: 'Submission date is already reached',
         delete: 'Delete',
         description: 'Description',
         descriptionExerciseSheets: 'Default description for example sheets',
