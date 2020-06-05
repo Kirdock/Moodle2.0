@@ -87,14 +87,10 @@ public class ExerciseSheetService {
             throw new ServiceValidationException("Error: ExerciseSheet not found!",HttpStatus.NOT_FOUND);
 
         UserDetailsImpl userDetails = getUserDetails();
+        if(!userDetails.getAdmin() && !exerciseSheetOptional.get().getCourse().getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
+            throw new ServiceValidationException("Error: Not an Admin or Owner",HttpStatus.UNAUTHORIZED);
 
-        Boolean isAssignedUser =  exerciseSheetOptional.get().getCourse().getStudents().stream()
-                .anyMatch(userInCourse -> userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
-        String matriculationNumber = null;
-        if(isAssignedUser)
-            matriculationNumber = userDetails.getMatriculationNumber();
-
-        return exerciseSheetOptional.get().getResponseObject(matriculationNumber);
+        return exerciseSheetOptional.get().getResponseObject(null);
     }
 
     public ExerciseSheetResponseObject getExerciseSheetAssigned(Long exerciseSheetId) throws ServiceValidationException

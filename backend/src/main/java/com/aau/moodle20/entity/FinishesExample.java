@@ -100,6 +100,7 @@ public class FinishesExample {
         this.state = state;
     }
 
+    //TODO check later if need -> if no remove
     public FinishesExampleResponse getFinishesExampleResponse()
     {
         FinishesExampleResponse response = new FinishesExampleResponse();

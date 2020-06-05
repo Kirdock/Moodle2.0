@@ -1,5 +1,6 @@
 package com.aau.moodle20.payload.response;
 
+import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.Example;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -24,7 +25,9 @@ public class ExampleResponseObject {
     private List<ExampleResponseObject> subExamples = new ArrayList<>();
     private Boolean submitFile;
     private List<String> customFileTypes;
-    private List<FinishesExampleResponse> finishesExampleResponses;
+    private EFinishesExampleState state;
+    private String submitDescription;
+    private Boolean hasAttachment;
 
 
     public ExampleResponseObject(){
@@ -146,11 +149,27 @@ public class ExampleResponseObject {
         this.customFileTypes = customFileTypes;
     }
 
-    public List<FinishesExampleResponse> getFinishesExampleResponses() {
-        return finishesExampleResponses;
+    public EFinishesExampleState getState() {
+        return state;
     }
 
-    public void setFinishesExampleResponses(List<FinishesExampleResponse> finishesExampleResponses) {
-        this.finishesExampleResponses = finishesExampleResponses;
+    public void setState(EFinishesExampleState state) {
+        this.state = state;
+    }
+
+    public String getSubmitDescription() {
+        return submitDescription;
+    }
+
+    public void setSubmitDescription(String submitDescription) {
+        this.submitDescription = submitDescription;
+    }
+
+    public Boolean getHasAttachment() {
+        return hasAttachment;
+    }
+
+    public void setHasAttachment(Boolean hasAttachment) {
+        this.hasAttachment = hasAttachment;
     }
 }

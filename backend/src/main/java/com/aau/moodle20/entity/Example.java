@@ -231,11 +231,15 @@ public class Example {
         }
         if(assignedUserMatriculationNumber!=null && getExamplesFinishedByUser()!=null)
         {
-            List<FinishesExampleResponse> finishesExampleResponses = getExamplesFinishedByUser().stream()
-                    .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(assignedUserMatriculationNumber))
-                    .map(FinishesExample::getFinishesExampleResponse)
-                    .collect(Collectors.toList());
-            exampleResponseObject.setFinishesExampleResponses(finishesExampleResponses);
+           Optional<FinishesExample> optionalFinishesExample = getExamplesFinishedByUser().stream()
+                   .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(assignedUserMatriculationNumber))
+                   .findFirst();
+            if(optionalFinishesExample.isPresent())
+            {
+                exampleResponseObject.setState(optionalFinishesExample.get().getState());
+                exampleResponseObject.setSubmitDescription(optionalFinishesExample.get().getDescription());
+                exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getAttachment()!=null?Boolean.TRUE:Boolean.FALSE);
+            }
         }
 
         return exampleResponseObject;
