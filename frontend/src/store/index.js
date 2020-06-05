@@ -242,11 +242,11 @@ export default new Vuex.Store({
     saveKreuzel({commit}, examples){
       return api.saveKreuzel(examples);
     },
-    addExampleattachment({commit}, formData){
-      return api.addExampleattachment(formData);
+    addExampleAttachment({commit}, formData){
+      return api.addExampleAttachment(formData);
     },
-    getExampleattachment({commit}, id){
-      return api.getExampleattachment(id);
+    getExampleAttachment({commit}, id){
+      return api.getExampleAttachment(id);
     },
     getUserKreuzel({commit}, kreuzelData){
       return api.getUserKreuzel(kreuzelData);

@@ -6,8 +6,6 @@
                 <th scope="col">{{$t('name')}}</th>
                 <th scope="col">{{$t('submissionDate')}}</th>
                 <th scope="col">{{$t('examples')}}</th>
-                <th scope="col">{{$t('pointsTotal')}}</th>
-                <th scope="col">{{$t('kreuzel.name')}}</th>
                 <th scope="col">{{$t('points')}}</th>
                 <th scope="col">{{$t('actions')}}</th>
             </thead>
@@ -20,26 +18,20 @@
                         {{new Date(exerciseSheet.submissionDate).toLocaleString()}}
                     </td>
                     <td>
-                        {{exerciseSheet.exampleCount}}
+                        {{exerciseSheet.kreuzel}}/{{exerciseSheet.exampleCount}}
                     </td>
                     <td>
-                        {{exerciseSheet.pointsTotal}}
+                        {{exerciseSheet.points}}/{{exerciseSheet.pointsTotal}}
                     </td>
                     <td>
-                        {{exerciseSheet.kreuzel}}
-                    </td>
-                    <td>
-                        {{exerciseSheet.points}}
-                    </td>
-                    <td>
-                        <router-link :title="$t('view')" :to="{
+                        <router-link :title="$t('edit')" :to="{
                                             name: 'ExerciseSheet',
                                             params: {
                                                 courseId: id,
                                                 exerciseSheetId: exerciseSheet.id
                                             }
                                         }">
-                            <span class="fas fa-eye fa-2x"></span>
+                            <span class="fas fa-edit fa-2x"></span>
                         </router-link>
                     </td>
                 </tr>

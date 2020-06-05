@@ -59,7 +59,7 @@ export default {
     },
     created(){
         this.$set(this.value, 'state', this.value.state || 'n');
-        const allTypes = this.supportedFileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType.id === fileType.id)).map(filetype => filetype.value).concat(this.value.customFileTypes);
+        const allTypes = this.supportedFileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType === fileType.id)).map(filetype => filetype.value).concat(this.value.customFileTypes);
         this.supportedTypes = allTypes.join(',');
     },
     methods:{
@@ -79,7 +79,7 @@ export default {
                 formData.append('id', this.value.id);
                 this.$refs[`file${this._uid}`].value = '';
                 try{
-                    const response = await this.$store.dispatch('addExampleattachment', formData);
+                    const response = await this.$store.dispatch('addExampleAttachment', formData);
                     this.value.hasAttachment = true;
                     this.$bvToast.toast(this.$t('attachment.saved'), {
                         title: this.$t('success'),
@@ -101,7 +101,7 @@ export default {
         },
         async downloadFile(id){
             try{
-                const response = await this.$store.dispatch('getExampleattachment', id);
+                const response = await this.$store.dispatch('getExampleAttachment', id);
                 fileManagement.downloadFile(response.data, response.headers);
             }
             catch{

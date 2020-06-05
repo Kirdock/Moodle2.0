@@ -164,7 +164,6 @@ const messages = {
         passwordUpdated: 'Passwort wurde aktualisiert',
         passwordUpdatedError: 'Passwort konnte nicht aktualisiert werden',
         points: 'Punkte',
-        pointsTotal: 'Punkte total',
         presentation: {
             deleted: 'Präsentation wurde gelöscht',
             saved: 'Präsentation wurde gespeichert',
@@ -414,7 +413,6 @@ const messages = {
         passwordUpdated: 'Password updated',
         passwordUpdatedError: 'Password could not be updated',
         points: 'Points',
-        pointsTotal: 'Points total',
         presentation: {
             deleted: 'Presentation deleted',
             saved: 'Presentation saved',

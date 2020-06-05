@@ -152,7 +152,7 @@ export default {
     saveKreuzel(examples){
         return axios.post('/user/kreuzel', examples);
     },
-    addExampleattachment(formData){
+    addExampleAttachment(formData){
         return axios.post('/user/kreuzel/attachment',
             formData,
             {
@@ -162,7 +162,7 @@ export default {
             }
         )
     },
-    getExampleattachment(id){
+    getExampleAttachment(id){
         return axios.get(`/user/kreuzel/attachment/${id}`,{
             responseType: 'blob'
         });

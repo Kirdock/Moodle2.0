@@ -187,7 +187,7 @@ export default {
             })
         },
         setFileTypes(){
-            let types = this.fileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType.id === fileType.id));
+            let types = this.fileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType === fileType.id));
             this.selectedfileTypes = types.concat(this.value.customFileTypes.map(type => {return {value: type, name: type}}));
         },
         submitFile_changed(){
