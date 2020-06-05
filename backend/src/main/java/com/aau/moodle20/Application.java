@@ -12,9 +12,17 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+
+import java.util.Locale;
 
 @Controller
 @SpringBootApplication
@@ -69,5 +77,23 @@ public class Application implements ApplicationRunner, ErrorController {
 	@Override
 	public String getErrorPath() {
 		return PATH;
+	}
+
+	//configure default locale
+	@Bean
+	public LocaleResolver localeResolver() {
+		AcceptHeaderLocaleResolver slr = new AcceptHeaderLocaleResolver();
+		slr.setDefaultLocale(Locale.ENGLISH);
+		return slr;
+	}
+
+	//configuring ResourceBundle
+	@Bean
+	public ReloadableResourceBundleMessageSource  bundleMessageSource()
+	{
+		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource ();
+		messageSource.setBasename("classpath:messages");
+		messageSource.setCacheSeconds(10);
+		return messageSource;
 	}
 }

@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.component.PdfHelper;
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.*;
@@ -19,6 +20,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -59,6 +62,9 @@ public class SemesterService {
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    PdfHelper pdfHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
 
@@ -323,15 +329,16 @@ public class SemesterService {
         Course course = courseRepository.findById(courseId).get();
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try{
-            Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+        try {
 
-            PdfPTable table = createAttendanceTable(course);
-            PdfPTable headerTable = createAttendanceHeaderTable();
             PdfWriter.getInstance(document, out);
             document.open();
+
+            pdfHelper.addAttendanceTitle(document);
+            pdfHelper.addAttendanceTable(document, course);
+            /*
             document.add(headerTable);
-            document.add(table);
+            document.add(table);*/
 
             document.close();
 
@@ -343,72 +350,8 @@ public class SemesterService {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    protected PdfPTable createAttendanceHeaderTable() throws DocumentException {
-        PdfPTable table = new PdfPTable(1);
-        table.setWidthPercentage(95);
-        table.setWidths(new int[]{1});
 
-        Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
 
-        table.setHeaderRows(1);
-
-        PdfPCell hcell;
-        hcell = new PdfPCell(new Phrase("AnwesenheitsListe", headFont));
-        hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(hcell);
-
-        return table;
-    }
-
-    protected PdfPTable createAttendanceTable(Course course) throws DocumentException {
-        PdfPTable table = new PdfPTable(3);
-        table.setWidthPercentage(95);
-        table.setWidths(new int[]{3, 3, 4});
-
-        Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-
-        table.setHeaderRows(1);
-
-        PdfPCell hcell;
-        hcell = new PdfPCell(new Phrase("Name", headFont));
-        hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(hcell);
-
-        hcell = new PdfPCell(new Phrase("MatrikelNummer", headFont));
-        hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(hcell);
-
-        hcell = new PdfPCell(new Phrase("Unterschrift", headFont));
-        hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(hcell);
-
-        for (UserInCourse userInCourse : course.getStudents()) {
-
-            if (!ECourseRole.Student.equals(userInCourse.getRole()))
-                continue;
-
-            PdfPCell cell;
-
-            cell = new PdfPCell(new Phrase(userInCourse.getUser().getForename() + " " + userInCourse.getUser().getSurname()));
-            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-            table.addCell(cell);
-
-            cell = new PdfPCell(new Phrase(userInCourse.getUser().getMatriculationNumber()));
-            cell.setPaddingLeft(5);
-            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-            table.addCell(cell);
-
-            cell = new PdfPCell(new Phrase(""));
-            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            cell.setPaddingRight(5);
-            table.addCell(cell);
-        }
-
-        return table;
-    }
 
 
     protected Course checkIfCourseExists(Long courseId) throws ServiceValidationException {
