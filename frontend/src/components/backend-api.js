@@ -1,5 +1,6 @@
 import AXIOS from 'axios';
 import store from '@/store/index';
+import i18n from '@/plugins/i18n';
 
 const axios = AXIOS.create({
   baseURL: `/api`
@@ -41,6 +42,9 @@ export default {
     },
     getCourses(semesterData){
         return axios.get(`/semester/${semesterData.id}/courses`); //only id, name, number
+    },
+    getCourseAssigned(data){
+        return axios.get(`/courseAssigned/${data.courseId}`); //all data
     },
     getCoursesAssigned(semesterData){
         return axios.get(`/semester/${semesterData.id}/coursesAssigned`);
@@ -136,7 +140,10 @@ export default {
     },
     getAttendanceList(courseId){
         return axios.get(`/course/${courseId}/attendanceList`,{
-            responseType: 'blob'
+            responseType: 'blob',
+            headers:{
+                'Accept-Language': i18n.locale
+            }
         });
     },
     saveKreuzel(examples){

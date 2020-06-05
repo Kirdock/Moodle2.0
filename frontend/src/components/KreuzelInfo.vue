@@ -25,7 +25,7 @@
                         <label :for="`kInfoDescription${_uid}`" class="control-label">
                             {{$t('reason')}}:
                         </label>
-                        <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.description" :disabled="deadlineReached">
+                        <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.submitDescription" :disabled="deadlineReached">
                     </div>
                 </div>
             </template>

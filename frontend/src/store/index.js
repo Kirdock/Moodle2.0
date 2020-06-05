@@ -160,6 +160,9 @@ export default new Vuex.Store({
     getCoursesAssigned({commit}, semesterData){
       return api.getCoursesAssigned(semesterData);
     },
+    getCourseAssigned({commit}, data){
+      return api.getCourseAssigned(data);
+    },
     getCourse({commit}, data){
       return api.getCourse(data);
     },
