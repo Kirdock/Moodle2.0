@@ -15,7 +15,6 @@ public class SignUpRequest {
     private String forename;
     @NotBlank
     private String surname;
-    @NotNull
     private Boolean isAdmin;
     private String email;
 
