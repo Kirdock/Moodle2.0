@@ -83,6 +83,7 @@ const messages = {
                 delete: 'Wollen Sie das Beispiel wirklich löschen?'
             }
         },
+        examples: 'Beispiele',
         reason: 'Begründung',
         subExample: {
             name: 'Unterbeispiel',
@@ -161,6 +162,7 @@ const messages = {
         passwordUpdated: 'Passwort wurde aktualisiert',
         passwordUpdatedError: 'Passwort konnte nicht aktualisiert werden',
         points: 'Punkte',
+        pointsTotal: 'Punkte total',
         presentation: {
             deleted: 'Präsentation wurde gelöscht',
             saved: 'Präsentation wurde gespeichert',
@@ -329,6 +331,7 @@ const messages = {
                 delete: 'Do you really want to delete this example?'
             }
         },
+        examples: 'Examples',
         reason: 'Reason',
         subExample: {
             name: 'Sub example',
@@ -407,6 +410,7 @@ const messages = {
         passwordUpdated: 'Password updated',
         passwordUpdatedError: 'Password could not be updated',
         points: 'Points',
+        pointsTotal: 'Points total',
         presentation: {
             deleted: 'Presentation deleted',
             saved: 'Presentation saved',
