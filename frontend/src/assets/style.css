@@ -24,3 +24,7 @@ a:not([href]){
 .document-editor__editable-container{
   border: 1px solid #ced4da;
 }
+
+.pointer{
+  cursor: pointer;
+}

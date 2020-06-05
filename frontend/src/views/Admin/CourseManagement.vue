@@ -66,7 +66,7 @@
                 </b-modal>
             </div>
         </div>
-        <b-tabs content-class="mt-3" v-if="selectedCourse">
+        <b-tabs content-class="mt-3" v-if="selectedCourse.id">
             <b-tab :title="$t('information')" active>
                 <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
                 <div class="form-horizontal col-md-4">
@@ -85,15 +85,23 @@
             </b-tab>
             <b-tab :title="$t('user.assigned')" id="assignedUsers">
                 <div class="form-horizontal col-md-7">
-                    <div class="form-group">
-                        <button class="btn btn-primary" type="button" @click="getAttendanceList(selectedCourseId)">
-                            <span class="fa fa-sync fa-spin" v-if="loading_attendanceList"></span>
-                            <span class="fas fa-download" v-else></span>
-                            {{$t('attendance.list')}}
-                        </button>
+                    <div class="form-inline" style="margin-bottom: 10px">
+                        <div class="form-group" style="margin-right: 10px">
+                            <button class="btn btn-primary" v-b-modal="'modal-presented'">
+                                <span class="fa fa-list"></span>
+                                {{$t('presentations')}}
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="button" @click="getAttendanceList(selectedCourseId)">
+                                <span class="fa fa-sync fa-spin" v-if="loading_attendanceList"></span>
+                                <span class="fas fa-download" v-else></span>
+                                {{$t('attendance.list')}}
+                            </button>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="btn btn-primary finger">
+                        <label class="btn btn-primary">
                             <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
                             <span class="fas fa-upload" v-else></span>
                             {{ $t('uploadCSV') }}
@@ -121,9 +129,34 @@
                     <table class="table" aria-describedby="assignedUsers">
                         <thead>
                             <th scope="col"></th>
-                            <th scope="col">{{$t('matriculationNumber')}}</th>
-                            <th scope="col">{{$t('surname')}}</th>
-                            <th scope="col">{{$t('forename')}}</th>
+                            <th scope="col">
+                                <span class="pointer" @click="setSortOrder(0)">{{$t('matriculationNumber')}}
+                                    <span class="fas fa-sort" v-if="sortOrder.index !== 0"></span>
+                                    <span class="fas fa-sort-up" v-else-if="sortOrder.type === 0"></span>
+                                    <span class="fas fa-sort-up fa-rotate-180" v-else></span>
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span class="pointer" @click="setSortOrder(1)">{{$t('surname')}}
+                                    <span class="fas fa-sort" v-if="sortOrder.index !== 1"></span>
+                                    <span class="fas fa-sort-up" v-else-if="sortOrder.type === 0"></span>
+                                    <span class="fas fa-sort-up fa-rotate-180" v-else></span>
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span class="pointer" @click="setSortOrder(2)">{{$t('forename')}}
+                                    <span class="fas fa-sort" v-if="sortOrder.index !== 2"></span>
+                                    <span class="fas fa-sort-up" v-else-if="sortOrder.type === 0"></span>
+                                    <span class="fas fa-sort-up fa-rotate-180" v-else></span>
+                                </span>
+                            </th>
+                            <th scope="col">
+                                <span class="pointer" @click="setSortOrder(3)">{{$t('presentations')}}
+                                    <span class="fas fa-sort" v-if="sortOrder.index !== 3"></span>
+                                    <span class="fas fa-sort-up" v-else-if="sortOrder.type === 0"></span>
+                                    <span class="fas fa-sort-up fa-rotate-180" v-else></span>
+                                </span>
+                            </th>
                             <th scope="col">{{$t('role')}}</th>
                         </thead>
                         <tbody>
@@ -139,6 +172,9 @@
                                 </td>
                                 <td>
                                     {{user.forename}}
+                                </td>
+                                <td>
+                                    {{user.presentedCount}}
                                 </td>
                                 <td>
                                     <select class="form-control" v-model="user.courseRole">
@@ -226,6 +262,87 @@
                 </div>
             </b-tab>
         </b-tabs>
+        <b-modal id="modal-presented" :title="$t('presentations')" size="lg" hide-footer>
+            <div class="form-horizontal">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="presentedUser" class="control-label">{{ $t('student') }}</label>
+                        <multiselect v-model="presentedUser" id="presentedUser" open-direction="bottom" @input="getUserKreuzel"
+                                    :custom-label="userFormat"
+                                    :placeholder="$t('typeToSearch')"
+                                    track-by="matriculationNumber"
+                                    selectLabel=""
+                                    :selectedLabel="$t('selected')"
+                                    :options="assignedUsers"
+                                    :searchable="true"
+                                    :clear-on-select="true"
+                                    :close-on-select="true"
+                                    :options-limit="300"
+                                    :allow-empty="false"
+                                    :max-height="600"
+                                    deselect-label=""
+                                    :show-no-results="false"
+                                    >
+                        </multiselect>
+                    </div>
+                    <div class="form-group">
+                        <label for="presentedExample" class="control-label">{{ $t('example.name') }}</label>
+                        <multiselect v-model="presentedExample" id="presentedExample" open-direction="bottom" @input="getUserKreuzel"
+                                    :placeholder="$t('typeToSearch')"
+                                    label="name"
+                                    track-by="id"
+                                    selectLabel=""
+                                    :selectedLabel="$t('selected')"
+                                    :options="assignedUsers"
+                                    :searchable="true"
+                                    :clear-on-select="true"
+                                    :close-on-select="true"
+                                    :options-limit="300"
+                                    :allow-empty="false"
+                                    :max-height="600"
+                                    deselect-label=""
+                                    :show-no-results="false"
+                                    >
+                        </multiselect>
+                    </div>
+                    <div class="form-group" style="margin-top: 22px">
+                        <button class="btn btn-primary" @click="addPresentation()">
+                            <span class="fa fa-plus"></span>
+                        </button>
+                    </div>
+                </div>
+                <table class="table" aria-describedby="modal-presented">
+                    <thead>
+                        <th scope="col">{{$t('matriculationNumber')}}</th>
+                        <th scope="col">{{$t('surname')}}</th>
+                        <th scope="col">{{$t('forename')}}</th>
+                        <th scope="col">{{$t('example.name')}}</th>
+                        <th scope="col">{{$t('actions')}}</th>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(presented, index) in selectedCourse.presented" :key="presented.id">
+                            <td>
+                                {{presented.matriculationNumber}}
+                            </td>
+                            <td>
+                                {{presented.surname}}
+                            </td>
+                            <td>
+                                {{presented.forename}}
+                            </td>
+                            <td>
+                                {{presented.exampleName}}
+                            </td>
+                            <td>
+                                <a href="#" :title="$t('delete')" @click.prevent="updatePresented({matriculationNumber: presented.matriculationNumber}, {id: presented.exampleId}, false, index)">
+                                    <span class="fa fa-trash fa-2x"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </b-modal>
     </div>
 </template>
 
@@ -235,11 +352,14 @@ import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
 import {userManagement, dateManagement, editorManagement, fileManagement} from '@/plugins/global';
 import Editor from '@/components/ckeditor';
 import i18n from '@/plugins/i18n';
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 export default {
     components: {
         'course-info': CourseInfo,
-        'es-info': ExerciseSheetInfo
+        'es-info': ExerciseSheetInfo,
+        Multiselect
     },
     data(){
         return {
@@ -249,7 +369,7 @@ export default {
             loading_delete: false,
             loading_edit_updateUsers: false,
             selectedSemester_edit: undefined,
-            selectedCourse: undefined,
+            selectedCourse: {},
             selectedCourseId: undefined,
             courseCopyId: undefined,
             courses: [],
@@ -266,7 +386,14 @@ export default {
             editorConfig: {
 	            language: i18n.locale
             },
-            loading_attendanceList: false
+            loading_attendanceList: false,
+            presentedUser: undefined,
+            presentedExample: {},
+            presentedExamples: [],
+            sortOrder:{
+                index: 0,
+                type: 0 //0 => DESC, 1 => ASC
+            }
         }
     },
     created(){
@@ -289,8 +416,21 @@ export default {
         rolesWithAll(){
             return userManagement.rolesAllAssign();
         },
+        assignedUsers(){
+            return userManagement.filteredUsers({users: this.courseUsers, role: 's'});
+        },
         filteredUsers(){
-            return userManagement.filteredUsers({users: this.courseUsers, role: this.showRoles, searchText: this.searchUserText});
+            const users = userManagement.filteredUsers({users: this.courseUsers, role: this.showRoles, searchText: this.searchUserText});
+            if(this.sortOrder.index !== 0 || this.sortOrder.type !== 0){
+                const key = this.sortOrder.index === 0 ? 'matriculationNumber' : this.sortOrder.index === 1 ? 'surname' : this.sortOrder.index === 2 ? 'forename' : 'presentedCount';
+                if(this.sortOrder.type === 0){
+                    users.sort((a,b) => a[key].localeCompare(b[key]));
+                }
+                else{
+                    users.sort((a,b) => b[key].localeCompare(a[key]));
+                }
+            }
+            return users;
         },
         semestersWithoutSelected(){
             return this.semesters.filter(semester => semester.id !== this.selectedSemester_edit);
@@ -298,9 +438,75 @@ export default {
     },
     methods:{
         onReady: editorManagement.onReady,
+        setSortOrder(index){
+            if(this.sortOrder.index !== index){
+                this.sortOrder = {
+                    index: index,
+                    type: 0
+                }
+            }
+            else if(this.sortOrder.type === 0){
+                this.sortOrder.type = 1;
+            }
+            else{
+                this.sortOrder.type = 0;
+            }
+        },
+        addPresentation(){
+            if(this.presentedUser && this.presentedUser.matriculationNumber && this.presentedExample && this.presentedExample.id){
+                this.updatePresented(this.presentedUser, this.presentedExample, true);
+            }
+        },
+        async updatePresented(user, example, status, index){
+            try{
+                const response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.id, status});
+                if(index){
+                    this.selectedCourse.presented.splice(index,1);
+                }
+                else{
+                    this.selectedCourse.presented.push({
+                        matriculationNumber: user.matriculationNumber,
+                        forename: user.forename,
+                        surname: user.surname,
+                        exampleId: example.id,
+                        exampleName: example.name
+                    });
+                }
+                this.$bvToast.toast(status ? this.$t('presentation.saved') : this.$t('presentation.deleted'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }
+            catch{
+                this.$bvToast.toast(status ? this.$t('presentation.error.save') : this.$t('presentation.error.delete'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }
+
+        },
         setCourseQuery(courseId){
             if(this.$route.query.courseId !== courseId){
-                this.$router.push({ query: { courseId }})
+                this.$router.push({ query: { courseId }});
+            }
+        },
+        userFormat(user){
+            return `${user.matriculationNumber} ${user.surname} ${user.forename}`;
+        },
+        async getUserKreuzel(){
+            try{
+                this.presentedExamples = [];
+                const response = await this.$store.dispatch('getUserKreuzel', {matriculationNumber: this.presentedUser.matriculationNumber, courseId: this.selectedCourseId});
+                this.presentedExamples = response.data;
+            }
+            catch{
+                this.$bvToast.toast(this.$t('kreuzel.error.get'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
             }
         },
         getAttendanceList(courseId){

@@ -238,6 +238,12 @@ export default new Vuex.Store({
     },
     addExampleAttachement({commit}, formData){
       return api.addExampleAttachement(formData);
+    },
+    getUserKreuzel({commit}, kreuzelData){
+      return api.getUserKreuzel(kreuzelData);
+    },
+    updatePresented({commit}, data){
+      return api.updatePresented(data);
     }
   },
   modules: {

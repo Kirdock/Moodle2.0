@@ -3,7 +3,7 @@
         <div class="form-group" v-if="$store.getters.userInfo.isAdmin">
             <label :for="`cInfoOwner${_uid}`" class="control-label required">{{ $t('owner') }}</label>
             <multiselect v-model="owner" :id="`cInfoOwner${_uid}`" open-direction="bottom" @input="ownerChanged"
-                        :custom-label="userFomat"
+                        :custom-label="userFormat"
                         :placeholder="$t('typeToSearch')"
                         track-by="matriculationNumber"
                         selectLabel=""
@@ -61,8 +61,8 @@ export default {
         }
     },
     methods: {
-        userFomat(user){
-            return `${user.matriculationNumber} ${user.surname} ${user.forename}`
+        userFormat(user){
+            return `${user.matriculationNumber} ${user.surname} ${user.forename}`;
         },
         ownerChanged(ownerUser){
             this.value.owner = ownerUser.matriculationNumber;

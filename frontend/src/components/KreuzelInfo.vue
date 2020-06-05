@@ -34,7 +34,7 @@
             </template>
             <template v-if="value.submitFile">
                 <div class="form-group">
-                    <label class="btn btn-primary finger" :disabled="deadlineReached">
+                    <label class="btn btn-primary">
                         <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
                         <span class="fas fa-upload" v-else></span>
                         {{$t('submitFile')}}

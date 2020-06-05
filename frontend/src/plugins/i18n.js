@@ -130,6 +130,7 @@ const messages = {
             save: 'Kreuzel wurden gespeichert',
             type: 'Kreuzeltyp',
             error: {
+                get: 'Kreuzel konnten nicht geladen werden',
                 save: 'Kreuzel konnten nicht gespeichert werden'
             },
             option:{
@@ -160,6 +161,15 @@ const messages = {
         passwordUpdated: 'Passwort wurde aktualisiert',
         passwordUpdatedError: 'Passwort konnte nicht aktualisiert werden',
         points: 'Punkte',
+        presentation: {
+            deleted: 'Präsentation wurde gelöscht',
+            saved: 'Präsentation wurde gespeichert',
+            error: {
+                save: 'Präsentation konnte nicht gespeichert werden',
+                delete: 'Präsentation konnte nicht gelöscht werden'
+            }
+        },
+        presentations: 'Präsentationen',
         remove: 'Entfernen',
         requiredField: 'Pflichtfeld',
         role: 'Rolle',
@@ -366,6 +376,7 @@ const messages = {
             save: 'Kreuzel saved',
             type: 'Kreuzel type',
             error: {
+                get: 'Kreuzel could not be loaded',
                 save: 'Kreuzel could not be saved'
             },
             option:{
@@ -396,6 +407,15 @@ const messages = {
         passwordUpdated: 'Password updated',
         passwordUpdatedError: 'Password could not be updated',
         points: 'Points',
+        presentation: {
+            deleted: 'Presentation deleted',
+            saved: 'Presentation saved',
+            error: {
+                save: 'Presentation could not be saved',
+                delete: 'Presentation could not be deleted'
+            }
+        },
+        presentations: 'Presentations',
         remove: 'Remove',
         requiredField: 'Required field',
         role: 'Role',

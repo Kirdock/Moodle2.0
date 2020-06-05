@@ -151,6 +151,12 @@ export default {
                 }
             }
         )
+    },
+    getUserKreuzel({matriculationNumber, courseId}){
+        return axios.get(`/user/${matriculationNumber}/kreuzel/${courseId}`);
+    },
+    updatePresented(data){
+        return axios.post('/user/examplePresented', data);
     }
 }
 

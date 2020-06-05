@@ -22,7 +22,7 @@
                         <user-info v-model="userInfo" :isEdit="false"></user-info>
                     </form>
                 </b-modal>
-                <label class="btn btn-primary finger" style="margin-right: 10px">
+                <label class="btn btn-primary" style="margin-right: 10px">
                     <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
                     <span class="fas fa-upload" v-else></span>
                     {{ $t('uploadCSV') }}
