@@ -83,7 +83,8 @@ CREATE TABLE IF NOT EXISTS FINISHES_EXAMPLE
     description  CLOB,
     valid   CHAR(5),
     has_Presented CHAR(5),
-    attachment CLOB,
+    attachment BLOB,
+    file_Name VARCHAR(200),
     PRIMARY KEY (example_id, matriculation_Number),
     CONSTRAINT FOREIGN_KEY_USER_FINISHES_EXAMPLE FOREIGN KEY (matriculation_Number) references USER on delete cascade,
     CONSTRAINT FOREIGN_KEY_EXAMPLE_FINISHES_EXAMPLE FOREIGN KEY (example_id) references EXAMPLE on delete cascade

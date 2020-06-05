@@ -25,8 +25,9 @@ public class FinishesExample {
 
     private String description;
     @Lob
-    @Column(name = "attachment", columnDefinition="CLOB")
+    @Column(name = "attachment", columnDefinition="BLOB")
     private byte [] attachment;
+    private String fileName;
 
     private Boolean valid = false;
     private Boolean hasPresented = false;
@@ -98,6 +99,14 @@ public class FinishesExample {
 
     public void setState(EFinishesExampleState state) {
         this.state = state;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     //TODO check later if need -> if no remove

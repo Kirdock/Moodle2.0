@@ -1,5 +1,6 @@
 package com.aau.moodle20.controller;
 
+import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.*;
@@ -10,6 +11,9 @@ import com.aau.moodle20.services.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 
 @RestController()
@@ -66,6 +72,21 @@ public class UserController {
     @GetMapping(path = "/user/{matriculationNumber}")
     public UserResponseObject getUser(@PathVariable String matriculationNumber) {
         return userDetailsService.getUser(matriculationNumber);
+    }
+
+    @GetMapping(path = "/user/kreuzel/attachment/{exampleId}")
+    public ResponseEntity<InputStreamResource> getUserKreuzelAttachment(@PathVariable Long exampleId) {
+        FinishesExample example = finishesExampleService.getKreuzelAttachment(exampleId);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(example.getAttachment());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename="+example.getFileName());
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new InputStreamResource(inputStream));
     }
 
     // post api----------------------------------------------------------------
@@ -122,6 +143,12 @@ public class UserController {
     public ResponseEntity<?> setKreuzelUser(@Valid @RequestBody List<UserKreuzelRequest> userKreuzelRequests) {
         finishesExampleService.setKreuzelUser(userKreuzelRequests);
         return ResponseEntity.ok(new MessageResponse("Kreuzel were successfully set!"));
+    }
+
+    @PostMapping(path = "/user/kreuzel/attachment")
+    public ResponseEntity<?> setKreuzelUserAttachment(@Valid  @RequestParam("file") MultipartFile file, @Valid  @RequestParam("id") Long exampleId) throws IOException {
+        finishesExampleService.setKreuzelUserAttachment(file,exampleId);
+        return ResponseEntity.ok(new MessageResponse("Attachment for kreuzel was successfully set!"));
     }
 
     // delete api -------------------------------------------------------------------------

@@ -10,11 +10,17 @@ import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.repository.ExampleRepository;
 import com.aau.moodle20.repository.FinishesExampleRepository;
 import com.aau.moodle20.repository.UserRepository;
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +75,33 @@ public class FinishesExampleService {
         finishesExampleRepository.saveAll(finishesExampleList);
     }
 
+    public void setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException {
+        UserDetailsImpl userDetails = getUserDetails();
+        if(file == null)
+            throw new ServiceValidationException("Error: file is null");
+        Optional<Example> optionalExample = exampleRepository.findById(exampleId);
+        if(!optionalExample.isPresent())
+            throw new ServiceValidationException("Error: example not found",HttpStatus.NOT_FOUND);
+        Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(exampleId,userDetails.getMatriculationNumber());
+        if(!optionalFinishesExample.isPresent())
+            throw new ServiceValidationException("Error: user did not kreuzel this example");
+
+        FinishesExample finishesExample = optionalFinishesExample.get();
+        finishesExample.setAttachment(file.getBytes());
+        finishesExample.setFileName(file.getOriginalFilename());
+        finishesExampleRepository.save(finishesExample);
+    }
+
+    public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceValidationException
+    {
+        UserDetailsImpl userDetails = getUserDetails();
+        Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(exampleId,userDetails.getMatriculationNumber());
+        if(!optionalFinishesExample.isPresent())
+            throw new ServiceValidationException("Error: user did not kreuzel this example");
+
+       return optionalFinishesExample.get();
+    }
+
     public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceValidationException
     {
         if(!exampleRepository.existsById(userExamplePresented.getExampleId()))
@@ -86,5 +119,8 @@ public class FinishesExampleService {
         finishesExampleRepository.save(finishesExample);
     }
 
+    public UserDetailsImpl getUserDetails() {
+        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
 }
