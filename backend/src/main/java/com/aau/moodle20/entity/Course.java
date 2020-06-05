@@ -1,11 +1,14 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.constants.ECourseRole;
+import com.aau.moodle20.payload.response.AssignedStudent;
 import com.aau.moodle20.payload.response.CourseResponseObject;
+import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
+import com.aau.moodle20.payload.response.UserPresentedResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -158,5 +161,53 @@ public class Course {
         course.setIncludeThird(getIncludeThird());
 
         return course;
+    }
+
+    public CourseResponseObject createCourseResponseObject_FullInfo() {
+        CourseResponseObject responseObject = new CourseResponseObject();
+        responseObject.setId(getId());
+        responseObject.setName(getName());
+        responseObject.setNumber(getNumber());
+        responseObject.setMinKreuzel(getMinKreuzel());
+        responseObject.setMinPoints(getMinPoints());
+        responseObject.setDescriptionTemplate(getDescriptionTemplate());
+        responseObject.setIncludeThird(getIncludeThird());
+        responseObject.setSemesterId(getSemester().getId());
+        if (getExerciseSheets() != null)
+            responseObject.setExerciseSheets(getExerciseSheets().stream()
+                    .map(ExerciseSheet::getResponseObjectLessInfo)
+                    .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
+                    .collect(Collectors.toList()));
+
+        List<AssignedStudent> assignedStudents = new ArrayList<>();
+        for(UserInCourse userInCourse : getStudents())
+        {
+            if(userInCourse.getRole().equals(ECourseRole.Student) && userInCourse.getUser().getFinishedExamples()!=null)
+            {
+                AssignedStudent assignedStudent = new AssignedStudent();
+                List<UserPresentedResponse> userPresentedResponseList = new ArrayList<>();
+                for(FinishesExample finishesExample: userInCourse.getUser().getFinishedExamples())
+                {
+                    if(!finishesExample.getHasPresented())
+                        continue;
+
+                    UserPresentedResponse userPresentedResponse = new UserPresentedResponse();
+                    userPresentedResponse.setExampleId(finishesExample.getExample().getId());
+                    userPresentedResponse.setExampleName(finishesExample.getExample().getName());
+                    userPresentedResponse.setOrder(finishesExample.getExample().getOrder());
+                    if(finishesExample.getExample().getParentExample()!=null)
+                        userPresentedResponse.setParentOrder(finishesExample.getExample().getParentExample().getOrder());
+                    userPresentedResponseList.add(userPresentedResponse);
+                }
+                assignedStudent.setPresentedExamples(userPresentedResponseList);
+                assignedStudent.setMatriculationNumber(userInCourse.getUser().getMatriculationNumber());
+                assignedStudents.add(assignedStudent);
+            }
+        }
+        responseObject.setAssignedStudents(assignedStudents);
+
+
+        return responseObject;
+
     }
 }

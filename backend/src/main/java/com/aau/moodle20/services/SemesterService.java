@@ -282,54 +282,14 @@ public class SemesterService {
     }
 
     public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
-
-        List<AssignedStudent> assignedUsers = new ArrayList<>();
         UserDetailsImpl userDetails = getUserDetails();
         checkIfCourseExists(courseId);
         Course course = courseRepository.findById(courseId).get();
         if(!userDetails.getAdmin() && !course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
-            throw new ServiceValidationException("Error: neither admin or user",HttpStatus.UNAUTHORIZED);
+            throw new ServiceValidationException("Error: neither admin or owner",HttpStatus.UNAUTHORIZED);
 
-        List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
 
-        CourseResponseObject responseObject = new CourseResponseObject();
-        responseObject.setId(course.getId());
-        responseObject.setName(course.getName());
-        responseObject.setNumber(course.getNumber());
-        responseObject.setMinKreuzel(course.getMinKreuzel());
-        responseObject.setMinPoints(course.getMinPoints());
-        responseObject.setDescriptionTemplate(course.getDescriptionTemplate());
-        responseObject.setIncludeThird(course.getIncludeThird());
-        responseObject.setSemesterId(course.getSemester().getId());
-        responseObject.setExerciseSheets(exerciseSheets.stream()
-                .map(ExerciseSheet::getResponseObjectLessInfo)
-                .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
-                .collect(Collectors.toList()));
-        for(UserInCourse userInCourse : course.getStudents())
-        {
-            if(userInCourse.getRole().equals(ECourseRole.Student) && userInCourse.getUser().getFinishedExamples()!=null)
-            {
-                AssignedStudent assignedUser = new AssignedStudent();
-                List<UserPresentedResponse> userPresentedResponseList = new ArrayList<>();
-                for(FinishesExample finishesExample: userInCourse.getUser().getFinishedExamples())
-                {
-                    if(!finishesExample.getHasPresented())
-                        continue;
-
-                    UserPresentedResponse userPresentedResponse = new UserPresentedResponse();
-                    userPresentedResponse.setExampleId(finishesExample.getExample().getId());
-                    userPresentedResponse.setExampleName(finishesExample.getExample().getName());
-                    userPresentedResponse.setOrder(finishesExample.getExample().getOrder());
-                    if(finishesExample.getExample().getParentExample()!=null)
-                        userPresentedResponse.setParentOrder(finishesExample.getExample().getParentExample().getOrder());
-                    userPresentedResponseList.add(userPresentedResponse);
-                }
-                assignedUser.setPresentedExamples(userPresentedResponseList);
-                assignedUser.setMatriculationNumber(userInCourse.getUser().getMatriculationNumber());
-                assignedUsers.add(assignedUser);
-            }
-        }
-        responseObject.setAssignedStudents(assignedUsers);
+        CourseResponseObject responseObject = course.createCourseResponseObject_FullInfo();
 
         if(userDetails.getAdmin())
             responseObject.setOwner(course.getOwner().getMatriculationNumber());
