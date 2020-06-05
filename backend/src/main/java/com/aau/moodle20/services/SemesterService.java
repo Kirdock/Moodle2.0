@@ -270,15 +270,18 @@ public class SemesterService {
         return responseObjects;
     }
 
-    public Boolean isCourseAssigned(Long courseId) throws ServiceValidationException {
-        Boolean isCourseAssigned = Boolean.FALSE;
+    public CourseResponseObject getCourseAssigned(Long courseId) throws ServiceValidationException {
         checkIfCourseExists(courseId);
         UserDetailsImpl userDetails = getUserDetails();
         Optional<User> user = userRepository.findByMatriculationNumber(userDetails.getMatriculationNumber());
         if (user.isPresent()) {
-            isCourseAssigned = user.get().getCourses().stream().anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
+            Boolean isCourseAssigned = user.get().getCourses().stream().anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
+            if(!isCourseAssigned)
+                throw new ServiceValidationException("Error: User is not assigned to this course!",HttpStatus.UNAUTHORIZED);
         }
-        return isCourseAssigned;
+        Course course = courseRepository.findById(courseId).get();
+
+        return course.createCourseResponseObject_FullInfo();
     }
 
     public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {

@@ -65,8 +65,8 @@ public class SemesterController {
     }
 
     @GetMapping(value = "/courseAssigned/{courseId}")
-    public ResponseEntity<Boolean> isCourseAssigned(@PathVariable("courseId") long courseId)  {
-        return ResponseEntity.ok(semesterService.isCourseAssigned(courseId));
+    public ResponseEntity<CourseResponseObject> isCourseAssigned(@PathVariable("courseId") long courseId)  {
+        return ResponseEntity.ok(semesterService.getCourseAssigned(courseId));
     }
 
     @GetMapping(value = "/course/{courseId}/attendanceList")
