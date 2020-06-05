@@ -1,5 +1,6 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -150,6 +151,31 @@ public class ExerciseSheet {
         responseObject.setName(getName());
         responseObject.setSubmissionDate(getSubmissionDate());
 
+        return responseObject;
+    }
+
+    public ExerciseSheetResponseObject getResponseObjectLessInfo_WithExampleInfo(String matriculationNumber) {
+        ExerciseSheetResponseObject responseObject = getResponseObjectLessInfo();
+        if (getExamples() != null) {
+            Integer totalPoints = 0;
+            Integer kreuzel = 0;
+            Integer points = 0;
+            responseObject.setExampleCount(getExamples().size());
+
+            for (Example example : getExamples()) {
+                totalPoints = totalPoints + (example.getPoints() * example.getWeighting());
+                Boolean hasFinishedExample = example.getExamplesFinishedByUser().stream()
+                        .anyMatch(finishesExample -> finishesExample.getId().getMatriculationNumber().equals(matriculationNumber)
+                                && (EFinishesExampleState.YES.equals(finishesExample.getState()) ||  EFinishesExampleState.MAYBE.equals(finishesExample.getState()) ));
+                if(hasFinishedExample) {
+                    kreuzel++;
+                    points = points + (example.getPoints() * example.getWeighting());
+                }
+            }
+            responseObject.setPointsTotal(totalPoints);
+            responseObject.setKreuzel(kreuzel);
+            responseObject.setPoints(points);
+        }
         return responseObject;
     }
 

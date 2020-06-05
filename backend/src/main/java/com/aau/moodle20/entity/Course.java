@@ -163,7 +163,7 @@ public class Course {
         return course;
     }
 
-    public CourseResponseObject createCourseResponseObject_FullInfo() {
+    public CourseResponseObject createCourseResponseObject_GetCourse() {
         CourseResponseObject responseObject = new CourseResponseObject();
         responseObject.setId(getId());
         responseObject.setName(getName());
@@ -179,35 +179,17 @@ public class Course {
                     .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
                     .collect(Collectors.toList()));
 
-        List<AssignedStudent> assignedStudents = new ArrayList<>();
-        for(UserInCourse userInCourse : getStudents())
-        {
-            if(userInCourse.getRole().equals(ECourseRole.Student) && userInCourse.getUser().getFinishedExamples()!=null)
-            {
-                AssignedStudent assignedStudent = new AssignedStudent();
-                List<UserPresentedResponse> userPresentedResponseList = new ArrayList<>();
-                for(FinishesExample finishesExample: userInCourse.getUser().getFinishedExamples())
-                {
-                    if(!finishesExample.getHasPresented())
-                        continue;
+        return responseObject;
+    }
 
-                    UserPresentedResponse userPresentedResponse = new UserPresentedResponse();
-                    userPresentedResponse.setExampleId(finishesExample.getExample().getId());
-                    userPresentedResponse.setExampleName(finishesExample.getExample().getName());
-                    userPresentedResponse.setOrder(finishesExample.getExample().getOrder());
-                    if(finishesExample.getExample().getParentExample()!=null)
-                        userPresentedResponse.setParentOrder(finishesExample.getExample().getParentExample().getOrder());
-                    userPresentedResponseList.add(userPresentedResponse);
-                }
-                assignedStudent.setPresentedExamples(userPresentedResponseList);
-                assignedStudent.setMatriculationNumber(userInCourse.getUser().getMatriculationNumber());
-                assignedStudents.add(assignedStudent);
-            }
-        }
-        responseObject.setAssignedStudents(assignedStudents);
-
+    public CourseResponseObject createCourseResponseObject_GetAssignedCourse(String matriculationNumber) {
+        CourseResponseObject responseObject = createCourseResponseObject_GetCourse();
+        if (getExerciseSheets() != null)
+            responseObject.setExerciseSheets(getExerciseSheets().stream()
+                    .map(exerciseSheet -> exerciseSheet.getResponseObjectLessInfo_WithExampleInfo(matriculationNumber))
+                    .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
+                    .collect(Collectors.toList()));
 
         return responseObject;
-
     }
 }

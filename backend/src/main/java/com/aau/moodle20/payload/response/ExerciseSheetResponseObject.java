@@ -24,6 +24,11 @@ public class ExerciseSheetResponseObject {
     private String courseNumber;
     private Boolean includeThird;
 
+    private Integer exampleCount;
+    private Integer pointsTotal;
+    private Integer kreuzel;
+    private Integer points;
+
 
     public Long getId() {
         return id;
@@ -119,5 +124,37 @@ public class ExerciseSheetResponseObject {
 
     public void setIncludeThird(Boolean includeThird) {
         this.includeThird = includeThird;
+    }
+
+    public Integer getExampleCount() {
+        return exampleCount;
+    }
+
+    public void setExampleCount(Integer exampleCount) {
+        this.exampleCount = exampleCount;
+    }
+
+    public Integer getPointsTotal() {
+        return pointsTotal;
+    }
+
+    public void setPointsTotal(Integer pointsTotal) {
+        this.pointsTotal = pointsTotal;
+    }
+
+    public Integer getKreuzel() {
+        return kreuzel;
+    }
+
+    public void setKreuzel(Integer kreuzel) {
+        this.kreuzel = kreuzel;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
     }
 }

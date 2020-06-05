@@ -16,8 +16,9 @@ public class CourseResponseObject {
     private String descriptionTemplate;
     private String owner;
     private Boolean includeThird;
-    private List<AssignedStudent> assignedStudents;
     private Long semesterId;
+
+
 
     public CourseResponseObject()
     {
@@ -100,14 +101,6 @@ public class CourseResponseObject {
 
     public void setIncludeThird(Boolean includeThird) {
         this.includeThird = includeThird;
-    }
-
-    public List<AssignedStudent> getAssignedStudents() {
-        return assignedStudents;
-    }
-
-    public void setAssignedStudents(List<AssignedStudent> assignedStudents) {
-        this.assignedStudents = assignedStudents;
     }
 
     public Long getSemesterId() {

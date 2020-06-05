@@ -9,10 +9,7 @@ import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
-import com.aau.moodle20.payload.response.AssignedStudent;
 import com.aau.moodle20.payload.response.CourseResponseObject;
-import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
-import com.aau.moodle20.payload.response.UserPresentedResponse;
 import com.aau.moodle20.repository.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -281,7 +278,7 @@ public class SemesterService {
         }
         Course course = courseRepository.findById(courseId).get();
 
-        return course.createCourseResponseObject_FullInfo();
+        return course.createCourseResponseObject_GetAssignedCourse(userDetails.getMatriculationNumber());
     }
 
     public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
@@ -292,7 +289,7 @@ public class SemesterService {
             throw new ServiceValidationException("Error: neither admin or owner",HttpStatus.UNAUTHORIZED);
 
 
-        CourseResponseObject responseObject = course.createCourseResponseObject_FullInfo();
+        CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
 
         if(userDetails.getAdmin())
             responseObject.setOwner(course.getOwner().getMatriculationNumber());
