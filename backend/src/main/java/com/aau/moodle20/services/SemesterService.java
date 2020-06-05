@@ -10,6 +10,7 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.CourseResponseObject;
+import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.repository.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -283,15 +284,33 @@ public class SemesterService {
 
     public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
         UserDetailsImpl userDetails = getUserDetails();
-        checkIfCourseExists(courseId);
-        Course course = courseRepository.findById(courseId).get();
-        if(!userDetails.getAdmin() && !course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
-            throw new ServiceValidationException("Error: neither admin or owner",HttpStatus.UNAUTHORIZED);
-
+        List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
+        List<FinishesExample> finishesExamples = new ArrayList<>();
+        
+        Course course = checkIfCourseExists(courseId);
+        if (!userDetails.getAdmin() && !course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
+            throw new ServiceValidationException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);
 
         CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
+        for (ExerciseSheet exerciseSheet : course.getExerciseSheets()) {
+            for (Example example : exerciseSheet.getExamples()) {
+                finishesExamples.addAll(new ArrayList<>(example.getExamplesFinishedByUser()));
+            }
+        }
 
-        if(userDetails.getAdmin())
+        for (FinishesExample finishesExample : finishesExamples) {
+            FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
+            finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
+            finishesExampleResponse.setSurname(finishesExample.getUser().getSurname());
+            finishesExampleResponse.setForname(finishesExample.getUser().getForename());
+            finishesExampleResponse.setExampleId(finishesExample.getExample().getId());
+            finishesExampleResponse.setExampleName(finishesExample.getExample().getName());
+            finishesExampleResponses.add(finishesExampleResponse);
+        }
+
+        responseObject.setPresented(finishesExampleResponses);
+
+        if (userDetails.getAdmin())
             responseObject.setOwner(course.getOwner().getMatriculationNumber());
 
         return responseObject;
@@ -390,8 +409,11 @@ public class SemesterService {
     }
 
 
-    protected void checkIfCourseExists(Long courseId) throws ServiceValidationException {
-        if (!courseRepository.existsById(courseId)) throw new ServiceValidationException("Error: Course not found",HttpStatus.NOT_FOUND);
+    protected Course checkIfCourseExists(Long courseId) throws ServiceValidationException {
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        if (!optionalCourse.isPresent()) throw new ServiceValidationException("Error: Course not found",HttpStatus.NOT_FOUND);
+
+        return optionalCourse.get();
     }
 
     protected void checkIfSemesterExists(Long semesterId) throws ServiceValidationException {

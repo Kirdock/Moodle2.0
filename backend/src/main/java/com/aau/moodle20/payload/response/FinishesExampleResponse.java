@@ -11,6 +11,10 @@ public class FinishesExampleResponse {
     private Integer order;
     private String exampleName;
 
+    private String matriculationNumber;
+    private String surname;
+    private String forname;
+
     public Long getExampleId() {
         return exampleId;
     }
@@ -41,5 +45,29 @@ public class FinishesExampleResponse {
 
     public void setExampleName(String exampleName) {
         this.exampleName = exampleName;
+    }
+
+    public String getMatriculationNumber() {
+        return matriculationNumber;
+    }
+
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getForname() {
+        return forname;
+    }
+
+    public void setForname(String forname) {
+        this.forname = forname;
     }
 }
