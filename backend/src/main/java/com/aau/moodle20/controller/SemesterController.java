@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Locale;
 
 @RestController()
 @RequestMapping("/api")
