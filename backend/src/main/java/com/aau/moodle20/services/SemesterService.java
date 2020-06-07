@@ -301,7 +301,7 @@ public class SemesterService {
         }
 
         finishesExamples.removeIf(finishesExample -> !finishesExample.getHasPresented());
-        
+
         for (FinishesExample finishesExample : finishesExamples) {
             FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
             finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());

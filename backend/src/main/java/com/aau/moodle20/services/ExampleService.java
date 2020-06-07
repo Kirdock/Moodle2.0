@@ -125,8 +125,8 @@ public class ExampleService {
                     .filter(example -> example.getParentExample()==null).collect(Collectors.toList());
         }
         examples.sort(Comparator.comparing(Example::getOrder));
-        for (int i = 1; i <= examples.size(); i++)
-            examples.get(i-1).setOrder(i);
+        for (int i = 0; i < examples.size(); i++)
+            examples.get(i).setOrder(i);
 
         exampleRepository.saveAll(examples);
         exampleRepository.flush();
