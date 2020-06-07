@@ -27,7 +27,6 @@ public class Course {
     private Integer minKreuzel;
     private Integer minPoints;
     private String descriptionTemplate;
-    private Boolean includeThird;
 
     @OneToMany(
             mappedBy = "course",
@@ -131,14 +130,6 @@ public class Course {
         this.exerciseSheets = exerciseSheets;
     }
 
-    public Boolean getIncludeThird() {
-        return includeThird;
-    }
-
-    public void setIncludeThird(Boolean includeThird) {
-        this.includeThird = includeThird;
-    }
-
     public CourseResponseObject createCourseResponseObject()
     {
         CourseResponseObject responseObject = new CourseResponseObject();
@@ -158,8 +149,6 @@ public class Course {
         course.setNumber(getNumber());
         course.setOwner(getOwner());
         course.setDescriptionTemplate(getDescriptionTemplate());
-        course.setIncludeThird(getIncludeThird());
-
         return course;
     }
 
@@ -171,7 +160,6 @@ public class Course {
         responseObject.setMinKreuzel(getMinKreuzel());
         responseObject.setMinPoints(getMinPoints());
         responseObject.setDescriptionTemplate(getDescriptionTemplate());
-        responseObject.setIncludeThird(getIncludeThird());
         responseObject.setSemesterId(getSemester().getId());
         if (getExerciseSheets() != null)
             responseObject.setExerciseSheets(getExerciseSheets().stream()

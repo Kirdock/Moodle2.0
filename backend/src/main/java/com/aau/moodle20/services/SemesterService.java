@@ -94,7 +94,6 @@ public class SemesterService {
         course.setNumber(createCourseRequest.getNumber());
         course.setSemester(new Semester(createCourseRequest.getSemesterId()));
         course.setOwner(new User(createCourseRequest.getOwner()));
-        course.setIncludeThird(createCourseRequest.getIncludeThird()!=null?createCourseRequest.getIncludeThird():Boolean.FALSE);
         courseRepository.save(course);
 
         return new CourseResponseObject(course.getId());
@@ -117,7 +116,6 @@ public class SemesterService {
         course.setMinPoints(updateCourseRequest.getMinPoints());
         course.setName(updateCourseRequest.getName());
         course.setNumber(updateCourseRequest.getNumber());
-        course.setIncludeThird(updateCourseRequest.getIncludeThird());
         if (userDetails.getAdmin() && updateCourseRequest.getOwner()!=null)
             course.setOwner(new User(updateCourseRequest.getOwner()));
 
