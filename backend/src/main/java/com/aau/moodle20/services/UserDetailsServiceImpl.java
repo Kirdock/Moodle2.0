@@ -157,9 +157,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 responseObject.setCourseRole(optionalUserInCourse.get().getRole());
                 // add presented examples of user
                 if(ECourseRole.Student.equals(optionalUserInCourse.get().getRole())) {
-
-                    List<FinishesExampleResponse> presentedExampleResponses = getPresentedExamplesInCourse(user,optionalUserInCourse.get().getCourse());
-                    responseObject.getPresentedExamples().addAll(presentedExampleResponses);
+                    responseObject.setPresentedCount(getPresentedExamplesCount(user,optionalUserInCourse.get().getCourse()));
                 }
             }
             else
@@ -169,7 +167,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userResponseObjectList;
     }
 
-    protected List<FinishesExampleResponse> getPresentedExamplesInCourse(User user, Course course)
+    protected Integer getPresentedExamplesCount(User user, Course course)
     {
         List<FinishesExample> presentedExamples = user.getFinishedExamples().stream()
                 .filter(FinishesExample::getHasPresented)
@@ -184,11 +182,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 presentedExamplesInCourse.add(finishesExample);
         }
 
-        // build response list
-        List<FinishesExampleResponse> presentedExampleResponses = presentedExamplesInCourse.stream().
-                map(FinishesExample::getFinishesExampleResponse).collect(Collectors.toList());
-
-        return presentedExampleResponses;
+        return presentedExamplesInCourse.size();
     }
 
     protected List<String> readLinesFromFile(MultipartFile file) throws UserException {

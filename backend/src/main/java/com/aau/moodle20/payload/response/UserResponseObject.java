@@ -16,8 +16,7 @@ public class UserResponseObject {
     private String email;
     private Boolean isAdmin;
     private ECourseRole courseRole;
-    private List<FinishesExampleResponse> presentedExamples = new ArrayList<>();
-
+    private Integer presentedCount = 0;
     public UserResponseObject()
     {
     }
@@ -78,11 +77,11 @@ public class UserResponseObject {
         this.courseRole = courseRole;
     }
 
-    public List<FinishesExampleResponse> getPresentedExamples() {
-        return presentedExamples;
+    public Integer getPresentedCount() {
+        return presentedCount;
     }
 
-    public void setPresentedExamples(List<FinishesExampleResponse> presentedExamples) {
-        this.presentedExamples = presentedExamples;
+    public void setPresentedCount(Integer presentedCount) {
+        this.presentedCount = presentedCount;
     }
 }
