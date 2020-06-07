@@ -300,11 +300,13 @@ public class SemesterService {
             }
         }
 
+        finishesExamples.removeIf(finishesExample -> !finishesExample.getHasPresented());
+        
         for (FinishesExample finishesExample : finishesExamples) {
             FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
             finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
             finishesExampleResponse.setSurname(finishesExample.getUser().getSurname());
-            finishesExampleResponse.setForname(finishesExample.getUser().getForename());
+            finishesExampleResponse.setForename(finishesExample.getUser().getForename());
             finishesExampleResponse.setExampleId(finishesExample.getExample().getId());
             finishesExampleResponse.setExampleName(finishesExample.getExample().getName());
             finishesExampleResponses.add(finishesExampleResponse);

@@ -1,6 +1,5 @@
 package com.aau.moodle20.payload.response;
 
-import com.aau.moodle20.constants.EFinishesExampleState;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,7 +12,7 @@ public class FinishesExampleResponse {
 
     private String matriculationNumber;
     private String surname;
-    private String forname;
+    private String forename;
 
     public Long getExampleId() {
         return exampleId;
@@ -63,11 +62,11 @@ public class FinishesExampleResponse {
         this.surname = surname;
     }
 
-    public String getForname() {
-        return forname;
+    public String getForename() {
+        return forename;
     }
 
-    public void setForname(String forname) {
-        this.forname = forname;
+    public void setForename(String forename) {
+        this.forename = forename;
     }
 }
