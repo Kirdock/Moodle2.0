@@ -300,22 +300,21 @@ public class SemesterService {
         CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
         for (ExerciseSheet exerciseSheet : course.getExerciseSheets()) {
             for (Example example : exerciseSheet.getExamples()) {
-                finishesExamples.addAll(new ArrayList<>(example.getExamplesFinishedByUser()));
+                for (FinishesExample finishesExample : example.getExamplesFinishedByUser()) {
+
+                    if(finishesExample.getHasPresented()) {
+                        FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
+                        finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
+                        finishesExampleResponse.setSurname(finishesExample.getUser().getSurname());
+                        finishesExampleResponse.setForename(finishesExample.getUser().getForename());
+                        finishesExampleResponse.setExampleId(finishesExample.getExample().getId());
+                        finishesExampleResponse.setExampleName(finishesExample.getExample().getName());
+                        finishesExampleResponse.setExerciseSheetName(exerciseSheet.getName());
+                        finishesExampleResponses.add(finishesExampleResponse);
+                    }
+                }
             }
         }
-
-        finishesExamples.removeIf(finishesExample -> !finishesExample.getHasPresented());
-
-        for (FinishesExample finishesExample : finishesExamples) {
-            FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
-            finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
-            finishesExampleResponse.setSurname(finishesExample.getUser().getSurname());
-            finishesExampleResponse.setForename(finishesExample.getUser().getForename());
-            finishesExampleResponse.setExampleId(finishesExample.getExample().getId());
-            finishesExampleResponse.setExampleName(finishesExample.getExample().getName());
-            finishesExampleResponses.add(finishesExampleResponse);
-        }
-
         responseObject.setPresented(finishesExampleResponses);
 
         if (userDetails.getAdmin())

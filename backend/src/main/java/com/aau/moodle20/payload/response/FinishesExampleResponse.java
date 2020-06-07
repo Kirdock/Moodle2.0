@@ -9,6 +9,7 @@ public class FinishesExampleResponse {
     private Integer parentOrder;
     private Integer order;
     private String exampleName;
+    private String exerciseSheetName;
 
     private String matriculationNumber;
     private String surname;
@@ -68,5 +69,13 @@ public class FinishesExampleResponse {
 
     public void setForename(String forename) {
         this.forename = forename;
+    }
+
+    public String getExerciseSheetName() {
+        return exerciseSheetName;
+    }
+
+    public void setExerciseSheetName(String exerciseSheetName) {
+        this.exerciseSheetName = exerciseSheetName;
     }
 }
