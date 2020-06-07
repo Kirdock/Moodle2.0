@@ -89,6 +89,11 @@ public class UserController {
                 .body(new InputStreamResource(inputStream));
     }
 
+
+    @GetMapping(path = "/user/{matriculationNumber}/kreuzel/{courseId}")
+    public List<ExampleResponseObject> getFinishedExamples(@PathVariable String matriculationNumber,@PathVariable Long courseId) {
+        return userDetailsService.getFinishedExamplesUserCourse(matriculationNumber,courseId);
+    }
     // post api----------------------------------------------------------------
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {

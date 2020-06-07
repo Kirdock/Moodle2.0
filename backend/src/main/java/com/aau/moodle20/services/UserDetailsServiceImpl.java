@@ -2,15 +2,14 @@ package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
-import com.aau.moodle20.entity.Course;
-import com.aau.moodle20.entity.FinishesExample;
-import com.aau.moodle20.entity.UserInCourse;
-import com.aau.moodle20.entity.User;
+import com.aau.moodle20.constants.EFinishesExampleState;
+import com.aau.moodle20.entity.*;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.request.UpdateUserRequest;
+import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
@@ -35,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -290,5 +290,44 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
+    /**
+     * returns all examples which the given user finihsed in given course
+     * @param matriculationNumber
+     * @param courseId
+     * @return list of example id and name
+     * @throws ServiceValidationException
+     */
+    public List<ExampleResponseObject> getFinishedExamplesUserCourse(String matriculationNumber, Long courseId) throws ServiceValidationException {
+        List<ExampleResponseObject> responseObjects = new ArrayList<>();
+        UserDetailsImpl userDetails = getUserDetails();
+        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        if (!optionalUser.isPresent())
+            throw new ServiceValidationException("Error: User not found!", HttpStatus.NOT_FOUND);
+        if (!optionalCourse.isPresent())
+            throw new ServiceValidationException("Error: Course not found!", HttpStatus.NOT_FOUND);
+        if (!userDetails.getAdmin() && !userDetails.getMatriculationNumber().equals(optionalCourse.get().getOwner().getMatriculationNumber()))
+            throw new ServiceValidationException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
 
+        Course course = optionalCourse.get();
+        for (ExerciseSheet exerciseSheet : course.getExerciseSheets()) {
+            for (Example example : exerciseSheet.getExamples()) {
+                Optional<FinishesExample> optFinishesExample = example.getExamplesFinishedByUser().stream()
+                        .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(optionalUser.get().getMatriculationNumber()))
+                        .findFirst();
+                if (optFinishesExample.isPresent() &&
+                        (EFinishesExampleState.MAYBE.equals(optFinishesExample.get().getState()) || (EFinishesExampleState.YES.equals(optFinishesExample.get().getState())))) {
+                    ExampleResponseObject responseObject = new ExampleResponseObject();
+                    responseObject.setId(optFinishesExample.get().getExample().getId());
+                    responseObject.setName(optFinishesExample.get().getExample().getName());
+                    responseObject.setSubExamples(null);
+
+                    responseObjects.add(responseObject);
+                }
+            }
+        }
+        responseObjects.sort(Comparator.comparing(ExampleResponseObject::getName));
+
+        return responseObjects;
+    }
 }
