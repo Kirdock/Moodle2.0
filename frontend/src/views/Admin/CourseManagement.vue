@@ -430,10 +430,10 @@ export default {
             if(this.sortOrder.index !== 0 || this.sortOrder.type !== 0){
                 const key = this.sortOrder.index === 0 ? 'matriculationNumber' : this.sortOrder.index === 1 ? 'surname' : this.sortOrder.index === 2 ? 'forename' : 'presentedCount';
                 if(this.sortOrder.type === 0){
-                    users.sort((a,b) => a[key].localeCompare(b[key]));
+                    users.sort((a,b) =>a[key] === b[key] ? a['matriculationNumber'].localeCompare(b['matriculationNumber']) : a[key].toString().localeCompare(b[key].toString()));
                 }
                 else{
-                    users.sort((a,b) => b[key].localeCompare(a[key]));
+                    users.sort((a,b) => a[key] === b[key] ? a['matriculationNumber'].localeCompare(b['matriculationNumber']) : b[key].toString().localeCompare(a[key].toString()));
                 }
             }
             return users;
