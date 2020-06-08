@@ -430,10 +430,10 @@ export default {
             if(this.sortOrder.index !== 0 || this.sortOrder.type !== 0){
                 const key = this.sortOrder.index === 0 ? 'matriculationNumber' : this.sortOrder.index === 1 ? 'surname' : this.sortOrder.index === 2 ? 'forename' : 'presentedCount';
                 if(this.sortOrder.type === 0){
-                    users.sort((a,b) =>a[key] === b[key] ? a['matriculationNumber'].localeCompare(b['matriculationNumber']) : a[key].toString().localeCompare(b[key].toString()));
+                    users.sort((a,b) => a[key].toString().localeCompare(b[key].toString()) || a['matriculationNumber'].localeCompare(b['matriculationNumber']));
                 }
                 else{
-                    users.sort((a,b) => a[key] === b[key] ? a['matriculationNumber'].localeCompare(b['matriculationNumber']) : b[key].toString().localeCompare(a[key].toString()));
+                    users.sort((a,b) => b[key].toString().localeCompare(a[key].toString()) || a['matriculationNumber'].localeCompare(b['matriculationNumber']));
                 }
             }
             return users;
@@ -459,40 +459,39 @@ export default {
             }
         },
         addPresentation(){
-            if(this.presentedUser && this.presentedUser.matriculationNumber && this.presentedExample && this.presentedExample.id){
+            if(this.presentedUser && this.presentedUser.matriculationNumber && this.presentedExample && this.presentedExample.id
+                && !this.selectedCourse.presented.some(presentedExample => presentedExample.matriculationNumber === this.presentedUser.matriculationNumber && presentedExample.exampleId === this.presentedExample.id)){
                 this.updatePresented(this.presentedUser, this.presentedExample, true);
             }
         },
         async updatePresented(user, example, hasPresented, index){
-            if(!hasPresented || !this.selectedCourse.presented.some(presentedExample => presentedExample.matriculationNumber === user.matriculationNumber && presentedExample.exampleId === example.id)){
-                try{
-                    const response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.id, hasPresented});
-                    if(index){
-                        this.selectedCourse.presented.splice(index,1);
-                    }
-                    else{
-                        this.selectedCourse.presented.push({
-                            matriculationNumber: user.matriculationNumber,
-                            forename: user.forename,
-                            surname: user.surname,
-                            exampleId: example.id,
-                            exampleName: example.name
-                        });
-                    }
-                    this.getCourseUsers(this.selectedCourseId);
-                    this.$bvToast.toast(hasPresented ? this.$t('presentation.saved') : this.$t('presentation.deleted'), {
-                        title: this.$t('success'),
-                        variant: 'success',
-                        appendToast: true
+            try{
+                const response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.id, hasPresented});
+                if(index){
+                    this.selectedCourse.presented.splice(index,1);
+                }
+                else{
+                    this.selectedCourse.presented.push({
+                        matriculationNumber: user.matriculationNumber,
+                        forename: user.forename,
+                        surname: user.surname,
+                        exampleId: example.id,
+                        exampleName: example.name
                     });
                 }
-                catch{
-                    this.$bvToast.toast(hasPresented ? this.$t('presentation.error.save') : this.$t('presentation.error.delete'), {
-                        title: this.$t('error'),
-                        variant: 'danger',
-                        appendToast: true
-                    });
-                }
+                this.getCourseUsers(this.selectedCourseId);
+                this.$bvToast.toast(hasPresented ? this.$t('presentation.saved') : this.$t('presentation.deleted'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }
+            catch{
+                this.$bvToast.toast(hasPresented ? this.$t('presentation.error.save') : this.$t('presentation.error.delete'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
             }
 
         },
