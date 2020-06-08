@@ -142,6 +142,7 @@ const messages = {
             }
         },
         lecturer: 'Lehrende/r',
+        listEmpty: 'Liste ist leer',
         loading: 'Laden',
         login: 'Anmelden',
         loggedInAs: 'Angemeldet als',
@@ -391,6 +392,7 @@ const messages = {
             }
         },
         lecturer: 'Lecturer',
+        listEmpty: 'List is empty',
         loading: 'Loading',
         login: 'Login',
         loggedInAs: 'Logged in as',

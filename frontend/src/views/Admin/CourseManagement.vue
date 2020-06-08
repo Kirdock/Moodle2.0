@@ -287,13 +287,13 @@
                     </div>
                     <div class="form-group">
                         <label for="presentedExample" class="control-label">{{ $t('example.name') }}</label>
-                        <multiselect v-model="presentedExample" id="presentedExample" open-direction="bottom" @input="getUserKreuzel"
+                        <multiselect v-model="presentedExample" id="presentedExample" open-direction="bottom"
                                     :placeholder="$t('typeToSearch')"
                                     label="name"
                                     track-by="id"
                                     selectLabel=""
                                     :selectedLabel="$t('selected')"
-                                    :options="assignedUsers"
+                                    :options="presentedExamples"
                                     :searchable="true"
                                     :clear-on-select="true"
                                     :close-on-select="true"
@@ -302,7 +302,9 @@
                                     :max-height="600"
                                     deselect-label=""
                                     :show-no-results="false"
+                                    :showNoOptions="true"
                                     >
+                                    <span slot="noOptions">{{$t('listEmpty')}}</span>
                         </multiselect>
                     </div>
                     <div class="form-group" style="margin-top: 22px">
@@ -316,6 +318,7 @@
                         <th scope="col">{{$t('matriculationNumber')}}</th>
                         <th scope="col">{{$t('surname')}}</th>
                         <th scope="col">{{$t('forename')}}</th>
+                        <th scope="col">{{$t('exerciseSheet.name')}}</th>
                         <th scope="col">{{$t('example.name')}}</th>
                         <th scope="col">{{$t('actions')}}</th>
                     </thead>
@@ -329,6 +332,9 @@
                             </td>
                             <td>
                                 {{presented.forename}}
+                            </td>
+                            <td>
+                                {{presented.exerciseSheetName}}
                             </td>
                             <td>
                                 {{presented.exampleName}}
@@ -457,33 +463,36 @@ export default {
                 this.updatePresented(this.presentedUser, this.presentedExample, true);
             }
         },
-        async updatePresented(user, example, status, index){
-            try{
-                const response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.id, status});
-                if(index){
-                    this.selectedCourse.presented.splice(index,1);
-                }
-                else{
-                    this.selectedCourse.presented.push({
-                        matriculationNumber: user.matriculationNumber,
-                        forename: user.forename,
-                        surname: user.surname,
-                        exampleId: example.id,
-                        exampleName: example.name
+        async updatePresented(user, example, hasPresented, index){
+            if(!hasPresented || !this.selectedCourse.presented.some(presentedExample => presentedExample.matriculationNumber === user.matriculationNumber && presentedExample.exampleId === example.id)){
+                try{
+                    const response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.id, hasPresented});
+                    if(index){
+                        this.selectedCourse.presented.splice(index,1);
+                    }
+                    else{
+                        this.selectedCourse.presented.push({
+                            matriculationNumber: user.matriculationNumber,
+                            forename: user.forename,
+                            surname: user.surname,
+                            exampleId: example.id,
+                            exampleName: example.name
+                        });
+                    }
+                    this.getCourseUsers(this.selectedCourseId);
+                    this.$bvToast.toast(hasPresented ? this.$t('presentation.saved') : this.$t('presentation.deleted'), {
+                        title: this.$t('success'),
+                        variant: 'success',
+                        appendToast: true
                     });
                 }
-                this.$bvToast.toast(status ? this.$t('presentation.saved') : this.$t('presentation.deleted'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
-            }
-            catch{
-                this.$bvToast.toast(status ? this.$t('presentation.error.save') : this.$t('presentation.error.delete'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
+                catch{
+                    this.$bvToast.toast(hasPresented ? this.$t('presentation.error.save') : this.$t('presentation.error.delete'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
             }
 
         },
@@ -498,6 +507,7 @@ export default {
         async getUserKreuzel(){
             try{
                 this.presentedExamples = [];
+                this.presentedExample = {};
                 const response = await this.$store.dispatch('getUserKreuzel', {matriculationNumber: this.presentedUser.matriculationNumber, courseId: this.selectedCourseId});
                 this.presentedExamples = response.data;
             }
