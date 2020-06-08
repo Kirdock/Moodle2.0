@@ -432,7 +432,7 @@ export default {
                 if(this.sortOrder.type === 0){
                     users.sort((a,b) => a[key].toString().localeCompare(b[key].toString()) || a['matriculationNumber'].localeCompare(b['matriculationNumber']));
                 }
-                else{
+                else{ 
                     users.sort((a,b) => b[key].toString().localeCompare(a[key].toString()) || a['matriculationNumber'].localeCompare(b['matriculationNumber']));
                 }
             }
