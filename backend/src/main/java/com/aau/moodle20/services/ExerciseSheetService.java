@@ -44,7 +44,7 @@ public class ExerciseSheetService {
         Long courseId = createExerciseSheetRequest.getCourseId();
 
         if (!courseRepository.existsById(courseId))
-            throw new ServiceValidationException("Error: the referenced course does not exists", ApiErrorResponseCodes.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new ServiceValidationException("Error: the referenced course does not exists", HttpStatus.NOT_FOUND);
 
         ExerciseSheet exerciseSheet = new ExerciseSheet();
         exerciseSheet.setCourse(new Course(createExerciseSheetRequest.getCourseId()));
