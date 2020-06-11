@@ -32,6 +32,7 @@ public class FinishesExample {
     private Boolean valid = false;
     private Boolean hasPresented = false;
     private EFinishesExampleState state ;
+    private Integer remainingUploadCount;
 
     public FinishesExample()
     {
@@ -109,6 +110,13 @@ public class FinishesExample {
         this.fileName = fileName;
     }
 
+    public Integer getRemainingUploadCount() {
+        return remainingUploadCount;
+    }
+
+    public void setRemainingUploadCount(Integer remainingUploadCount) {
+        this.remainingUploadCount = remainingUploadCount;
+    }
 
     public FinishesExampleResponse getFinishesExampleResponse() {
         FinishesExampleResponse response = new FinishesExampleResponse();

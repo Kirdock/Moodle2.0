@@ -28,6 +28,7 @@ public class ExerciseSheetResponseObject {
     private Integer pointsTotal;
     private Integer kreuzel;
     private Integer points;
+    private Integer uploadCount;
 
 
     public Long getId() {
@@ -156,5 +157,13 @@ public class ExerciseSheetResponseObject {
 
     public void setPoints(Integer points) {
         this.points = points;
+    }
+
+    public Integer getUploadCount() {
+        return uploadCount;
+    }
+
+    public void setUploadCount(Integer uploadCount) {
+        this.uploadCount = uploadCount;
     }
 }

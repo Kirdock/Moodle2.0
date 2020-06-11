@@ -70,6 +70,7 @@ public class FinishesExampleService {
                finishesExample.setUser(new User(userDetails.getMatriculationNumber()));
                finishesExample.setDescription(userKreuzelRequest.getDescription());
                finishesExample.setState(userKreuzelRequest.getState());
+               finishesExample.setRemainingUploadCount(example.getExerciseSheet().getUploadCount());
                finishesExampleList.add(finishesExample);
            }
        }
@@ -90,6 +91,8 @@ public class FinishesExampleService {
         FinishesExample finishesExample = optionalFinishesExample.get();
         finishesExample.setAttachment(file.getBytes());
         finishesExample.setFileName(file.getOriginalFilename());
+        if (finishesExample.getRemainingUploadCount() > 0)
+            finishesExample.setRemainingUploadCount(finishesExample.getRemainingUploadCount() - 1);
         finishesExampleRepository.save(finishesExample);
     }
 

@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS EXERCISE_SHEET
     issue_Date datetime,
     description CLOB,
     include_Third char(5),
+    upload_Count NUMBER(10),
     CONSTRAINT FOREIGN_KEY_COURSE_EXERCISE_SHEET FOREIGN KEY (course_id) references COURSE on delete cascade
 );
 
@@ -85,6 +86,7 @@ CREATE TABLE IF NOT EXISTS FINISHES_EXAMPLE
     has_Presented CHAR(5),
     attachment BLOB,
     file_Name VARCHAR(200),
+    remaining_Upload_Count NUMBER(10),
     PRIMARY KEY (example_id, matriculation_Number),
     CONSTRAINT FOREIGN_KEY_USER_FINISHES_EXAMPLE FOREIGN KEY (matriculation_Number) references USER on delete cascade,
     CONSTRAINT FOREIGN_KEY_EXAMPLE_FINISHES_EXAMPLE FOREIGN KEY (example_id) references EXAMPLE on delete cascade

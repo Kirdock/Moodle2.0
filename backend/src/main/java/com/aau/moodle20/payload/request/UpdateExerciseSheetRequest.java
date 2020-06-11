@@ -21,6 +21,7 @@ public class UpdateExerciseSheetRequest {
     private Integer minPoints;
     private String description;
     private Boolean includeThird;
+    private Integer uploadCount;
 
 
     public Long getId() {
@@ -85,5 +86,13 @@ public class UpdateExerciseSheetRequest {
 
     public void setIncludeThird(Boolean includeThird) {
         this.includeThird = includeThird;
+    }
+
+    public Integer getUploadCount() {
+        return uploadCount;
+    }
+
+    public void setUploadCount(Integer uploadCount) {
+        this.uploadCount = uploadCount;
     }
 }

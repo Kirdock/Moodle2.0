@@ -55,6 +55,7 @@ public class ExerciseSheetService {
         exerciseSheet.setIssueDate(createExerciseSheetRequest.getIssueDate());
         exerciseSheet.setDescription(createExerciseSheetRequest.getDescription());
         exerciseSheet.setIncludeThird(createExerciseSheetRequest.getIncludeThird());
+        exerciseSheet.setUploadCount(0);
 
         exerciseSheetRepository.save(exerciseSheet);
     }
@@ -75,7 +76,9 @@ public class ExerciseSheetService {
         exerciseSheet.setSubmissionDate(updateExerciseSheetRequest.getSubmissionDate());
         exerciseSheet.setIssueDate(updateExerciseSheetRequest.getIssueDate());
         exerciseSheet.setDescription(updateExerciseSheetRequest.getDescription());
-        exerciseSheet.setIncludeThird(updateExerciseSheetRequest.getIncludeThird()); 
+        exerciseSheet.setIncludeThird(updateExerciseSheetRequest.getIncludeThird());
+        if (updateExerciseSheetRequest.getUploadCount() != null)
+            exerciseSheet.setUploadCount(updateExerciseSheetRequest.getUploadCount());
 
         exerciseSheetRepository.save(exerciseSheet);
     }
