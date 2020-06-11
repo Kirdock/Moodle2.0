@@ -36,23 +36,32 @@ public class ExampleService {
     @Autowired
     FileTypeRepository fileTypeRepository;
 
+    @Autowired
+    FinishesExampleRepository finishesExampleRepository;
+
 
     @Transactional
     public ExampleResponseObject createExample (ExampleRequest createExampleRequest) throws ServiceValidationException
     {
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
-        if(createExampleRequest.getExerciseSheetId()==null)
-            throw new ServiceValidationException("error: exerciseSheet must not be null");
 
         example.fillValuesFromRequestObject(createExampleRequest);
         exampleRepository.save(example);
         supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest);
         supportFileTypeRepository.saveAll(supportFileTypes);
 
+        // if this is an subExample remove all finishesExample entries of parentExample
+        if(createExampleRequest.getParentId()!=null)
+        {
+            List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_Id(createExampleRequest.getParentId());
+            finishesExampleRepository.deleteAll(finishesExamples);
+        }
+
         ExampleResponseObject responseObject = new ExampleResponseObject();
         responseObject.setId(example.getId());
         responseObject.setSubExamples(null);
+
 
         return responseObject;
     }

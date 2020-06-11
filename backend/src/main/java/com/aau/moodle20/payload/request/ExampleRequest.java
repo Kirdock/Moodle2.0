@@ -8,6 +8,7 @@ public class ExampleRequest {
 
     private Long id;
     private Long parentId;
+    @NotNull
     private Long exerciseSheetId;
     @NotBlank
     private String name;
