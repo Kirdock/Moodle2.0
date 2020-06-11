@@ -84,11 +84,11 @@ public class AbstractService {
 
     protected Boolean isOwner(Long courseId) {
         Course course = readCourse(courseId);
-        return course.getOwner().equals(getUserDetails().getMatriculationNumber());
+        return course.getOwner().getMatriculationNumber().equals(getUserDetails().getMatriculationNumber());
     }
 
     protected Boolean isOwner(Course course) {
-        return course.getOwner().equals(getUserDetails().getMatriculationNumber());
+        return course.getOwner().getMatriculationNumber().equals(getUserDetails().getMatriculationNumber());
     }
 
     protected User getCurrentUser() {
