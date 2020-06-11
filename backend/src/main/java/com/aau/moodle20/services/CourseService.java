@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 public class CourseService extends AbstractService {
 
+
     public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceValidationException {
 
         Semester semester = readSemester(createCourseRequest.getSemesterId());

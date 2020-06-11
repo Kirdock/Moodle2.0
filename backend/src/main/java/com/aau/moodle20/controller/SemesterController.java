@@ -27,15 +27,11 @@ import java.util.Locale;
 public class SemesterController {
 
     @Autowired
-    SemesterRepository semesterRepository;
-
-    @Autowired
     SemesterService semesterService;
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/semester")
     public ResponseEntity<?> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  throws SemesterException {
-
         semesterService.createSemester(createSemesterRequest);
         return ResponseEntity.ok(new MessageResponse("Semester was sucessfully created!"));
     }
@@ -58,39 +54,5 @@ public class SemesterController {
     @GetMapping(value = "/semester/{semesterId}/coursesAssigned")
     public ResponseEntity<List<CourseResponseObject>> getAssignedCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
         return ResponseEntity.ok(semesterService.getAssignedCoursesFromSemester(semesterId));
-    }
-
-
-
-    @GetMapping(value = "/courseAssigned/{courseId}")
-    public ResponseEntity<CourseResponseObject> isCourseAssigned(@PathVariable("courseId") long courseId)  {
-        return ResponseEntity.ok(semesterService.getCourseAssigned(courseId));
-    }
-
-    @GetMapping(value = "/course/{courseId}/attendanceList")
-    public ResponseEntity<InputStreamResource> getAttendanceList(@PathVariable("courseId") long courseId)  {
-
-        ByteArrayInputStream bis = semesterService.generateCourseAttendanceList(courseId);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename="+courseId+"_attendanceList.pdf");
-
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(bis));
-    }
-
-    @PostMapping(value = "/course/assign")
-    public ResponseEntity<?> assignCourseToSemester(@Valid  @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests)  throws SemesterException {
-
-        semesterService.assignUsers(assignUserToCourseRequests);
-        return ResponseEntity.ok(new MessageResponse("User were successfully assigned to courses!"));
-    }
-
-    @PostMapping(value = "/course/assignFile")
-    public ResponseEntity<?> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  throws ServiceValidationException {
-        semesterService.assignFile(file,courseId);
-        return ResponseEntity.ok("Users successfully assigned to course");
     }
 }
