@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.entity.Example;
 import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.entity.User;
@@ -10,16 +11,12 @@ import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.repository.ExampleRepository;
 import com.aau.moodle20.repository.FinishesExampleRepository;
 import com.aau.moodle20.repository.UserRepository;
-import org.apache.tomcat.util.http.fileupload.FileItem;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,8 +101,7 @@ public class FinishesExampleService {
 
     public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceValidationException
     {
-        if(!exampleRepository.existsById(userExamplePresented.getExampleId()))
-            throw new ServiceValidationException("Error: Example does not exists!", HttpStatus.NOT_FOUND);
+        getExample(userExamplePresented.getExampleId());
         if(!userRepository.existsByMatriculationNumber(userExamplePresented.getMatriculationNumber()))
             throw new ServiceValidationException("Error: User does not exists!", HttpStatus.NOT_FOUND);
 
@@ -114,6 +110,9 @@ public class FinishesExampleService {
         if(!optionalFinishesExample.isPresent())
             throw new ServiceValidationException("Error: user did not check this example");
 
+        if (userExamplePresented.getHasPresented())
+            checkIfExampleWasNeverPresented(userExamplePresented.getExampleId());
+
         FinishesExample finishesExample = optionalFinishesExample.get();
         finishesExample.setHasPresented(userExamplePresented.getHasPresented());
         finishesExampleRepository.save(finishesExample);
@@ -121,6 +120,33 @@ public class FinishesExampleService {
 
     public UserDetailsImpl getUserDetails() {
         return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+
+    /**
+     * reads the example from database or throws ServiceValidationException if example is not found
+     * @param exampleId
+     * @return Example
+     * @throws ServiceValidationException
+     */
+    protected Example getExample(Long exampleId) throws ServiceValidationException
+    {
+        Optional<Example> optionalExample = exampleRepository.findById(exampleId);
+        if(!optionalExample.isPresent())
+            throw new ServiceValidationException("Error: Example not found!",HttpStatus.NOT_FOUND);
+        return optionalExample.get();
+    }
+
+    /**
+     * checks if example was already presented by a student
+     * @param exampleId
+     * @throws ServiceValidationException
+     */
+    protected void checkIfExampleWasNeverPresented(Long exampleId) throws ServiceValidationException {
+        List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_Id(exampleId);
+        Boolean examplePresented = finishesExamples.stream().anyMatch(FinishesExample::getHasPresented);
+        if (examplePresented)
+            throw new ServiceValidationException("Error: Example was already presented by a Student!", ApiErrorResponseCodes.EXAMPLE_ALREADY_PRESENTED);
     }
 
 }
