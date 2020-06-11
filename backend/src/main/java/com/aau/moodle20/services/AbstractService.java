@@ -5,6 +5,7 @@ import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -66,5 +67,18 @@ public class AbstractService {
         if (!optionalExample.isPresent())
             throw new ServiceValidationException("Error: Example not found!", HttpStatus.NOT_FOUND);
         return optionalExample.get();
+    }
+
+    protected UserDetailsImpl getUserDetails() {
+        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    protected Boolean isAdmin() {
+        return getUserDetails().getAdmin();
+    }
+
+    protected Boolean isOwner(Long courseId) {
+        Course course = readCourse(courseId);
+        return course.getOwner().equals(getUserDetails().getMatriculationNumber());
     }
 }

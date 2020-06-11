@@ -131,7 +131,7 @@ public class SemesterController {
     }
 
     @PostMapping(value = "/course/assignFile")
-    public ResponseEntity<?> assignFile(@Valid  @RequestParam("file") MultipartFile file, @Valid  @RequestParam("id") Long courseId)  throws ServiceValidationException {
+    public ResponseEntity<?> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  throws ServiceValidationException {
         semesterService.assignFile(file,courseId);
         return ResponseEntity.ok("Users successfully assigned to course");
     }
