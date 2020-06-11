@@ -23,6 +23,11 @@ public class UserCourseController {
 
     private UserCourseService userCourseService;
 
+    public UserCourseController(UserCourseService userCourseService)
+    {
+        this.userCourseService = userCourseService;
+    }
+
     @GetMapping(value = "/courseAssigned/{courseId}")
     public ResponseEntity<CourseResponseObject> isCourseAssigned(@PathVariable("courseId") long courseId)  {
         return ResponseEntity.ok(userCourseService.getCourseAssigned(courseId));

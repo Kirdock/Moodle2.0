@@ -9,7 +9,6 @@ import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.CourseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +19,12 @@ import javax.validation.Valid;
 @RequestMapping("/api")
 public class CourseController {
 
-    @Autowired
     CourseService courseService;
+
+    public CourseController(CourseService courseService)
+    {
+        this.courseService = courseService;
+    }
 
     @GetMapping(value = "/course/{courseId}")
     public ResponseEntity<CourseResponseObject> getCourse(@PathVariable("courseId") long courseId)  {

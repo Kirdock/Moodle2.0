@@ -7,7 +7,6 @@ import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.ExerciseSheetService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +17,12 @@ import java.util.List;
 @RequestMapping("/api")
 public class ExerciseSheetController {
 
-    @Autowired
     ExerciseSheetService exerciseSheetService;
+
+    public ExerciseSheetController(ExerciseSheetService exerciseSheetService)
+    {
+        this.exerciseSheetService= exerciseSheetService;
+    }
 
     @PutMapping(value = "/exerciseSheet")
     public ResponseEntity<?> createExerciseSheet(@Valid @RequestBody CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceValidationException {

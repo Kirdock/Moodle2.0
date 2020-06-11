@@ -3,14 +3,13 @@ package com.aau.moodle20.controller;
 import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.*;
-import com.aau.moodle20.payload.response.*;
-import com.aau.moodle20.repository.UserRepository;
+import com.aau.moodle20.payload.response.ExampleResponseObject;
+import com.aau.moodle20.payload.response.JwtResponse;
+import com.aau.moodle20.payload.response.MessageResponse;
+import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import com.aau.moodle20.services.FinishesExampleService;
 import com.aau.moodle20.services.UserDetailsServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,7 +19,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,26 +30,18 @@ import java.util.List;
 @RestController()
 @RequestMapping("/api")
 public class UserController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
-
-    @Autowired
     AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
     JwtUtils jwtUtils;
-
-    @Autowired
     private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private FinishesExampleService finishesExampleService;
+
+    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserDetailsServiceImpl userDetailsService, FinishesExampleService finishesExampleService)
+    {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+        this.finishesExampleService = finishesExampleService;
+    }
 
     // get api--------------------------------------------------------------------
     @PreAuthorize("hasAuthority('Admin')")

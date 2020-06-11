@@ -7,7 +7,6 @@ import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.ExampleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +17,12 @@ import java.util.List;
 @RequestMapping("/api")
 public class ExampleController {
 
-    @Autowired
     ExampleService exampleService;
 
+    public ExampleController(ExampleService exampleService)
+    {
+        this.exampleService = exampleService;
+    }
 
     @GetMapping(value = "/fileTypes")
     public List<FileTypeResponseObject> getFileTypes()  {
