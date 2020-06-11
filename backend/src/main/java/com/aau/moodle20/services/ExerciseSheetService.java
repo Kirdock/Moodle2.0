@@ -1,6 +1,5 @@
 package com.aau.moodle20.services;
 
-import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.ExerciseSheet;
@@ -9,19 +8,11 @@ import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
-import com.aau.moodle20.repository.CourseRepository;
-import com.aau.moodle20.repository.ExerciseSheetRepository;
-import com.aau.moodle20.repository.SupportFileTypeRepository;
-import com.aau.moodle20.repository.UserInCourseRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ExerciseSheetService extends AbstractService{

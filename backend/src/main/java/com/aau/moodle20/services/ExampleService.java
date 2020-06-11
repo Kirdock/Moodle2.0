@@ -3,12 +3,10 @@ package com.aau.moodle20.services;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import com.aau.moodle20.exception.ServiceValidationException;
-import com.aau.moodle20.payload.request.*;
+import com.aau.moodle20.payload.request.ExampleOrderRequest;
+import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
-import com.aau.moodle20.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
