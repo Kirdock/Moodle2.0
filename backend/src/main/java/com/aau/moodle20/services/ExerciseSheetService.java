@@ -24,30 +24,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ExerciseSheetService {
-
-    @Autowired
-    ExerciseSheetRepository exerciseSheetRepository;
-
-    @Autowired
-    CourseRepository courseRepository;
-
-    @Autowired
-    UserInCourseRepository userInCourseRepository;
-
-    @Autowired
-    SupportFileTypeRepository supportFileTypeRepository;
-
-
+public class ExerciseSheetService extends AbstractService{
 
     public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceValidationException {
-        Long courseId = createExerciseSheetRequest.getCourseId();
-
-        if (!courseRepository.existsById(courseId))
-            throw new ServiceValidationException("Error: the referenced course does not exists", HttpStatus.NOT_FOUND);
+        Course course = readCourse(createExerciseSheetRequest.getCourseId());
 
         ExerciseSheet exerciseSheet = new ExerciseSheet();
-        exerciseSheet.setCourse(new Course(createExerciseSheetRequest.getCourseId()));
+        exerciseSheet.setCourse(course);
         exerciseSheet.setMinKreuzel(createExerciseSheetRequest.getMinKreuzel());
         exerciseSheet.setMinPoints(createExerciseSheetRequest.getMinPoints());
         exerciseSheet.setName(createExerciseSheetRequest.getName());
@@ -61,12 +44,7 @@ public class ExerciseSheetService {
     }
 
     public void updateExerciseSheet(UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceValidationException {
-
-        if (!exerciseSheetRepository.existsById(updateExerciseSheetRequest.getId()))
-            throw new EntityNotFoundException("Error: Exercise sheet not found!");
-
-        ExerciseSheet exerciseSheet = exerciseSheetRepository.findById(updateExerciseSheetRequest.getId()).get();
-
+        ExerciseSheet exerciseSheet = readExerciseSheet(updateExerciseSheetRequest.getId());
         List<ExerciseSheet> courseExerciseSheets = exerciseSheetRepository.findByCourse_Id(exerciseSheet.getCourse().getId());
         courseExerciseSheets.removeIf(sheet -> sheet.getId().equals(updateExerciseSheetRequest.getId()));
 
@@ -84,46 +62,33 @@ public class ExerciseSheetService {
     }
 
     public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceValidationException {
-
-        Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(id);
-        if(!exerciseSheetOptional.isPresent())
-            throw new ServiceValidationException("Error: ExerciseSheet not found!",HttpStatus.NOT_FOUND);
-
-        UserDetailsImpl userDetails = getUserDetails();
-        if(!userDetails.getAdmin() && !exerciseSheetOptional.get().getCourse().getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
+        ExerciseSheet exerciseSheet = readExerciseSheet(id);
+        if(!isAdmin() && !isOwner(exerciseSheet.getCourse()))
             throw new ServiceValidationException("Error: Not an Admin or Owner",HttpStatus.UNAUTHORIZED);
 
-        return exerciseSheetOptional.get().getResponseObject(null);
+        return exerciseSheet.getResponseObject(null);
     }
 
-    public ExerciseSheetResponseObject getExerciseSheetAssigned(Long exerciseSheetId) throws ServiceValidationException
-    {
-        Optional<ExerciseSheet> exerciseSheetOptional = exerciseSheetRepository.findById(exerciseSheetId);
-        if(!exerciseSheetOptional.isPresent())
-            throw new ServiceValidationException("Error: ExerciseSheet not found!",HttpStatus.NOT_FOUND);
-
+    public ExerciseSheetResponseObject getExerciseSheetAssigned(Long exerciseSheetId) throws ServiceValidationException {
+        ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         UserDetailsImpl userDetails = getUserDetails();
-        Boolean isAssignedUser =  exerciseSheetOptional.get().getCourse().getStudents().stream()
+        Boolean isAssignedUser = exerciseSheet.getCourse().getStudents().stream()
                 .anyMatch(userInCourse -> userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
         ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
-        if(isAssignedUser)
-           responseObject = exerciseSheetOptional.get().getResponseObject(userDetails.getMatriculationNumber());
+        if (isAssignedUser)
+            responseObject = exerciseSheet.getResponseObject(userDetails.getMatriculationNumber());
 
         return responseObject;
     }
 
     public void deleteExerciseSheet(Long id) throws EntityNotFoundException {
-        if (!exerciseSheetRepository.existsById(id))
-            throw new EntityNotFoundException("Exercise Sheet not found");
-        exerciseSheetRepository.deleteById(id);
+        ExerciseSheet exerciseSheet = readExerciseSheet(id);
+        exerciseSheetRepository.delete(exerciseSheet);
     }
 
-
     public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) throws ServiceValidationException {
-        if (!courseRepository.existsById(courseId))
-            throw new EntityNotFoundException("Course not found");
         UserDetailsImpl userDetails = getUserDetails();
-        Course course = courseRepository.findById(courseId).get();
+        Course course = readCourse(courseId);
         if (!userDetails.getAdmin()) {
             boolean isOwner = course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber());
             boolean isStudentInCourse = course.getStudents().stream()
@@ -142,9 +107,5 @@ public class ExerciseSheetService {
             responseObjects.add(responseObject);
         }
         return responseObjects;
-    }
-
-    public UserDetailsImpl getUserDetails() {
-        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

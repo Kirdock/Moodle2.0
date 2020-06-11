@@ -54,12 +54,18 @@ public class AbstractService {
         return optionalCourse.get();
     }
 
-    protected User readUser(String matriculationNumber) throws ServiceValidationException
-    {
+    protected User readUser(String matriculationNumber) throws ServiceValidationException {
         Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
-        if(!optionalUser.isPresent())
-            throw new ServiceValidationException("Error: User not found!",HttpStatus.NOT_FOUND);
+        if (!optionalUser.isPresent())
+            throw new ServiceValidationException("Error: User not found!", HttpStatus.NOT_FOUND);
         return optionalUser.get();
+    }
+
+    protected ExerciseSheet readExerciseSheet(Long exerciseSheetId) throws ServiceValidationException {
+        Optional<ExerciseSheet> optionalExerciseSheet = exerciseSheetRepository.findById(exerciseSheetId);
+        if (!optionalExerciseSheet.isPresent())
+            throw new ServiceValidationException("Error: ExerciseSheet not found!", HttpStatus.NOT_FOUND);
+        return optionalExerciseSheet.get();
     }
 
     protected Example readExample(Long exampleId) throws ServiceValidationException {
