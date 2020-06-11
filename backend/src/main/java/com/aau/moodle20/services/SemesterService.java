@@ -31,30 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class SemesterService {
-
-    @Autowired
-    SemesterRepository semesterRepository;
-
-    @Autowired
-    CourseRepository courseRepository;
-
-    @Autowired
-    ExerciseSheetRepository exerciseSheetRepository;
-
-    @Autowired
-    UserInCourseRepository userInCourseRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    FileTypeRepository fileTypeRepository;
-    @Autowired
-    SupportFileTypeRepository supportFileTypeRepository;
-
-    @Autowired
-    ExampleRepository exampleRepository;
+public class SemesterService extends AbstractService{
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -63,8 +40,6 @@ public class SemesterService {
     PdfHelper pdfHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
-
-
 
 
     public void createSemester(CreateSemesterRequest createSemesterRequest) throws ServiceValidationException {
@@ -79,7 +54,7 @@ public class SemesterService {
 
     public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceValidationException {
 
-        checkIfSemesterExists(createCourseRequest.getSemesterId());
+        Semester semester = readSemester(createCourseRequest.getSemesterId());
         if(courseRepository.existsByNameAndNumberAndSemester_Id(createCourseRequest.getName(),createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
             throw new ServiceValidationException("Course in Semester already exists",ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
@@ -88,7 +63,7 @@ public class SemesterService {
         course.setMinPoints(createCourseRequest.getMinPoints());
         course.setName(createCourseRequest.getName());
         course.setNumber(createCourseRequest.getNumber());
-        course.setSemester(new Semester(createCourseRequest.getSemesterId()));
+        course.setSemester(semester);
         course.setOwner(new User(createCourseRequest.getOwner()));
         course.setDescription(createCourseRequest.getDescription());
         courseRepository.save(course);
@@ -97,24 +72,20 @@ public class SemesterService {
     }
 
     public void updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceValidationException {
-
         UserDetailsImpl userDetails = getUserDetails();
-        checkIfCourseExists(updateCourseRequest.getId());
-        if (userDetails.getAdmin()&& updateCourseRequest.getOwner()!=null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
+        Course course = readCourse(updateCourseRequest.getId());
+        if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
             throw new ServiceValidationException("Error: Owner cannot be updated because the given matriculationNumber those not exists!", HttpStatus.NOT_FOUND);
 
-        Course course = null;
-        Optional<Course> optionalCourse = courseRepository.findById(updateCourseRequest.getId());
-        if (!userDetails.getAdmin() &&  !userDetails.getMatriculationNumber().equals(optionalCourse.get().getOwner().getMatriculationNumber()))
+        if (!userDetails.getAdmin() && !isOwner(course))
             throw new ServiceValidationException("Error: User is not owner of this course and thus cannot update this course!", HttpStatus.UNAUTHORIZED);
 
-        course = optionalCourse.get();
         course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
         course.setMinPoints(updateCourseRequest.getMinPoints());
         course.setName(updateCourseRequest.getName());
         course.setNumber(updateCourseRequest.getNumber());
         course.setDescription(updateCourseRequest.getDescription());
-        if (userDetails.getAdmin() && updateCourseRequest.getOwner()!=null)
+        if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null)
             course.setOwner(new User(updateCourseRequest.getOwner()));
 
         courseRepository.save(course);
@@ -122,12 +93,9 @@ public class SemesterService {
 
     public void updateCourseDescriptionTemplate(UpdateCourseDescriptionTemplate updateCourseDescriptionTemplate) throws ServiceValidationException
     {
-        if(!courseRepository.existsById(updateCourseDescriptionTemplate.getId()))
-            throw new ServiceValidationException("Error: course not found",HttpStatus.NOT_FOUND);
-
-        Course course = courseRepository.findById(updateCourseDescriptionTemplate.getId()).get();
+        Course course = readCourse(updateCourseDescriptionTemplate.getId());
         UserDetailsImpl userDetails = getUserDetails();
-        if(!userDetails.getAdmin() && !userDetails.getMatriculationNumber().equals(course.getOwner().getMatriculationNumber()))
+        if(!userDetails.getAdmin() && !isOwner(course))
             throw new ServiceValidationException("Error: not authorized to update course",HttpStatus.UNAUTHORIZED);
 
         course.setDescriptionTemplate(updateCourseDescriptionTemplate.getDescription());
@@ -135,11 +103,9 @@ public class SemesterService {
     }
 
     public void deleteCourse(Long courseId) throws EntityNotFoundException {
-        checkIfCourseExists(courseId);
-        courseRepository.deleteById(courseId);
+        Course course = readCourse(courseId);
+        courseRepository.delete(course);
     }
-
-
 
     public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws SemesterException
     {
@@ -172,11 +138,7 @@ public class SemesterService {
 
     @Transactional
     public void assignFile(MultipartFile file, Long courseId) throws ServiceValidationException {
-        if (file == null)
-            throw new ServiceValidationException("Error: file is null");
-        if (courseId == null)
-            throw new ServiceValidationException("Error: file is null");
-        checkIfCourseExists(courseId);
+        Course course = readCourse(courseId);
         List<User> allGivenUsers = userDetailsService.registerUsers(file);
         List<UserInCourse> userInCourses = new ArrayList<>();
 
@@ -184,7 +146,6 @@ public class SemesterService {
 
             UserCourseKey userCourseKey = new UserCourseKey();
             UserInCourse userInCourse = new UserInCourse();
-            Course course = new Course(courseId);
 
             userCourseKey.setCourseId(courseId);
             userCourseKey.setMatriculationNumber(user.getMatriculationNumber());
@@ -207,7 +168,7 @@ public class SemesterService {
         else if(courseRepository.existsByOwner_MatriculationNumber(userDetails.getMatriculationNumber()))
         {
             List<Course> courses = courseRepository.findByOwner_MatriculationNumber(userDetails.getMatriculationNumber());
-            List<Semester> semesters = courses.stream().map(course -> course.getSemester()).collect(Collectors.toList());
+            List<Semester> semesters = courses.stream().map(Course::getSemester).collect(Collectors.toList());
             for(Semester semester: semesters)
             {
                 if(!semestersToBeReturned.contains(semester))
@@ -232,10 +193,8 @@ public class SemesterService {
     }
 
     public List<CourseResponseObject> getCoursesFromSemester(Long semesterId) {
-        checkIfSemesterExists(semesterId);
-
+        readSemester(semesterId);
         UserDetailsImpl userDetails = getUserDetails();
-
         List<CourseResponseObject> responseObjects = new ArrayList<>();
         List<Course> courses = null;
 
@@ -255,7 +214,7 @@ public class SemesterService {
     }
 
     public List<CourseResponseObject> getAssignedCoursesFromSemester(Long semesterId) {
-        checkIfSemesterExists(semesterId);
+        readSemester(semesterId);
         UserDetailsImpl userDetails = getUserDetails();
 
         List<CourseResponseObject> responseObjects = new ArrayList<>();
@@ -273,24 +232,20 @@ public class SemesterService {
     }
 
     public CourseResponseObject getCourseAssigned(Long courseId) throws ServiceValidationException {
-        checkIfCourseExists(courseId);
-        UserDetailsImpl userDetails = getUserDetails();
-        Optional<User> user = userRepository.findByMatriculationNumber(userDetails.getMatriculationNumber());
-        if (user.isPresent()) {
-            Boolean isCourseAssigned = user.get().getCourses().stream().anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
-            if(!isCourseAssigned)
-                throw new ServiceValidationException("Error: User is not assigned to this course!",HttpStatus.UNAUTHORIZED);
-        }
-        Course course = courseRepository.findById(courseId).get();
+        Course course = readCourse(courseId);
+        User currentUser = getCurrentUser();
+        Boolean isCourseAssigned = currentUser.getCourses().stream().anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
+        if (!isCourseAssigned)
+            throw new ServiceValidationException("Error: User is not assigned to this course!", HttpStatus.UNAUTHORIZED);
 
-        return course.createCourseResponseObject_GetAssignedCourse(userDetails.getMatriculationNumber());
+        return course.createCourseResponseObject_GetAssignedCourse(currentUser.getMatriculationNumber());
     }
 
     public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
         UserDetailsImpl userDetails = getUserDetails();
         List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
-        Course course = checkIfCourseExists(courseId);
-        if (!userDetails.getAdmin() && !course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
+        Course course = readCourse(courseId);
+        if (!userDetails.getAdmin() && !isOwner(course))
             throw new ServiceValidationException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);
 
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);
@@ -340,61 +295,33 @@ public class SemesterService {
         return finishesExampleResponses;
     }
 
-
     public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceValidationException {
-        checkIfCourseExists(courseId);
-        Course course = courseRepository.findById(courseId).get();
+        Course course = readCourse(courseId);
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
 
             PdfWriter.getInstance(document, out);
             document.open();
-
             pdfHelper.addAttendanceTitle(document);
             pdfHelper.addAttendanceTable(document, course);
-            /*
-            document.add(headerTable);
-            document.add(table);*/
-
             document.close();
-
         } catch (DocumentException ex) {
             logger.error("Error occurred: {0}", ex);
             throw new ServiceValidationException(ex.getMessage());
         }
-
         return new ByteArrayInputStream(out.toByteArray());
-    }
-
-
-
-
-
-    protected Course checkIfCourseExists(Long courseId) throws ServiceValidationException {
-        Optional<Course> optionalCourse = courseRepository.findById(courseId);
-        if (!optionalCourse.isPresent()) throw new ServiceValidationException("Error: Course not found",HttpStatus.NOT_FOUND);
-
-        return optionalCourse.get();
-    }
-
-    protected void checkIfSemesterExists(Long semesterId) throws ServiceValidationException {
-        if (!semesterRepository.existsById(semesterId)) throw new ServiceValidationException("Error: Semester not found",HttpStatus.NOT_FOUND);
     }
 
     @Transactional
     public CourseResponseObject copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException {
-        Optional<Course> optionalCourse = courseRepository.findById(copyCourseRequest.getCourseId());
-        if (!optionalCourse.isPresent())
-            throw new ServiceValidationException("Error: Course not found", HttpStatus.NOT_FOUND);
-        if (!semesterRepository.existsById(copyCourseRequest.getSemesterId()))
-            throw new ServiceValidationException("Error: Semester not found", HttpStatus.NOT_FOUND);
 
-        Course originalCourse = optionalCourse.get();
+        Semester semester = readSemester(copyCourseRequest.getSemesterId());
+        Course originalCourse = readCourse(copyCourseRequest.getCourseId());
 
         // first copy course
         Course copiedCourse = originalCourse.copy();
-        copiedCourse.setSemester(new Semester(copyCourseRequest.getSemesterId()));
+        copiedCourse.setSemester(semester);
         courseRepository.save(copiedCourse);
 
         if (originalCourse.getExerciseSheets() == null || originalCourse.getExerciseSheets().isEmpty())
@@ -461,9 +388,5 @@ public class SemesterService {
             copiedSupportFileType.setFileType(supportFileType.getFileType());
             supportFileTypeRepository.save(copiedSupportFileType);
         }
-    }
-
-    public UserDetailsImpl getUserDetails() {
-        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
