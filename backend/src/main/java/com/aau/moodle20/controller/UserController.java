@@ -151,7 +151,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/user/kreuzel/attachment")
-    public ResponseEntity<?> setKreuzelUserAttachment(@Valid  @RequestParam("file") MultipartFile file, @Valid  @RequestParam("id") Long exampleId) throws IOException {
+    public ResponseEntity<?> setKreuzelUserAttachment(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws IOException {
         finishesExampleService.setKreuzelUserAttachment(file,exampleId);
         return ResponseEntity.ok(new MessageResponse("Attachment for kreuzel was successfully set!"));
     }
