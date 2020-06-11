@@ -14,6 +14,7 @@ public class FinishesExampleResponse {
     private String matriculationNumber;
     private String surname;
     private String forename;
+    private Long exerciseSheetId;
 
     public Long getExampleId() {
         return exampleId;
@@ -77,5 +78,13 @@ public class FinishesExampleResponse {
 
     public void setExerciseSheetName(String exerciseSheetName) {
         this.exerciseSheetName = exerciseSheetName;
+    }
+
+    public Long getExerciseSheetId() {
+        return exerciseSheetId;
+    }
+
+    public void setExerciseSheetId(Long exerciseSheetId) {
+        this.exerciseSheetId = exerciseSheetId;
     }
 }
