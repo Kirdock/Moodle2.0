@@ -45,8 +45,9 @@ public class FinishesExampleService {
        List<FinishesExample> finishesExampleList = new ArrayList<>();
        for(UserKreuzelRequest userKreuzelRequest: userKreuzelRequests)
        {
-           if(!exampleRepository.existsById(userKreuzelRequest.getExampleId()))
-               throw new ServiceValidationException("Error: Example with id:"+userKreuzelRequest.getExampleId()+"does not exists!", HttpStatus.NOT_FOUND);
+           Example example = readExample(userKreuzelRequest.getExampleId());
+           if(!example.getSubExamples().isEmpty())
+               throw new ServiceValidationException("Error: Example has sub-examples and can therefore not be kreuzelt"); 
 
            Optional<FinishesExample> optionalFinishesExample =  finishesExampleRepository
                    .findByExample_IdAndUser_MatriculationNumber(userKreuzelRequest.getExampleId(),
@@ -121,6 +122,13 @@ public class FinishesExampleService {
 
     public UserDetailsImpl getUserDetails() {
         return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    protected Example readExample(Long exampleId) throws ServiceValidationException {
+        Optional<Example> optionalExample = exampleRepository.findById(exampleId);
+        if (!optionalExample.isPresent())
+            throw new ServiceValidationException("Error: Example not found!", HttpStatus.NOT_FOUND);
+        return optionalExample.get();
     }
 
 }
