@@ -13,15 +13,12 @@ import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.repository.*;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -293,27 +289,26 @@ public class SemesterService {
     public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
         UserDetailsImpl userDetails = getUserDetails();
         List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
-        List<FinishesExample> finishesExamples = new ArrayList<>();
-
         Course course = checkIfCourseExists(courseId);
         if (!userDetails.getAdmin() && !course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber()))
             throw new ServiceValidationException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);
 
-        CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
-        for (ExerciseSheet exerciseSheet : course.getExerciseSheets()) {
-            for (Example example : exerciseSheet.getExamples()) {
-                for (FinishesExample finishesExample : example.getExamplesFinishedByUser()) {
+        Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);
+        List<ExerciseSheet> sortedExerciseSheets = course.getExerciseSheets().stream()
+                .sorted(Comparator.comparing(ExerciseSheet::getSubmissionDate)).collect(Collectors.toList());
 
-                    if(finishesExample.getHasPresented()) {
-                        FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
-                        finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
-                        finishesExampleResponse.setSurname(finishesExample.getUser().getSurname());
-                        finishesExampleResponse.setForename(finishesExample.getUser().getForename());
-                        finishesExampleResponse.setExampleId(finishesExample.getExample().getId());
-                        finishesExampleResponse.setExampleName(finishesExample.getExample().getName());
-                        finishesExampleResponse.setExerciseSheetName(exerciseSheet.getName());
-                        finishesExampleResponses.add(finishesExampleResponse);
-                    }
+        CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
+        for (ExerciseSheet exerciseSheet : sortedExerciseSheets) {
+
+            List<Example> sortedExamples = exerciseSheet.getExamples().stream()
+                    .filter(example -> example.getParentExample()==null)
+                    .sorted(exampleComparator).collect(Collectors.toList());
+            for (Example example : sortedExamples) {
+                if (example.getSubExamples() == null || example.getSubExamples().isEmpty())
+                    finishesExampleResponses.addAll(createFinishesExampleResponses(example, exerciseSheet));
+                else {
+                    List<Example> sortedSubExamples = example.getSubExamples().stream().sorted(exampleComparator).collect(Collectors.toList());
+                    sortedSubExamples.forEach(subExample -> finishesExampleResponses.addAll(createFinishesExampleResponses(subExample,exerciseSheet)));
                 }
             }
         }
@@ -324,6 +319,27 @@ public class SemesterService {
 
         return responseObject;
     }
+
+    protected List<FinishesExampleResponse> createFinishesExampleResponses(Example example, ExerciseSheet exerciseSheet)
+    {
+        List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
+        for (FinishesExample finishesExample : example.getExamplesFinishedByUser()) {
+
+            if(finishesExample.getHasPresented()) {
+                FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
+                finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
+                finishesExampleResponse.setSurname(finishesExample.getUser().getSurname());
+                finishesExampleResponse.setForename(finishesExample.getUser().getForename());
+                finishesExampleResponse.setExampleId(finishesExample.getExample().getId());
+                finishesExampleResponse.setExampleName(finishesExample.getExample().getName());
+                finishesExampleResponse.setExerciseSheetName(exerciseSheet.getName());
+                finishesExampleResponse.setExerciseSheetId(exerciseSheet.getId());
+                finishesExampleResponses.add(finishesExampleResponse);
+            }
+        }
+        return finishesExampleResponses;
+    }
+
 
     public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceValidationException {
         checkIfCourseExists(courseId);
