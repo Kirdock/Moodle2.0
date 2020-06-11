@@ -150,6 +150,8 @@ public class ExerciseSheet {
         responseObject.setId(getId());
         responseObject.setName(getName());
         responseObject.setSubmissionDate(getSubmissionDate());
+        responseObject.setMinPoints(getMinPoints());
+        responseObject.setMinKreuzel(getMinKreuzel());
 
         return responseObject;
     }
