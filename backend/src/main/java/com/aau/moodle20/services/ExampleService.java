@@ -16,29 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ExampleService {
-
-    @Autowired
-    ExerciseSheetRepository exerciseSheetRepository;
-
-    @Autowired
-    CourseRepository courseRepository;
-
-    @Autowired
-    UserInCourseRepository userInCourseRepository;
-
-    @Autowired
-    ExampleRepository exampleRepository;
-
-    @Autowired
-    SupportFileTypeRepository supportFileTypeRepository;
-
-    @Autowired
-    FileTypeRepository fileTypeRepository;
-
-    @Autowired
-    FinishesExampleRepository finishesExampleRepository;
-
+public class ExampleService extends AbstractService{
 
     @Transactional
     public ExampleResponseObject createExample (ExampleRequest createExampleRequest) throws ServiceValidationException
@@ -61,7 +39,6 @@ public class ExampleService {
         ExampleResponseObject responseObject = new ExampleResponseObject();
         responseObject.setId(example.getId());
         responseObject.setSubExamples(null);
-
 
         return responseObject;
     }
@@ -88,50 +65,34 @@ public class ExampleService {
 
     @Transactional
     public void updateExample(ExampleRequest updateExampleRequest) throws ServiceValidationException {
-
         List<SupportFileType> supportFileTypes;
-
-        if (updateExampleRequest.getSubmitFile()!=null &&updateExampleRequest.getSubmitFile()) {
+        if (updateExampleRequest.getSubmitFile() != null && updateExampleRequest.getSubmitFile()) {
             if (updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty())
                 throw new ServiceValidationException("Error: supported file types must not be null!");
         }
-
-        Optional<Example> optionalExample = exampleRepository.findById(updateExampleRequest.getId());
-
-        if (!optionalExample.isPresent())
-            throw new ServiceValidationException("Error: example not found", HttpStatus.NOT_FOUND);
-
-        Example example = optionalExample.get();
+        Example example = readExample(updateExampleRequest.getId());
         example.fillValuesFromRequestObject(updateExampleRequest);
         supportFileTypes = createSupportedFileTypesEntries(example, updateExampleRequest);
         supportFileTypeRepository.saveAll(supportFileTypes);
         example.setSupportFileTypes(new HashSet<>(supportFileTypes));
         exampleRepository.saveAndFlush(example);
-
     }
-
-
 
     @Transactional
     public void deleteExample(Long exampleId) throws ServiceValidationException {
-        Optional<Example> optionalExample = exampleRepository.findById(exampleId);
-        if (!optionalExample.isPresent())
-            throw new ServiceValidationException("Example not found", HttpStatus.NOT_FOUND);
-        ExerciseSheet exerciseSheet = optionalExample.get().getExerciseSheet();
-        Example parentExample = optionalExample.get().getParentExample();
+        Example example = readExample(exampleId);
+        ExerciseSheet exerciseSheet = example.getExerciseSheet();
+        Example parentExample = example.getParentExample();
         exampleRepository.deleteById(exampleId);
         exampleRepository.flush();
 
         // remove order gap caused by delete of example
         List<Example> examples = null;
-        if(parentExample!=null)
-        {
-            examples =  new ArrayList<>(parentExample.getSubExamples());
-
-        }else
-        {
-            examples =  exerciseSheet.getExamples().stream()
-                    .filter(example -> example.getParentExample()==null).collect(Collectors.toList());
+        if (parentExample != null)
+            examples = new ArrayList<>(parentExample.getSubExamples());
+        else {
+            examples = exerciseSheet.getExamples().stream()
+                    .filter(example1 -> example1.getParentExample() == null).collect(Collectors.toList());
         }
         examples.sort(Comparator.comparing(Example::getOrder));
         for (int i = 0; i < examples.size(); i++)
@@ -146,28 +107,15 @@ public class ExampleService {
     }
 
     public ExampleResponseObject getExample(Long id) throws ServiceValidationException {
-        if (!exampleRepository.existsById(id))
-            throw new ServiceValidationException("Error: example not found!", HttpStatus.NOT_FOUND);
-        return exampleRepository.findById(id).get().createExampleResponseObject(null);
+        Example example = readExample(id);
+        return example.createExampleResponseObject(null);
     }
 
-    public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) throws ServiceValidationException
-    {
-        for(ExampleOrderRequest exampleOrderRequest: exampleOrderRequests)
-        {
-            if(!exampleRepository.existsById(exampleOrderRequest.getId()))
-                throw new ServiceValidationException("Error: Example with id:"+exampleOrderRequest.getId()+" not found!",HttpStatus.NOT_FOUND);
-        }
-
-        for(ExampleOrderRequest exampleOrderRequest: exampleOrderRequests)
-        {
-           Optional<Example> optionalExample = exampleRepository.findById(exampleOrderRequest.getId());
-           if(optionalExample.isPresent())
-           {
-               Example example = optionalExample.get();
-               example.setOrder(exampleOrderRequest.getOrder());
-               exampleRepository.save(example);
-           }
+    public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) throws ServiceValidationException {
+        for (ExampleOrderRequest exampleOrderRequest : exampleOrderRequests) {
+            Example example = readExample(exampleOrderRequest.getId());
+            example.setOrder(exampleOrderRequest.getOrder());
+            exampleRepository.save(example);
         }
     }
 }
