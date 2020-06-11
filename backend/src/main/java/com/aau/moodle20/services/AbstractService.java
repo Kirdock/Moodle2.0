@@ -81,4 +81,12 @@ public class AbstractService {
         Course course = readCourse(courseId);
         return course.getOwner().equals(getUserDetails().getMatriculationNumber());
     }
+
+    protected Boolean isOwner(Course course) {
+        return course.getOwner().equals(getUserDetails().getMatriculationNumber());
+    }
+
+    protected User getCurrentUser() {
+        return readUser(getUserDetails().getMatriculationNumber());
+    }
 }
