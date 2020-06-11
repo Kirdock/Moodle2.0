@@ -18,6 +18,7 @@ public class CourseResponseObject {
     private Boolean includeThird;
     private Long semesterId;
     private List<FinishesExampleResponse> presented;
+    private String description;
 
 
 
@@ -118,5 +119,13 @@ public class CourseResponseObject {
 
     public void setPresented(List<FinishesExampleResponse> presented) {
         this.presented = presented;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -15,6 +15,7 @@ public class UpdateCourseRequest {
     private Integer minPoints;
     private String owner;
     private Boolean includeThird;
+    private String description;
 
     public Long getId() {
         return id;
@@ -70,5 +71,13 @@ public class UpdateCourseRequest {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

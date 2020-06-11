@@ -27,6 +27,7 @@ public class Course {
     private Integer minKreuzel;
     private Integer minPoints;
     private String descriptionTemplate;
+    private String description;
 
     @OneToMany(
             mappedBy = "course",
@@ -42,6 +43,7 @@ public class Course {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner", referencedColumnName = "matriculation_Number")
     User owner;
+
     public Course(Long id)
     {
         this.id = id;
@@ -130,6 +132,14 @@ public class Course {
         this.exerciseSheets = exerciseSheets;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public CourseResponseObject createCourseResponseObject()
     {
         CourseResponseObject responseObject = new CourseResponseObject();
@@ -149,6 +159,7 @@ public class Course {
         course.setNumber(getNumber());
         course.setOwner(getOwner());
         course.setDescriptionTemplate(getDescriptionTemplate());
+        course.setDescription(getDescription());
         return course;
     }
 
@@ -161,6 +172,7 @@ public class Course {
         responseObject.setMinPoints(getMinPoints());
         responseObject.setDescriptionTemplate(getDescriptionTemplate());
         responseObject.setSemesterId(getSemester().getId());
+        responseObject.setDescription(getDescription());
         if (getExerciseSheets() != null)
             responseObject.setExerciseSheets(getExerciseSheets().stream()
                     .map(ExerciseSheet::getResponseObjectLessInfo)

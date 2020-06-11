@@ -13,6 +13,7 @@ public class CreateCourseRequest {
     private Integer minPoints;
     private String owner;
     private Boolean includeThird;
+    private String description;
 
     public Long getSemesterId() {
         return semesterId;
@@ -68,5 +69,13 @@ public class CreateCourseRequest {
 
     public void setIncludeThird(Boolean includeThird) {
         this.includeThird = includeThird;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
