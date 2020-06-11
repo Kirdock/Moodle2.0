@@ -60,10 +60,7 @@ public class SemesterController {
         return ResponseEntity.ok(semesterService.getAssignedCoursesFromSemester(semesterId));
     }
 
-    @GetMapping(value = "/course/{courseId}")
-    public ResponseEntity<CourseResponseObject> getCourse(@PathVariable("courseId") long courseId)  {
-        return ResponseEntity.ok(semesterService.getCourse(courseId));
-    }
+
 
     @GetMapping(value = "/courseAssigned/{courseId}")
     public ResponseEntity<CourseResponseObject> isCourseAssigned(@PathVariable("courseId") long courseId)  {
@@ -84,50 +81,11 @@ public class SemesterController {
                 .body(new InputStreamResource(bis));
     }
 
-
-    //Course Section
-    @PreAuthorize("hasAuthority('Admin')")
-    @PutMapping(value = "/course")
-    public ResponseEntity<?> createCourse(@Valid  @RequestBody CreateCourseRequest createCourseRequest)  throws SemesterException {
-        return ResponseEntity.ok(semesterService.createCourse(createCourseRequest));
-    }
-
-
-    @PostMapping(value = "/course")
-    public ResponseEntity<?> updateCourse(@Valid  @RequestBody UpdateCourseRequest updateCourseRequest)  throws SemesterException {
-
-        semesterService.updateCourse(updateCourseRequest);
-        return ResponseEntity.ok(new MessageResponse("Course was sucessfully updated!"));
-    }
-
-    @PostMapping(value = "/course/template")
-    public ResponseEntity<?> updateCourseDescriptionTemplate(@Valid  @RequestBody UpdateCourseDescriptionTemplate updateCourseDescriptionTemplate)  throws SemesterException {
-
-        semesterService.updateCourseDescriptionTemplate(updateCourseDescriptionTemplate);
-        return ResponseEntity.ok(new MessageResponse("Course Description Template was sucessfully updated!"));
-    }
-
-    @PreAuthorize("hasAuthority('Admin')")
-    @DeleteMapping(value = "/course/{courseId}")
-    public ResponseEntity<?> deleteCourse(@PathVariable("courseId") long courseId)  throws SemesterException {
-
-        semesterService.deleteCourse(courseId);
-        return ResponseEntity.ok(new MessageResponse("Course was sucessfully deleted!"));
-    }
-
-
     @PostMapping(value = "/course/assign")
     public ResponseEntity<?> assignCourseToSemester(@Valid  @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests)  throws SemesterException {
 
         semesterService.assignUsers(assignUserToCourseRequests);
         return ResponseEntity.ok(new MessageResponse("User were successfully assigned to courses!"));
-    }
-
-    @PostMapping(value = "/course/copy")
-    public ResponseEntity<?> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest)  throws ServiceValidationException {
-
-        CourseResponseObject responseObject = semesterService.copyCourse(copyCourseRequest);
-        return ResponseEntity.ok(responseObject);
     }
 
     @PostMapping(value = "/course/assignFile")
