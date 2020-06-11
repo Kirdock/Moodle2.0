@@ -57,7 +57,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(path = "/users")
     public List<UserResponseObject> getUsers() {
-        return userDetailsService.getAllUses();
+        return userDetailsService.getAllUsers();
     }
 
     @GetMapping(path = "/users/course/{courseId}")
@@ -108,8 +108,8 @@ public class UserController {
     }
 
     @PostMapping(path = "/user/password")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, @RequestHeader("Authorization") String jwtToken) {
-        userDetailsService.changePassword(changePasswordRequest, jwtToken);
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
+        userDetailsService.changePassword(changePasswordRequest);
         return ResponseEntity.ok(new MessageResponse("User password changed!"));
     }
 

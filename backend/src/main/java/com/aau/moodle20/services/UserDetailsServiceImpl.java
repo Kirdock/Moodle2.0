@@ -10,17 +10,12 @@ import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.request.UpdateUserRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
-import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.UserResponseObject;
-import com.aau.moodle20.repository.CourseRepository;
-import com.aau.moodle20.repository.UserInCourseRepository;
-import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,16 +35,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    CourseRepository courseRepository;
-
-    @Autowired
-    UserInCourseRepository userInCourseRepository;
+public class UserDetailsServiceImpl extends AbstractService implements UserDetailsService {
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -139,13 +125,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @throws ServiceValidationException
      */
     public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws ServiceValidationException {
-
-        if(!courseRepository.existsById(courseId))
-            throw new ServiceValidationException("Error: course not found",HttpStatus.NOT_FOUND);
-
         List<UserResponseObject> userResponseObjectList = new ArrayList<>();
+
+        readCourse(courseId);
         List<UserInCourse> userInCourses = userInCourseRepository.findByCourse_Id(courseId);
-        List<User> allUsers = getAllUsers();
+        List<User> allUsers = userRepository.findAll();
         allUsers.removeIf(User::getAdmin);
 
         for (User user : allUsers) {
@@ -204,32 +188,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return lines;
     }
 
-    /**
-     * returns all users (except admin)
-     * @return
-     * @throws UserException
-     */
-    public List<User> getAllUsers() throws UserException {
-        return userRepository.findAll();
+    public List<UserResponseObject> getAllUsers() throws UserException {
+        return userRepository.findAll().stream().map(User::createUserResponseObject).collect(Collectors.toList());
     }
 
-    public List<UserResponseObject> getAllUses() throws UserException
-    {
-        List<UserResponseObject> userResponseObjectList = getAllUsers().stream().map(User::createUserResponseObject).collect(Collectors.toList());
-        return userResponseObjectList;
-    }
-
-    public void changePassword(ChangePasswordRequest changePasswordRequest,String jwtToken)
-    {
-        String matriculationNumber = jwtUtils.getMatriculationNumberFromJwtToken(jwtToken.split(" ")[1].trim());
-
-        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
-        if(!encoder.matches(changePasswordRequest.getOldPassword(), optionalUser.get().getPassword()))
-            throw new UserException("Password for User not correct!");
-
-        User user = optionalUser.get();
-        user.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
-        userRepository.save(user);
+    public void changePassword(ChangePasswordRequest changePasswordRequest) throws ServiceValidationException {
+        User currentUser = getCurrentUser();
+        if (!encoder.matches(changePasswordRequest.getOldPassword(), currentUser.getPassword()))
+            throw new ServiceValidationException("Password for User not correct!");
+        currentUser.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(currentUser);
     }
 
     public void updateUser(UpdateUserRequest updateUserRequest) throws ServiceValidationException {
@@ -245,13 +213,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(!userDetails.getAdmin() && !userDetails.getMatriculationNumber().equals(matriculationNumber))
             throw new ServiceValidationException("Error: User is not admin and therefore not allowed to edit other users than himself ", HttpStatus.UNAUTHORIZED);
 
-
         if(adminMatriculationNumber.equals(matriculationNumber))
             throw new ServiceValidationException("Error: Root admin cannot be updated!");
 
-
-
-        User user = userRepository.findByMatriculationNumber(matriculationNumber).get();
+        User user = readUser(matriculationNumber);
         user.setEmail(updateUserRequest.getEmail());
         user.setSurname(updateUserRequest.getSurname());
         user.setForename(updateUserRequest.getForename());
@@ -261,16 +226,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void deleteUser(String matriculationNumber) throws ServiceValidationException
-    {
-        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
-        if(!optionalUser.isPresent())
-            throw new ServiceValidationException("User not found",HttpStatus.NOT_FOUND);
-
-        if(optionalUser.get().getMatriculationNumber().equals(adminMatriculationNumber))
+    public void deleteUser(String matriculationNumber) throws ServiceValidationException {
+        User user = readUser(matriculationNumber);
+        if (user.getMatriculationNumber().equals(adminMatriculationNumber))
             throw new ServiceValidationException("Super Admin user cannot be deleted!");
 
-        userRepository.delete(optionalUser.get());
+        userRepository.delete(user);
     }
 
     public Boolean isOwner() {
@@ -278,16 +239,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return courseRepository.existsByOwner_MatriculationNumber(userDetails.getMatriculationNumber());
     }
 
-    public UserResponseObject getUser(String matriculationNumber)
-    {
-        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
-        if(!optionalUser.isPresent())
-         throw new ServiceValidationException("Error: user with given matriculationNumber not found", HttpStatus.NOT_FOUND);
-       return optionalUser.get().createUserResponseObject();
-    }
-
-    public UserDetailsImpl getUserDetails() {
-        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public UserResponseObject getUser(String matriculationNumber) {
+        return readUser(matriculationNumber).createUserResponseObject();
     }
 
     /**
@@ -299,21 +252,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     public List<ExampleResponseObject> getFinishedExamplesUserCourse(String matriculationNumber, Long courseId) throws ServiceValidationException {
         List<ExampleResponseObject> responseObjects = new ArrayList<>();
-        UserDetailsImpl userDetails = getUserDetails();
-        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
-        Optional<Course> optionalCourse = courseRepository.findById(courseId);
-        if (!optionalUser.isPresent())
-            throw new ServiceValidationException("Error: User not found!", HttpStatus.NOT_FOUND);
-        if (!optionalCourse.isPresent())
-            throw new ServiceValidationException("Error: Course not found!", HttpStatus.NOT_FOUND);
-        if (!userDetails.getAdmin() && !userDetails.getMatriculationNumber().equals(optionalCourse.get().getOwner().getMatriculationNumber()))
+
+        User user = readUser(matriculationNumber);
+        Course course = readCourse(courseId);
+
+        if (!isAdmin() && !isOwner(course))
             throw new ServiceValidationException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
 
-        Course course = optionalCourse.get();
         for (ExerciseSheet exerciseSheet : course.getExerciseSheets()) {
             for (Example example : exerciseSheet.getExamples()) {
                 Optional<FinishesExample> optFinishesExample = example.getExamplesFinishedByUser().stream()
-                        .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(optionalUser.get().getMatriculationNumber()))
+                        .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(user.getMatriculationNumber()))
                         .findFirst();
                 if (optFinishesExample.isPresent() &&
                         (EFinishesExampleState.MAYBE.equals(optFinishesExample.get().getState()) || (EFinishesExampleState.YES.equals(optFinishesExample.get().getState())))) {
