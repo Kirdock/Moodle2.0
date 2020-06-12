@@ -33,14 +33,12 @@ public class UserController {
     AuthenticationManager authenticationManager;
     JwtUtils jwtUtils;
     private UserDetailsServiceImpl userDetailsService;
-    private FinishesExampleService finishesExampleService;
 
-    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserDetailsServiceImpl userDetailsService, FinishesExampleService finishesExampleService)
+    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserDetailsServiceImpl userDetailsService)
     {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.userDetailsService = userDetailsService;
-        this.finishesExampleService = finishesExampleService;
     }
 
     // get api--------------------------------------------------------------------
@@ -64,26 +62,7 @@ public class UserController {
         return userDetailsService.getUser(matriculationNumber);
     }
 
-    @GetMapping(path = "/user/kreuzel/attachment/{exampleId}")
-    public ResponseEntity<InputStreamResource> getUserKreuzelAttachment(@PathVariable Long exampleId) {
-        FinishesExample example = finishesExampleService.getKreuzelAttachment(exampleId);
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(example.getAttachment());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename="+example.getFileName());
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new InputStreamResource(inputStream));
-    }
-
-
-    @GetMapping(path = "/user/{matriculationNumber}/kreuzel/{courseId}")
-    public List<ExampleResponseObject> getFinishedExamples(@PathVariable String matriculationNumber,@PathVariable Long courseId) {
-        return userDetailsService.getFinishedExamplesUserCourse(matriculationNumber,courseId);
-    }
     // post api----------------------------------------------------------------
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -109,12 +88,6 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("User was successfully updated!"));
     }
 
-    @PostMapping(path = "/user/examplePresented")
-    public ResponseEntity<?> setUserExamplePresented(@Valid @RequestBody UserExamplePresentedRequest userExamplePresentedRequest) {
-        finishesExampleService.setUserExamplePresented(userExamplePresentedRequest);
-        return ResponseEntity.ok(new MessageResponse("Presented flag was successfully updated!"));
-    }
-
     // put api---------------------------------------------------------------------
 
     @PreAuthorize("hasAuthority('Admin')")
@@ -125,25 +98,12 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
-
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
     public ResponseEntity<?> registerUsers(@Valid  @RequestParam("file") MultipartFile file) throws UserException {
 
         userDetailsService.registerUsers(file);
         return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
-    }
-
-    @PostMapping(path = "/user/kreuzel")
-    public ResponseEntity<?> setKreuzelUser(@Valid @RequestBody List<UserKreuzelRequest> userKreuzelRequests) {
-        finishesExampleService.setKreuzelUser(userKreuzelRequests);
-        return ResponseEntity.ok(new MessageResponse("Kreuzel were successfully set!"));
-    }
-
-    @PostMapping(path = "/user/kreuzel/attachment")
-    public ResponseEntity<?> setKreuzelUserAttachment(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws IOException {
-        finishesExampleService.setKreuzelUserAttachment(file,exampleId);
-        return ResponseEntity.ok(new MessageResponse("Attachment for kreuzel was successfully set!"));
     }
 
     // delete api -------------------------------------------------------------------------
@@ -153,6 +113,4 @@ public class UserController {
         userDetailsService.deleteUser(matriculationNumber);
         return ResponseEntity.ok(new MessageResponse("User was deleted!"));
     }
-
-
 }

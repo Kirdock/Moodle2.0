@@ -243,40 +243,5 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         return readUser(matriculationNumber).createUserResponseObject();
     }
 
-    /**
-     * returns all examples which the given user finihsed in given course
-     * @param matriculationNumber
-     * @param courseId
-     * @return list of example id and name
-     * @throws ServiceValidationException
-     */
-    public List<ExampleResponseObject> getFinishedExamplesUserCourse(String matriculationNumber, Long courseId) throws ServiceValidationException {
-        List<ExampleResponseObject> responseObjects = new ArrayList<>();
 
-        User user = readUser(matriculationNumber);
-        Course course = readCourse(courseId);
-
-        if (!isAdmin() && !isOwner(course))
-            throw new ServiceValidationException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
-
-        for (ExerciseSheet exerciseSheet : course.getExerciseSheets()) {
-            for (Example example : exerciseSheet.getExamples()) {
-                Optional<FinishesExample> optFinishesExample = example.getExamplesFinishedByUser().stream()
-                        .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(user.getMatriculationNumber()))
-                        .findFirst();
-                if (optFinishesExample.isPresent() &&
-                        (EFinishesExampleState.MAYBE.equals(optFinishesExample.get().getState()) || (EFinishesExampleState.YES.equals(optFinishesExample.get().getState())))) {
-                    ExampleResponseObject responseObject = new ExampleResponseObject();
-                    responseObject.setId(optFinishesExample.get().getExample().getId());
-                    responseObject.setName(optFinishesExample.get().getExample().getName());
-                    responseObject.setSubExamples(null);
-
-                    responseObjects.add(responseObject);
-                }
-            }
-        }
-        responseObjects.sort(Comparator.comparing(ExampleResponseObject::getName));
-
-        return responseObjects;
-    }
 }
