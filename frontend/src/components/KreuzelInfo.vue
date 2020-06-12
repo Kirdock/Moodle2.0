@@ -5,7 +5,7 @@
                 {{value.name}}
             </template>
         </td>
-        <td>
+        <td v-if="hasSubExamples">
             <template v-if="!isParent">
                 {{value.name}}
             </template>
@@ -28,7 +28,7 @@
         </template>
         <td>
             <template v-if="value.subExamples.length === 0">
-                <template v-if="includeThird">
+                <template v-if="true">
                     <div class="form-inline">
                         <div class="form-check">
                             <input :id="`kInfoYes${_uid}`" type="radio" value="y" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
@@ -44,15 +44,15 @@
                         </div>
                         <div class="form-check" style="margin-left:15px">
                             <input :id="`kInfoNotSure${_uid}`" type="radio" value="m" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
-                            <label :for="`kInfoNotSure${_uid}`" class="form-check-label" v-b-tooltip.hover :title="$t('notSureTooltip')">
+                            <label :for="`kInfoNotSure${_uid}`" class="form-check-label help" v-b-tooltip.hover :title="$t('notSureTooltip')">
                                 {{$t('notSure')}}
                             </label>
                         </div>
-                        <div class="form-inline" v-show="value.state === 'm'" style="margin-left: 15px">
-                            <label :for="`kInfoDescription${_uid}`" class="control-label">
+                        <div class="form-inline" v-if="value.state === 'm'" style="margin-left: 15px">
+                            <label :for="`kInfoDescription${_uid}`" class="control-label required">
                                 {{$t('reason')}}:
                             </label>
-                            <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.submitDescription" :disabled="deadlineReached">
+                            <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.submitDescription" :disabled="deadlineReached" required>
                         </div>
                     </div>
                 </template>
@@ -84,7 +84,7 @@
 import {fileManagement} from '@/plugins/global';
 export default {
     name: 'kreuzel-info',
-    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent'],
+    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples'],
     data(){
         return {
             loadingFileUpload: false

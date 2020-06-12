@@ -9,46 +9,49 @@
         <div class="form-group">
             <label class="control-label">{{$t('minPoints')}}: <strong>{{sheetInfo.minPoints || 0}}%</strong></label>
         </div>
-        <table class="table" aria-describedby="sheetName" v-if="sheetInfo.id">
-            <thead>
-                <th scope="col">{{$t('example.name')}}</th>
-                <th scope="col" v-if="hasSubExamples">{{$t('subExample.name')}}</th>
-                <th scope="col">{{$t('mandatory')}}</th>
-                <th scope="col">{{$t('weighting')}}</th>
-                <th scope="col">{{$t('points')}}</th>
-                <th scope="col">{{$t('kreuzel.name')}}</th>
-                <th scope="col">{{$t('actions')}}</th>
-            </thead>
-            <tbody>
-                <template v-for="example in sheetInfo.examples">
-                    <kreuzel-info :key="example.id" :isParent="true" :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
-                    <kreuzel-info v-for="subExample in example.subExamples" :key="subExample.id" :isParent="false" :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
-                </template>
-                <tr style="font-weight: bold">
-                    <td>
-                        {{$t('total')}}
-                    </td>
-                    <td></td>
-                    <td :style="minimumRequired(mandatoryTotal, mandatory, mandatoryTotal)">
-                        {{mandatory}}/{{mandatoryTotal}}
-                    </td>
-                    <td></td>
-                    <td :style="minimumRequired(sheetInfo.minPoints, points, pointsTotal)">
-                        {{points}}/{{pointsTotal}}
-                    </td>
-                    <td :style="minimumRequired(sheetInfo.minKreuzel, kreuzel, kreuzelTotal)">
-                        {{kreuzel}}/{{kreuzelTotal}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="form-group">
-            <button type="button" class="btn btn-primary" @click="saveKreuzel()" :disabled="deadlineReached">
-                <span class="fa fa-sync fa-spin" v-if="loading"></span>
-                <span class="fa fa-save" v-else></span>
-                {{$t('save')}}
-            </button>
-        </div>
+        <form @submit.prevent="saveKreuzel()">
+            <table class="table" aria-describedby="sheetName" v-if="sheetInfo.id">
+                <thead>
+                    <th scope="col">{{$t('example.name')}}</th>
+                    <th scope="col" v-if="hasSubExamples">{{$t('subExample.name')}}</th>
+                    <th scope="col">{{$t('mandatory')}}</th>
+                    <th scope="col">{{$t('weighting')}}</th>
+                    <th scope="col">{{$t('points')}}</th>
+                    <th scope="col">{{$t('kreuzel.name')}}</th>
+                    <th scope="col">{{$t('actions')}}</th>
+                </thead>
+                <tbody>
+                    <template v-for="example in sheetInfo.examples">
+                        <kreuzel-info :hasSubExamples="hasSubExamples" :key="example.id" :isParent="true" :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
+                        <kreuzel-info :hasSubExamples="hasSubExamples" v-for="subExample in example.subExamples" :key="subExample.id" :isParent="false" :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
+                    </template>
+                    <tr style="font-weight: bold">
+                        <td>
+                            {{$t('total')}}
+                        </td>
+                        <td v-if="hasSubExamples"></td>
+                        <td :style="minimumRequired(mandatoryTotal, mandatory, mandatoryTotal)">
+                            {{mandatory}}/{{mandatoryTotal}}
+                        </td>
+                        <td></td>
+                        <td :style="minimumRequired(sheetInfo.minPoints, points, pointsTotal)">
+                            {{points}}/{{pointsTotal}}
+                        </td>
+                        <td :style="minimumRequired(sheetInfo.minKreuzel, kreuzel, kreuzelTotal)">
+                            {{kreuzel}}/{{kreuzelTotal}}
+                        </td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" :disabled="deadlineReached">
+                    <span class="fa fa-sync fa-spin" v-if="loading"></span>
+                    <span class="fa fa-save" v-else></span>
+                    {{$t('save')}}
+                </button>
+            </div>
+        </form>
     </div>
 </template>
 

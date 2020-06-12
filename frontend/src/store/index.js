@@ -253,6 +253,9 @@ export default new Vuex.Store({
     },
     updatePresented({commit}, data){
       return api.updatePresented(data);
+    },
+    getCoursePresented({commit}, courseId){
+      return api.getCoursePresented(courseId);
     }
   },
   modules: {

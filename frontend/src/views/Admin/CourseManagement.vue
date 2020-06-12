@@ -262,7 +262,7 @@
                 </div>
             </b-tab>
         </b-tabs>
-        <b-modal id="modal-presented" :title="$t('presentations')" size="lg" hide-footer>
+        <b-modal id="modal-presented" :title="$t('presentations')" size="xl" hide-footer>
             <div class="form-horizontal">
                 <div class="form-inline">
                     <div class="form-group">
@@ -286,11 +286,32 @@
                         </multiselect>
                     </div>
                     <div class="form-group">
+                        <label for="presentedExerciseSheet" class="control-label">{{ $t('exerciseSheet.name') }} ({{$t('optional')}})</label>
+                        <multiselect v-model="presentedExerciseSheet" id="presentedExerciseSheet" open-direction="bottom"
+                                    :placeholder="$t('typeToSearch')"
+                                    
+                                    selectLabel=""
+                                    :selectedLabel="$t('selected')"
+                                    :options="presentedExerciseSheets"
+                                    :searchable="true"
+                                    :clear-on-select="true"
+                                    :close-on-select="true"
+                                    :options-limit="300"
+                                    :allow-empty="true"
+                                    :max-height="600"
+                                    :deselect-label="$t('remove')"
+                                    :show-no-results="false"
+                                    :showNoOptions="true"
+                                    >
+                                    <span slot="noOptions">{{$t('listEmpty')}}</span>
+                        </multiselect>
+                    </div>
+                    <div class="form-group">
                         <label for="presentedExample" class="control-label">{{ $t('example.name') }}</label>
                         <multiselect v-model="presentedExample" id="presentedExample" open-direction="bottom"
                                     :placeholder="$t('typeToSearch')"
-                                    label="name"
-                                    track-by="id"
+                                    label="exampleName"
+                                    track-by="exampleId"
                                     selectLabel=""
                                     :selectedLabel="$t('selected')"
                                     :options="presentedExamples"
@@ -313,6 +334,17 @@
                         </button>
                     </div>
                 </div>
+                <div class="form-group">
+                        <label class="control-label" for="showExerciseSheets">
+                            <span class="fas fa-filter"></span>
+                            {{$t('show')}}
+                        </label>
+                        <select class="form-control" id="showExerciseSheets" v-model="showExerciseSheet">
+                            <option v-for="sheet in exerciseSheetSelect" :value="sheet" :key="sheet">
+                                {{sheet}}
+                            </option>
+                        </select>
+                    </div>
                 <table class="table" aria-describedby="modal-presented">
                     <thead>
                         <th scope="col">{{$t('matriculationNumber')}}</th>
@@ -323,7 +355,7 @@
                         <th scope="col">{{$t('actions')}}</th>
                     </thead>
                     <tbody>
-                        <tr v-for="(presented, index) in selectedCourse.presented" :key="presented.id">
+                        <tr v-for="(presented, index) in filteredExerciseSheets" :key="presented.id">
                             <td>
                                 {{presented.matriculationNumber}}
                             </td>
@@ -340,7 +372,7 @@
                                 {{presented.exampleName}}
                             </td>
                             <td>
-                                <a href="#" :title="$t('delete')" @click.prevent="updatePresented({matriculationNumber: presented.matriculationNumber}, {id: presented.exampleId}, false, index)">
+                                <a href="#" :title="$t('delete')" @click.prevent="updatePresented({matriculationNumber: presented.matriculationNumber}, {exampleId: presented.exampleId}, false, index)">
                                     <span class="fa fa-trash fa-2x"></span>
                                 </a>
                             </td>
@@ -391,7 +423,10 @@ export default {
             loading_attendanceList: false,
             presentedUser: undefined,
             presentedExample: {},
-            presentedExamples: [],
+            presentedExerciseSheet: undefined,
+            presentedExerciseSheets: [],
+            showExerciseSheet: undefined,
+            userKreuzel: [],
             sortOrder:{
                 index: 0,
                 type: 0 //0 => DESC, 1 => ASC
@@ -399,6 +434,7 @@ export default {
         }
     },
     created(){
+        this.showExerciseSheet = this.$t('all');
         this.resetExerciseSheet();
         if(this.$route.query.courseId){
             this.selectedCourseId = this.$route.query.courseId;
@@ -436,6 +472,31 @@ export default {
         },
         semestersWithoutSelected(){
             return this.semesters.filter(semester => semester.id !== this.selectedSemester_edit);
+        },
+        presentedExamples(){
+            let examples = [];
+            if(this.presentedExerciseSheet){
+                examples = this.userKreuzel.find(sheet => sheet.exerciseSheetName === this.presentedExerciseSheet).examples;
+            }
+            else{
+                for(let sheet of this.userKreuzel){
+                    examples = examples.concat(sheet.examples);
+                }
+            }
+            return examples;
+        },
+        exerciseSheetSelect(){
+            return this.selectedCourse.id ? [this.$t('all')].concat(this.selectedCourse.exerciseSheets.map(sheet => sheet.name)) : [];
+        },
+        filteredExerciseSheets(){
+            let presented;
+            if(this.showExerciseSheet === this.$t('all')){
+                presented = this.selectedCourse.presented;
+            }
+            else{
+                presented = this.selectedCourse.presented.filter(presentation => presentation.exerciseSheetName === this.showExerciseSheet);
+            }
+            return presented;
         }
     },
     methods:{
@@ -454,25 +515,37 @@ export default {
             }
         },
         addPresentation(){
-            if(this.presentedUser && this.presentedUser.matriculationNumber && this.presentedExample && this.presentedExample.id
-                && !this.selectedCourse.presented.some(presentedExample => presentedExample.matriculationNumber === this.presentedUser.matriculationNumber && presentedExample.exampleId === this.presentedExample.id)){
-                this.updatePresented(this.presentedUser, this.presentedExample, true);
+            if(this.presentedUser && this.presentedUser.matriculationNumber && this.presentedExample && this.presentedExample.exampleId){
+                if(this.selectedCourse.presented.some(presentedExample => presentedExample.matriculationNumber === this.presentedUser.matriculationNumber && presentedExample.exampleId === this.presentedExample.exampleId)){
+                    this.$bvToast.toast(this.$t('presentation.exists'), {
+                        title: this.$t('warning'),
+                        variant: 'warning',
+                        appendToast: true
+                    });
+                }
+                else{
+                    this.updatePresented(this.presentedUser, this.presentedExample, true);
+                }
             }
         },
         async updatePresented(user, example, hasPresented, index){
             try{
-                const response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.id, hasPresented});
+                const response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.exampleId, hasPresented});
                 if(index){
                     this.selectedCourse.presented.splice(index,1);
                 }
                 else{
-                    this.selectedCourse.presented.push({
-                        matriculationNumber: user.matriculationNumber,
-                        forename: user.forename,
-                        surname: user.surname,
-                        exampleId: example.id,
-                        exampleName: example.name
-                    });
+                    try{
+                        const response = await this.$store.getCoursePresented(this.selectedCourseId);
+                        this.selectedCourse.presented = response.data;
+                    }
+                    catch{
+                        this.$bvToast.toast(this.$t('presentation.error.get'), {
+                            title: this.$t('error'),
+                            variant: 'danger',
+                            appendToast: true
+                        });
+                    }
                 }
                 this.getCourseUsers(this.selectedCourseId);
                 this.$bvToast.toast(hasPresented ? this.$t('presentation.saved') : this.$t('presentation.deleted'), {
@@ -500,10 +573,11 @@ export default {
         },
         async getUserKreuzel(){
             try{
-                this.presentedExamples = [];
                 this.presentedExample = {};
                 const response = await this.$store.dispatch('getUserKreuzel', {matriculationNumber: this.presentedUser.matriculationNumber, courseId: this.selectedCourseId});
-                this.presentedExamples = response.data;
+                this.presentedExerciseSheet = undefined;
+                this.userKreuzel = response.data;
+                this.presentedExerciseSheets = response.data.map(sheet => sheet.exerciseSheetName);
             }
             catch{
                 this.$bvToast.toast(this.$t('kreuzel.error.get'), {

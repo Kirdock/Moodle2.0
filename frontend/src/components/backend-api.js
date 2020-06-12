@@ -172,6 +172,9 @@ export default {
     },
     updatePresented(data){
         return axios.post('/user/examplePresented', data);
+    },
+    getCoursePresented(courseId){
+        return axios.get(`/course/${courseId}/presented`);
     }
 }
 

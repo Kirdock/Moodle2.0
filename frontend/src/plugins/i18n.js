@@ -160,6 +160,7 @@ const messages = {
         notSure: 'Nicht sicher',
         notSureTooltip: 'myTooltip',
         number: 'Nummer',
+        optional: 'optional',
         owner: 'Besitzer',
         password: 'Passwort',
         passwordDontMatch: 'Passwörter stimmen nicht überein',
@@ -171,10 +172,12 @@ const messages = {
         points: 'Punkte',
         presentation: {
             deleted: 'Präsentation wurde gelöscht',
+            exists: 'Dieser Eintrag existiert bereits',
             saved: 'Präsentation wurde gespeichert',
             error: {
-                save: 'Präsentation konnte nicht gespeichert werden',
-                delete: 'Präsentation konnte nicht gelöscht werden'
+                delete: 'Präsentation konnte nicht gelöscht werden',
+                get: 'Präsentationen konnten nicht geladen werden',
+                save: 'Präsentation konnte nicht gespeichert werden'
             }
         },
         presentations: 'Präsentationen',
@@ -416,6 +419,7 @@ const messages = {
         notSure: 'Not sure',
         notSureTooltip: 'myTooltip',
         number: 'Number',
+        optional: 'optional',
         owner: 'Owner',
         password: 'Password',
         passwordDontMatch: 'Passwords do not match',
@@ -427,10 +431,12 @@ const messages = {
         points: 'Points',
         presentation: {
             deleted: 'Presentation deleted',
+            exists: 'This entry already exists',
             saved: 'Presentation saved',
             error: {
-                save: 'Presentation could not be saved',
-                delete: 'Presentation could not be deleted'
+                delete: 'Presentation could not be deleted',
+                get: 'Presentation could not be loaded',
+                save: 'Presentation could not be saved'
             }
         },
         presentations: 'Presentations',
