@@ -1,6 +1,7 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
+import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import com.aau.moodle20.exception.EntityNotFoundException;
@@ -11,6 +12,7 @@ import com.aau.moodle20.payload.request.UpdateCourseDescriptionTemplate;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
+import com.aau.moodle20.payload.response.KreuzelCourseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,16 +84,28 @@ public class CourseService extends AbstractService {
 
     public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
         UserDetailsImpl userDetails = getUserDetails();
-        List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
+
         Course course = readCourse(courseId);
         if (!userDetails.getAdmin() && !isOwner(course))
             throw new ServiceValidationException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);
 
+        CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
+        responseObject.setPresented(createCoursePresentedList(course));
+        responseObject.setKreuzelList(createKreuzelCourseResponses(course));
+
+        if (userDetails.getAdmin())
+            responseObject.setOwner(course.getOwner().getMatriculationNumber());
+
+        return responseObject;
+    }
+
+    protected List<FinishesExampleResponse> createCoursePresentedList(Course course)
+    {
+        List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);
         List<ExerciseSheet> sortedExerciseSheets = course.getExerciseSheets().stream()
                 .sorted(Comparator.comparing(ExerciseSheet::getSubmissionDate)).collect(Collectors.toList());
 
-        CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
         for (ExerciseSheet exerciseSheet : sortedExerciseSheets) {
 
             List<Example> sortedExamples = exerciseSheet.getExamples().stream()
@@ -106,12 +120,34 @@ public class CourseService extends AbstractService {
                 }
             }
         }
-        responseObject.setPresented(finishesExampleResponses);
 
-        if (userDetails.getAdmin())
-            responseObject.setOwner(course.getOwner().getMatriculationNumber());
+        return finishesExampleResponses;
+    }
 
-        return responseObject;
+    protected List<KreuzelCourseResponse> createKreuzelCourseResponses(Course course) {
+        List<KreuzelCourseResponse> kreuzelCourseResponses = new ArrayList<>();
+        List<Example> examplesInCourse = new ArrayList<>();
+
+        for (ExerciseSheet exerciseSheet : course.getExerciseSheets()) {
+            examplesInCourse.addAll(exerciseSheet.getExamples());
+        }
+        List<Long> exampleIds = examplesInCourse.stream().map(example -> example.getId()).collect(Collectors.toList());
+        List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_IdIn(exampleIds);
+        finishesExamples.removeIf(finishesExample -> EFinishesExampleState.NO.equals(finishesExample.getState()));
+
+        for (FinishesExample finishesExample : finishesExamples) {
+            KreuzelCourseResponse kreuzelCourseResponse = new KreuzelCourseResponse();
+            kreuzelCourseResponse.setExampleId(finishesExample.getExample().getId());
+            kreuzelCourseResponse.setExampleName(finishesExample.getExample().getName());
+            kreuzelCourseResponse.setExerciseSheetName(finishesExample.getExample().getExerciseSheet().getName());
+            kreuzelCourseResponse.setForename(finishesExample.getUser().getForename());
+            kreuzelCourseResponse.setSurname(finishesExample.getUser().getSurname());
+            kreuzelCourseResponse.setMatriculationName(finishesExample.getUser().getMatriculationNumber());
+            kreuzelCourseResponse.setState(finishesExample.getState());
+
+            kreuzelCourseResponses.add(kreuzelCourseResponse);
+        }
+        return kreuzelCourseResponses;
     }
 
     protected List<FinishesExampleResponse> createFinishesExampleResponses(Example example, ExerciseSheet exerciseSheet)

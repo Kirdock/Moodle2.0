@@ -19,6 +19,7 @@ public class CourseResponseObject {
     private Long semesterId;
     private List<FinishesExampleResponse> presented;
     private String description;
+    private List<KreuzelCourseResponse> kreuzelList;
 
 
 
@@ -127,5 +128,13 @@ public class CourseResponseObject {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<KreuzelCourseResponse> getKreuzelList() {
+        return kreuzelList;
+    }
+
+    public void setKreuzelList(List<KreuzelCourseResponse> kreuzelList) {
+        this.kreuzelList = kreuzelList;
     }
 }
