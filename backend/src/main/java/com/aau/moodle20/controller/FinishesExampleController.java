@@ -4,6 +4,7 @@ import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
+import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.FinishesExampleService;
 import org.springframework.core.io.InputStreamResource;
@@ -63,7 +64,7 @@ public class FinishesExampleController {
     }
 
     @GetMapping(path = "/user/{matriculationNumber}/kreuzel/{courseId}")
-    public List<ExampleResponseObject> getFinishedExamples(@PathVariable String matriculationNumber, @PathVariable Long courseId) {
-        return finishesExampleService.getFinishedExamplesUserCourse(matriculationNumber,courseId);
+    public List<KreuzelResponse> getKreuzelUserCourse(@PathVariable String matriculationNumber, @PathVariable Long courseId) {
+        return finishesExampleService.getKreuzelUserCourse(matriculationNumber,courseId);
     }
 }

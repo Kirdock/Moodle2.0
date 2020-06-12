@@ -245,6 +245,7 @@ public class Example {
         return exampleResponseObject;
     }
 
+
     public Example copy()
     {
         Example example = new Example();
