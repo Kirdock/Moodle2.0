@@ -117,15 +117,6 @@ export const userManagement = {
     }
 }
 
-export const editorManagement = {
-    onReady(editor) {
-        editor.ui.getEditableElement().parentElement.insertBefore(
-            editor.ui.view.toolbar.element,
-            editor.ui.getEditableElement()
-        );
-    }
-}
-
 export const fileManagement = {
     getFileNameOutOfHeader(headers){
         let fileName = '';
@@ -146,6 +137,12 @@ export const fileManagement = {
         link.setAttribute('download', this.getFileNameOutOfHeader(headers));
         document.body.appendChild(link);
         link.click();
+    }
+}
+
+export const calcManagement = {
+    minimumRequired(required, user, total){
+        return (required || 0) > ((user/total)*100) ? 'color: red' : 'color: green';
     }
 }
 

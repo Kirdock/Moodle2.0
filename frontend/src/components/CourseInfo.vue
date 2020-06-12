@@ -41,14 +41,22 @@
                 <i-input :id="`cInfoMinPoints${_uid}`" class="form-control" min="0" max="100" v-model="value.minPoints"> </i-input>
             </div>
         </div>
+        <div class="form-group">
+            <label class="control-label" :for="`description${_uid}`">{{$t('description')}}</label>
+            <div class="document-editor__editable-container">
+                <ckeditor :id="`description${_uid}`" v-model="value.description" :editor="editor" @ready="onReady" :config="editorConfig" ></ckeditor>
+            </div>
+        </div>
     </div>
 </template>
 <script>
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
+import Editor from '@/components/Editor.vue';
 export default {
     name: 'course-info',
     props: ['value', 'users'],
+    mixins:[Editor],
     components: {
         Multiselect
     },

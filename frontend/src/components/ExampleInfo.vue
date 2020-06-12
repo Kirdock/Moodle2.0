@@ -111,14 +111,14 @@
 <script>
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import {orderManagement, editorManagement} from '@/plugins/global';
+import {orderManagement} from '@/plugins/global';
 import Sortable from "sortablejs";
-import Editor from '@/components/ckeditor';
-import i18n from '@/plugins/i18n';
+import Editor from '@/components/Editor.vue';
 
 export default {
     name: 'example-info',
     props: ['value', 'setSelectedExample', 'isSubExample', 'deleteExample', 'setDeleteExample', 'buildExample'],
+    mixins: [Editor],
     components: {
         Multiselect
     },
@@ -155,10 +155,6 @@ export default {
     },
     data(){
         return {
-            editor: Editor,
-            editorConfig: {
-	            language: i18n.locale
-            },
             selectedExample_delete: undefined,
             selectedfileTypes: [],
             fileTypes: [],
@@ -166,7 +162,6 @@ export default {
         }
     },
     methods:{
-        onReady: editorManagement.onReady,
         setExample(example){
             this.setSelectedExample(example);
             this.$nextTick(()=>{ //else selectedExample isn't changed in time and file types of selectedExample before are being used

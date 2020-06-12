@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="col-md-4" style="margin-top: 31px">
-                <button class="btn btn-primary" v-b-modal="'modal-new-course'" style="margin-right: 10px">
+                <button class="btn btn-primary" v-b-modal="'modal-new-course'" style="margin-right: 10px" v-show="selectedSemester_edit !== undefined">
                     <span class="fa fa-plus"></span>
                     {{ $t('new') }}
                 </button>
@@ -355,9 +355,8 @@
 <script>
 import CourseInfo from '@/components/CourseInfo.vue';
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
-import {userManagement, dateManagement, editorManagement, fileManagement} from '@/plugins/global';
-import Editor from '@/components/ckeditor';
-import i18n from '@/plugins/i18n';
+import {userManagement, dateManagement, fileManagement} from '@/plugins/global';
+import Editor from '@/components/Editor.vue';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 
@@ -367,6 +366,7 @@ export default {
         'es-info': ExerciseSheetInfo,
         Multiselect
     },
+    mixins: [Editor],
     data(){
         return {
             courseInfo_create: {},
@@ -388,10 +388,6 @@ export default {
             loadingFileUpload: false,
             loading_defaultTemplate: false,
             selectedCourseTemplate: undefined,
-            editor: Editor,
-            editorConfig: {
-	            language: i18n.locale
-            },
             loading_attendanceList: false,
             presentedUser: undefined,
             presentedExample: {},
@@ -443,7 +439,6 @@ export default {
         }
     },
     methods:{
-        onReady: editorManagement.onReady,
         setSortOrder(index){
             if(this.sortOrder.index !== index){
                 this.sortOrder = {

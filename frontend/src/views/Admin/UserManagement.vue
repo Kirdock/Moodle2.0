@@ -62,7 +62,7 @@
                             {{user.forename}}
                         </td>
                         <td>
-                            {{user.isAdmin}}
+                            {{user.isAdmin ? $t('yes') : $t('no')}}
                         </td>
                         <td>
                             <a href="#" v-b-modal="'modal-edit-user'" :title="$t('edit')" @click.prevent="userInfo = {...user}; selectedUser = user" >

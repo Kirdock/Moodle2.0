@@ -1,37 +1,67 @@
 <template>
-    <td class="kreuzelInfo">
+    <tr class="kreuzelInfo">
+        <td>
+            <template v-if="isParent">
+                {{value.name}}
+            </template>
+        </td>
+        <td>
+            <template v-if="!isParent">
+                {{value.name}}
+            </template>
+        </td>
         <template v-if="value.subExamples.length === 0">
-            <template v-if="includeThird">
-                <div class="form-inline">
-                    <div class="form-check">
-                        <input :id="`kInfoYes${_uid}`" type="radio" value="y" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
-                        <label :id="`kInfoYes${_uid}`" class="form-check-label">
-                            {{$t('yes')}}
-                        </label>
+            <td>
+                {{value.mandatory ? $t('yes') : $t('no')}}
+            </td>
+            <td>
+                {{value.weighting}}
+            </td>
+            <td>
+                {{value.points}}
+            </td>
+        </template>
+        <template v-else>
+            <td></td>
+            <td></td>
+            <td></td>
+        </template>
+        <td>
+            <template v-if="value.subExamples.length === 0">
+                <template v-if="includeThird">
+                    <div class="form-inline">
+                        <div class="form-check">
+                            <input :id="`kInfoYes${_uid}`" type="radio" value="y" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
+                            <label :id="`kInfoYes${_uid}`" class="form-check-label">
+                                {{$t('yes')}}
+                            </label>
+                        </div>
+                        <div class="form-check" style="margin-left:15px">
+                            <input :id="`kInfoNo${_uid}`" type="radio" value="n" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
+                            <label :for="`kInfoNo${_uid}`" class="form-check-label">
+                                {{$t('no')}}
+                            </label>
+                        </div>
+                        <div class="form-check" style="margin-left:15px">
+                            <input :id="`kInfoNotSure${_uid}`" type="radio" value="m" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
+                            <label :for="`kInfoNotSure${_uid}`" class="form-check-label" v-b-tooltip.hover :title="$t('notSureTooltip')">
+                                {{$t('notSure')}}
+                            </label>
+                        </div>
+                        <div class="form-inline" v-show="value.state === 'm'" style="margin-left: 15px">
+                            <label :for="`kInfoDescription${_uid}`" class="control-label">
+                                {{$t('reason')}}:
+                            </label>
+                            <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.submitDescription" :disabled="deadlineReached">
+                        </div>
                     </div>
-                    <div class="form-check" style="margin-left:15px">
-                        <input :id="`kInfoNo${_uid}`" type="radio" value="n" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
-                        <label :for="`kInfoNo${_uid}`" class="form-check-label">
-                            {{$t('no')}}
-                        </label>
-                    </div>
-                    <div class="form-check" style="margin-left:15px">
-                        <input :id="`kInfoMaybe${_uid}`" type="radio" value="m" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
-                        <label :for="`kInfoMaybe${_uid}`" class="form-check-label">
-                            {{$t('maybe')}}
-                        </label>
-                    </div>
-                    <div class="form-inline" v-show="value.state === 'm'" style="margin-left: 15px">
-                        <label :for="`kInfoDescription${_uid}`" class="control-label">
-                            {{$t('reason')}}:
-                        </label>
-                        <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.submitDescription" :disabled="deadlineReached">
-                    </div>
-                </div>
+                </template>
+                <template v-else style="margin-right: 20px">
+                    <input :true-value="'y'" :false-value="'n'" type="checkbox" class="form-check-input" v-model="value.state" :disabled="deadlineReached">
+                </template>
             </template>
-            <template v-else style="margin-right: 20px">
-                <input :true-value="'y'" :false-value="'n'" type="checkbox" class="form-check-input" v-model="value.state" :disabled="deadlineReached">
-            </template>
+        </td>
+        <td>
             <template v-if="value.submitFile">
                 <label class="btn btn-primary">
                     <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
@@ -39,19 +69,22 @@
                     {{$t('submitFile')}}
                     <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached"/>
                 </label>
+                <a href.prevent="#" style="color: red; font-size: 25px" v-b-tooltip.hover :title="$t('noFileUploaded')">
+                    <span class="fas fa-exclamation-circle" v-show="value.state !== 'n' && !value.hasAttachment"></span>
+                </a>
                 <a href="#" @click.prevent="downloadFile(value.id)" :title="$t('download')" v-if="value.hasAttachment">
                     <span class="fa fa-download fa-2x"></span>
                 </a>
             </template>
-        </template>
-    </td>
+        </td>
+    </tr>
 </template>
 
 <script>
 import {fileManagement} from '@/plugins/global';
 export default {
     name: 'kreuzel-info',
-    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached'],
+    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent'],
     data(){
         return {
             loadingFileUpload: false

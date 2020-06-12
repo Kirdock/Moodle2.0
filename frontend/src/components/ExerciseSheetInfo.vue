@@ -52,23 +52,16 @@
 
 <script>
 import {dateManagement, editorManagement} from '@/plugins/global';
-import Editor from '@/components/ckeditor';
-import i18n from '@/plugins/i18n';
+import Editor from '@/components/Editor.vue';
 
 export default {
     name: 'es-info',
     props: ['value'],
+    mixins: [Editor],
     data(){
         return {
-            editor: Editor,
-            editorConfig: {
-	            language: i18n.locale
-            },
             minDate: dateManagement.currentDateTime()
         }
-    },
-    methods:{
-        onReady: editorManagement.onReady
     }
 }
 </script>
