@@ -130,7 +130,7 @@ const messages = {
         issueDate: 'Ausgabedatum',
         kreuzel: {
             name: 'Kreuzel',
-            save: 'Kreuzel wurden gespeichert',
+            saved: 'Kreuzel wurden gespeichert',
             type: 'Kreuzeltyp',
             error: {
                 get: 'Kreuzel konnten nicht geladen werden',

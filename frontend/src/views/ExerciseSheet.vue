@@ -218,7 +218,7 @@ export default {
                     this.loading = true;
                     try{
                         await this.$store.dispatch('saveKreuzel', exampleManagement.selectMany(this.sheetInfo.examples));
-                        this.$bvToast.toast(this.$t('kreuzel.save'), {
+                        this.$bvToast.toast(this.$t('kreuzel.saved'), {
                             title: this.$t('success'),
                             variant: 'success',
                             appendToast: true

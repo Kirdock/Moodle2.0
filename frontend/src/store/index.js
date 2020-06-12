@@ -239,8 +239,14 @@ export default new Vuex.Store({
     getAttendanceList({commit}, courseId){
       return api.getAttendanceList(courseId);
     },
+    getKreuzelList({commit}, sheetId){
+      return api.getKreuzelList(sheetId);
+    },
     saveKreuzel({commit}, examples){
       return api.saveKreuzel(examples);
+    },
+    saveKreuzelMulti({commit}, kreuzel){
+      return api.saveKreuzelMulti(kreuzel);
     },
     addExampleAttachment({commit}, formData){
       return api.addExampleAttachment(formData);

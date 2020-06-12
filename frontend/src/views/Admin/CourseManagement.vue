@@ -87,6 +87,12 @@
                 <div class="form-horizontal col-md-7">
                     <div class="form-inline" style="margin-bottom: 10px">
                         <div class="form-group" style="margin-right: 10px">
+                            <button class="btn btn-primary" v-b-modal="'modal-kreuzelList'">
+                                <span class="fa fa-list"></span>
+                                {{$t('kreuzel.name')}}
+                            </button>
+                        </div>
+                        <div class="form-group" style="margin-right: 10px">
                             <button class="btn btn-primary" v-b-modal="'modal-presented'">
                                 <span class="fa fa-list"></span>
                                 {{$t('presentations')}}
@@ -95,7 +101,7 @@
                         <div class="form-group">
                             <button class="btn btn-primary" type="button" @click="getAttendanceList(selectedCourseId)">
                                 <span class="fa fa-sync fa-spin" v-if="loading_attendanceList"></span>
-                                <span class="fas fa-download" v-else></span>
+                                <span class="fas fa-list" v-else></span>
                                 {{$t('attendance.list')}}
                             </button>
                         </div>
@@ -381,12 +387,16 @@
                 </table>
             </div>
         </b-modal>
+        <b-modal id="modal-kreuzelList" :title="$t('kreuzel.name')" size="xl" hide-footer>
+            <kreuzel-list :exerciseSheets="selectedCourse.exerciseSheets"></kreuzel-list>
+        </b-modal>
     </div>
 </template>
 
 <script>
 import CourseInfo from '@/components/CourseInfo.vue';
 import ExerciseSheetInfo from '@/components/ExerciseSheetInfo.vue';
+import KreuzelList from '@/components/KreuzelList.vue';
 import {userManagement, dateManagement, fileManagement} from '@/plugins/global';
 import Editor from '@/components/Editor.vue';
 import Multiselect from 'vue-multiselect';
@@ -396,6 +406,7 @@ export default {
     components: {
         'course-info': CourseInfo,
         'es-info': ExerciseSheetInfo,
+        'kreuzel-list': KreuzelList,
         Multiselect
     },
     mixins: [Editor],

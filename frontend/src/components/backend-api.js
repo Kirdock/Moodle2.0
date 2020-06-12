@@ -149,8 +149,14 @@ export default {
             }
         });
     },
+    getKreuzelList(sheetId){
+        return axios.get(`/exerciseSheet/${sheetId}/kreuzel`)
+    },
     saveKreuzel(examples){
         return axios.post('/user/kreuzel', examples);
+    },
+    saveKreuzelMulti(kreuzel){
+        return axios.post('/course/kreuzelMulti', kreuzel);
     },
     addExampleAttachment(formData){
         return axios.post('/user/kreuzel/attachment',
