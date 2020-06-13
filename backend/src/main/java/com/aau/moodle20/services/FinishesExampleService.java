@@ -114,13 +114,12 @@ public class FinishesExampleService extends AbstractService{
 
         Comparator<ExerciseSheet> exerciseSheetComparator = Comparator.comparing(ExerciseSheet::getSubmissionDate);
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);
-
         List<ExerciseSheet> sortedExerciseSheets = course.getExerciseSheets().stream().sorted(exerciseSheetComparator).collect(Collectors.toList());
 
         for (ExerciseSheet exerciseSheet : sortedExerciseSheets) {
 
             List<Example> notSubExamples = exerciseSheet.getExamples().stream()
-                    .filter(example -> example.getParentExample()==null)
+                    .filter(example -> example.getParentExample() == null)
                     .sorted(exampleComparator).collect(Collectors.toList());
 
             KreuzelResponse kreuzelResponse = new KreuzelResponse();
@@ -130,20 +129,17 @@ public class FinishesExampleService extends AbstractService{
             // examples which are not sub examples
             for (Example example : notSubExamples) {
 
-                if(!example.getSubExamples().isEmpty())
-                {
+                if (!example.getSubExamples().isEmpty()) {
                     List<FinishesExampleResponse> finishesExamplesSubExamples = new ArrayList<>();
                     List<Example> sortedSubExamples = example.getSubExamples().stream().sorted(exampleComparator).collect(Collectors.toList());
                     for (Example subExample : sortedSubExamples) {
                         if (hasUserFinishedExample(subExample, user))
                             finishesExamplesSubExamples.add(createFinishedExampleResponse4UserKreuzel(subExample));
                     }
-                    if(!finishesExamplesSubExamples.isEmpty())
-                    {
-                        kreuzelResponse.getExamples().add(createFinishedExampleResponse4UserKreuzel(example));
+                    if (!finishesExamplesSubExamples.isEmpty()) {
                         kreuzelResponse.getExamples().addAll(finishesExamplesSubExamples);
                     }
-                }else if(hasUserFinishedExample(example,user))
+                } else if (hasUserFinishedExample(example, user))
                     kreuzelResponse.getExamples().add(createFinishedExampleResponse4UserKreuzel(example));
             }
             responseObjects.add(kreuzelResponse);
