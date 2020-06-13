@@ -142,7 +142,8 @@ public class FinishesExampleService extends AbstractService{
                 } else if (hasUserFinishedExample(example, user))
                     kreuzelResponse.getExamples().add(createFinishedExampleResponse4UserKreuzel(example));
             }
-            responseObjects.add(kreuzelResponse);
+            if (!kreuzelResponse.getExamples().isEmpty())
+                responseObjects.add(kreuzelResponse);
         }
         return responseObjects;
     }
