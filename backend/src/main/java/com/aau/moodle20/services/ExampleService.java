@@ -21,18 +21,23 @@ public class ExampleService extends AbstractService{
     {
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
+        Example parentExample = null;
+
+        // if this is an subExample remove all finishesExample entries of parentExample
+        // and set points to 0
+        if(createExampleRequest.getParentId()!=null)
+        {
+            parentExample = readExample(createExampleRequest.getParentId());
+            List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_Id(createExampleRequest.getParentId());
+            finishesExampleRepository.deleteAll(finishesExamples);
+            parentExample.setPoints(0);
+            exampleRepository.save(parentExample);
+        }
 
         example.fillValuesFromRequestObject(createExampleRequest);
         exampleRepository.save(example);
         supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest);
         supportFileTypeRepository.saveAll(supportFileTypes);
-
-        // if this is an subExample remove all finishesExample entries of parentExample
-        if(createExampleRequest.getParentId()!=null)
-        {
-            List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_Id(createExampleRequest.getParentId());
-            finishesExampleRepository.deleteAll(finishesExamples);
-        }
 
         ExampleResponseObject responseObject = new ExampleResponseObject();
         responseObject.setId(example.getId());
