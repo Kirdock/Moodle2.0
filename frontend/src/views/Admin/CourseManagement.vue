@@ -239,12 +239,9 @@
                                         }">
                                             <span class="fa fa-edit fa-2x"></span>
                                         </router-link>
-                                        <a href.prevent="#" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'">
+                                        <a href.prevent="#" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'" @click="selectedDeleteExerciseSheet = sheet.id">
                                             <span class="fa fa-trash fa-2x"></span>
                                         </a>
-                                        <b-modal id="modal-delete-exerciseSheet" :title="$t('title.delete')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="deleteExerciseSheet(sheet.id)">
-                                            {{$t('exerciseSheet.question.delete')}}
-                                        </b-modal>
                                     </td>
                                 </tr>
                             </tbody>
@@ -257,7 +254,7 @@
                     <div class="form-group">
                         <label class="control-label" for="defaultDescription">{{$t('descriptionExerciseSheets')}}</label>
                         <div class="document-editor__editable-container">
-                            <ckeditor :id="`defaultDescription`" v-model="selectedCourseTemplate" :editor="editor" @ready="onReady" :config="editorConfig" ></ckeditor>
+                            <editor :id="`defaultDescription`" v-model="selectedCourseTemplate"></editor>
                         </div>
                     </div>
                     <button class="btn btn-primary" type="button" @click="saveDefaultTemplate()">
@@ -268,6 +265,9 @@
                 </div>
             </b-tab>
         </b-tabs>
+        <b-modal id="modal-delete-exerciseSheet" :title="$t('title.delete')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="deleteExerciseSheet(selectedDeleteExerciseSheet)">
+            {{$t('exerciseSheet.question.delete')}}
+        </b-modal>
         <b-modal id="modal-presented" :title="$t('presentations')" size="xl" hide-footer>
             <div class="form-horizontal">
                 <div class="form-inline">
@@ -295,7 +295,7 @@
                         <label for="presentedExerciseSheet" class="control-label">{{ $t('exerciseSheet.name') }} ({{$t('optional')}})</label>
                         <multiselect v-model="presentedExerciseSheet" id="presentedExerciseSheet" open-direction="bottom"
                                     :placeholder="$t('typeToSearch')"
-                                    
+                                    @input="presentedExample = {}"
                                     selectLabel=""
                                     :selectedLabel="$t('selected')"
                                     :options="presentedExerciseSheets"
@@ -343,7 +343,7 @@
                 <div class="form-group">
                         <label class="control-label" for="showExerciseSheets">
                             <span class="fas fa-filter"></span>
-                            {{$t('show')}}
+                            {{$t('exerciseSheets.name')}}
                         </label>
                         <select class="form-control" id="showExerciseSheets" v-model="showExerciseSheet">
                             <option v-for="sheet in exerciseSheetSelect" :value="sheet" :key="sheet">
@@ -407,9 +407,9 @@ export default {
         'course-info': CourseInfo,
         'es-info': ExerciseSheetInfo,
         'kreuzel-list': KreuzelList,
+        Editor,
         Multiselect
     },
-    mixins: [Editor],
     data(){
         return {
             courseInfo_create: {},
@@ -431,6 +431,7 @@ export default {
             loadingFileUpload: false,
             loading_defaultTemplate: false,
             selectedCourseTemplate: undefined,
+            selectedDeleteExerciseSheet: undefined,
             loading_attendanceList: false,
             presentedUser: undefined,
             presentedExample: {},
@@ -541,13 +542,13 @@ export default {
         },
         async updatePresented(user, example, hasPresented, index){
             try{
-                const response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.exampleId, hasPresented});
+                let response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.exampleId, hasPresented});
                 if(index){
                     this.selectedCourse.presented.splice(index,1);
                 }
                 else{
                     try{
-                        const response = await this.$store.getCoursePresented(this.selectedCourseId);
+                        response = await this.$store.dispatch('getCoursePresented',this.selectedCourseId);
                         this.selectedCourse.presented = response.data;
                     }
                     catch{

@@ -8,9 +8,7 @@
                 </div>
                 <div class="form-group">
                     <label :for="`eInfoDescription${_uid}`" class="control-label" :class="value.subExamples.length === 0 ? 'required' : ''">{{ $t('description') }}</label>
-                    <div class="document-editor__editable-container">
-                        <ckeditor :id="`eInfoDescription${_uid}`" v-model="value.description" :editor="editor" @ready="onReady" :config="editorConfig" :required="value.subExamples.length === 0" ></ckeditor>
-                    </div>
+                    <editor :id="`eInfoDescription${_uid}`" v-model="value.description" :required="value.subExamples.length === 0" ></editor>
                 </div>
                 <div v-if="value.subExamples.length === 0">
                     <div class="form-group">
@@ -118,9 +116,9 @@ import Editor from '@/components/Editor.vue';
 export default {
     name: 'example-info',
     props: ['value', 'setSelectedExample', 'isSubExample', 'deleteExample', 'setDeleteExample', 'buildExample'],
-    mixins: [Editor],
     components: {
-        Multiselect
+        Multiselect,
+        Editor
     },
     mounted(){
         if(!this.isSubExample){

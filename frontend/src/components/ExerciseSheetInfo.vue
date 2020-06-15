@@ -15,7 +15,7 @@
         <div class="form-group">
             <label :for="`esInfoDescription${_uid}`" class="control-label">{{ $t('description') }}</label>
             <div class="document-editor__editable-container">
-                <ckeditor :id="`esInfoDescription${_uid}`" v-model="value.description" :editor="editor" @ready="onReady" :config="editorConfig" ></ckeditor>
+                <editor :id="`esInfoDescription${_uid}`" v-model="value.description"></editor>
             </div>
         </div>
         <div class="form-group">
@@ -57,7 +57,9 @@ import Editor from '@/components/Editor.vue';
 export default {
     name: 'es-info',
     props: ['value'],
-    mixins: [Editor],
+    components:{
+        Editor
+    },
     data(){
         return {
             minDate: dateManagement.currentDateTime()
