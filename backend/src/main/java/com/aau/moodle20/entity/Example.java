@@ -3,9 +3,6 @@ package com.aau.moodle20.entity;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
-import com.aau.moodle20.payload.response.FileTypeResponseObject;
-import com.aau.moodle20.payload.response.FinishesExampleResponse;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.*;
@@ -237,7 +234,7 @@ public class Example {
             if (optionalFinishesExample.isPresent()) {
                 exampleResponseObject.setState(optionalFinishesExample.get().getState());
                 exampleResponseObject.setSubmitDescription(optionalFinishesExample.get().getDescription());
-                exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getAttachment() != null ? Boolean.TRUE : Boolean.FALSE);
+                exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getAttachmentContent() != null ? Boolean.TRUE : Boolean.FALSE);
             } else {
                 exampleResponseObject.setState(EFinishesExampleState.NO);
             }

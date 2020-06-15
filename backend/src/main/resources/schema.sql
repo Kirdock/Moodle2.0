@@ -84,7 +84,6 @@ CREATE TABLE IF NOT EXISTS FINISHES_EXAMPLE
     description  CLOB,
     valid   CHAR(5),
     has_Presented CHAR(5),
-    attachment BLOB,
     file_Name VARCHAR(200),
     remaining_Upload_Count NUMBER(10),
     PRIMARY KEY (example_id, matriculation_Number),
