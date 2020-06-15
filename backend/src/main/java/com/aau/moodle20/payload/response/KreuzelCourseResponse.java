@@ -1,9 +1,11 @@
 package com.aau.moodle20.payload.response;
 
 import com.aau.moodle20.constants.EFinishesExampleState;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class KreuzelCourseResponse {
 
     private String exerciseSheetName;
@@ -13,6 +15,7 @@ public class KreuzelCourseResponse {
     private EFinishesExampleState state;
     private String exampleName;
     private Long exampleId;
+    private List<String> states;
 
     public String getExerciseSheetName() {
         return exerciseSheetName;
@@ -68,5 +71,13 @@ public class KreuzelCourseResponse {
 
     public void setExampleId(Long exampleId) {
         this.exampleId = exampleId;
+    }
+
+    public List<String> getStates() {
+        return states;
+    }
+
+    public void setStates(List<String> states) {
+        this.states = states;
     }
 }

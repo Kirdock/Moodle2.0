@@ -4,6 +4,7 @@ import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
+import com.aau.moodle20.payload.response.ExerciseSheetKreuzelResponse;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.ExerciseSheetService;
@@ -33,6 +34,11 @@ public class ExerciseSheetController {
     @GetMapping(value = "/exerciseSheet/{id}")
     public ExerciseSheetResponseObject getExerciseSheets(@PathVariable("id") long id) {
         return exerciseSheetService.getExerciseSheet(id);
+    }
+
+    @GetMapping(value = "/exerciseSheet/{id}/kreuzel")
+    public ExerciseSheetKreuzelResponse getExerciseSheetKreuzel(@PathVariable("id") long id) {
+        return exerciseSheetService.getExerciseSheetKreuzel(id);
     }
 
     @GetMapping(value = "/exerciseSheetAssigned/{id}")

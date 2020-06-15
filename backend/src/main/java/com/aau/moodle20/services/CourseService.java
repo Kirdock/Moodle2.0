@@ -91,7 +91,6 @@ public class CourseService extends AbstractService {
 
         CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
         responseObject.setPresented(createCoursePresentedList(course));
-        responseObject.setKreuzelList(createKreuzelCourseResponses(course));
 
         if (userDetails.getAdmin())
             responseObject.setOwner(course.getOwner().getMatriculationNumber());
