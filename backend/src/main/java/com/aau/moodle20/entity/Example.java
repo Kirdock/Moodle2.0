@@ -234,7 +234,7 @@ public class Example {
             if (optionalFinishesExample.isPresent()) {
                 exampleResponseObject.setState(optionalFinishesExample.get().getState());
                 exampleResponseObject.setSubmitDescription(optionalFinishesExample.get().getDescription());
-                exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getAttachmentContent() != null ? Boolean.TRUE : Boolean.FALSE);
+                exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getFileName() != null ? Boolean.TRUE : Boolean.FALSE);
             } else {
                 exampleResponseObject.setState(EFinishesExampleState.NO);
             }
