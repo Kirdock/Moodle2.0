@@ -156,7 +156,7 @@ export default {
         return axios.post('/user/kreuzel', examples);
     },
     saveKreuzelMulti(kreuzel){
-        return axios.post('/course/kreuzelMulti', kreuzel);
+        return axios.post('/user/kreuzelMulti', kreuzel);
     },
     addExampleAttachment(formData){
         return axios.post('/user/kreuzel/attachment',
