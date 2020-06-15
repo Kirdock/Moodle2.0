@@ -1,13 +1,13 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.EFinishesExampleState;
+import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
 import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
-import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -77,19 +81,66 @@ public class FinishesExampleService extends AbstractService{
 
     public void setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException {
         UserDetailsImpl userDetails = getUserDetails();
-        readExample(exampleId);
+        Example example = readExample(exampleId);
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
+        saveFileToDisk(file,example);
 
-        finishesExample.setAttachment(file.getBytes());
         finishesExample.setFileName(file.getOriginalFilename());
         if (finishesExample.getRemainingUploadCount() > 0)
             finishesExample.setRemainingUploadCount(finishesExample.getRemainingUploadCount() - 1);
         finishesExampleRepository.save(finishesExample);
     }
 
+    protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
+
+        String filePath = createExampleAttachmentDir(example);
+        File fileToBeSaved= new File(filePath);
+        // if path does not exists create it
+        if(!fileToBeSaved.exists()) {
+           fileToBeSaved.mkdirs();
+        }
+
+        Path path = Paths.get(filePath + "/"+file.getOriginalFilename());
+        Files.write(path,file.getBytes());
+    }
+
+    protected byte[] readFileFromDisk(FinishesExample  finishesExample) throws IOException {
+        String filePath = createExampleAttachmentDir(finishesExample.getExample());
+        Path path = Paths.get(filePath+"/"+finishesExample.getFileName());
+
+        return Files.readAllBytes(path);
+    }
+
+    protected String createExampleAttachmentDir(Example example)
+    {
+        Semester semester = example.getExerciseSheet().getCourse().getSemester();
+        Course course = example.getExerciseSheet().getCourse();
+        ExerciseSheet exerciseSheet = example.getExerciseSheet();
+
+        String semesterDir = "/"+semester.getType().name()+"_"+semester.getYear();
+        String courseDir = "/" +course.getNumber();
+        String exerciseSheetDir = "/" + exerciseSheet.getId();
+        String exampleDir = "";
+        if(example.getParentExample()!=null)
+            exampleDir = "/" + example.getParentExample().getId() + "/" + example.getId();
+        else
+            exampleDir = "/" + example.getId();
+        String userDir = "/" + getUserDetails().getMatriculationNumber();
+
+        return  FileConstants.attachmentsDir + semesterDir + courseDir + exerciseSheetDir + exampleDir + userDir;
+    }
+
     public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceValidationException {
         UserDetailsImpl userDetails = getUserDetails();
-        return readFinishesExample(exampleId, userDetails.getMatriculationNumber());
+        FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
+        try {
+            finishesExample.setAttachmentContent(readFileFromDisk(finishesExample));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new ServiceValidationException(e.getMessage());
+        }
+
+        return finishesExample;
     }
 
     public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceValidationException {

@@ -24,9 +24,9 @@ public class FinishesExample {
     private Example example;
 
     private String description;
-    @Lob
-    @Column(name = "attachment", columnDefinition="BLOB")
-    private byte [] attachment;
+
+    @Transient
+    private byte [] attachmentContent;
     private String fileName;
 
     private Boolean valid = false;
@@ -70,12 +70,12 @@ public class FinishesExample {
         this.description = reason;
     }
 
-    public byte[] getAttachment() {
-        return attachment;
+    public byte[] getAttachmentContent() {
+        return attachmentContent;
     }
 
-    public void setAttachment(byte[] attachment) {
-        this.attachment = attachment;
+    public void setAttachmentContent(byte[] attachmentContent) {
+        this.attachmentContent = attachmentContent;
     }
 
     public Boolean getValid() {

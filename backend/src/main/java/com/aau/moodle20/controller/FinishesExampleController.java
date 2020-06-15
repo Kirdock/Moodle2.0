@@ -4,7 +4,6 @@ import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
 import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
-import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.FinishesExampleService;
@@ -52,9 +51,7 @@ public class FinishesExampleController {
     @GetMapping(path = "/user/kreuzel/attachment/{exampleId}")
     public ResponseEntity<InputStreamResource> getUserKreuzelAttachment(@PathVariable Long exampleId) {
         FinishesExample example = finishesExampleService.getKreuzelAttachment(exampleId);
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(example.getAttachment());
-
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(example.getAttachmentContent());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename="+example.getFileName());
         return ResponseEntity

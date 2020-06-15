@@ -54,6 +54,7 @@ logback.out.xml
 data/
 backend/src/main/resources/public/
 backend/target
+backend/attachments
 frontend/dist/
 frontend/node/
 frontend/node_modules/
