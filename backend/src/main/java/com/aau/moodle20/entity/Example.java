@@ -1,5 +1,6 @@
 package com.aau.moodle20.entity;
 
+import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
@@ -213,7 +214,7 @@ public class Example {
         exampleResponseObject.setCustomFileTypes(getCustomFileTypesList());
         exampleResponseObject.setSubmitFile(getSubmitFile());
 
-        if(getSubExamples()!=null) {
+        if (getSubExamples() != null) {
             exampleResponseObject.setSubExamples(getSubExamples().stream()
                     .map(example -> example.createExampleResponseObject(assignedUserMatriculationNumber))
                     .collect(Collectors.toList()));
@@ -229,16 +230,16 @@ public class Example {
                     .collect(Collectors.toList());
             exampleResponseObject.setSupportedFileTypes(fileTypes);
         }
-        if(assignedUserMatriculationNumber!=null && getExamplesFinishedByUser()!=null)
-        {
-           Optional<FinishesExample> optionalFinishesExample = getExamplesFinishedByUser().stream()
-                   .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(assignedUserMatriculationNumber))
-                   .findFirst();
-            if(optionalFinishesExample.isPresent())
-            {
+        if (assignedUserMatriculationNumber != null && getExamplesFinishedByUser() != null) {
+            Optional<FinishesExample> optionalFinishesExample = getExamplesFinishedByUser().stream()
+                    .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(assignedUserMatriculationNumber))
+                    .findFirst();
+            if (optionalFinishesExample.isPresent()) {
                 exampleResponseObject.setState(optionalFinishesExample.get().getState());
                 exampleResponseObject.setSubmitDescription(optionalFinishesExample.get().getDescription());
-                exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getAttachment()!=null?Boolean.TRUE:Boolean.FALSE);
+                exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getAttachment() != null ? Boolean.TRUE : Boolean.FALSE);
+            } else {
+                exampleResponseObject.setState(EFinishesExampleState.NO);
             }
         }
 
