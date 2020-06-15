@@ -5,12 +5,14 @@ import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
+import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -23,42 +25,54 @@ import java.util.stream.Collectors;
 @Service
 public class FinishesExampleService extends AbstractService{
 
-    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceValidationException
-    {
-       UserDetailsImpl userDetails = getUserDetails();
-       List<FinishesExample> finishesExampleList = new ArrayList<>();
-       for(UserKreuzelRequest userKreuzelRequest: userKreuzelRequests)
-       {
-           Example example = readExample(userKreuzelRequest.getExampleId());
-           if(!example.getSubExamples().isEmpty())
-               throw new ServiceValidationException("Error: Example has sub-examples and can therefore not be kreuzelt"); 
+    @Transactional
+    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceValidationException {
+        UserDetailsImpl userDetails = getUserDetails();
+        for (UserKreuzelRequest userKreuzelRequest : userKreuzelRequests) {
+            updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription());
+        }
+    }
 
-           Optional<FinishesExample> optionalFinishesExample =  finishesExampleRepository
-                   .findByExample_IdAndUser_MatriculationNumber(userKreuzelRequest.getExampleId(),
-                           userDetails.getMatriculationNumber());
-           //update
-           if(optionalFinishesExample.isPresent())
-           {
-               FinishesExample finishesExample = optionalFinishesExample.get();
-               finishesExample.setState(userKreuzelRequest.getState());
-               finishesExample.setDescription(userKreuzelRequest.getDescription());
-               finishesExampleList.add(finishesExample);
-           }
-           //Create
-           else
-           {
-               FinishesExampleKey finishesExampleKey = new FinishesExampleKey(userDetails.getMatriculationNumber(),userKreuzelRequest.getExampleId());
-               FinishesExample finishesExample = new FinishesExample();
-               finishesExample.setId(finishesExampleKey);
-               finishesExample.setExample(new Example(userKreuzelRequest.getExampleId()));
-               finishesExample.setUser(new User(userDetails.getMatriculationNumber()));
-               finishesExample.setDescription(userKreuzelRequest.getDescription());
-               finishesExample.setState(userKreuzelRequest.getState());
-               finishesExample.setRemainingUploadCount(example.getExerciseSheet().getUploadCount());
-               finishesExampleList.add(finishesExample);
-           }
-       }
-        finishesExampleRepository.saveAll(finishesExampleList);
+    @Transactional
+    public void setKreuzelUserMulti(List<UserKreuzeMultilRequest> userKreuzeMultilRequests) throws ServiceValidationException
+    {
+        for(UserKreuzeMultilRequest userKreuzeMultilRequest: userKreuzeMultilRequests)
+        {
+            updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(),userKreuzeMultilRequest.getMatriculationNumber(),userKreuzeMultilRequest.getState(),null);
+        }
+    }
+
+    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description) throws ServiceValidationException
+    {
+        FinishesExample finishesExample = null;
+        Example example = readExample(exampleId);
+        User user = readUser(matriculationNumber);
+        if(!example.getSubExamples().isEmpty())
+            throw new ServiceValidationException("Error: Example has sub-examples and can therefore not be kreuzelt");
+
+        Optional<FinishesExample> optionalFinishesExample =  finishesExampleRepository
+                .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
+        //update
+        if(optionalFinishesExample.isPresent())
+        {
+            finishesExample = optionalFinishesExample.get();
+            finishesExample.setState(state);
+            finishesExample.setDescription(description);
+        }
+        //Create
+        else
+        {
+            FinishesExampleKey finishesExampleKey = new FinishesExampleKey(matriculationNumber,exampleId);
+            finishesExample = new FinishesExample();
+            finishesExample.setId(finishesExampleKey);
+            finishesExample.setExample(example);
+            finishesExample.setUser(user);
+            finishesExample.setDescription(description);
+            finishesExample.setState(state);
+            finishesExample.setRemainingUploadCount(example.getExerciseSheet().getUploadCount());
+        }
+
+        finishesExampleRepository.save(finishesExample);
     }
 
     public void setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException {

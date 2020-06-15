@@ -2,6 +2,7 @@ package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
+import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.KreuzelResponse;
@@ -34,6 +35,12 @@ public class FinishesExampleController {
     public ResponseEntity<?> setKreuzelUser(@Valid @RequestBody List<UserKreuzelRequest> userKreuzelRequests) {
         finishesExampleService.setKreuzelUser(userKreuzelRequests);
         return ResponseEntity.ok(new MessageResponse("Kreuzel were successfully set!"));
+    }
+
+    @PostMapping(path = "/user/kreuzelMulti")
+    public ResponseEntity<?> setKreuzelUserMulti(@Valid @RequestBody List<UserKreuzeMultilRequest> userKreuzelRequests) {
+        finishesExampleService.setKreuzelUserMulti(userKreuzelRequests);
+        return ResponseEntity.ok(new MessageResponse("Kreuzel of users were successfully set!"));
     }
 
     @PostMapping(path = "/user/kreuzel/attachment")
