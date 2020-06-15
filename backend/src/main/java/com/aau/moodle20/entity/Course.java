@@ -176,7 +176,7 @@ public class Course {
         if (getExerciseSheets() != null)
             responseObject.setExerciseSheets(getExerciseSheets().stream()
                     .map(ExerciseSheet::getResponseObjectLessInfo)
-                    .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
+                    .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate).thenComparing(ExerciseSheetResponseObject::getName))
                     .collect(Collectors.toList()));
 
         return responseObject;
@@ -187,7 +187,7 @@ public class Course {
         if (getExerciseSheets() != null)
             responseObject.setExerciseSheets(getExerciseSheets().stream()
                     .map(exerciseSheet -> exerciseSheet.getResponseObjectLessInfo_WithExampleInfo(matriculationNumber))
-                    .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate))
+                    .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate).thenComparing(ExerciseSheetResponseObject::getName))
                     .collect(Collectors.toList()));
 
         return responseObject;

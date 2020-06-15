@@ -165,6 +165,7 @@ public class ExerciseSheetService extends AbstractService{
         }
 
         List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
+        exerciseSheets.sort(Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName));
         List<ExerciseSheetResponseObject> responseObjects = new ArrayList<>();
         for (ExerciseSheet sheet : exerciseSheets) {
             ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();

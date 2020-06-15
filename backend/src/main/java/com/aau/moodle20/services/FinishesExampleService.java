@@ -126,7 +126,7 @@ public class FinishesExampleService extends AbstractService{
         if (!isAdmin() && !isOwner(course))
             throw new ServiceValidationException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
 
-        Comparator<ExerciseSheet> exerciseSheetComparator = Comparator.comparing(ExerciseSheet::getSubmissionDate);
+        Comparator<ExerciseSheet> exerciseSheetComparator = Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName);
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);
         List<ExerciseSheet> sortedExerciseSheets = course.getExerciseSheets().stream().sorted(exerciseSheetComparator).collect(Collectors.toList());
 
