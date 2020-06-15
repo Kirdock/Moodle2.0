@@ -8,7 +8,7 @@ const axios = AXIOS.create({
 
 axios.interceptors.request.use(config => {
     if(store.getters.token){
-        config.headers.Authorization = 'Bearer ' + store.getters.token;
+        config.headers.Authorization = `Bearer ${store.getters.token}`;
     }
     return config;
 });
@@ -68,7 +68,7 @@ export default {
         return axios.delete(`/course/${data.id}`);
     },
     getUsers({courseId}){
-        return axios.get('/users' + (courseId ? `/course/${courseId}` : '')); //without admin
+        return axios.get(`/users${courseId ? `/course/${courseId}` : ''}`); //without admin
     },
     getUser(){
         return axios.get(`/user/${store.getters.userInfo.matriculationNumber}`);

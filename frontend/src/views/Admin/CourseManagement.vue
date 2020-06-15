@@ -3,9 +3,6 @@
         <h1>{{$t('course.management')}}</h1>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <router-link to="/">{{ $t('home') }}</router-link>
-            </li>
-            <li class="breadcrumb-item">
                 <router-link :to="{name:'Admin'}" >{{ $t('admin') }}</router-link>
             </li>
             <li class="breadcrumb-item active">{{$t('course.management')}}</li>

@@ -3,9 +3,6 @@
         <h1>{{$t('course.management')}}</h1>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <router-link to="/">{{ $t('home') }}</router-link>
-            </li>
-            <li class="breadcrumb-item">
                 <router-link :to="{name:'Admin'}" >{{ $t('admin') }}</router-link>
             </li>
             <li class="breadcrumb-item">
@@ -50,7 +47,7 @@
                         <span class="fas fa-chevron-right"></span>
                         <span>{{selectedExample.name}}</span>
                     </div>
-                    <form @submit.prevent="updateExample(selectedExample || example)" :ref="'formExample'+index.toString()">
+                    <form @submit.prevent="updateExample(selectedExample || example)" :ref="`formExample${index}`">
                         <example-info :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
                         <div class="form-inline" style="margin-left: 10px; margin-top: 10px" v-if="!isSubExample">
                             <button class="btn btn-primary" type="submit">

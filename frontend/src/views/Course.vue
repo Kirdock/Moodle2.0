@@ -1,6 +1,13 @@
 <template>
     <div class="course">
         <h1>{{$t('course.name')}}: {{courseInfo.number}} {{courseInfo.name}}</h1>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <router-link :to="{name:'Courses'}" >{{ $t('courses.name') }}</router-link>
+            </li>
+            <li class="breadcrumb-item active">{{courseInfo.number}} {{courseInfo.name}}</li>
+        </ol>
+        <h2>{{$t('description')}}</h2>
         <div v-html="courseInfo.description"> </div>
         <h2>{{$t('requirements')}}</h2>
         <div class="form-group">

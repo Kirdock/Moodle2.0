@@ -1,6 +1,22 @@
 <template>
     <div class="exerciseSheet">
         <h1 id="sheetName">{{sheetInfo.name}}</h1>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <router-link :to="{name:'Courses'}" >{{ $t('courses.name') }}</router-link>
+            </li>
+            <li class="breadcrumb-item">
+                <router-link :to="{
+                                name:'Course',
+                                params: {
+                                    id: courseId,
+                                }}" >
+                    {{sheetInfo.courseNumber}} {{sheetInfo.courseName}}
+                </router-link>
+            </li>
+            <li class="breadcrumb-item active">{{$t('exerciseSheet.name')}}</li>
+            <li class="breadcrumb-item active">{{sheetInfo.name}}</li>
+        </ol>
         <h2>{{$t('submissionDate')}}: {{new Date(sheetInfo.submissionDate).toLocaleString()}}</h2>
         <h2>{{$t('requirements')}}</h2>
         <div class="form-group">
@@ -63,7 +79,7 @@ export default {
     components:{
         'kreuzel-info': kreuzelInfo
     },
-    props: ['exerciseSheetId'],
+    props: ['exerciseSheetId', 'courseId'],
     data(){
         return {
             sheetInfo: {},
