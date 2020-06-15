@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import {dateManagement, editorManagement} from '@/plugins/global';
+import {dateManagement} from '@/plugins/global';
 import Editor from '@/components/Editor.vue';
 
 export default {

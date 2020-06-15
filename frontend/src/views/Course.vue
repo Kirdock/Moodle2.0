@@ -41,6 +41,9 @@
                         {{exerciseSheet.minPoints || 0}}
                     </td>
                     <td>
+                        <a href="#" :title="$t('download')" @click.prevent="getExerciseSheetPdf(exerciseSheet.id)">
+                            <span class="fa fa-eye fa-2x"></span>
+                        </a>
                         <router-link :title="$t('edit')" :to="{
                                             name: 'ExerciseSheet',
                                             params: {
@@ -75,7 +78,7 @@
 </template>
 
 <script>
-import { calcManagement } from "@/plugins/global";
+import { calcManagement, fileManagement } from "@/plugins/global";
 export default {
     props: ['id'],
     data(){
@@ -119,6 +122,19 @@ export default {
                         title: 'Fehler',
                         variant: 'danger',
                         appendToast: true
+                });
+            }
+        },
+        async getExerciseSheetPdf(id){
+            try{
+                const response = await this.$store.dispatch('getExerciseSheetPdf', id);
+                fileManagement.downloadFile(response.data, response.headers);
+            }
+            catch{
+                this.$bvToast.toast(this.$t('exerciseSheet.error.get'), {
+                    title: 'Fehler',
+                    variant: 'danger',
+                    appendToast: true
                 });
             }
         }

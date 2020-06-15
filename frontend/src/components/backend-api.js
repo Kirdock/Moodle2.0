@@ -120,6 +120,14 @@ export default {
     getExerciseSheet(sheetId){
         return axios.get(`/exerciseSheet/${sheetId}`)
     },
+    getExerciseSheetPdf(sheetId){
+        return axios.get(`/exerciseSheetAssigned/${sheetId}/pdf`,{
+            responseType: 'blob',
+            headers:{
+                'Accept-Language': i18n.locale
+            }
+        });
+    },
     getExerciseSheetAssigned(sheetId){
         return axios.get(`/exerciseSheetAssigned/${sheetId}`);
     },

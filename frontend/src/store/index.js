@@ -212,8 +212,11 @@ export default new Vuex.Store({
     getExerciseSheets({commit}, courseData){
       return api.getExerciseSheets(courseData);
     },
-    getExerciseSheet({commit}, sheedId){
-      return api.getExerciseSheet(sheedId);
+    getExerciseSheet({commit}, sheetId){
+      return api.getExerciseSheet(sheetId);
+    },
+    getExerciseSheetPdf({commit}, sheetId){
+      return api.getExerciseSheetPdf(sheetId);
     },
     getExerciseSheetAssigned({commit}, sheetId){
       return api.getExerciseSheetAssigned(sheetId);
