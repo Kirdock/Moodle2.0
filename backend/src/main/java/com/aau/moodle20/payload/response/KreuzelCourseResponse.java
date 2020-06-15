@@ -9,7 +9,7 @@ import java.util.List;
 public class KreuzelCourseResponse {
 
     private String exerciseSheetName;
-    private String matriculationName;
+    private String matriculationNumber;
     private String surname;
     private String forename;
     private EFinishesExampleState state;
@@ -25,12 +25,12 @@ public class KreuzelCourseResponse {
         this.exerciseSheetName = exerciseSheetName;
     }
 
-    public String getMatriculationName() {
-        return matriculationName;
+    public String getMatriculationNumber() {
+        return matriculationNumber;
     }
 
-    public void setMatriculationName(String matriculationName) {
-        this.matriculationName = matriculationName;
+    public void setMatriculationNumber(String matriculationNumber) {
+        this.matriculationNumber = matriculationNumber;
     }
 
     public String getSurname() {

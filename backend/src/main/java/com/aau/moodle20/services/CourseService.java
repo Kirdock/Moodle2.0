@@ -147,7 +147,7 @@ public class CourseService extends AbstractService {
             kreuzelCourseResponse.setExerciseSheetName(finishesExample.getExample().getExerciseSheet().getName());
             kreuzelCourseResponse.setForename(finishesExample.getUser().getForename());
             kreuzelCourseResponse.setSurname(finishesExample.getUser().getSurname());
-            kreuzelCourseResponse.setMatriculationName(finishesExample.getUser().getMatriculationNumber());
+            kreuzelCourseResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
             kreuzelCourseResponse.setState(finishesExample.getState());
 
             kreuzelCourseResponses.add(kreuzelCourseResponse);

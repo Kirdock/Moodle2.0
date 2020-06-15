@@ -79,7 +79,7 @@ public class ExerciseSheetService extends AbstractService{
         {
             User user = userInCourse.getUser();
             KreuzelCourseResponse kreuzelCourseResponse = new KreuzelCourseResponse();
-            kreuzelCourseResponse.setMatriculationName(user.getMatriculationNumber());
+            kreuzelCourseResponse.setMatriculationNumber(user.getMatriculationNumber());
             kreuzelCourseResponse.setSurname(user.getSurname());
             kreuzelCourseResponse.setForename(user.getForename());
             kreuzelCourseResponse.setStates(getExampleStatesOfExerciseSheet(sortedExampleList,user));
