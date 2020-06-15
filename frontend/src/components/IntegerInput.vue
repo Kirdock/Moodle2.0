@@ -18,7 +18,7 @@ export default {
             this.update(e);
         },
         update(e){
-            this.$emit('input', e.target.value)
+            this.$emit('input', e.target.value);
         }
     }
 }

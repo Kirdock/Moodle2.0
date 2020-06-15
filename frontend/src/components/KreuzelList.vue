@@ -2,7 +2,7 @@
     <div class="kreuzelList">
         <div class="form-group">
             <label :for="`exerciseSheets_${_uid}`" class="control-label">
-                {{$t('exerciseSheets.name')}}
+                {{$t('exerciseSheet.name')}}
             </label>
             <select class="form-control" v-model="selectedExerciseSheet" @change="getKreuzelList()">
                 <option v-for="sheet in exerciseSheets" :value="sheet.id" :key="sheet.id">
@@ -97,7 +97,7 @@ export default {
     methods:{
         async getKreuzelList(){
             try{
-                const response = await this.$store.dispatch('getKreuzelList', this.selectedExerciseSheet.id);
+                const response = await this.$store.dispatch('getKreuzelList', this.selectedExerciseSheet);
                 this.includeThird = response.data.includeThird;
                 this.examples = response.data.examples;
                 this.kreuzelList = response.data.kreuzel;

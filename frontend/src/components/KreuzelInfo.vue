@@ -28,7 +28,7 @@
         </template>
         <td>
             <template v-if="value.subExamples.length === 0">
-                <template v-if="true">
+                <template v-if="includeThird">
                     <div class="form-inline">
                         <div class="form-check">
                             <input :id="`kInfoYes${_uid}`" type="radio" value="y" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
@@ -91,7 +91,6 @@ export default {
         }
     },
     created(){
-        this.$set(this.value, 'state', this.value.state || 'n');
         const allTypes = this.supportedFileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType === fileType.id)).map(filetype => filetype.value).concat(this.value.customFileTypes);
         this.supportedTypes = allTypes.join(',');
     },

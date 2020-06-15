@@ -43,9 +43,7 @@
         </div>
         <div class="form-group">
             <label class="control-label" :for="`description${_uid}`">{{$t('description')}}</label>
-            <div class="document-editor__editable-container">
-                <ckeditor :id="`description${_uid}`" v-model="value.description" :editor="editor" @ready="onReady" :config="editorConfig" ></ckeditor>
-            </div>
+            <editor :id="`description${_uid}`" v-model="value.description"></editor>
         </div>
     </div>
 </template>
@@ -56,9 +54,9 @@ import Editor from '@/components/Editor.vue';
 export default {
     name: 'course-info',
     props: ['value', 'users'],
-    mixins:[Editor],
     components: {
-        Multiselect
+        Multiselect,
+        Editor
     },
     data(){
         return {
