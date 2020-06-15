@@ -172,7 +172,8 @@ public class ExerciseSheet {
             Integer totalPoints = 0;
             Integer kreuzel = 0;
             Integer points = 0;
-            responseObject.setExampleCount(getExamples().size());
+            Long exampleCount = getExamples().stream().filter(example -> example.getSubExamples().isEmpty()).count();
+            responseObject.setExampleCount(Math.toIntExact(exampleCount));
 
             for (Example example : getExamples()) {
                 totalPoints = totalPoints + (example.getPoints() * example.getWeighting());
