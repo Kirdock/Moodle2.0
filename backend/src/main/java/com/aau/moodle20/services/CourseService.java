@@ -98,12 +98,18 @@ public class CourseService extends AbstractService {
         return responseObject;
     }
 
+    public List<FinishesExampleResponse> getCoursePresented(Long courseId) throws ServiceValidationException {
+        Course course = readCourse(courseId);
+        return createCoursePresentedList(course);
+    }
+
     protected List<FinishesExampleResponse> createCoursePresentedList(Course course)
     {
         List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);
         List<ExerciseSheet> sortedExerciseSheets = course.getExerciseSheets().stream()
-                .sorted(Comparator.comparing(ExerciseSheet::getSubmissionDate)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName))
+                .collect(Collectors.toList());
 
         for (ExerciseSheet exerciseSheet : sortedExerciseSheets) {
 

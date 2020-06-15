@@ -7,6 +7,7 @@ import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.UpdateCourseDescriptionTemplate;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
+import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.CourseService;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController()
 @RequestMapping("/api")
@@ -29,6 +31,11 @@ public class CourseController {
     @GetMapping(value = "/course/{courseId}")
     public ResponseEntity<CourseResponseObject> getCourse(@PathVariable("courseId") long courseId)  {
         return ResponseEntity.ok(courseService.getCourse(courseId));
+    }
+
+    @GetMapping(value = "/course/{courseId}/presented")
+    public ResponseEntity<List<FinishesExampleResponse>> getCoursePresented(@PathVariable("courseId") long courseId)  {
+        return ResponseEntity.ok(courseService.getCoursePresented(courseId));
     }
 
     @PreAuthorize("hasAuthority('Admin')")
