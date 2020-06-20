@@ -1,12 +1,19 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class AbstractService {
@@ -93,5 +100,39 @@ public class AbstractService {
 
     protected User getCurrentUser() {
         return readUser(getUserDetails().getMatriculationNumber());
+    }
+
+    protected void saveFile(String filePath, MultipartFile file) throws IOException
+    {
+        File fileToBeSaved= new File(filePath);
+        // if path does not exists create it
+        if(!fileToBeSaved.exists()) {
+            fileToBeSaved.mkdirs();
+        }
+
+        Path path = Paths.get(filePath + "/"+file.getOriginalFilename());
+        Files.write(path,file.getBytes());
+    }
+
+    protected byte[] readFileFromDisk(String filePath, String fileName) throws IOException {
+        Path path = Paths.get(filePath+"/"+fileName);
+        return Files.readAllBytes(path);
+    }
+    protected String createExampleAttachmentDir(Example example)
+    {
+        Semester semester = example.getExerciseSheet().getCourse().getSemester();
+        Course course = example.getExerciseSheet().getCourse();
+        ExerciseSheet exerciseSheet = example.getExerciseSheet();
+
+        String semesterDir = "/"+semester.getType().name()+"_"+semester.getYear();
+        String courseDir = "/" +course.getNumber();
+        String exerciseSheetDir = "/" + exerciseSheet.getId();
+        String exampleDir = "";
+        if(example.getParentExample()!=null)
+            exampleDir = "/" + example.getParentExample().getId() + "/" + example.getId();
+        else
+            exampleDir = "/" + example.getId();
+
+        return semesterDir + courseDir + exerciseSheetDir + exampleDir;
     }
 }

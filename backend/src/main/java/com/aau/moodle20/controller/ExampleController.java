@@ -9,8 +9,10 @@ import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.ExampleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController()
@@ -46,6 +48,12 @@ public class ExampleController {
     public ResponseEntity<?> updateExampleOrder(@Valid @RequestBody List<ExampleOrderRequest> exampleOrderRequests) throws ServiceValidationException {
         exampleService.updateExampleOrder(exampleOrderRequests);
         return ResponseEntity.ok("Example order updated successfully");
+    }
+
+    @PostMapping(value = "/example/validator")
+    public ResponseEntity<?> setExampleValidator(@RequestParam(value = "file",required = true) MultipartFile validator, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws ServiceValidationException, IOException {
+        exampleService.setExampleValidator(validator,exampleId);
+        return ResponseEntity.ok("Validator was successfully set");
     }
 
     // TODO refactor make own controller

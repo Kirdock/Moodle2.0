@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS EXAMPLE
     description CLOB,
     submit_File char(5),
     name varchar(100),
+    validator varchar(200),
     custom_File_Types CLOB,
     CONSTRAINT FOREIGN_KEY_EXERCISE_SHEET FOREIGN KEY (exercise_Sheet_id) references EXERCISE_SHEET on delete cascade,
     CONSTRAINT FOREIGN_KEY_EXAMPLE_PARENT FOREIGN KEY (parent_Example_id) references EXAMPLE on delete cascade

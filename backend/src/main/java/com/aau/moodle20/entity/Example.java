@@ -40,7 +40,7 @@ public class Example {
 
     @OneToMany(mappedBy = "example", fetch = FetchType.LAZY)
     Set<FinishesExample> examplesFinishedByUser;
-
+    private String validator;
 
     public Example() {
     }
@@ -160,6 +160,14 @@ public class Example {
         this.examplesFinishedByUser = examplesFinishedByUser;
     }
 
+    public String getValidator() {
+        return validator;
+    }
+
+    public void setValidator(String validator) {
+        this.validator = validator;
+    }
+
     public List<String> getCustomFileTypesList() {
         List<String> list = new ArrayList<>();
         if (customFileTypes != null && customFileTypes.length()>0) {
@@ -242,6 +250,8 @@ public class Example {
 
         return exampleResponseObject;
     }
+
+
 
 
     public Example copy()

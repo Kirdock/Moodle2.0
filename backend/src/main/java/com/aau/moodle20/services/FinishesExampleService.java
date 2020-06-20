@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -92,42 +91,21 @@ public class FinishesExampleService extends AbstractService{
     }
 
     protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
-
-        String filePath = createExampleAttachmentDir(example);
-        File fileToBeSaved= new File(filePath);
-        // if path does not exists create it
-        if(!fileToBeSaved.exists()) {
-           fileToBeSaved.mkdirs();
-        }
-
-        Path path = Paths.get(filePath + "/"+file.getOriginalFilename());
-        Files.write(path,file.getBytes());
+        String filePath = createUserExampleAttachmentDir(example);
+        saveFile(filePath,file);
     }
 
     protected byte[] readFileFromDisk(FinishesExample  finishesExample) throws IOException {
-        String filePath = createExampleAttachmentDir(finishesExample.getExample());
+        String filePath = createUserExampleAttachmentDir(finishesExample.getExample());
         Path path = Paths.get(filePath+"/"+finishesExample.getFileName());
 
         return Files.readAllBytes(path);
     }
 
-    protected String createExampleAttachmentDir(Example example)
+    protected String createUserExampleAttachmentDir(Example example)
     {
-        Semester semester = example.getExerciseSheet().getCourse().getSemester();
-        Course course = example.getExerciseSheet().getCourse();
-        ExerciseSheet exerciseSheet = example.getExerciseSheet();
-
-        String semesterDir = "/"+semester.getType().name()+"_"+semester.getYear();
-        String courseDir = "/" +course.getNumber();
-        String exerciseSheetDir = "/" + exerciseSheet.getId();
-        String exampleDir = "";
-        if(example.getParentExample()!=null)
-            exampleDir = "/" + example.getParentExample().getId() + "/" + example.getId();
-        else
-            exampleDir = "/" + example.getId();
         String userDir = "/" + getUserDetails().getMatriculationNumber();
-
-        return  FileConstants.attachmentsDir + semesterDir + courseDir + exerciseSheetDir + exampleDir + userDir;
+        return FileConstants.attachmentsDir + createExampleAttachmentDir(example) + userDir;
     }
 
     public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceValidationException {

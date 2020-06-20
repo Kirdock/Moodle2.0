@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import com.aau.moodle20.exception.ServiceValidationException;
@@ -9,7 +10,13 @@ import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -120,5 +127,19 @@ public class ExampleService extends AbstractService{
             example.setOrder(exampleOrderRequest.getOrder());
             exampleRepository.save(example);
         }
+    }
+
+    public void setExampleValidator(MultipartFile validator, Long exampleId) throws ServiceValidationException, IOException {
+        Example example = readExample(exampleId);
+        String fileName = validator.getOriginalFilename();
+        if(fileName!=null) {
+            String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+            if (!FileConstants.JarFileExtension.equals(extension))
+                throw new ServiceValidationException("Error: Not a jar File!");
+        }
+        String filePath = FileConstants.validatorDir + createExampleAttachmentDir(example);
+        saveFile(filePath,validator);
+        example.setValidator(validator.getOriginalFilename());
+        exampleRepository.save(example);
     }
 }
