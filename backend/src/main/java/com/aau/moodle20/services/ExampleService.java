@@ -129,17 +129,32 @@ public class ExampleService extends AbstractService{
         }
     }
 
-    public void setExampleValidator(MultipartFile validator, Long exampleId) throws ServiceValidationException, IOException {
+    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws ServiceValidationException, IOException {
         Example example = readExample(exampleId);
-        String fileName = validator.getOriginalFilename();
+        String fileName = validatorFile.getOriginalFilename();
         if(fileName!=null) {
             String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
             if (!FileConstants.JarFileExtension.equals(extension))
                 throw new ServiceValidationException("Error: Not a jar File!");
         }
-        String filePath = FileConstants.validatorDir + createExampleAttachmentDir(example);
-        saveFile(filePath,validator);
-        example.setValidator(validator.getOriginalFilename());
+        String validatorFilePath = getValidatorFilePath(example);
+        saveFile(validatorFilePath,validatorFile);
+        example.setValidator(validatorFile.getOriginalFilename());
         exampleRepository.save(example);
+    }
+
+    public Example getExampleValidator(Long exampleId) throws ServiceValidationException, IOException {
+        Example example = readExample(exampleId);
+        String validatorFilePath = getValidatorFilePath(example);
+        byte [] content = readFileFromDisk(validatorFilePath,example.getValidator());
+        example.setValidatorContent(content);
+
+        return example;
+    }
+
+
+    protected String getValidatorFilePath(Example example)
+    {
+        return FileConstants.validatorDir + createExampleAttachmentDir(example);
     }
 }

@@ -42,6 +42,9 @@ public class Example {
     Set<FinishesExample> examplesFinishedByUser;
     private String validator;
 
+    @Transient
+    private byte [] validatorContent;
+
     public Example() {
     }
 
@@ -162,6 +165,14 @@ public class Example {
 
     public String getValidator() {
         return validator;
+    }
+
+    public byte[] getValidatorContent() {
+        return validatorContent;
+    }
+
+    public void setValidatorContent(byte[] validatorContent) {
+        this.validatorContent = validatorContent;
     }
 
     public void setValidator(String validator) {
