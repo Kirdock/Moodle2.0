@@ -10,20 +10,21 @@ import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @Service
 public class FinishesExampleService extends AbstractService{
@@ -84,14 +85,66 @@ public class FinishesExampleService extends AbstractService{
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
         saveFileToDisk(file,example);
 
+        // zip => maven project
+        if(FileConstants.MediaType_ZIP_ARCHIVE.equals(file.getContentType()))
+        {
+            String filePath = createUserExampleAttachmentDir(example) +"/"+ file.getOriginalFilename();
+            validateMavenProject(filePath,example);
+        }
+
         finishesExample.setFileName(file.getOriginalFilename());
         if (finishesExample.getRemainingUploadCount() > 0)
             finishesExample.setRemainingUploadCount(finishesExample.getRemainingUploadCount() - 1);
         finishesExampleRepository.save(finishesExample);
     }
 
+    protected void validateMavenProject(String filePath, Example example) throws IOException {
+
+        unzipMavenProject(filePath,example);
+
+    }
+
+    protected void unzipMavenProject(String filePath, Example example) throws IOException {
+        File destDir = new File(FileConstants.UNZIP_DIR_MAVEN_PROJECT +"/"+example.getId());
+        if(!destDir.exists()) {
+            destDir.mkdirs();
+        }
+        byte[] buffer = new byte[1024];
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath));
+        ZipEntry zipEntry = zis.getNextEntry();
+        while (zipEntry != null) {
+            File newFile = newFile(destDir, zipEntry);
+            FileOutputStream fos = new FileOutputStream(newFile);
+            int len;
+            while ((len = zis.read(buffer)) > 0) {
+                fos.write(buffer, 0, len);
+            }
+            fos.close();
+            zipEntry = zis.getNextEntry();
+        }
+        zis.closeEntry();
+        zis.close();
+    }
+
+
+    public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        File destFile = new File(destinationDir, zipEntry.getName());
+
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = destFile.getCanonicalPath();
+
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        }
+
+        return destFile;
+    }
+
+
     protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
         String filePath = createUserExampleAttachmentDir(example);
+        FileUtils.cleanDirectory(new File(filePath));
+
         saveFile(filePath,file);
     }
 

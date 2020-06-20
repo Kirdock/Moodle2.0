@@ -8,6 +8,7 @@ import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -133,10 +134,10 @@ public class ExampleService extends AbstractService{
         Example example = readExample(exampleId);
         String fileName = validatorFile.getOriginalFilename();
         if(fileName!=null) {
-            String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-            if (!FileConstants.JarFileExtension.equals(extension))
+            if (!FileConstants.MediaType_JAVA_ARCHIVE.equals(validatorFile.getContentType()))
                 throw new ServiceValidationException("Error: Not a jar File!");
         }
+
         String validatorFilePath = getValidatorFilePath(example);
         saveFile(validatorFilePath,validatorFile);
         example.setValidator(validatorFile.getOriginalFilename());
