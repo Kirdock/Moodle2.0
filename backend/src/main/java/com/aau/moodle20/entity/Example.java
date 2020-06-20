@@ -229,6 +229,7 @@ public class Example {
         exampleResponseObject.setOrder(getOrder());
         exampleResponseObject.setCustomFileTypes(getCustomFileTypesList());
         exampleResponseObject.setSubmitFile(getSubmitFile());
+        exampleResponseObject.setValidator(getValidator()); 
 
         if (getSubExamples() != null) {
             exampleResponseObject.setSubExamples(getSubExamples().stream()
