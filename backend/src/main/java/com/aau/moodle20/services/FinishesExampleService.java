@@ -10,21 +10,24 @@ import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
+import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 @Service
 public class FinishesExampleService extends AbstractService{
@@ -99,47 +102,68 @@ public class FinishesExampleService extends AbstractService{
     }
 
     protected void validateMavenProject(String filePath, Example example) throws IOException {
+        String destDir = FileConstants.UNZIP_DIR_MAVEN_PROJECT +"/"+example.getId();
 
-        unzipMavenProject(filePath,example);
+        unzipMavenProject1(filePath,new File(destDir));
+       // unzip(filePath,destDir);
+        //unzipMavenProject(filePath,new File(destDir),example);
+        installMavenProject(destDir);
 
     }
 
-    protected void unzipMavenProject(String filePath, Example example) throws IOException {
-        File destDir = new File(FileConstants.UNZIP_DIR_MAVEN_PROJECT +"/"+example.getId());
-        if(!destDir.exists()) {
-            destDir.mkdirs();
-        }
-        byte[] buffer = new byte[1024];
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath));
-        ZipEntry zipEntry = zis.getNextEntry();
-        while (zipEntry != null) {
-            File newFile = newFile(destDir, zipEntry);
-            FileOutputStream fos = new FileOutputStream(newFile);
-            int len;
-            while ((len = zis.read(buffer)) > 0) {
-                fos.write(buffer, 0, len);
+    protected void installMavenProject(String destDir) throws ServiceValidationException
+    {
+        MavenCli cli = new MavenCli();
+        int result = cli.doMain(new String[]{"clean", "install"}, destDir, System.out, System.out);
+        if(result !=0)
+            throw new ServiceValidationException("Error: maven project could not be build!");
+
+//        InvocationRequest request = new DefaultInvocationRequest();
+//        request.setPomFile( new File( "/path/to/pom.xml" ) );
+//        request.setGoals( Collections.singletonList( "install" ) );
+//
+//        Invoker invoker = new DefaultInvoker();
+//        invoker.execute( request );
+    }
+
+    protected void unzipMavenProject1(String zipFilePath, File destDir) throws IOException {
+
+
+        ZipFile zipFile = new ZipFile(zipFilePath);
+        Enumeration zipEntries = zipFile.entries();
+        while (zipEntries.hasMoreElements())
+        {
+            ZipEntry zipEntry = (ZipEntry) zipEntries.nextElement();
+            if (zipEntry.isDirectory())
+            {
+                String subDir = destDir + "\\" + zipEntry.getName();
+                File as = new File(subDir);
+                as.mkdirs();
             }
-            fos.close();
-            zipEntry = zis.getNextEntry();
+            else
+            {
+                // Create new  file
+                File newFile = new File(destDir, zipEntry.getName());
+                String extractedDirectoryPath = destDir.getCanonicalPath();
+                String extractedFilePath = newFile.getCanonicalPath();
+                if (!extractedFilePath.startsWith(extractedDirectoryPath + File.separator))
+                {
+                    throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+                }
+
+                BufferedInputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry));
+                try (FileOutputStream outputStream = new FileOutputStream(newFile))
+                {
+                    while (inputStream.available() > 0)
+                    {
+                        outputStream.write(inputStream.read());
+                    }
+
+                }
+            }
         }
-        zis.closeEntry();
-        zis.close();
+        zipFile.close();
     }
-
-
-    public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
-    }
-
 
     protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
         String filePath = createUserExampleAttachmentDir(example);
