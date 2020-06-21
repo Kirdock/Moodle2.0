@@ -142,6 +142,7 @@ public class ExampleService extends AbstractService{
         String validatorFilePath = getValidatorFilePath(example);
         saveFile(validatorFilePath,validatorFile);
         example.setValidator(validatorFile.getOriginalFilename());
+        example.setSubmitFile(Boolean.TRUE);
         exampleRepository.save(example);
     }
 
