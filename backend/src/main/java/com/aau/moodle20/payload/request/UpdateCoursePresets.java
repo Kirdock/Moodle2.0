@@ -1,9 +1,13 @@
 package com.aau.moodle20.payload.request;
 
-public class UpdateCourseDescriptionTemplate {
+import javax.validation.constraints.NotNull;
 
+public class UpdateCoursePresets {
+
+    @NotNull
     private Long id;
     private String description;
+    private Integer uploadCount;
 
     public Long getId() {
         return id;
@@ -19,5 +23,13 @@ public class UpdateCourseDescriptionTemplate {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getUploadCount() {
+        return uploadCount;
+    }
+
+    public void setUploadCount(Integer uploadCount) {
+        this.uploadCount = uploadCount;
     }
 }

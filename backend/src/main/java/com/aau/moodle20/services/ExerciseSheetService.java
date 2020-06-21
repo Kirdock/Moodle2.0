@@ -35,7 +35,6 @@ public class ExerciseSheetService extends AbstractService{
         exerciseSheet.setIssueDate(createExerciseSheetRequest.getIssueDate());
         exerciseSheet.setDescription(createExerciseSheetRequest.getDescription());
         exerciseSheet.setIncludeThird(createExerciseSheetRequest.getIncludeThird());
-        exerciseSheet.setUploadCount(0);
 
         exerciseSheetRepository.save(exerciseSheet);
     }
@@ -52,8 +51,6 @@ public class ExerciseSheetService extends AbstractService{
         exerciseSheet.setIssueDate(updateExerciseSheetRequest.getIssueDate());
         exerciseSheet.setDescription(updateExerciseSheetRequest.getDescription());
         exerciseSheet.setIncludeThird(updateExerciseSheetRequest.getIncludeThird());
-        if (updateExerciseSheetRequest.getUploadCount() != null)
-            exerciseSheet.setUploadCount(updateExerciseSheetRequest.getUploadCount());
 
         exerciseSheetRepository.save(exerciseSheet);
     }
@@ -142,8 +139,9 @@ public class ExerciseSheetService extends AbstractService{
         Boolean isAssignedUser = exerciseSheet.getCourse().getStudents().stream()
                 .anyMatch(userInCourse -> userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
         ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
-        if (isAssignedUser)
+        if (isAssignedUser) {
             responseObject = exerciseSheet.getResponseObject(userDetails.getMatriculationNumber());
+        }
 
         return responseObject;
     }

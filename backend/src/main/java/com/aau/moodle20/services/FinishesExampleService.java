@@ -77,29 +77,29 @@ public class FinishesExampleService extends AbstractService{
             finishesExample.setUser(user);
             finishesExample.setDescription(description);
             finishesExample.setState(state);
-            finishesExample.setRemainingUploadCount(example.getExerciseSheet().getUploadCount());
+            finishesExample.setRemainingUploadCount(example.getUploadCount());
         }
 
         finishesExampleRepository.save(finishesExample);
     }
 
     public void setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException {
-
-        if(file.isEmpty())
+        if (file.isEmpty())
             throw new ServiceValidationException("Error: given file is empty");
 
         UserDetailsImpl userDetails = getUserDetails();
         Example example = readExample(exampleId);
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
-        saveFileToDisk(file,example);
+        if (finishesExample.getRemainingUploadCount() == 0 && finishesExample.getExample().getUploadCount() != 0)
+            throw new ServiceValidationException("Error: max upload counts reached!");
 
+        saveFileToDisk(file, example);
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
         // zip => maven project
-        if(FileConstants.ZipFileExtension.equals(extension))
-        {
-            String filePath = createUserExampleAttachmentDir(example) +"/"+ file.getOriginalFilename();
-            validateMavenProject(filePath,example);
+        if (FileConstants.ZipFileExtension.equals(extension)) {
+            String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
+            validateMavenProject(filePath, example);
         }
 
         finishesExample.setFileName(file.getOriginalFilename());

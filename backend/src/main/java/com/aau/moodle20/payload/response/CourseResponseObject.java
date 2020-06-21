@@ -20,6 +20,7 @@ public class CourseResponseObject {
     private List<FinishesExampleResponse> presented;
     private String description;
     private List<KreuzelCourseResponse> kreuzelList;
+    private Integer uploadCount;
 
 
 
@@ -136,5 +137,13 @@ public class CourseResponseObject {
 
     public void setKreuzelList(List<KreuzelCourseResponse> kreuzelList) {
         this.kreuzelList = kreuzelList;
+    }
+
+    public Integer getUploadCount() {
+        return uploadCount;
+    }
+
+    public void setUploadCount(Integer uploadCount) {
+        this.uploadCount = uploadCount;
     }
 }

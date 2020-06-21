@@ -41,6 +41,7 @@ public class Example {
     @OneToMany(mappedBy = "example", fetch = FetchType.LAZY)
     Set<FinishesExample> examplesFinishedByUser;
     private String validator;
+    private Integer uploadCount;
 
     @Transient
     private byte [] validatorContent;
@@ -179,6 +180,14 @@ public class Example {
         this.validator = validator;
     }
 
+    public Integer getUploadCount() {
+        return uploadCount;
+    }
+
+    public void setUploadCount(Integer uploadCount) {
+        this.uploadCount = uploadCount;
+    }
+
     public List<String> getCustomFileTypesList() {
         List<String> list = new ArrayList<>();
         if (customFileTypes != null && customFileTypes.length()>0) {
@@ -205,6 +214,7 @@ public class Example {
         setOrder(exampleRequest.getOrder());
         setPoints(exampleRequest.getPoints());
         setWeighting(exampleRequest.getWeighting());
+        setUploadCount(exampleRequest.getUploadCount());
 
         setSubmitFile(exampleRequest.getSubmitFile() != null ? exampleRequest.getSubmitFile() : Boolean.FALSE);
         setMandatory(exampleRequest.getMandatory() != null ? exampleRequest.getMandatory() : Boolean.FALSE);
@@ -229,7 +239,8 @@ public class Example {
         exampleResponseObject.setOrder(getOrder());
         exampleResponseObject.setCustomFileTypes(getCustomFileTypesList());
         exampleResponseObject.setSubmitFile(getSubmitFile());
-        exampleResponseObject.setValidator(getValidator()); 
+        exampleResponseObject.setValidator(getValidator());
+        exampleResponseObject.setUploadCount(getUploadCount());
 
         if (getSubExamples() != null) {
             exampleResponseObject.setSubExamples(getSubExamples().stream()
@@ -255,6 +266,7 @@ public class Example {
                 exampleResponseObject.setState(optionalFinishesExample.get().getState());
                 exampleResponseObject.setSubmitDescription(optionalFinishesExample.get().getDescription());
                 exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getFileName() != null ? Boolean.TRUE : Boolean.FALSE);
+                exampleResponseObject.setRemainingUploadCount(optionalFinishesExample.get().getRemainingUploadCount());
             } else {
                 exampleResponseObject.setState(EFinishesExampleState.NO);
             }

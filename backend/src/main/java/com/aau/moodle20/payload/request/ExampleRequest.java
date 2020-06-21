@@ -22,6 +22,7 @@ public class ExampleRequest {
     private List<Long> supportedFileTypes;
     private Boolean submitFile;
     private List<String> customFileTypes;
+    private Integer uploadCount;
 
     public Long getExerciseSheetId() {
         return exerciseSheetId;
@@ -117,5 +118,13 @@ public class ExampleRequest {
 
     public void setCustomFileTypes(List<String> customFileTypes) {
         this.customFileTypes = customFileTypes;
+    }
+
+    public Integer getUploadCount() {
+        return uploadCount;
+    }
+
+    public void setUploadCount(Integer uploadCount) {
+        this.uploadCount = uploadCount;
     }
 }

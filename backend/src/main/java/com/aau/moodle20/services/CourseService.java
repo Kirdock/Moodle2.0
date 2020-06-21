@@ -8,7 +8,7 @@ import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.CopyCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
-import com.aau.moodle20.payload.request.UpdateCourseDescriptionTemplate;
+import com.aau.moodle20.payload.request.UpdateCoursePresets;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
@@ -41,6 +41,7 @@ public class CourseService extends AbstractService {
         course.setSemester(semester);
         course.setOwner(new User(createCourseRequest.getOwner()));
         course.setDescription(createCourseRequest.getDescription());
+        course.setUploadCount(0);
         courseRepository.save(course);
 
         return new CourseResponseObject(course.getId());
@@ -66,14 +67,15 @@ public class CourseService extends AbstractService {
         courseRepository.save(course);
     }
 
-    public void updateCourseDescriptionTemplate(UpdateCourseDescriptionTemplate updateCourseDescriptionTemplate) throws ServiceValidationException
+    public void updateCoursePresets(UpdateCoursePresets updateCoursePresets) throws ServiceValidationException
     {
-        Course course = readCourse(updateCourseDescriptionTemplate.getId());
+        Course course = readCourse(updateCoursePresets.getId());
         UserDetailsImpl userDetails = getUserDetails();
         if(!userDetails.getAdmin() && !isOwner(course))
             throw new ServiceValidationException("Error: not authorized to update course",HttpStatus.UNAUTHORIZED);
 
-        course.setDescriptionTemplate(updateCourseDescriptionTemplate.getDescription());
+        course.setDescriptionTemplate(updateCoursePresets.getDescription());
+        course.setUploadCount(updateCoursePresets.getUploadCount());
         courseRepository.save(course);
     }
 

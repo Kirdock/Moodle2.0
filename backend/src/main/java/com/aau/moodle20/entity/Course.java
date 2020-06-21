@@ -28,6 +28,7 @@ public class Course {
     private Integer minPoints;
     private String descriptionTemplate;
     private String description;
+    private Integer uploadCount;
 
     @OneToMany(
             mappedBy = "course",
@@ -140,6 +141,14 @@ public class Course {
         this.description = description;
     }
 
+    public Integer getUploadCount() {
+        return uploadCount;
+    }
+
+    public void setUploadCount(Integer uploadCount) {
+        this.uploadCount = uploadCount;
+    }
+
     public CourseResponseObject createCourseResponseObject()
     {
         CourseResponseObject responseObject = new CourseResponseObject();
@@ -173,6 +182,8 @@ public class Course {
         responseObject.setDescriptionTemplate(getDescriptionTemplate());
         responseObject.setSemesterId(getSemester().getId());
         responseObject.setDescription(getDescription());
+        responseObject.setUploadCount(getUploadCount());
+
         if (getExerciseSheets() != null)
             responseObject.setExerciseSheets(getExerciseSheets().stream()
                     .map(ExerciseSheet::getResponseObjectLessInfo)

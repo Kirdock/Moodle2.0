@@ -37,7 +37,6 @@ public class ExerciseSheet {
             fetch = FetchType.LAZY
     )
     private Set<Example> examples;
-    private Integer uploadCount;
     public ExerciseSheet()
     {
     }
@@ -119,13 +118,6 @@ public class ExerciseSheet {
         this.includeThird = includeThird;
     }
 
-    public Integer getUploadCount() {
-        return uploadCount;
-    }
-
-    public void setUploadCount(Integer uploadCount) {
-        this.uploadCount = uploadCount;
-    }
 
     public ExerciseSheetResponseObject getResponseObject(String assignedUserMatriculationNumber)
     {
@@ -139,7 +131,6 @@ public class ExerciseSheet {
         responseObject.setIssueDate(getIssueDate());
         responseObject.setDescription(getDescription());
         responseObject.setIncludeThird(getIncludeThird());
-        responseObject.setUploadCount(getUploadCount());
         if (getExamples() != null) {
             responseObject.setExamples(getExamples().stream()
                     .filter(example -> example.getParentExample() == null)
@@ -151,6 +142,7 @@ public class ExerciseSheet {
 
         responseObject.setCourseName(course.getName());
         responseObject.setCourseNumber(course.getNumber());
+        responseObject.setUploadCount(course.getUploadCount());
         return responseObject;
     }
 

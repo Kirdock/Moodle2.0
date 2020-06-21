@@ -28,6 +28,8 @@ public class ExampleResponseObject {
     private EFinishesExampleState state;
     private String submitDescription;
     private Boolean hasAttachment;
+    private Integer uploadCount;
+    private Integer remainingUploadCount;
 
 
     public ExampleResponseObject(){
@@ -171,5 +173,21 @@ public class ExampleResponseObject {
 
     public void setHasAttachment(Boolean hasAttachment) {
         this.hasAttachment = hasAttachment;
+    }
+
+    public Integer getUploadCount() {
+        return uploadCount;
+    }
+
+    public void setUploadCount(Integer uploadCount) {
+        this.uploadCount = uploadCount;
+    }
+
+    public Integer getRemainingUploadCount() {
+        return remainingUploadCount;
+    }
+
+    public void setRemainingUploadCount(Integer remainingUploadCount) {
+        this.remainingUploadCount = remainingUploadCount;
     }
 }

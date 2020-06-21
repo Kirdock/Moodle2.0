@@ -4,7 +4,7 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.CopyCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
-import com.aau.moodle20.payload.request.UpdateCourseDescriptionTemplate;
+import com.aau.moodle20.payload.request.UpdateCoursePresets;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
@@ -51,11 +51,11 @@ public class CourseController {
         return ResponseEntity.ok(new MessageResponse("Course was successfully updated!"));
     }
 
-    @PostMapping(value = "/course/template")
-    public ResponseEntity<?> updateCourseDescriptionTemplate(@Valid  @RequestBody UpdateCourseDescriptionTemplate updateCourseDescriptionTemplate)  throws SemesterException {
+    @PostMapping(value = "/course/presets")
+    public ResponseEntity<?> updateCoursePresets(@Valid  @RequestBody UpdateCoursePresets updateCoursePresets)  throws SemesterException {
 
-        courseService.updateCourseDescriptionTemplate(updateCourseDescriptionTemplate);
-        return ResponseEntity.ok(new MessageResponse("Course Description Template was successfully updated!"));
+        courseService.updateCoursePresets(updateCoursePresets);
+        return ResponseEntity.ok(new MessageResponse("Course Presets were successfully updated!"));
     }
 
     @PreAuthorize("hasAuthority('Admin')")

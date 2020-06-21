@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS COURSE
     owner       VARCHAR(20),
     description CLOB,
     description_Template CLOB,
+    upload_Count NUMBER(10),
     CONSTRAINT FOREIGN_KEY_SEMESTER FOREIGN KEY (semester_id) references SEMESTER on delete cascade ,
     CONSTRAINT FOREIGN_KEY_OWNER FOREIGN KEY (owner) references USER on delete cascade
 );
@@ -54,7 +55,6 @@ CREATE TABLE IF NOT EXISTS EXERCISE_SHEET
     issue_Date datetime,
     description CLOB,
     include_Third char(5),
-    upload_Count NUMBER(10),
     CONSTRAINT FOREIGN_KEY_COURSE_EXERCISE_SHEET FOREIGN KEY (course_id) references COURSE on delete cascade
 );
 
@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS EXAMPLE
     name varchar(100),
     validator varchar(200),
     custom_File_Types CLOB,
+    upload_Count NUMBER(10),
     CONSTRAINT FOREIGN_KEY_EXERCISE_SHEET FOREIGN KEY (exercise_Sheet_id) references EXERCISE_SHEET on delete cascade,
     CONSTRAINT FOREIGN_KEY_EXAMPLE_PARENT FOREIGN KEY (parent_Example_id) references EXAMPLE on delete cascade
 
