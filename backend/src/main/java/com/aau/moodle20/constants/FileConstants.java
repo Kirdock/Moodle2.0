@@ -8,6 +8,7 @@ public class FileConstants {
 
 
     public static final String JarFileExtension = "jar";
+    public static final String ZipFileExtension = "zip";
 
     public static final String MediaType_JAVA_ARCHIVE = "application/java-archive";
     public static final String MediaType_ZIP_ARCHIVE = "application/zip";
