@@ -10,6 +10,7 @@ import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
+import org.apache.maven.cli.CliRequest;
 import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
@@ -83,6 +84,10 @@ public class FinishesExampleService extends AbstractService{
     }
 
     public void setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException {
+
+        if(file.isEmpty())
+            throw new ServiceValidationException("Error: given file is empty");
+
         UserDetailsImpl userDetails = getUserDetails();
         Example example = readExample(exampleId);
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
@@ -108,7 +113,8 @@ public class FinishesExampleService extends AbstractService{
 
         unzipMavenProject(filePath,new File(destDir));
         installMavenProject(destDir);
-
+        executeValidator(destDir);
+        deleteMavenProject(destDir);
     }
 
     protected void installMavenProject(String destDir) throws ServiceValidationException
@@ -124,6 +130,21 @@ public class FinishesExampleService extends AbstractService{
 //
 //        Invoker invoker = new DefaultInvoker();
 //        invoker.execute( request );
+    }
+
+    protected void executeValidator(String destDir)
+    {
+        MavenCli cli = new MavenCli();
+        int result = cli.doMain(new String[]{"test"}, destDir, System.out, System.out);
+        if(result !=0)
+            throw new ServiceValidationException("Error: maven project could not be tested!");
+
+    }
+
+    protected void deleteMavenProject(String destDir) throws IOException {
+        File directory = new File(destDir);
+        if(directory.exists())
+            FileUtils.deleteDirectory(directory);
     }
 
     protected void unzipMavenProject(String zipFilePath, File destDir) throws IOException {
