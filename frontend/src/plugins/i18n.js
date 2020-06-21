@@ -252,7 +252,14 @@ const messages = {
         },
         userPwdInvalid: 'Benutzername oder Passwort stimmt nicht überein',
         username: 'Benutzername',
-        validator: 'Validator',
+        validator: {
+            name: 'Validator',
+            saved: 'Validator wurde gespeichert',
+            error: {
+                get: 'Validator konnte nicht geladen werden',
+                save: 'Validator konnte nicht gespeichert werden'
+            }
+        },
         view: 'Ansehen',
         warning: 'Warnung',
         weighting: 'Gewichtung',
@@ -506,7 +513,14 @@ const messages = {
         },
         userPwdInvalid: 'Username or password do not match',
         username: 'Username',
-        validator: 'Validator',
+        validator: {
+            name: 'Validator',
+            saved: 'Validator saved',
+            error: {
+                get: 'Validator could not be loaded',
+                save: 'Validator could not be saved'
+            }
+        },
         view: 'View',
         warning: 'Warning',
         weighting: 'Weighting',

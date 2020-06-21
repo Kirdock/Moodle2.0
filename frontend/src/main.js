@@ -11,7 +11,6 @@ import './assets/style.css';
 import i18n from '@/plugins/i18n';
 import {BVConfigPlugin, ToastPlugin, TabsPlugin, ModalPlugin, BNavItem, TooltipPlugin, FormCheckboxPlugin} from 'bootstrap-vue';
 import IntegerInput from '@/components/IntegerInput.vue';
-import CKEditor from '@ckeditor/ckeditor5-vue';
 
 Vue.config.productionTip = true;
 Vue.use(BVConfigPlugin, {
@@ -27,7 +26,6 @@ Vue.use(ModalPlugin);
 Vue.use(TabsPlugin);
 Vue.use(TooltipPlugin);
 Vue.use(FormCheckboxPlugin);
-Vue.use( CKEditor );
 
 Vue.component('b-nav-item', BNavItem);
 Vue.component('i-input', IntegerInput); //Global registration

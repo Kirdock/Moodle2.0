@@ -251,11 +251,17 @@ export default new Vuex.Store({
     saveKreuzelMulti({commit}, kreuzel){
       return api.saveKreuzelMulti(kreuzel);
     },
+    addExampleValidator({commit}, formData){
+      return api.addExampleValidator(formData)
+    },
     addExampleAttachment({commit}, formData){
       return api.addExampleAttachment(formData);
     },
     getExampleAttachment({commit}, id){
       return api.getExampleAttachment(id);
+    },
+    getExampleValidator({commit}, id){
+      return api.getExampleValidator(id);
     },
     getUserKreuzel({commit}, kreuzelData){
       return api.getUserKreuzel(kreuzelData);

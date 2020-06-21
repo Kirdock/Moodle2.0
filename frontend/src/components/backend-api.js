@@ -166,6 +166,21 @@ export default {
     saveKreuzelMulti(kreuzel){
         return axios.post('/user/kreuzelMulti', kreuzel);
     },
+    addExampleValidator(formData){
+        return axios.post('/example/validator',
+            formData,
+            {
+                headers: {
+                    'Content-Type': undefined
+                }
+            }
+        )
+    },
+    getExampleValidator(id){
+        return axios.get(`/example/${id}/validator`,{
+            responseType: 'blob'
+        });
+    },
     addExampleAttachment(formData){
         return axios.post('/user/kreuzel/attachment',
             formData,

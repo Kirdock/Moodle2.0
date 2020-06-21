@@ -25,9 +25,25 @@
                     </div>
                     <div class="form-check" style="margin-top: 20px">
                         <input :id="`eInfoSubmitFile${_uid}`" type="checkbox" class="form-check-input" v-model="value.submitFile" @click="submitFile_changed()">
-                        <label :for="`eInfoSubmitFile${_uid}`"   class="form-check-label" style="margin-right:15px">
+                        <label :for="`eInfoSubmitFile${_uid}`" class="form-check-label" style="margin-right:15px">
                             {{$t('submitFile')}}
                         </label>
+                    </div>
+                    <div class="form-group" v-show="value.submitFile">
+                        <label class="control-label" :for="`validatorGroup${_uid}`">
+                            {{$t('validator.name')}}: {{value.validator}}
+                        </label>
+                        <div class="form-inline" :id="`validatorGroup${_uid}`">
+                            <label class="btn btn-primary">
+                                <span class="fa fa-sync fa-spin" v-if="loadingValidatorUpload"></span>
+                                <span class="fas fa-upload" v-else></span>
+                                {{$t('submitFile')}}
+                                <input type="file" class="d-none" :id="`validator${_uid}`" :ref="`validator${_uid}`" accept=".jar" @change="submitValidator()"/>
+                            </label>
+                            <a href="#" v-if="value.validator" @click.prevent="downloadValidator()" :title="$t('download')" style="margin-left: 10px">
+                                <span class="fa fa-download fa-2x"></span>
+                            </a>
+                        </div>
                     </div>
                     <div class="form-group" v-show="value.submitFile">
                         <label :for="`eInfoSupportedFileTypes${_uid}`" class="control-label required">{{ $t('supportedFileTypes') }}</label>
@@ -109,7 +125,7 @@
 <script>
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import {orderManagement} from '@/plugins/global';
+import {orderManagement, fileManagement} from '@/plugins/global';
 import Sortable from "sortablejs";
 import Editor from '@/components/Editor.vue';
 
@@ -156,7 +172,7 @@ export default {
             selectedExample_delete: undefined,
             selectedfileTypes: [],
             fileTypes: [],
-
+            loadingValidatorUpload: false
         }
     },
     methods:{
@@ -210,13 +226,57 @@ export default {
             }
             
         },
+        async submitValidator(){
+            this.loadingValidatorUpload = true;
+            const file = this.$refs[`validator${this._uid}`].files[0];
+            if(file.name.endsWith('.jar')){
+                const formData = new FormData();
+                console.log(file)
+                const newFile = new File([file],file.name,{type:'application/java-archive'});
+                formData.append('file',newFile);
+                formData.append('id', this.value.id);
+                this.$refs[`validator${this._uid}`].value = '';
+                try{
+                    const response = await this.$store.dispatch('addExampleValidator', formData);
+                    this.value.validator = file.name;
+                    this.$bvToast.toast(this.$t('validator.saved'), {
+                        title: this.$t('success'),
+                        variant: 'success',
+                        appendToast: true
+                    });
+                }
+                catch{
+                    this.$bvToast.toast(this.$t('validator.error.save'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
+                finally{
+                    this.loadingValidatorUpload = false;
+                }
+            }
+        },
+        async downloadValidator(){
+            try{
+                const response = await this.$store.dispatch('getExampleValidator', this.value.id);
+                fileManagement.download(response.data, response.headers);
+            }
+            catch{
+                this.$bvToast.toast(this.$t('validator.error.get'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }
+        },
         addCustomFileType(test){
             let type = test.split(' ')[0];
-            if(type.startsWith('.')){
-                type = `*${type}`;
+            while(type.startsWith('*')){
+                type = type.substring(1);
             }
-            else if(!type.startsWith('*.')){
-                type = `*.${type}`;
+            if(!type.startsWith('.')){
+                type = `.${type}`;
             }
             this.value.customFileTypes.push(type);
             this.selectedfileTypes.push({name: type, value: type});
