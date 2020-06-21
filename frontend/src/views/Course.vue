@@ -135,7 +135,7 @@ export default {
         async getExerciseSheetPdf(id){
             try{
                 const response = await this.$store.dispatch('getExerciseSheetPdf', id);
-                fileManagement.downloadFile(response.data, response.headers);
+                fileManagement.download(response.data, response.headers);
             }
             catch{
                 this.$bvToast.toast(this.$t('exerciseSheet.error.get'), {

@@ -599,7 +599,7 @@ export default {
         getAttendanceList(courseId){
             this.loading_attendanceList = true;
             this.$store.dispatch('getAttendanceList', courseId).then(response => {
-                fileManagement.downloadFile(response.data, response.headers);
+                fileManagement.download(response.data, response.headers);
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('attendance.error.get'), {
                     title: this.$t('error'),

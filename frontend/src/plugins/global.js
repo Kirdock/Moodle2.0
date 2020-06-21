@@ -130,7 +130,7 @@ export const fileManagement = {
         }
         return fileName;
     },
-    downloadFile(data, headers){
+    download(data, headers){
         const url = window.URL.createObjectURL(data);
         const link = document.createElement('a');
         link.href = url;

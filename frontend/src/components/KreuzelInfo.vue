@@ -134,7 +134,7 @@ export default {
         async downloadFile(id){
             try{
                 const response = await this.$store.dispatch('getExampleAttachment', id);
-                fileManagement.downloadFile(response.data, response.headers);
+                fileManagement.download(response.data, response.headers);
             }
             catch{
                 this.$bvToast.toast(this.$t('attachment.error.get'), {
