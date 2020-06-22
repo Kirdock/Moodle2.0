@@ -47,6 +47,8 @@ public class UserCourseController {
                 .body(new InputStreamResource(bis));
     }
 
+
+
     @PostMapping(value = "/course/assign")
     public ResponseEntity<?> assignCourseToSemester(@Valid @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests)  throws SemesterException {
 

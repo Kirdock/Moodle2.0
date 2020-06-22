@@ -8,10 +8,14 @@ import com.aau.moodle20.payload.response.ExerciseSheetKreuzelResponse;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.ExerciseSheetService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @RestController()
@@ -55,6 +59,20 @@ public class ExerciseSheetController {
     @GetMapping(value = "/course/{id}/exerciseSheets")
     public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(@PathVariable("id") long id) throws EntityNotFoundException {
         return exerciseSheetService.getExerciseSheetsFromCourse(id);
+    }
+
+    @GetMapping(value = "/exerciseSheet/{id}/kreuzelList")
+    public ResponseEntity<InputStreamResource> getKreuzelList(@PathVariable("id") long exerciseSheetId)  {
+
+        ByteArrayInputStream bis = exerciseSheetService.generateKreuzelList(exerciseSheetId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename="+exerciseSheetId+"_kreuzelList.pdf");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
     }
 
     @DeleteMapping(value = "/exerciseSheet/{id}")

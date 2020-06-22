@@ -56,7 +56,7 @@ public class UserCourseService extends AbstractService {
 
             PdfWriter.getInstance(document, out);
             document.open();
-            pdfHelper.addAttendanceTitle(document);
+            pdfHelper.addTitle(document,"attendanceList.title");
             pdfHelper.addAttendanceTable(document, course);
             document.close();
         } catch (DocumentException ex) {
