@@ -55,8 +55,8 @@ export default {
     updateCourse(data){
         return axios.post('/course',data);
     },
-    updateCourseDefaultTemplate(templateData){
-        return axios.post('/course/template', templateData);
+    updateCoursePresets(presetsData){
+        return axios.post('/course/presets', presetsData);
     },
     copyCourse(data){
         return axios.post(`/course/copy`, data);
@@ -157,8 +157,16 @@ export default {
             }
         });
     },
-    getKreuzelList(sheetId){
+    getKreuzel(sheetId){
         return axios.get(`/exerciseSheet/${sheetId}/kreuzel`)
+    },
+    getKreuzelList(sheetId){
+        return axios.get(`/exerciseSheet/${sheetId}/kreuzelList`,{
+            responseType: 'blob',
+            headers:{
+                'Accept-Language': i18n.locale
+            }
+        });
     },
     saveKreuzel(examples){
         return axios.post('/user/kreuzel', examples);
@@ -175,6 +183,9 @@ export default {
                 }
             }
         )
+    },
+    deleteExampleValidator(id){
+        return axios.delete(`/example/validator/${id}`);
     },
     getExampleValidator(id){
         return axios.get(`/example/${id}/validator`,{

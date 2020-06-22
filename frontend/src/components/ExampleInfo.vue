@@ -14,62 +14,77 @@
                     <div class="form-group">
                         <label :for="`eInfoWeighting${_uid}`" class="control-label required">{{ $t('weighting') }}</label>
                         <div class="col-md-4" style="padding-left: 0px">
-                            <i-input :id="`eInfoWeighting${_uid}`" type="number" min="1" class="form-control"  v-model="value.weighting" required> </i-input>
+                            <i-input :id="`eInfoWeighting${_uid}`" min="1" class="form-control"  v-model="value.weighting" required> </i-input>
                         </div>
                     </div>
                     <div class="form-group">
                         <label :for="`eInfoPoints${_uid}`" class="control-label required">{{ $t('points') }}</label>
                         <div class="col-md-4" style="padding-left: 0px">
-                            <i-input :id="`eInfoPoints${_uid}`" type="number" class="form-control" min="0"  v-model="value.points" required> </i-input>
+                            <i-input :id="`eInfoPoints${_uid}`" class="form-control" min="0"  v-model="value.points" required> </i-input>
                         </div>
                     </div>
                     <div class="form-check" style="margin-top: 20px">
-                        <input :id="`eInfoSubmitFile${_uid}`" type="checkbox" class="form-check-input" v-model="value.submitFile" @click="submitFile_changed()">
+                        <input :id="`eInfoSubmitFile${_uid}`" type="checkbox" class="form-check-input" v-model="value.submitFile" @change="submitFile_changed()">
                         <label :for="`eInfoSubmitFile${_uid}`" class="form-check-label" style="margin-right:15px">
                             {{$t('submitFile')}}
                         </label>
                     </div>
-                    <div class="form-group" v-show="value.submitFile">
-                        <label class="control-label" :for="`validatorGroup${_uid}`">
-                            {{$t('validator.name')}}: {{value.validator}}
-                        </label>
-                        <div class="form-inline" :id="`validatorGroup${_uid}`">
-                            <label class="btn btn-primary">
-                                <span class="fa fa-sync fa-spin" v-if="loadingValidatorUpload"></span>
-                                <span class="fas fa-upload" v-else></span>
-                                {{$t('submitFile')}}
-                                <input type="file" class="d-none" :id="`validator${_uid}`" :ref="`validator${_uid}`" accept=".jar" @change="submitValidator()"/>
+                    <template v-if="value.submitFile">
+                        <div class="form-group">
+                            <label class="control-label required" :for="`uploadCount${_uid}`">
+                                {{$t('uploadLimit')}}
                             </label>
-                            <a href="#" v-if="value.validator" @click.prevent="downloadValidator()" :title="$t('download')" style="margin-left: 10px">
-                                <span class="fa fa-download fa-2x"></span>
-                            </a>
+                            <div class="col-md-4" style="padding-left: 0px">
+                                <i-input class="form-control" :id="`uploadCount${_uid}`" v-model="value.uploadCount" min="0" required></i-input>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" v-show="value.submitFile">
-                        <label :for="`eInfoSupportedFileTypes${_uid}`" class="control-label required">{{ $t('supportedFileTypes') }}</label>
-                        <multiselect v-model="selectedfileTypes" :id="`eInfoSupportedFileTypes${_uid}`" label="name" open-direction="bottom" @input="fileTypesChanged"
-                                    :placeholder="$t('searchOrAddFileType')"
-                                    track-by="value"
-                                    selectLabel=""
-                                    :tag-placeholder="$t('addTag')"
-                                    :taggable="true"
-                                    @tag="addCustomFileType"
-                                    :selectedLabel="$t('selected')"
-                                    :options="fileTypes"
-                                    :multiple="true"
-                                    :searchable="true"
-                                    :clear-on-select="false"
-                                    :close-on-select="false"
-                                    :options-limit="300"
-                                    :minHeight="800"
-                                    :max-height="800"
-                                    :deselectLabel="$t('remove')"
-                                    :show-no-results="false"
-                                    :hide-selected="false"
-                                    required
-                                    >
-                        </multiselect>
-                    </div>
+                        <div class="form-group">
+                            <label class="control-label" :for="`validatorGroup${_uid}`">
+                                {{$t('validator.name')}}: {{value.validator}}
+                            </label>
+                            <div class="form-inline" :id="`validatorGroup${_uid}`">
+                                <label class="btn btn-primary">
+                                    <span class="fa fa-sync fa-spin" v-if="loadingValidatorUpload"></span>
+                                    <span class="fas fa-upload" v-else></span>
+                                    {{$t('submitFile')}}
+                                    <input type="file" class="d-none" :id="`validator${_uid}`" :ref="`validator${_uid}`" accept=".jar" @change="submitValidator()"/>
+                                </label>
+                                <template v-if="value.validator">
+                                    <a href="#" @click.prevent="downloadValidator()" :title="$t('download')" style="margin-left: 10px">
+                                        <span class="fa fa-download fa-2x"></span>
+                                    </a>
+                                    <a href="#" @click.prevent="deleteValidator()" :title="$t('delete')" style="margin-left: 10px">
+                                        <span class="fa fa-trash fa-2x"></span>
+                                    </a>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="form-group" required>
+                            <label :for="`eInfoSupportedFileTypes${_uid}`" class="control-label required">{{ $t('supportedFileTypes') }}</label>
+                            <multiselect v-model="selectedfileTypes" :id="`eInfoSupportedFileTypes${_uid}`" label="name" open-direction="bottom" @input="fileTypesChanged"
+                                        :placeholder="$t('searchOrAddFileType')"
+                                        track-by="value"
+                                        selectLabel=""
+                                        :tag-placeholder="$t('addTag')"
+                                        :taggable="true"
+                                        @tag="addCustomFileType"
+                                        :selectedLabel="$t('selected')"
+                                        :options="fileTypes"
+                                        :multiple="true"
+                                        :searchable="true"
+                                        :clear-on-select="false"
+                                        :close-on-select="false"
+                                        :options-limit="300"
+                                        :minHeight="800"
+                                        :max-height="800"
+                                        :deselectLabel="$t('remove')"
+                                        :show-no-results="false"
+                                        :hide-selected="false"
+                                        required
+                                        >
+                            </multiselect>
+                        </div>
+                    </template>
                     <div class="form-check" style="margin-top: 20px">
                         <input :id="`eInfoMandatory${_uid}`" type="checkbox" class="form-check-input" v-model="value.mandatory">
                         <label :for="`eInfoMandatory${_uid}`"   class="form-check-label" style="margin-right:15px">
@@ -84,7 +99,7 @@
                     <span class="fa fa-plus"></span>
                     {{$t('new')}}
                 </button>
-                <table class="table" :aria-describedby="`eInfoHeader${_uid}`">
+                <table class="table table-hover" :aria-describedby="`eInfoHeader${_uid}`">
                     <thead>
                         <th scope="col">{{$t('name')}}</th>
                         <th scope="col">{{$t('points')}}</th>
@@ -131,7 +146,7 @@ import Editor from '@/components/Editor.vue';
 
 export default {
     name: 'example-info',
-    props: ['value', 'setSelectedExample', 'isSubExample', 'deleteExample', 'setDeleteExample', 'buildExample'],
+    props: ['value', 'setSelectedExample', 'isSubExample', 'deleteExample', 'setDeleteExample', 'buildExample', 'uploadCount'],
     components: {
         Multiselect,
         Editor
@@ -202,6 +217,13 @@ export default {
         submitFile_changed(){
             if(!this.value.submitFile){
                 this.value.supportedFileTypes = [];
+                this.value.uploadCount = undefined;
+            }
+            else{
+                this.$set(this.value, 'uploadCount', this.uploadCount);
+                this.$nextTick(()=>{
+                    document.getElementById(`eInfoSupportedFileTypes${this._uid}`).setAttribute('required', true);
+                })
             }
         },
         async newSubExample(){
@@ -229,11 +251,9 @@ export default {
         async submitValidator(){
             this.loadingValidatorUpload = true;
             const file = this.$refs[`validator${this._uid}`].files[0];
-            if(file.name.endsWith('.jar')){
+            if(file.name.toLowerCase().endsWith('.jar')){
                 const formData = new FormData();
-                console.log(file)
-                const newFile = new File([file],file.name,{type:'application/java-archive'});
-                formData.append('file',newFile);
+                formData.append('file',file);
                 formData.append('id', this.value.id);
                 this.$refs[`validator${this._uid}`].value = '';
                 try{
@@ -257,10 +277,27 @@ export default {
                 }
             }
         },
+        async deleteValidator(){
+            try{
+                await this.$store.dispatch('deleteExampleValidator', this.value.id);
+                this.$bvToast.toast(this.$t('validator.deleted'), {
+                    title: this.$t('success'),
+                    variant: 'success',
+                    appendToast: true
+                });
+            }
+            catch{
+                this.$bvToast.toast(this.$t('validator.error.delete'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }
+        },
         async downloadValidator(){
             try{
                 const response = await this.$store.dispatch('getExampleValidator', this.value.id);
-                fileManagement.download(response.data, response.headers);
+                fileManagement.download(response);
             }
             catch{
                 this.$bvToast.toast(this.$t('validator.error.get'), {
@@ -284,6 +321,13 @@ export default {
         fileTypesChanged(fileTypes){
             this.value.supportedFileTypes = fileTypes.filter(type => type.id !== undefined).map(type => type.id);
             this.value.customFileTypes = fileTypes.filter(type => type.id === undefined).map(type => type.value);
+            if(fileTypes.length === 0){
+                document.getElementById(`eInfoSupportedFileTypes${this._uid}`).setAttribute('required', true);
+            }
+            else{
+                document.getElementById(`eInfoSupportedFileTypes${this._uid}`).removeAttribute('required');
+            }
+            
         }
     }
 }

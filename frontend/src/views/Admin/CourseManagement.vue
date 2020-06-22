@@ -129,7 +129,7 @@
                             </option>
                         </select>
                     </div>
-                    <table class="table" aria-describedby="assignedUsers">
+                    <table class="table table-hover" aria-describedby="assignedUsers">
                         <thead>
                             <th scope="col"></th>
                             <th scope="col">
@@ -212,7 +212,7 @@
                         </b-modal>
                     </div>
                     <div class=" col-md-6">
-                        <table class="table" aria-describedby="exerciseSheets">
+                        <table class="table table-hover" aria-describedby="exerciseSheets">
                             <thead>
                                 <th scope="col">{{$t('name')}}</th>
                                 <th scope="col">{{$t('submissionDate')}}</th>
@@ -246,20 +246,30 @@
                     </div>
                 </div>
             </b-tab>
-            <b-tab :title="$t('templates')">
-                <div class="form-horizontal col-md-6">
-                    <div class="form-group">
-                        <label class="control-label" for="defaultDescription">{{$t('descriptionExerciseSheets')}}</label>
-                        <div class="document-editor__editable-container">
-                            <editor :id="`defaultDescription`" v-model="selectedCourseTemplate"></editor>
+            <b-tab :title="$t('presets')">
+                <form @submit.prevent="savePresets()">
+                    <div class="form-horizontal">
+                        <div class="form-group col-md-6">
+                            <label class="control-label" for="defaultDescription">{{$t('descriptionExerciseSheets')}}</label>
+                            <div class="document-editor__editable-container">
+                                <editor :id="`defaultDescription`" v-model="selectedCourseTemplate"></editor>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label :for="`uploadCount`" class="control-label col-md-2 required">{{ $t('exampleUploadLimit') }}</label>
+                            <div class="col-md-1">
+                                <i-input :id="`uploadCount`" min="0" class="form-control"  v-model="selectedCourse.uploadCount" required></i-input>
+                            </div>
+                        </div>
+                        <div class="col-md-2"> 
+                            <button class="btn btn-primary" type="submit">
+                                <span class="fa fa-sync fa-spin" v-if="loading_presets"></span>
+                                <span class="fa fa-save" v-else></span>
+                                {{ $t('save') }}
+                            </button>
                         </div>
                     </div>
-                    <button class="btn btn-primary" type="button" @click="saveDefaultTemplate()">
-                        <span class="fa fa-sync fa-spin" v-if="loading_defaultTemplate"></span>
-                        <span class="fa fa-save" v-else></span>
-                        {{ $t('save') }}
-                    </button>
-                </div>
+                </form>
             </b-tab>
         </b-tabs>
         <b-modal id="modal-delete-exerciseSheet" :title="$t('title.delete')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="deleteExerciseSheet(selectedDeleteExerciseSheet)">
@@ -348,7 +358,7 @@
                             </option>
                         </select>
                     </div>
-                <table class="table" aria-describedby="modal-presented">
+                <table class="table table-hover" aria-describedby="modal-presented">
                     <thead>
                         <th scope="col">{{$t('matriculationNumber')}}</th>
                         <th scope="col">{{$t('surname')}}</th>
@@ -426,7 +436,7 @@ export default {
             exerciseSheet_create: {},
             users: [],
             loadingFileUpload: false,
-            loading_defaultTemplate: false,
+            loading_presets: false,
             selectedCourseTemplate: undefined,
             selectedDeleteExerciseSheet: undefined,
             loading_attendanceList: false,
@@ -599,7 +609,7 @@ export default {
         getAttendanceList(courseId){
             this.loading_attendanceList = true;
             this.$store.dispatch('getAttendanceList', courseId).then(response => {
-                fileManagement.download(response.data, response.headers);
+                fileManagement.download(response);
             }).catch(()=>{
                 this.$bvToast.toast(this.$t('attendance.error.get'), {
                     title: this.$t('error'),
@@ -792,21 +802,27 @@ export default {
                 this.loading_edit = false;
             });
         },
-        saveDefaultTemplate(){
-            this.$store.dispatch('updateCourseDefaultTemplate', {id: this.selectedCourse.id, description: this.selectedCourseTemplate}).then(()=>{
+        async savePresets(){
+            this.loading_presets = true;
+            try{
+                await this.$store.dispatch('updateCoursePresets', {id: this.selectedCourse.id, description: this.selectedCourseTemplate, uploadCount: this.selectedCourse.uploadCount});
                 this.selectedCourse.descriptionTemplate = this.selectedCourseTemplate;
-                this.$bvToast.toast(this.$t('course.templateUpdated'), {
+                this.$bvToast.toast(this.$t('course.presetsUpdated'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
-                this.$bvToast.toast(this.$t('course.error.templateUpdate'), {
+            }
+            catch{
+                this.$bvToast.toast(this.$t('course.error.presetsUpdate'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            })
+            }
+            finally{
+                this.loading_presets = false;
+            }
         },
         copyCourse(courseId, semesterId){
             this.loading_delete = true;

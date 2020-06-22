@@ -39,7 +39,7 @@
                 </label>
                 <input id="searchText" type="text" class="form-control" v-model="searchText">
             </div>
-            <table class="table" aria-describedby="users">
+            <table class="table table-hover" aria-describedby="users">
                 <thead>
                     <th scope="col">{{$t('matriculationNumber')}}</th>
                     <th scope="col">{{$t('surname')}}</th>

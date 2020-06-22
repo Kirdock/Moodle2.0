@@ -33,3 +33,12 @@ a:not([href]){
   border-bottom: dotted 2px;
   cursor: help;
 }
+
+.table_scroll{
+  display: block;
+  overflow-x: auto;
+}
+
+table.nowrap th{
+  white-space: nowrap;
+}

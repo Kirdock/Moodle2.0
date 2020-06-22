@@ -136,8 +136,8 @@ export default new Vuex.Store({
     updateCourse({commit}, courseData){
       return api.updateCourse(courseData)
     },
-    updateCourseDefaultTemplate({commit}, templateData){
-      return api.updateCourseDefaultTemplate(templateData);
+    updateCoursePresets({commit}, presetData){
+      return api.updateCoursePresets(presetData);
     },
     copyCourse({commit}, data){
       return api.copyCourse(data);
@@ -242,6 +242,9 @@ export default new Vuex.Store({
     getAttendanceList({commit}, courseId){
       return api.getAttendanceList(courseId);
     },
+    getKreuzel({commit}, sheetId){
+      return api.getKreuzel(sheetId);
+    },
     getKreuzelList({commit}, sheetId){
       return api.getKreuzelList(sheetId);
     },
@@ -253,6 +256,9 @@ export default new Vuex.Store({
     },
     addExampleValidator({commit}, formData){
       return api.addExampleValidator(formData)
+    },
+    deleteExampleValidator({commit}, id){
+      return api.deleteExampleValidator(id);
     },
     addExampleAttachment({commit}, formData){
       return api.addExampleAttachment(formData);
@@ -298,7 +304,9 @@ function getToken(){
 
 function getSettings(){
   let settings = storage.getItem(settingName);
-  return settings ? JSON.parse(settings) : {};
+  return settings ? JSON.parse(settings) : {
+    locale: 'de'
+  };
 }
 
 function saveSettings(settings){

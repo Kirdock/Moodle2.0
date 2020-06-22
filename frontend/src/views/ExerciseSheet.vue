@@ -26,7 +26,7 @@
             <label class="control-label">{{$t('minPoints')}}: <strong>{{sheetInfo.minPoints || 0}}%</strong></label>
         </div>
         <form @submit.prevent="saveKreuzel()">
-            <table class="table" aria-describedby="sheetName" v-if="sheetInfo.id">
+            <table class="table table-hover" aria-describedby="sheetName" v-if="sheetInfo.id">
                 <thead>
                     <th scope="col">{{$t('example.name')}}</th>
                     <th scope="col" v-if="hasSubExamples">{{$t('subExample.name')}}</th>
@@ -34,12 +34,13 @@
                     <th scope="col">{{$t('weighting')}}</th>
                     <th scope="col">{{$t('points')}}</th>
                     <th scope="col">{{$t('kreuzel.name')}}</th>
+                    <th scope="col" v-if="this.hasFileUpload">{{$t('attempts')}}</th>
                     <th scope="col">{{$t('actions')}}</th>
                 </thead>
                 <tbody>
                     <template v-for="example in sheetInfo.examples">
-                        <kreuzel-info :hasSubExamples="hasSubExamples" :key="example.id" :isParent="true" :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
-                        <kreuzel-info :hasSubExamples="hasSubExamples" v-for="subExample in example.subExamples" :key="subExample.id" :isParent="false" :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
+                        <kreuzel-info :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" :key="example.id" :isParent="true" :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
+                        <kreuzel-info :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" v-for="subExample in example.subExamples" :key="subExample.id" :isParent="false" :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
                     </template>
                     <tr style="font-weight: bold">
                         <td>
@@ -56,6 +57,7 @@
                         <td :style="minimumRequired(sheetInfo.minKreuzel, kreuzel, kreuzelTotal)">
                             {{kreuzel}}/{{kreuzelTotal}}
                         </td>
+                        <td v-if="hasFileUpload"></td>
                         <td></td>
                     </tr>
                 </tbody>
@@ -188,6 +190,9 @@ export default {
     },
     methods: {
         minimumRequired: calcManagement.minimumRequired,
+        hasFileUpload(){
+            this.hasFileUpload = this.sheetInfo.examples.some(example => example.submitFile || example.subExamples.some(subExample => subExample.submitFile));
+        },
         isDeadlineReached(){
             this.deadlineReached = new Date() >= new Date(this.sheetInfo.submissionDate);
             return this.deadlineReached;
@@ -198,6 +203,7 @@ export default {
                 const response = await this.$store.dispatch('getExerciseSheetAssigned', id);
                 this.sheetInfo = response.data;
                 this.hasSubExamples = this.sheetInfo.examples.some(example => example.subExamples.length > 0);
+                this.hasFileUpload();
                 this.isDeadlineReached();
             }
             catch{

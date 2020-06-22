@@ -17,7 +17,7 @@
             <label class="control-label">{{$t('minPoints')}}: <strong>{{courseInfo.minPoints || 0}}%</strong></label>
         </div>
         <h2 id="exerciseSheets">{{$t('exerciseSheets.name')}}</h2>
-        <table class="table" aria-describedby="exerciseSheets" v-if="courseInfo.id">
+        <table class="table table-hover" aria-describedby="exerciseSheets" v-if="courseInfo.id">
             <thead>
                 <th scope="col">{{$t('name')}}</th>
                 <th scope="col">{{$t('submissionDate')}}</th>
@@ -135,7 +135,7 @@ export default {
         async getExerciseSheetPdf(id){
             try{
                 const response = await this.$store.dispatch('getExerciseSheetPdf', id);
-                fileManagement.download(response.data, response.headers);
+                fileManagement.download(response);
             }
             catch{
                 this.$bvToast.toast(this.$t('exerciseSheet.error.get'), {

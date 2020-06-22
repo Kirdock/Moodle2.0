@@ -61,6 +61,11 @@
                 </template>
             </template>
         </td>
+        <td v-if="hasFileUpload">
+            <template v-if="value.submitFile">
+                {{value.remainingUploadCount}}/{{value.uploadCount}}
+            </template>
+        </td>
         <td>
             <template v-if="value.submitFile">
                 <label class="btn btn-primary">
@@ -84,7 +89,7 @@
 import {fileManagement} from '@/plugins/global';
 export default {
     name: 'kreuzel-info',
-    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples'],
+    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload'],
     data(){
         return {
             loadingFileUpload: false
@@ -104,6 +109,13 @@ export default {
                 });
                 this.deadlineReached = true;
             }
+            else if(this.value.submitFile && this.value.uploadCount !== 0 && this.value.remainingUploadCount === 0){
+                this.$bvToast.toast(this.$t('maxAttemptsReached'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }
             else{
                 this.loadingFileUpload = true;
                 const formData = new FormData();
@@ -112,6 +124,7 @@ export default {
                 this.$refs[`file${this._uid}`].value = '';
                 try{
                     const response = await this.$store.dispatch('addExampleAttachment', formData);
+                    this.value.remainingUploadCount--;
                     this.value.hasAttachment = true;
                     this.$bvToast.toast(this.$t('attachment.saved'), {
                         title: this.$t('success'),
@@ -134,7 +147,7 @@ export default {
         async downloadFile(id){
             try{
                 const response = await this.$store.dispatch('getExampleAttachment', id);
-                fileManagement.download(response.data, response.headers);
+                fileManagement.download(response);
             }
             catch{
                 this.$bvToast.toast(this.$t('attachment.error.get'), {

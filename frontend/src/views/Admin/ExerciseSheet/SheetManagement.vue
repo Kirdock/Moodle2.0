@@ -48,7 +48,7 @@
                         <span>{{selectedExample.name}}</span>
                     </div>
                     <form @submit.prevent="updateExample(selectedExample || example)" :ref="`formExample${index}`">
-                        <example-info :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
+                        <example-info :uploadCount="sheetInfo.uploadCount" :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
                         <div class="form-inline" style="margin-left: 10px; margin-top: 10px" v-if="!isSubExample">
                             <button class="btn btn-primary" type="submit">
                                 <span class="fa fa-sync fa-spin"  v-if="example.loading"></span>
