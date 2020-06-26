@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 
 @RestController()
@@ -62,11 +63,24 @@ public class ExerciseSheetController {
     }
 
     @GetMapping(value = "/exerciseSheet/{id}/kreuzelList")
-    public ResponseEntity<InputStreamResource> getKreuzelList(@PathVariable("id") long exerciseSheetId)  {
+    public ResponseEntity<InputStreamResource> getKreuzelList(@PathVariable("id") long exerciseSheetId) throws IOException {
 
         ByteArrayInputStream bis = exerciseSheetService.generateKreuzelList(exerciseSheetId);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename="+exerciseSheetId+"_kreuzelList.pdf");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
+    }
+
+    @GetMapping(value = "/exerciseSheet/{id}/document")
+    public ResponseEntity<InputStreamResource> getExerciseSheetDocument(@PathVariable("id") long exerciseSheetId)  {
+        ByteArrayInputStream bis = exerciseSheetService.generateExerciseSheetDocument(exerciseSheetId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename="+exerciseSheetId+"_document.pdf");
 
         return ResponseEntity
                 .ok()
