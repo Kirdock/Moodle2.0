@@ -24,21 +24,13 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class PdfHelper {
 
-//    private PdfFont headFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
-//    private PdfFont exampleFont = FontFactory.get
-//    private PdfFont normalFont = FontFactory.getFont(FontFactory.HELVETICA,13);
-
-    private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 7;
-
+    private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 9;
     private ResourceBundleMessageSource resourceBundleMessageSource;
 
     public PdfHelper(ResourceBundleMessageSource resourceBundleMessageSource)
@@ -78,6 +70,7 @@ public class PdfHelper {
 
         Paragraph titleParagraph = getTitleParagraph("kreuzelList.title");
         titleParagraph.setFont(font).setFontSize(16);
+        titleParagraph.setBold();
         doc.add(titleParagraph);
         doc.add(getKreuzelListTable(exerciseSheet));
         doc.close();
@@ -163,32 +156,34 @@ public class PdfHelper {
 
         List<Example> examplesInTable = new ArrayList<>();
 
-        Table table = new Table(UnitValue.createPercentArray((int) (exampleNumber+2)));
-        table.setAutoLayout();
-        table.setWidth(UnitValue.createPercentValue(90));
+        float [] widths = new float[(int) (exampleNumber+2)];
+        Arrays.fill(widths, (float) 1);
+        widths[0] = (float) 6;
+        widths[1] = (float) 5;
 
-//        Table table = new PdfPTable((int) (exampleNumber + 2));
-//        table.setWidthPercentage(95);
-//        float [] widths = new float[(int) (exampleNumber+2)];
-//        Arrays.fill(widths, (float) 0.2);
-//        widths[0] = (float) 1;
-//        widths[1] = (float) 1;
-//        table.setWidths(widths);
-//        table.setHeaderRows(1);
+        int absoluteTableWidth = 0;
+        for(float width: widths)
+        {
+            absoluteTableWidth = (int) (absoluteTableWidth + (width * 25));
+        }
 
-        table.addHeaderCell(createCell(name,TextAlignment.LEFT));
-        table.addHeaderCell(createCell(matriculationNumber,TextAlignment.LEFT));
+        Table table = new Table(widths);
+        table.setFixedLayout();
+        table.setWidth(absoluteTableWidth);
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        table.addHeaderCell(createHeaderCell(name));
+        table.addHeaderCell(createHeaderCell(matriculationNumber));
 
         for (Example example : exampleList) {
             if (example.getSubExamples().isEmpty()) {
-                table.addHeaderCell(createCell(Integer.toString(example.getOrder() + 1), TextAlignment.LEFT));
+                table.addHeaderCell(createHeaderCell(Integer.toString(example.getOrder() + 1)).setTextAlignment(TextAlignment.CENTER));
                 examplesInTable.add(example);
             } else {
                 List<Example> subExamples = example.getSubExamples().stream().sorted(Comparator.comparing(Example::getOrder))
                         .collect(Collectors.toList());
                 for (Example subExample : subExamples) {
                     String headerText = (example.getOrder() + 1) + "." + (subExample.getOrder() + 1);
-                    table.addHeaderCell(createCell(headerText, TextAlignment.LEFT));
+                    table.addHeaderCell(createHeaderCell(headerText).setTextAlignment(TextAlignment.CENTER));
                     examplesInTable.add(subExample);
                 }
             }
