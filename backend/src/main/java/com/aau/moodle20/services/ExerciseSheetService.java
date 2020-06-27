@@ -190,21 +190,8 @@ public class ExerciseSheetService extends AbstractService{
         return new ByteArrayInputStream(pdfHelper.createKreuzelList(exerciseSheet));
     }
 
-    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceValidationException
-    {
-//        ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
-//        Document document = new Document();
-//        ByteArrayOutputStream out = new ByteArrayOutputStream();
-//        try {
-//            PdfWriter.getInstance(document, out);
-//            document.open();
-//            pdfHelper.addTitle(document, "exerciseSheet.title");
-//            pdfHelper.addExerciseSheetBody(document, exerciseSheet);
-//            document.close();
-//        } catch (DocumentException ex) {
-//            throw new ServiceValidationException(ex.getMessage());
-//        }
-//        return new ByteArrayInputStream(out.toByteArray());
-        return null;
+    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceValidationException, IOException {
+        ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
+        return new ByteArrayInputStream(pdfHelper.createExerciseSheet(exerciseSheet));
     }
 }
