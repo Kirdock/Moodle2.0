@@ -10,21 +10,19 @@ import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.element.Text;
-import com.itextpdf.layout.property.HorizontalAlignment;
-import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.UnitValue;
-import com.itextpdf.layout.property.VerticalAlignment;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.property.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -45,7 +43,7 @@ public class PdfHelper {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
         Document doc = new Document(pdfDoc);
-        Paragraph titleParagraph = getTitleParagraph("attendanceList.title");
+        Paragraph titleParagraph = getTitleParagraph(getLocaleMessage("attendanceList.title"));
         titleParagraph.setFont(font).setFontSize(16);
         titleParagraph.setBold();
         doc.add(titleParagraph);
@@ -68,7 +66,7 @@ public class PdfHelper {
         if (exampleNumber > EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE)
             pdfDoc.setDefaultPageSize(PageSize.A4.rotate());
 
-        Paragraph titleParagraph = getTitleParagraph("kreuzelList.title");
+        Paragraph titleParagraph = getTitleParagraph(getLocaleMessage("kreuzelList.title"));
         titleParagraph.setFont(font).setFontSize(16);
         titleParagraph.setBold();
         doc.add(titleParagraph);
@@ -78,13 +76,74 @@ public class PdfHelper {
         return baos.toByteArray();
     }
 
-    public Paragraph getTitleParagraph(String titleCode) throws IOException {
-        String headerText = getLocaleMessage(titleCode);
+    public byte [] createExerciseSheet(ExerciseSheet exerciseSheet) throws IOException {
+        PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
+        Document doc = new Document(pdfDoc);
+        doc.setLeftMargin(50);
+        doc.setRightMargin(50);
+
+
+        Paragraph titleParagraph = getTitleParagraph(exerciseSheet.getName());
+        titleParagraph.setFont(font).setFontSize(16);
+        titleParagraph.setBold();
+        doc.add(titleParagraph);
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+
+        Table table = new Table(2);
+        //table.addCell(getCell("Text to the left", TextAlignment.LEFT));
+        table.addCell(getCell(getLocaleMessage("exerciseSheet.issueDate") +": "+ exerciseSheet.getSubmissionDate().format(dateFormatter), TextAlignment.LEFT));
+        table.addCell(getCell(exerciseSheet.getTotalPoints() + " " + getLocaleMessage("exerciseSheet.points"), TextAlignment.RIGHT));
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        table.setWidth(UnitValue.createPercentValue(100));
+        doc.add(table);
+
+        Paragraph description = new Paragraph();
+        addEmptyLine(description,1);
+        description.add(exerciseSheet.getDescription());
+        doc.add(description);
+
+//        List<Example> examples = exerciseSheet.getExamples().stream()
+//                .filter(example -> example.getParentExample()==null)
+//                .sorted(Comparator.comparing(Example::getOrder))
+//                .collect(Collectors.toList());
+//
+//        for(Example example: examples)
+//        {
+//            if(example.getSubExamples().isEmpty())
+//            {
+//                Paragraph exampleDescription = new Paragraph();
+//                addEmptyLine(description,1);
+//                description.add(example.getDescription());
+//                doc.add(description);
+//            }
+//        }
+
+
+        doc.close();
+
+        return baos.toByteArray();
+    }
+
+    protected Cell getCell(String text, TextAlignment alignment) {
+        Cell cell = new Cell().add(new Paragraph(text));
+        cell.setPadding(0);
+        cell.setTextAlignment(alignment);
+        cell.setBorder(Border.NO_BORDER);
+        cell.setFontSize(11);
+        return cell;
+    }
+
+    protected Paragraph getTitleParagraph(String text) throws IOException {
 
         Paragraph preface = new Paragraph();
         preface.setTextAlignment(TextAlignment.CENTER);
         // Lets write a big header
-        Paragraph paragraph = new Paragraph(headerText);
+        Paragraph paragraph = new Paragraph(text);
         paragraph.setHorizontalAlignment(HorizontalAlignment.CENTER);
         preface.add(paragraph);
 

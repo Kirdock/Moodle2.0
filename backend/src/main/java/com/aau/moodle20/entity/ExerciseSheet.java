@@ -192,6 +192,15 @@ public class ExerciseSheet {
         this.examples = examples;
     }
 
+    public Integer getTotalPoints()
+    {
+        Integer totalPoints = 0;
+        for (Example example : getExamples()) {
+            totalPoints = totalPoints + (example.getPoints() * example.getWeighting());
+        }
+        return totalPoints;
+    }
+
     public ExerciseSheet copy()
     {
         ExerciseSheet exerciseSheet = new ExerciseSheet();

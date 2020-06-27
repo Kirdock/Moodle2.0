@@ -77,7 +77,7 @@ public class ExerciseSheetController {
     }
 
     @GetMapping(value = "/exerciseSheet/{id}/document")
-    public ResponseEntity<InputStreamResource> getExerciseSheetDocument(@PathVariable("id") long exerciseSheetId)  {
+    public ResponseEntity<InputStreamResource> getExerciseSheetDocument(@PathVariable("id") long exerciseSheetId) throws IOException {
         ByteArrayInputStream bis = exerciseSheetService.generateExerciseSheetDocument(exerciseSheetId);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename="+exerciseSheetId+"_document.pdf");
