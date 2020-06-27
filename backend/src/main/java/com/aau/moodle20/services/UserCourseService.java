@@ -10,9 +10,6 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.PdfWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,22 +45,12 @@ public class UserCourseService extends AbstractService {
     }
 
 
-    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceValidationException {
+    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceValidationException, IOException {
         Course course = readCourse(courseId);
-        Document document = new Document();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        byte [] data = null;
+        data =  pdfHelper.createAttendanceList(course);
 
-            PdfWriter.getInstance(document, out);
-            document.open();
-            pdfHelper.addTitle(document,"attendanceList.title");
-            pdfHelper.addAttendanceTable(document, course);
-            document.close();
-        } catch (DocumentException ex) {
-            logger.error("Error occurred: {0}", ex);
-            throw new ServiceValidationException(ex.getMessage());
-        }
-        return new ByteArrayInputStream(out.toByteArray());
+        return new ByteArrayInputStream(data);
     }
 
     public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws SemesterException

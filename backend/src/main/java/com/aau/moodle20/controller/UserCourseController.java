@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 
 @RestController()
@@ -34,7 +35,7 @@ public class UserCourseController {
     }
 
     @GetMapping(value = "/course/{courseId}/attendanceList")
-    public ResponseEntity<InputStreamResource> getAttendanceList(@PathVariable("courseId") long courseId)  {
+    public ResponseEntity<InputStreamResource> getAttendanceList(@PathVariable("courseId") long courseId) throws IOException {
 
         ByteArrayInputStream bis = userCourseService.generateCourseAttendanceList(courseId);
         HttpHeaders headers = new HttpHeaders();

@@ -19,7 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
@@ -79,21 +81,4 @@ public class Application implements ApplicationRunner, ErrorController {
 		return PATH;
 	}
 
-	//configure default locale
-	@Bean
-	public LocaleResolver localeResolver() {
-		AcceptHeaderLocaleResolver slr = new AcceptHeaderLocaleResolver();
-		slr.setDefaultLocale(Locale.ENGLISH);
-		return slr;
-	}
-
-	//configuring ResourceBundle
-	@Bean
-	public ReloadableResourceBundleMessageSource  bundleMessageSource()
-	{
-		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource ();
-		messageSource.setBasename("classpath:messages");
-		messageSource.setCacheSeconds(10);
-		return messageSource;
-	}
 }

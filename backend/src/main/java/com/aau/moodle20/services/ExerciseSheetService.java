@@ -12,15 +12,11 @@ import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetKreuzelResponse;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.KreuzelCourseResponse;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -31,7 +27,6 @@ import java.util.stream.Collectors;
 public class ExerciseSheetService extends AbstractService{
 
     private PdfHelper pdfHelper;
-    private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 7;
 
     public ExerciseSheetService(PdfHelper pdfHelper)
     {
@@ -190,26 +185,26 @@ public class ExerciseSheetService extends AbstractService{
         return responseObjects;
     }
 
-    public ByteArrayInputStream generateKreuzelList(Long exerciseSheetId) throws ServiceValidationException {
+    public ByteArrayInputStream generateKreuzelList(Long exerciseSheetId) throws ServiceValidationException, IOException {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
-        Document document = new Document();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        return new ByteArrayInputStream(pdfHelper.createKreuzelList(exerciseSheet));
+    }
 
-            long exampleNumber = exerciseSheet.getExamples().stream()
-                    .filter(example -> example.getSubExamples().isEmpty())
-                    .count();
-
-            PdfWriter.getInstance(document, out);
-            if (exampleNumber > EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE)
-                document.setPageSize(PageSize.A4.rotate());
-            document.open();
-            pdfHelper.addTitle(document, "kreuzelList.title");
-            pdfHelper.addKreuzelTable(document, exerciseSheet);
-            document.close();
-        } catch (DocumentException ex) {
-            throw new ServiceValidationException(ex.getMessage());
-        }
-        return new ByteArrayInputStream(out.toByteArray());
+    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceValidationException
+    {
+//        ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
+//        Document document = new Document();
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        try {
+//            PdfWriter.getInstance(document, out);
+//            document.open();
+//            pdfHelper.addTitle(document, "exerciseSheet.title");
+//            pdfHelper.addExerciseSheetBody(document, exerciseSheet);
+//            document.close();
+//        } catch (DocumentException ex) {
+//            throw new ServiceValidationException(ex.getMessage());
+//        }
+//        return new ByteArrayInputStream(out.toByteArray());
+        return null;
     }
 }
