@@ -104,12 +104,14 @@ export default {
                 const newIndex = Sortable.utils.index(evt.related, '>*')
                 return oldIndex !== 0 && oldIndex !== lastIndex && newIndex !== 0 && newIndex !== lastIndex; //exclude "Information" and "new example" tab
             },
-            onEnd: evt =>{
+            onEnd: async evt =>{
                 if(evt.oldIndex !== evt.newIndex){
                     const changedOrders = orderManagement.moveTo(this.sheetInfo.examples, evt.oldIndex-1, evt.newIndex-1); //-1 because "Information"-Tab is before
-                    this.$store.dispatch('updateExampleOrder', changedOrders).then(()=>{
+                    try{
+                        await this.$store.dispatch('updateExampleOrder', changedOrders);
                         orderManagement.sort(this.sheetInfo.examples);
-                    }).catch(()=>{
+                    }
+                    catch{
                         orderManagement.revertSort(this.sheetInfo.examples);
                         const array = sortable.toArray();
                         orderManagement.move(array, evt.newIndex, evt.oldIndex);
@@ -120,7 +122,7 @@ export default {
                             variant: 'danger',
                             appendToast: true
                         });
-                    })
+                    }
                 }
             }
         });
@@ -153,76 +155,86 @@ export default {
                 })
             });
         },
-        getSheet(sheedId){
-            this.$store.dispatch('getExerciseSheet', sheedId).then(response =>{
+        async getSheet(sheedId){
+            try{
+                const response = await this.$store.dispatch('getExerciseSheet', sheedId);
                 this.sheetInfo = response.data;
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('exerciseSheet.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            })
+            }
         },
-        updateInfo(){
+        async updateInfo(){
             this.loading_updateInformation = true;
             const {examples, ...data} = this.sheetInfo;
-            this.$store.dispatch('updateExerciseSheet', data).then(()=>{
+            try{
+                await this.$store.dispatch('updateExerciseSheet', data);
                 this.$bvToast.toast(this.$t('exerciseSheet.saved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('exerciseSheet.error.save'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }finally{
                 this.loading_updateInformation = false;
-            });
+            }
         },
         setDeleteExample(id, index, array){
             this.selectedDeleteExample.id = id;
             this.selectedDeleteExample.index = index;
             this.selectedDeleteExample.array = array;
         },
-        updateExample(example){
+        async updateExample(example){
             example.loading = true;
             const {loading, subExamples, ...data} = example;
-            this.$store.dispatch('updateExample', data).then(response=>{
+            try{
+                await this.$store.dispatch('updateExample', data);
                 this.$bvToast.toast(this.$t('example.saved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('example.error.save'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 example.loading = false;
-            });
+            }
         },
-        createExample(){
+        async createExample(){
             this.loading_createExample = true;
             const example = this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length, true);
-            this.$store.dispatch('createExample', example).then(response=>{
+            try{
+                const response = await this.$store.dispatch('createExample', example);
                 example.id = response.data.id;
                 this.sheetInfo.examples.push(example);
                 this.setActiveTab(this.sheetInfo.examples.length);
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('example.error.create'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loading_createExample = false;
-            });
+            }
         },
         buildExample(name, order, isParent){
             return {
@@ -237,21 +249,23 @@ export default {
                 customFileTypes: []
             }
         },
-        deleteExample(id, index){
-            this.$store.dispatch('deleteExample', id).then(()=>{
+        async deleteExample(id, index){
+            try{
+                await this.$store.dispatch('deleteExample', id);
                 orderManagement.deletedAt(this.selectedDeleteExample.array, index);
                 this.$bvToast.toast(this.$t('example.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('example.error.delete'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            })
+            }
         },
         setSelectedExample(example){
             this.selectedExample = example;

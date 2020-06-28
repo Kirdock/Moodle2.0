@@ -33,18 +33,18 @@ export default {
     }
   },
   methods:{
-    login(){
-      this.$store.dispatch('login', { user: this.user, password: this.password})
-        .then(() => {
-          this.$router.push('Courses');
-        })
-        .catch(() => {
-          this.$bvToast.toast(this.$t('userPwdInvalid'), {
-            title: this.$t('error'),
-            appendToast: true,
-            variant: 'danger'
-          });
-        })
+    async login(){
+      try{
+        await this.$store.dispatch('login', { user: this.user, password: this.password});
+        this.$router.push('Courses');
+      }
+      catch{
+        this.$bvToast.toast(this.$t('userPwdInvalid'), {
+          title: this.$t('error'),
+          appendToast: true,
+          variant: 'danger'
+        });
+      }
     }
   }
 }

@@ -60,39 +60,44 @@ export default {
     this.getUser();
   },
   methods:{
-    getUser(){
-      this.$store.dispatch('getUser').then(response =>{
+    async getUser(){
+      try{
+        const response = await this.$store.dispatch('getUser');
         this.userInfo = response.data;
-      }).catch(()=>{
+      }
+      catch{
         this.$bvToast.toast(this.$t('user.error.get'), {
-            title: this.$t('error'),
-            variant: 'danger',
-            appendToast: true
-          });
-      });
+          title: this.$t('error'),
+          variant: 'danger',
+          appendToast: true
+        });
+      };
     },
-    updateUser(){
+    async updateUser(){
       this.loading_updateInformation = true;
-      this.$store.dispatch('updateUser', this.userInfo).then(response=>{
-          this.$bvToast.toast(this.$t('user.saved'), {
-              title: this.$t('success'),
-              variant: 'success',
-              appendToast: true
-          });
-      }).catch(()=>{
-          this.$bvToast.toast(this.$t('user.error.save'), {
-              title: this.$t('error'),
-              variant: 'danger',
-              appendToast: true
-          });
-      }).finally(()=>{
+      try{
+        await this.$store.dispatch('updateUser', this.userInfo);
+        this.$bvToast.toast(this.$t('user.saved'), {
+          title: this.$t('success'),
+          variant: 'success',
+          appendToast: true
+        });
+      }
+      catch{
+        this.$bvToast.toast(this.$t('user.error.save'), {
+          title: this.$t('error'),
+          variant: 'danger',
+          appendToast: true
+        });
+      }
+      finally{
           this.loading_updateInformation = false;
-      });
+      }
     },
     resetValidationMessage(){
       this.$refs.newPasswordConfirm.setCustomValidity('');
     },
-    updatePassword(){
+    async updatePassword(){
       if(this.passwordData.newPassword !== this.passwordData.newPasswordConfirm){
         this.$refs.newPasswordConfirm.setCustomValidity(this.$t('passwordDontMatch'));
         this.$refs.form.reportValidity();
@@ -100,21 +105,24 @@ export default {
       else{
         this.loadingPasswordChange = true;
         const {newPasswordConfirm, ...data} = this.passwordData;
-        this.$store.dispatch('udpatePassword', data).then(()=>{
+        try{
+          await this.$store.dispatch('udpatePassword', data);
           this.$bvToast.toast(this.$t('passwordUpdated'), {
             title: this.$t('success'),
             variant: 'success',
             appendToast: true
           });
-        }).catch(()=>{
+        }
+        catch{
           this.$bvToast.toast(this.$t('passwordUpdatedError'), {
             title: this.$t('error'),
             variant: 'danger',
             appendToast: true
           });
-        }).finally(()=>{
+        }
+        finally{
           this.loadingPasswordChange = false;
-        });
+        }
       }
     }
   }

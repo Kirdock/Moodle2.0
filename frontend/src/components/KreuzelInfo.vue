@@ -123,7 +123,7 @@ export default {
                 formData.append('id', this.value.id);
                 this.$refs[`file${this._uid}`].value = '';
                 try{
-                    const response = await this.$store.dispatch('addExampleAttachment', formData);
+                    await this.$store.dispatch('addExampleAttachment', formData);
                     this.value.remainingUploadCount--;
                     this.value.hasAttachment = true;
                     this.$bvToast.toast(this.$t('attachment.saved'), {

@@ -28,10 +28,10 @@
                         <th scope="col">{{$t('matriculationNumber')}}</th>
                         <th scope="col">{{$t('surname')}}</th>
                         <th scope="col">{{$t('forename')}}</th>
-                        <th scope="col" v-for="example in examples" :key="example.id">{{example.name}}</th>
+                        <th scope="col" v-for="example in kreuzelInfo.examples" :key="example.id">{{example.name}}</th>
                     </thead>
                     <tbody>
-                        <tr v-for="kreuzel in kreuzelList" :key="`${kreuzel.matriculationNumber} ${kreuzel.exampleId}`">
+                        <tr v-for="kreuzel in kreuzelInfo.kreuzel" :key="`${kreuzel.matriculationNumber} ${kreuzel.exampleId}`">
                             <td>
                                 {{kreuzel.matriculationNumber}}
                             </td>
@@ -71,16 +71,14 @@ export default {
     props: ['exerciseSheets'],
     data(){
         return {
-            includeThird: false,
+            kreuzelInfo: {},
             selectedExerciseSheet: undefined,
-            editMode: false,
-            examples: [],
-            kreuzelList: []
+            editMode: false
         }
     },
     computed:{
         stateTypes(){
-            return this.includeThird ? [
+            return this.kreuzelInfo.includeThird ? [
                 {
                     value: 'X',
                     key: 'y'
@@ -109,9 +107,7 @@ export default {
         async getKreuzel(){
             try{
                 const response = await this.$store.dispatch('getKreuzel', this.selectedExerciseSheet);
-                this.includeThird = response.data.includeThird;
-                this.examples = response.data.examples;
-                this.kreuzelList = response.data.kreuzel;
+                this.kreuzelInfo = response.data;
             }
             catch{
                 this.$bvToast.toast(this.$t('kreuzel.error.get'), {
@@ -137,11 +133,11 @@ export default {
         async saveKreuzel(){
             try{
                 let data = [];
-                for(let kreuzel of this.kreuzelList){
+                for(let kreuzel of this.kreuzelInfo.kreuzel){
                     kreuzel.states.forEach((state, index) =>{
                         data.push({
                             matriculationNumber: kreuzel.matriculationNumber,
-                            exampleId: this.examples[index].id,
+                            exampleId: this.kreuzelInfo.examples[index].id,
                             state
                         })
                     });

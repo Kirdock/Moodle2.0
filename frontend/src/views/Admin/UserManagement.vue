@@ -121,29 +121,32 @@ export default {
         resetUserInfo(){
             this.userInfo = {};
         },
-        submitUsers(){
+        async submitUsers(){
             this.loadingFileUpload = true;
             const formData = new FormData();
             formData.append('file',this.$refs.file.files[0]);
             formData.append('isAdmin', this.isAdmin)
             this.$refs.file.value = '';
-            this.$store.dispatch('createUsers', formData).then(response =>{
+            try{
+                await this.$store.dispatch('createUsers', formData);
                 this.$bvToast.toast(this.$t('user.created'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('user.create.error'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loadingFileUpload = false;
-            });
+            }
         },
-        createUser(modal){
+        async createUser(modal){
             if(modal){
                 modal.preventDefault();
             }
@@ -152,7 +155,8 @@ export default {
             }
             else{
                 this.loadingCreateUser = true;
-                this.$store.dispatch('createUser', this.userInfo).then(response=>{
+                try{
+                    await this.$store.dispatch('createUser', this.userInfo);
                     this.$bvModal.hide('modal-new-user');
                     this.$bvToast.toast(this.$t('user.created'), {
                         title: this.$t('success'),
@@ -160,7 +164,8 @@ export default {
                         appendToast: true
                     });
                     this.getUsers();
-                }).catch(error=>{
+                }
+                catch(error){
                     const status = error.response.data.errorResponseCode;
                     let message;
                     if(status === 470){
@@ -177,12 +182,13 @@ export default {
                         variant: 'danger',
                         appendToast: true
                     });
-                }).finally(()=>{
+                }
+                finally{
                     this.loadingCreateUser = false;
-                });
+                }
             }
         },
-        updateUser(modal){
+        async updateUser(modal){
             if(modal){
                 modal.preventDefault();
             }
@@ -191,7 +197,8 @@ export default {
             }
             else{
                 this.loadingUpdateUser = true;
-                this.$store.dispatch('updateUser', this.userInfo).then(response=>{
+                try{
+                    await this.$store.dispatch('updateUser', this.userInfo);
                     Object.assign(this.selectedUser,this.userInfo); //update local
                     this.$bvModal.hide('modal-edit-user');
                     this.$bvToast.toast(this.$t('user.saved'), {
@@ -200,43 +207,53 @@ export default {
                         appendToast: true
                     });
                     this.resetUserInfo();
-                }).catch(()=>{
+                }
+                catch{
                     this.$bvToast.toast(this.$t('user.error.save'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true
                     });
-                }).finally(()=>{
+                }
+                finally{
                     this.loadingUpdateUser = false;
-                });
+                }
             }
         },
-        deleteUser(){
-            this.$store.dispatch('deleteUser', this.selectedUser.matriculationNumber).then(response =>{
-                this.getUsers(); //just splice instead??
+        async deleteUser(){
+            try{
+                const matriculationNumber = this.selectedUser.matriculationNumber;
+                await this.$store.dispatch('deleteUser', matriculationNumber);
+                const index = this.users.findIndex(user => user.matriculationNumber === matriculationNumber);
+                console.log(index, this.users)
+                this.users.splice(index, 1);
+                console.log(this.users)
                 this.$bvToast.toast(this.$t('user.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('user.error.delete'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            })
+            }
         },
-        getUsers(){
-            this.$store.dispatch('getUsers').then(response=>{
+        async getUsers(){
+            try{
+                const response = await this.$store.dispatch('getUsers');
                 this.users = response.data;
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('users.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            });
+            }
         }
     }
 }

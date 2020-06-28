@@ -157,12 +157,14 @@ export default {
             const sortable = Sortable.create(el, {
                 handle: '.handle',
                 animation: 200,
-                onEnd: evt =>{
+                onEnd: async evt =>{
                     if(evt.oldIndex !== evt.newIndex){
                         const changedOrders = orderManagement.moveTo(this.value.subExamples, evt.oldIndex, evt.newIndex);
-                        this.$store.dispatch('updateExampleOrder', changedOrders).then(()=>{
+                        try{
+                            await this.$store.dispatch('updateExampleOrder', changedOrders);
                             orderManagement.sort(this.value.subExamples);
-                        }).catch(()=>{
+                        }
+                        catch{
                             orderManagement.revertSort(this.value.subExamples);
                             const array = sortable.toArray();
                             orderManagement.move(array, evt.newIndex, evt.oldIndex);
@@ -173,7 +175,7 @@ export default {
                                 variant: 'danger',
                                 appendToast: true
                             });
-                        })
+                        }
                     }
                 }
             });
@@ -198,17 +200,19 @@ export default {
             });
             
         },
-        getFileTypes(){
-            this.$store.dispatch('getFileTypes').then(response =>{
+        async getFileTypes(){
+            try{
+                const response = await this.$store.dispatch('getFileTypes');
                 this.fileTypes = response.data;
                 this.setFileTypes();
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('fileTypes.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            })
+            }
         },
         setFileTypes(){
             let types = this.fileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType === fileType.id));
@@ -235,7 +239,7 @@ export default {
             }
             const example = this.buildExample(this.$t('subExample.name'), this.value.subExamples.length);
             try{
-                const response = await this.$store.dispatch('createExample', example)
+                const response = await this.$store.dispatch('createExample', example);
                 example.id = response.data.id;
                 this.value.subExamples.push(example);
             }
@@ -257,7 +261,7 @@ export default {
                 formData.append('id', this.value.id);
                 this.$refs[`validator${this._uid}`].value = '';
                 try{
-                    const response = await this.$store.dispatch('addExampleValidator', formData);
+                    await this.$store.dispatch('addExampleValidator', formData);
                     this.value.validator = file.name;
                     this.$bvToast.toast(this.$t('validator.saved'), {
                         title: this.$t('success'),

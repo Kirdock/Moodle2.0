@@ -549,13 +549,13 @@ export default {
         },
         async updatePresented(user, example, hasPresented, index){
             try{
-                let response = await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.exampleId, hasPresented});
+                await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.exampleId, hasPresented});
                 if(index){
                     this.selectedCourse.presented.splice(index,1);
                 }
                 else{
                     try{
-                        response = await this.$store.dispatch('getCoursePresented',this.selectedCourseId);
+                        const response = await this.$store.dispatch('getCoursePresented',this.selectedCourseId);
                         this.selectedCourse.presented = response.data;
                     }
                     catch{
@@ -606,53 +606,61 @@ export default {
                 });
             }
         },
-        getAttendanceList(courseId){
+        async getAttendanceList(courseId){
             this.loading_attendanceList = true;
-            this.$store.dispatch('getAttendanceList', courseId).then(response => {
+            try{
+                const response = await this.$store.dispatch('getAttendanceList', courseId);
                 fileManagement.download(response);
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('attendance.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loading_attendanceList = false;
-            });
+            }
         },
-        getUsers(){
-            this.$store.dispatch('getUsers').then(({data}) =>{
-                this.users = data;
-            }).catch(()=>{
+        async getUsers(){
+            try{
+                const response = await this.$store.dispatch('getUsers');
+                this.users = response.data;
+            }
+            catch{
                 this.$bvToast.toast(this.$t('users.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            });
+            }
         },
-        submitUsers(){
+        async submitUsers(){
             this.loadingFileUpload = true;
             const formData = new FormData();
             formData.append('file',this.$refs.file.files[0]);
             formData.append('id', this.selectedCourseId)
             this.$refs.file.value = '';
-            this.$store.dispatch('assignCourseUsers', formData).then(response =>{
+            try{
+                await this.$store.dispatch('assignCourseUsers', formData);
                 this.getCourseUsers(this.selectedCourseId);
                 this.$bvToast.toast(this.$t('course.usersSaved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('course.error.usersSave'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loadingFileUpload = false;
-            });
+            }
         },
         resetExerciseSheet(){
             this.exerciseSheet_create = {
@@ -661,7 +669,7 @@ export default {
                 includeThird: false
             }
         },
-        createExerciseSheet(modal){
+        async createExerciseSheet(modal){
             if(modal && !this.$refs.exerciseSheet.checkValidity()){
                 modal.preventDefault();
                 this.$refs.exerciseSheet.reportValidity();
@@ -669,7 +677,8 @@ export default {
             else{
                 this.exerciseSheet_create.courseId = this.selectedCourseId;
                 this.exerciseSheet_create.description = this.selectedCourse.descriptionTemplate;
-                this.$store.dispatch('createExerciseSheet', this.exerciseSheet_create).then(()=>{
+                try{
+                    await this.$store.dispatch('createExerciseSheet', this.exerciseSheet_create);
                     this.$bvModal.hide('modal-new-exerciseSheet');
                     if(this.exerciseSheet_create.courseId === this.selectedCourseId){
                         this.getExerciseSheets(this.selectedCourseId);
@@ -681,18 +690,20 @@ export default {
                         appendToast: true
                     });
                     
-                }).catch(()=>{
+                }
+                catch{
                     this.$bvToast.toast(this.$t('exerciseSheet.error.create'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true
                     });
-                });
+                }
             }
         },
-        deleteExerciseSheet(sheetId){
+        async deleteExerciseSheet(sheetId){
             const courseId = this.selectedCourseId;
-            this.$store.dispatch('deleteExerciseSheet', sheetId).then(()=>{
+            try{
+                await this.$store.dispatch('deleteExerciseSheet', sheetId);
                 if(courseId === this.selectedCourseId){
                     this.getExerciseSheets(this.selectedCourseId);
                 }
@@ -703,28 +714,31 @@ export default {
                     appendToast: true
                 });
                 
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('exerciseSheet.error.delete'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            });
+            }
         },
-        getExerciseSheets(id){
-            this.$store.dispatch('getExerciseSheets', {id}).then((response)=>{
+        async getExerciseSheets(id){
+            try{
+                const response = await this.$store.dispatch('getExerciseSheets', {id});
                 if(this.selectedCourseId === id){
                     this.selectedCourse.exerciseSheets = response.data;
                 }
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('exerciseSheet.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            })
+            }
         },
-        updateCourseUsers(){
+        async updateCourseUsers(){
             this.loading_edit_updateUsers = true;
             const id = this.selectedCourse.id;
             const data = this.courseUsers.filter(user => user.courseRole !== user.oldRole).map(user =>{
@@ -734,23 +748,26 @@ export default {
                     role: user.courseRole
                 };
             });
-            this.$store.dispatch('updateCourseUsers', data).then(response=>{
+            try{
+                await this.$store.dispatch('updateCourseUsers', data);
                 this.$bvToast.toast(this.$t('course.usersSaved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('course.error.usersSave'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loading_edit_updateUsers = false;
-            });
+            }
         },
-        createCourse(modal){
+        async createCourse(modal){
             if(modal && !this.$refs.createCourse.checkValidity()){
                 modal.preventDefault();
                 this.$refs.createCourse.reportValidity();
@@ -758,7 +775,8 @@ export default {
             else{
                 this.courseInfo_create.semesterId = this.selectedSemester_edit;
                 this.loading_create = true;
-                this.$store.dispatch('createCourse',this.courseInfo_create).then(response=>{
+                try{
+                    const response = await this.$store.dispatch('createCourse',this.courseInfo_create);
                     this.$bvToast.toast(this.$t('course.created'), {
                         title: this.$t('success'),
                         variant: 'success',
@@ -772,35 +790,40 @@ export default {
                         this.selectedCourseId = response.data.id;
                         this.getCourse(response.data.id);
                     }
-                }).catch(()=>{
+                }
+                catch{
                     this.$bvToast.toast(this.$t('course.error.create'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true
                     });
-                }).finally(()=>{
+                }
+                finally{
                     this.loading_create = false;
-                });
+                }
             }
         },
-        updateCourse(){
+        async updateCourse(){
             this.loading_edit = true;
             const {exerciseSheets, ...data} = this.selectedCourse;
-            this.$store.dispatch('updateCourse', data).then(response=>{
+            try{
+                await this.$store.dispatch('updateCourse', data);
                 this.$bvToast.toast(this.$t('course.saved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('course.error.save'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loading_edit = false;
-            });
+            }
         },
         async savePresets(){
             this.loading_presets = true;
@@ -824,9 +847,10 @@ export default {
                 this.loading_presets = false;
             }
         },
-        copyCourse(courseId, semesterId){
+        async copyCourse(courseId, semesterId){
             this.loading_delete = true;
-            this.$store.dispatch('copyCourse', {courseId, semesterId}).then(response=>{
+            try{
+                const response = await this.$store.dispatch('copyCourse', {courseId, semesterId});
                 this.selectedSemester_edit = semesterId;
                 this.getCourses(semesterId);
                 this.selectedCourseId = response.data.id;
@@ -837,47 +861,54 @@ export default {
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('course.error.copy'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loading_delete = false;
-            });
+            };
             
         },
-        getCourse(courseId){
+        async getCourse(courseId){
             this.getCourseUsers(courseId);
-            this.$store.dispatch('getCourse',{courseId}).then(response =>{
+            try{
+                const response = await this.$store.dispatch('getCourse',{courseId});
                 this.selectedCourse = response.data;
                 if(this.semesters.length === 0){
                     this.getSemesters(this.selectedCourse.semesterId);
                 }
                 this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('course.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            });
+            }
         },
-        getCourses(id){
-            this.$store.dispatch('getCourses',{id}).then(response =>{
+        async getCourses(id){
+            try{
+                const response = await this.$store.dispatch('getCourses',{id});
                 this.courses = response.data;
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('courses.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            });
+            }
         },
-        deleteCourse(id){
+        async deleteCourse(id){
             this.loading_delete = true;
-            this.$store.dispatch('deleteCourse',{id}).then(response =>{
+            try{
+                await this.$store.dispatch('deleteCourse',{id});
                 if(id === this.selectedCourseId){
                     this.selectedCourse = undefined;
                 }
@@ -887,42 +918,48 @@ export default {
                     appendToast: true
                 });
                 this.getCourses(this.selectedSemester_edit);
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('course.error.delete'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loading_delete = false;
-            });
+            }
         },
-        getCourseUsers(courseId){
-            this.$store.dispatch('getUsers',{courseId}).then(response=>{
+        async getCourseUsers(courseId){
+            try{
+                const response = await this.$store.dispatch('getUsers',{courseId});
                 this.courseUsers = response.data;
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('users.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            });
+            }
         },
-        getSemesters(selectSemesterId){
-            this.$store.dispatch('getSemesters').then(response =>{
+        async getSemesters(selectSemesterId){
+            try{
+                const response = await this.$store.dispatch('getSemesters');
                 this.semesters = response.data;
                 if(this.semesters.length !== 0){
                     this.courseInfo_create.semesterId = this.courseCopyId = this.semesters[0].id;
                     this.selectedSemester_edit = selectSemesterId || this.semesters[0].id;
                     this.getCourses(this.selectedSemester_edit);
                 }
-            }).catch(()=>{
+            }
+            catch{
                 this.$bvToast.toast(this.$t('semester.error.get'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
                 });
-            });
+            }
         }
     },
     watch:{

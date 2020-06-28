@@ -53,15 +53,17 @@ export default {
         
     },
     methods:{
-        create(){
+        async create(){
             this.loadingCreate = true;
-            this.$store.dispatch('createSemester', this.semesterInfo).then(response=>{
+            try{
+                await this.$store.dispatch('createSemester', this.semesterInfo);
                 this.$bvToast.toast(this.$t('semester.created'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-            }).catch(error=>{
+            }
+            catch(error){
                 const status = error.response.data.errorResponseCode;
                 let message;
                 if(status === 472){
@@ -75,9 +77,10 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
-            }).finally(()=>{
+            }
+            finally{
                 this.loadingCreate = false;
-            });
+            }
         }
     }
 }

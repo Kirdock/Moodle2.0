@@ -41,31 +41,35 @@
             this.getSemesters();
         },
         methods: {
-            getSemesters(){
-                this.$store.dispatch("getSemestersAssigned").then(response=>{
+            async getSemesters(){
+                try{
+                    const response = await this.$store.dispatch("getSemestersAssigned");
                     this.semesters = response.data;
                     if(this.semesters.length > 0){
                         this.selectedSemester = this.semesters[this.semesters.length - 1].id; //this.$store.selectedSemester
                         this.getCourses(this.selectedSemester);
                     }
-                }).catch(()=>{
+                }
+                catch{
                     this.$bvToast.toast(this.$t('semester.error.get'), {
                         title: 'Fehler',
                         variant: 'danger',
                         appendToast: true
                     });
-                })
+                }
             },
-            getCourses(id){
-                this.$store.dispatch("getCoursesAssigned", {id}).then(response=>{
+            async getCourses(id){
+                try{
+                    const response = await this.$store.dispatch("getCoursesAssigned", {id});
                     this.courses = response.data;
-                }).catch(() =>{
+                }
+                catch{
                     this.$bvToast.toast(this.$t('courses.error.get'), {
                         title: 'Fehler',
                         variant: 'danger',
                         appendToast: true
                     });
-                })
+                }
             }
         }
 
