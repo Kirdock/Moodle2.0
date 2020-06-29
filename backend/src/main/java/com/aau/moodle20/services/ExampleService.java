@@ -155,6 +155,20 @@ public class ExampleService extends AbstractService{
         return example;
     }
 
+    public void deleteExampleValidator(Long exampleId) throws ServiceValidationException, IOException {
+        Example example = readExample(exampleId);
+        if(example.getValidator()==null || example.getValidator().isEmpty())
+            throw new ServiceValidationException("Error: No Validator was set for this example");
+        String validatorFilePath = getValidatorFilePath(example);
+        boolean result = deleteFileFromDisk(validatorFilePath,example.getValidator());
+        if(!result)
+            throw new ServiceValidationException("Error: Validator could not be deleted");
+
+
+        example.setValidator(null);
+        exampleRepository.save(example);
+    }
+
 
     protected String getValidatorFilePath(Example example)
     {

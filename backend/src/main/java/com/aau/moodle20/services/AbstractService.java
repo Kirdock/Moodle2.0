@@ -118,6 +118,11 @@ public class AbstractService {
         Path path = Paths.get(filePath+"/"+fileName);
         return Files.readAllBytes(path);
     }
+
+    protected boolean deleteFileFromDisk(String filePath, String fileName) throws IOException,ServiceValidationException {
+        Path path = Paths.get(filePath+"/"+fileName);
+        return Files.deleteIfExists(path);
+    }
     protected String createExampleAttachmentDir(Example example)
     {
         Semester semester = example.getExerciseSheet().getCourse().getSemester();
