@@ -14,4 +14,6 @@ public interface FinishesExampleRepository extends JpaRepository<FinishesExample
     List<FinishesExample>  findByExample_Id(Long exampleId);
 
     List<FinishesExample> findByExample_IdIn(List<Long> exampleIds);
+
+    Boolean existsByExample_IdAndUser_MatriculationNumber(Long exampleId, String matriculationNumber);
 }

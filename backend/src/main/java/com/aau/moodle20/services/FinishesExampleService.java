@@ -83,12 +83,26 @@ public class FinishesExampleService extends AbstractService{
         finishesExampleRepository.save(finishesExample);
     }
 
+    @Transactional
     public void setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException {
         if (file.isEmpty())
             throw new ServiceValidationException("Error: given file is empty");
 
         UserDetailsImpl userDetails = getUserDetails();
         Example example = readExample(exampleId);
+
+        if(!finishesExampleRepository.existsByExample_IdAndUser_MatriculationNumber(exampleId,userDetails.getMatriculationNumber()))
+        {
+            List<UserKreuzelRequest> requests = new ArrayList<>();
+            UserKreuzelRequest kreuzelRequest = new UserKreuzelRequest();
+            kreuzelRequest.setDescription(null);
+            kreuzelRequest.setExampleId(exampleId);
+            kreuzelRequest.setState(EFinishesExampleState.NO);
+            requests.add(kreuzelRequest);
+            setKreuzelUser(requests);
+            finishesExampleRepository.flush();
+        }
+
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
         if (finishesExample.getRemainingUploadCount() == 0 && finishesExample.getExample().getUploadCount() != 0)
             throw new ServiceValidationException("Error: max upload counts reached!");
