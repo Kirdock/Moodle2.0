@@ -82,7 +82,13 @@ public class ExerciseSheetService extends AbstractService{
         for(Example example:sortedExampleList)
             response.getExamples().add(createExampleResponseObject(example));
 
-        for(UserInCourse userInCourse: exerciseSheet.getCourse().getStudents())
+        Comparator<UserInCourse> userInCourseComparatorSureName = Comparator.comparing(userInCourse -> userInCourse.getUser().getSurname());
+        Comparator<UserInCourse> userInCourseComparatorForename = Comparator.comparing(userInCourse -> userInCourse.getUser().getForename());
+
+        List<UserInCourse> sortedUserInCourse = exerciseSheet.getCourse().getStudents().stream()
+                .sorted(userInCourseComparatorSureName.thenComparing(userInCourseComparatorForename))
+                .collect(Collectors.toList());
+        for(UserInCourse userInCourse: sortedUserInCourse)
         {
             User user = userInCourse.getUser();
             KreuzelCourseResponse kreuzelCourseResponse = new KreuzelCourseResponse();
