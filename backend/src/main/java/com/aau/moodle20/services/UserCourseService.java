@@ -1,6 +1,5 @@
 package com.aau.moodle20.services;
 
-import com.aau.moodle20.component.PdfHelper;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.User;
@@ -27,7 +26,7 @@ import java.util.List;
 public class UserCourseService extends AbstractService {
 
     @Autowired
-    PdfHelper pdfHelper;
+    PdfService pdfService;
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -45,13 +44,7 @@ public class UserCourseService extends AbstractService {
     }
 
 
-    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceValidationException, IOException {
-        Course course = readCourse(courseId);
-        byte [] data = null;
-        data =  pdfHelper.createAttendanceList(course);
 
-        return new ByteArrayInputStream(data);
-    }
 
     public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws SemesterException
     {

@@ -8,6 +8,7 @@ import com.aau.moodle20.payload.response.ExerciseSheetKreuzelResponse;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.ExerciseSheetService;
+import com.aau.moodle20.services.PdfService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,10 +25,12 @@ import java.util.List;
 public class ExerciseSheetController {
 
     ExerciseSheetService exerciseSheetService;
+    PdfService pdfService;
 
-    public ExerciseSheetController(ExerciseSheetService exerciseSheetService)
+    public ExerciseSheetController(ExerciseSheetService exerciseSheetService, PdfService pdfService)
     {
         this.exerciseSheetService= exerciseSheetService;
+        this.pdfService = pdfService;
     }
 
     @PutMapping(value = "/exerciseSheet")
@@ -65,7 +68,7 @@ public class ExerciseSheetController {
     @GetMapping(value = "/exerciseSheet/{id}/kreuzelList")
     public ResponseEntity<InputStreamResource> getKreuzelList(@PathVariable("id") long exerciseSheetId) throws IOException {
 
-        ByteArrayInputStream bis = exerciseSheetService.generateKreuzelList(exerciseSheetId);
+        ByteArrayInputStream bis = pdfService.generateKreuzelList(exerciseSheetId);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename="+exerciseSheetId+"_kreuzelList.pdf");
 
@@ -78,7 +81,7 @@ public class ExerciseSheetController {
 
     @GetMapping(value = "/exerciseSheet/{id}/document")
     public ResponseEntity<InputStreamResource> getExerciseSheetDocument(@PathVariable("id") long exerciseSheetId) throws IOException {
-        ByteArrayInputStream bis = exerciseSheetService.generateExerciseSheetDocument(exerciseSheetId);
+        ByteArrayInputStream bis = pdfService.generateExerciseSheetDocument(exerciseSheetId);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename="+exerciseSheetId+"_document.pdf");
 

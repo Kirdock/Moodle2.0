@@ -5,6 +5,7 @@ import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
+import com.aau.moodle20.services.PdfService;
 import com.aau.moodle20.services.UserCourseService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -23,10 +24,12 @@ import java.util.List;
 public class UserCourseController {
 
     private UserCourseService userCourseService;
+    private PdfService pdfService;
 
-    public UserCourseController(UserCourseService userCourseService)
+    public UserCourseController(UserCourseService userCourseService, PdfService pdfService)
     {
         this.userCourseService = userCourseService;
+        this.pdfService = pdfService;
     }
 
     @GetMapping(value = "/courseAssigned/{courseId}")
@@ -37,7 +40,7 @@ public class UserCourseController {
     @GetMapping(value = "/course/{courseId}/attendanceList")
     public ResponseEntity<InputStreamResource> getAttendanceList(@PathVariable("courseId") long courseId) throws IOException {
 
-        ByteArrayInputStream bis = userCourseService.generateCourseAttendanceList(courseId);
+        ByteArrayInputStream bis = pdfService.generateCourseAttendanceList(courseId);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename="+courseId+"_attendanceList.pdf");
 

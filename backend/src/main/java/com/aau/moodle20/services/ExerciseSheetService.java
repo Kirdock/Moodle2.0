@@ -1,6 +1,5 @@
 package com.aau.moodle20.services;
 
-import com.aau.moodle20.component.PdfHelper;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
@@ -26,11 +25,11 @@ import java.util.stream.Collectors;
 @Service
 public class ExerciseSheetService extends AbstractService{
 
-    private PdfHelper pdfHelper;
+    private PdfService pdfService;
 
-    public ExerciseSheetService(PdfHelper pdfHelper)
+    public ExerciseSheetService(PdfService pdfService)
     {
-        this.pdfHelper = pdfHelper;
+        this.pdfService = pdfService;
     }
 
     public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceValidationException {
@@ -191,13 +190,5 @@ public class ExerciseSheetService extends AbstractService{
         return responseObjects;
     }
 
-    public ByteArrayInputStream generateKreuzelList(Long exerciseSheetId) throws ServiceValidationException, IOException {
-        ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
-        return new ByteArrayInputStream(pdfHelper.createKreuzelList(exerciseSheet));
-    }
 
-    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceValidationException, IOException {
-        ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
-        return new ByteArrayInputStream(pdfHelper.createExerciseSheet(exerciseSheet));
-    }
 }

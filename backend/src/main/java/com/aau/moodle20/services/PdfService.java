@@ -1,8 +1,9 @@
-package com.aau.moodle20.component;
+package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
+import com.aau.moodle20.exception.ServiceValidationException;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -16,7 +17,9 @@ import com.itextpdf.layout.property.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -25,19 +28,19 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
-public class PdfHelper {
+@Service
+public class PdfService extends AbstractService {
 
     private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 9;
     private ResourceBundleMessageSource resourceBundleMessageSource;
 
-    public PdfHelper(ResourceBundleMessageSource resourceBundleMessageSource)
+    public PdfService(ResourceBundleMessageSource resourceBundleMessageSource)
     {
         this.resourceBundleMessageSource = resourceBundleMessageSource;
     }
 
 
-    public byte [] createAttendanceList(Course course) throws IOException {
+    protected byte [] createAttendanceList(Course course) throws IOException {
         PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -53,7 +56,7 @@ public class PdfHelper {
         return baos.toByteArray();
     }
 
-    public byte [] createKreuzelList(ExerciseSheet exerciseSheet) throws IOException {
+    protected byte [] createKreuzelList(ExerciseSheet exerciseSheet) throws IOException {
         PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
         long exampleNumber = exerciseSheet.getExamples().stream()
@@ -76,7 +79,7 @@ public class PdfHelper {
         return baos.toByteArray();
     }
 
-    public byte [] createExerciseSheet(ExerciseSheet exerciseSheet) throws IOException {
+    protected byte [] createExerciseSheet(ExerciseSheet exerciseSheet) throws IOException {
         PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -107,23 +110,6 @@ public class PdfHelper {
         description.add(exerciseSheet.getDescription());
         doc.add(description);
 
-//        List<Example> examples = exerciseSheet.getExamples().stream()
-//                .filter(example -> example.getParentExample()==null)
-//                .sorted(Comparator.comparing(Example::getOrder))
-//                .collect(Collectors.toList());
-//
-//        for(Example example: examples)
-//        {
-//            if(example.getSubExamples().isEmpty())
-//            {
-//                Paragraph exampleDescription = new Paragraph();
-//                addEmptyLine(description,1);
-//                description.add(example.getDescription());
-//                doc.add(description);
-//            }
-//        }
-
-
         doc.close();
 
         return baos.toByteArray();
@@ -153,32 +139,35 @@ public class PdfHelper {
     }
 
 
-    public Table  getAttendanceTable( Course course)  {
+    protected Table  getAttendanceTable( Course course)  {
 
         String forename = getLocaleMessage("attendanceList.forename");
         String surname = getLocaleMessage("attendanceList.surname");
         String matriculationNumber = getLocaleMessage("attendanceList.matriculationNumber");
         String signature = getLocaleMessage("attendanceList.signature");
 
-        Table table = new Table(UnitValue.createPercentArray(new float[]{22,22,25,31}));
+        Table table = new Table(UnitValue.createPercentArray(new float[]{25,22,22,31}));
         table.setFixedLayout();
         table.setWidth(UnitValue.createPercentValue(95));
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
 
+        table.addHeaderCell(createHeaderCell(matriculationNumber));
         table.addHeaderCell(createHeaderCell(forename));
         table.addHeaderCell(createHeaderCell(surname));
-        table.addHeaderCell(createHeaderCell(matriculationNumber));
         table.addHeaderCell(createHeaderCell(signature));
 
+        List<UserInCourse> userInCourses = course.getStudents().stream()
+                .sorted(Comparator.comparing(userInCourse -> userInCourse.getUser().getSurname()))
+                .collect(Collectors.toList());
 
-        for (UserInCourse userInCourse : course.getStudents()) {
+        for (UserInCourse userInCourse : userInCourses) {
 
             if (!ECourseRole.Student.equals(userInCourse.getRole()))
                 continue;
 
+            table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(),TextAlignment.LEFT));
             table.addCell(createCell(userInCourse.getUser().getForename(),TextAlignment.LEFT));
             table.addCell(createCell(userInCourse.getUser().getSurname(),TextAlignment.LEFT));
-            table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(),TextAlignment.LEFT));
             table.addCell(createCell("",TextAlignment.LEFT));
         }
 
@@ -199,7 +188,7 @@ public class PdfHelper {
         return cell;
     }
 
-    public Table  getKreuzelListTable(ExerciseSheet exerciseSheet)  {
+    protected Table  getKreuzelListTable(ExerciseSheet exerciseSheet)  {
 
         String name = getLocaleMessage("kreuzelList.name");
         String matriculationNumber = getLocaleMessage("kreuzelList.matriculationNumber");
@@ -274,25 +263,6 @@ public class PdfHelper {
     }
 
 
-
-//    private void addExampleHeading(Paragraph paragraph, Example example)
-//    {
-//        addEmptyLine(paragraph,1);
-//
-//
-//        Paragraph heading = new Paragraph((example.getOrder()+1) +" "+example.getName(), exampleFont);
-//
-//
-//        preface.add(paragraph);
-//
-//    }
-
-//    public PdfPCell getCell(String text, Ele alignment)
-//    {
-//        PdfPCell cell = new PdfPCell().addElement(new Paragraph(text));
-//    }
-
-
     private  void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Text("\n"));
@@ -309,9 +279,18 @@ public class PdfHelper {
         return resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
     }
 
+    public ByteArrayInputStream generateKreuzelList(Long exerciseSheetId) throws ServiceValidationException, IOException {
+        ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
+        return new ByteArrayInputStream(createKreuzelList(exerciseSheet));
+    }
 
+    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceValidationException, IOException {
+        ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
+        return new ByteArrayInputStream(createExerciseSheet(exerciseSheet));
+    }
 
-    //    private PdfFont headFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
-//    private PdfFont exampleFont = FontFactory.get
-//    private PdfFont normalFont = FontFactory.getFont(FontFactory.HELVETICA,13);
+    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceValidationException, IOException {
+        Course course = readCourse(courseId);
+        return new ByteArrayInputStream(createAttendanceList(course));
+    }
 }
