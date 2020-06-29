@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class PdfService extends AbstractService {
 
-    private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 9;
+    private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 7;
     private ResourceBundleMessageSource resourceBundleMessageSource;
 
     public PdfService(ResourceBundleMessageSource resourceBundleMessageSource)
@@ -190,7 +190,8 @@ public class PdfService extends AbstractService {
 
     protected Table  getKreuzelListTable(ExerciseSheet exerciseSheet)  {
 
-        String name = getLocaleMessage("kreuzelList.name");
+        String forename = getLocaleMessage("kreuzelList.forename");
+        String surename = getLocaleMessage("kreuzelList.surname");
         String matriculationNumber = getLocaleMessage("kreuzelList.matriculationNumber");
 
         long exampleNumber = exerciseSheet.getExamples().stream()
@@ -204,10 +205,11 @@ public class PdfService extends AbstractService {
 
         List<Example> examplesInTable = new ArrayList<>();
 
-        float [] widths = new float[(int) (exampleNumber+2)];
+        float [] widths = new float[(int) (exampleNumber+3)];
         Arrays.fill(widths, (float) 1);
-        widths[0] = (float) 6;
+        widths[0] = (float) 5;
         widths[1] = (float) 5;
+        widths[2] = (float) 5;
 
         int absoluteTableWidth = 0;
         for(float width: widths)
@@ -219,8 +221,11 @@ public class PdfService extends AbstractService {
         table.setFixedLayout();
         table.setWidth(absoluteTableWidth);
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
-        table.addHeaderCell(createHeaderCell(name));
+        // add header cells
         table.addHeaderCell(createHeaderCell(matriculationNumber));
+        table.addHeaderCell(createHeaderCell(surename));
+        table.addHeaderCell(createHeaderCell(forename));
+
 
         for (Example example : exampleList) {
             if (example.getSubExamples().isEmpty()) {
@@ -237,14 +242,22 @@ public class PdfService extends AbstractService {
             }
         }
 
-        for (UserInCourse userInCourse : exerciseSheet.getCourse().getStudents()) {
+        Comparator<UserInCourse> comparatorSureName = Comparator.comparing(userInCourse -> userInCourse.getUser().getSurname());
+        Comparator<UserInCourse> comparatorForeName = Comparator.comparing(userInCourse -> userInCourse.getUser().getForename());
+        Comparator<UserInCourse> comparatorMatriculationNumber = Comparator.comparing(userInCourse -> userInCourse.getUser().getMatriculationNumber());
+
+        List<UserInCourse> sortedUserInCourse = exerciseSheet.getCourse().getStudents().stream()
+                .sorted(comparatorSureName.thenComparing(comparatorForeName).thenComparing(comparatorMatriculationNumber))
+                .collect(Collectors.toList());
+
+        for (UserInCourse userInCourse : sortedUserInCourse) {
 
             if (!ECourseRole.Student.equals(userInCourse.getRole()))
                 continue;
 
-            String studentName = userInCourse.getUser().getForename() +" "+ userInCourse.getUser().getSurname();
-            table.addCell(createCell(studentName,TextAlignment.LEFT));
             table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(),TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getSurname(),TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getForename(),TextAlignment.LEFT));
 
             for(Example example : examplesInTable)
             {
