@@ -143,6 +143,7 @@ const messages = {
                 2: 'Ja/Nein/Nicht sicher'
             }
         },
+        lang: 'de-DE',
         lecturer: 'Lehrende/r',
         listEmpty: 'Liste ist leer',
         loading: 'Laden',
@@ -416,6 +417,7 @@ const messages = {
                 2: 'Yes/No/Not sure'
             }
         },
+        lang: 'en-US',
         lecturer: 'Lecturer',
         listEmpty: 'List is empty',
         loading: 'Loading',

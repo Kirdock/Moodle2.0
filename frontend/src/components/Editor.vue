@@ -1,38 +1,65 @@
 <template>
-    <div class="document-editor__editable-container">
-        <ckeditor :id="`description${_uid}`" :value="value" :editor="editor" @ready="onReady" :config="editorConfig" @input="update" :required="required"></ckeditor>
+    <div>
+        <div :id="`summernote_${_uid}`">
+        </div>
     </div>
 </template>
 
 <script>
-    import Editor from '@/components/editor';
     import i18n from '@/plugins/i18n';
-    import CKEditor from '@ckeditor/ckeditor5-vue';
+    import 'summernote';
+    import 'summernote/dist/summernote.css';
+    import 'summernote/lang/summernote-de-DE.js';
 
     export default {
         name: 'editor',
         props: ['value', 'required'],
-        components: {
-            'ckeditor': CKEditor.component
-        },
         data(){
             return {
-                editor: Editor,
-                editorConfig: {
-                    language: i18n.locale
+                
+            }
+        },
+        computed:{
+            locale(){
+                return i18n.locale;
+            },
+            options(){
+                const vm = this;
+                return {
+                    lang: vm.$t('lang'),
+                    callbacks: {
+                        onChange: vm.update
+                    }
                 }
             }
         },
+        mounted(){
+            const vm = this;
+            $(document).ready(()=> {
+                $(`#summernote_${vm._uid}`).summernote(vm.options);
+                vm.$nextTick(()=>{
+                    setTimeout(()=>{
+                        $(`#summernote_${vm._uid}`).summernote('code', vm.value || '');
+                    },500)
+                });
+            });
+        },
         methods:{
-            onReady(editor) {
-                editor.ui.getEditableElement().parentElement.insertBefore(
-                    editor.ui.view.toolbar.element,
-                    editor.ui.getEditableElement()
-                );
-            },
             update(value){
                 this.$emit('input', value);
+            }
+        },
+        watch:{
+            'options.lang': function(newVal, oldVal){
+                $(`#summernote_${this._uid}`).summernote('destroy');
+                $(`#summernote_${this._uid}`).summernote(this.options);
             }
         }
     }
 </script>
+
+<style>
+.note-editor.note-frame.panel.panel-default.fullscreen {
+    background-color: #F5F7F7 !important;
+}
+</style>

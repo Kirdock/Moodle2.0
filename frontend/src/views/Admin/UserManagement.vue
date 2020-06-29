@@ -225,9 +225,7 @@ export default {
                 const matriculationNumber = this.selectedUser.matriculationNumber;
                 await this.$store.dispatch('deleteUser', matriculationNumber);
                 const index = this.users.findIndex(user => user.matriculationNumber === matriculationNumber);
-                console.log(index, this.users)
                 this.users.splice(index, 1);
-                console.log(this.users)
                 this.$bvToast.toast(this.$t('user.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',
