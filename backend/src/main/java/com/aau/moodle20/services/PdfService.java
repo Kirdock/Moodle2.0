@@ -20,6 +20,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.UniqueConstraint;
 import javax.print.Doc;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,13 +37,12 @@ public class PdfService extends AbstractService {
     private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 7;
     private ResourceBundleMessageSource resourceBundleMessageSource;
 
-    public PdfService(ResourceBundleMessageSource resourceBundleMessageSource)
-    {
+    public PdfService(ResourceBundleMessageSource resourceBundleMessageSource) {
         this.resourceBundleMessageSource = resourceBundleMessageSource;
     }
 
 
-    protected byte [] createAttendanceList(Course course) throws IOException {
+    protected byte[] createAttendanceList(Course course) throws IOException {
         PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -58,7 +58,7 @@ public class PdfService extends AbstractService {
         return baos.toByteArray();
     }
 
-    protected byte [] createKreuzelList(ExerciseSheet exerciseSheet) throws IOException {
+    protected byte[] createKreuzelList(ExerciseSheet exerciseSheet) throws IOException {
         PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
         long exampleNumber = exerciseSheet.getExamples().stream()
@@ -81,7 +81,7 @@ public class PdfService extends AbstractService {
         return baos.toByteArray();
     }
 
-    protected byte [] createExerciseSheet(ExerciseSheet exerciseSheet) throws IOException {
+    protected byte[] createExerciseSheet(ExerciseSheet exerciseSheet) throws IOException {
         PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -99,36 +99,32 @@ public class PdfService extends AbstractService {
         // add first line
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         Table table = new Table(2);
-        table.addCell(getCell(getLocaleMessage("exerciseSheet.issueDate") +": "+ exerciseSheet.getIssueDate().format(dateFormatter), TextAlignment.LEFT));
+        table.addCell(getCell(getLocaleMessage("exerciseSheet.issueDate") + ": " + exerciseSheet.getIssueDate().format(dateFormatter), TextAlignment.LEFT));
         table.addCell(getCell(exerciseSheet.getTotalPoints() + " " + getLocaleMessage("exerciseSheet.points"), TextAlignment.RIGHT));
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
         table.setWidth(UnitValue.createPercentValue(100));
         doc.add(table);
 
-        addEmptyLinesToDocument(doc,1);
-        addHtmlToPdfDocument(exerciseSheet.getDescription(),doc);
-        addEmptyLinesToDocument(doc,1);
+        addEmptyLinesToDocument(doc, 1);
+        addHtmlToPdfDocument(exerciseSheet.getDescription(), doc);
+        addEmptyLinesToDocument(doc, 1);
         List<Example> sortedExamples = exerciseSheet.getExamples().stream()
-                .filter(example -> example.getParentExample()==null)
+                .filter(example -> example.getParentExample() == null)
                 .sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
-        for(Example example: sortedExamples)
-        {
-            if(example.getSubExamples().isEmpty())
-            {
-                addExampleHeader(example.getName(), "("+example.getPoints()+" "+getLocaleMessage("exerciseSheet.points")+")",doc);
-                addHtmlToPdfDocument(example.getDescription(),doc);
-                addEmptyLinesToDocument(doc,1);
-            }else
-            {
-                addExampleHeader(example.getName(), "("+example.getPoints()+" "+getLocaleMessage("exerciseSheet.points")+")",doc);
-                addHtmlToPdfDocument(example.getDescription(),doc);
-                addEmptyLinesToDocument(doc,1);
+        for (Example example : sortedExamples) {
+            if (example.getSubExamples().isEmpty()) {
+                addExampleHeader(example.getName(), "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
+                addHtmlToPdfDocument(example.getDescription(), doc);
+                addEmptyLinesToDocument(doc, 1);
+            } else {
+                addExampleHeader(example.getName(), "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
+                addHtmlToPdfDocument(example.getDescription(), doc);
+                addEmptyLinesToDocument(doc, 1);
                 List<Example> subExamples = example.getSubExamples().stream().sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
-                for(Example subExample : subExamples)
-                {
-                    addExampleHeader(subExample.getName(), "("+subExample.getPoints()+" "+getLocaleMessage("exerciseSheet.points")+")",doc);
-                    addHtmlToPdfDocument(subExample.getDescription(),doc);
-                    addEmptyLinesToDocument(doc,1);
+                for (Example subExample : subExamples) {
+                    addExampleHeader(subExample.getName(), "(" + subExample.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
+                    addHtmlToPdfDocument(subExample.getDescription(), doc);
+                    addEmptyLinesToDocument(doc, 1);
                 }
             }
         }
@@ -139,28 +135,28 @@ public class PdfService extends AbstractService {
         return baos.toByteArray();
     }
 
-    protected void addEmptyLinesToDocument(Document document,Integer number)
-    {
+    protected void addEmptyLinesToDocument(Document document, Integer number) {
         Paragraph emptyLine = new Paragraph();
         emptyLine.setFontSize(12);
-        addEmptyLine(emptyLine,number);
+        addEmptyLine(emptyLine, number);
         document.add(emptyLine);
     }
 
-    protected void addHtmlToPdfDocument(String html, Document document)
-    {
+    protected void addHtmlToPdfDocument(String html, Document document) {
         List<IElement> elements = HtmlConverter.convertToElements(html);
-        for(IElement element: elements)
+        for (IElement element : elements) {
+            element.setProperty(Property.OVERFLOW_X, OverflowPropertyValue.FIT);
             document.add((IBlockElement) element);
+        }
     }
 
-    protected void addExampleHeader(String leftText, String rightText, Document document)
-    {
+    protected void addExampleHeader(String leftText, String rightText, Document document) {
         Table table = new Table(2);
-        table.addCell(getCell(leftText, TextAlignment.LEFT));
+        table.addCell(getCell(leftText, TextAlignment.LEFT).setFontSize(13).setBold());
         table.addCell(getCell(rightText, TextAlignment.RIGHT));
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
         table.setWidth(UnitValue.createPercentValue(100));
+        table.setMarginBottom(10);
         document.add(table);
     }
 
@@ -188,14 +184,14 @@ public class PdfService extends AbstractService {
     }
 
 
-    protected Table  getAttendanceTable( Course course)  {
+    protected Table getAttendanceTable(Course course) {
 
         String forename = getLocaleMessage("attendanceList.forename");
         String surname = getLocaleMessage("attendanceList.surname");
         String matriculationNumber = getLocaleMessage("attendanceList.matriculationNumber");
         String signature = getLocaleMessage("attendanceList.signature");
 
-        Table table = new Table(UnitValue.createPercentArray(new float[]{25,22,22,31}));
+        Table table = new Table(UnitValue.createPercentArray(new float[]{25, 22, 22, 31}));
         table.setFixedLayout();
         table.setWidth(UnitValue.createPercentValue(95));
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -219,30 +215,29 @@ public class PdfService extends AbstractService {
             if (!ECourseRole.Student.equals(userInCourse.getRole()))
                 continue;
 
-            table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(),TextAlignment.LEFT));
-            table.addCell(createCell(userInCourse.getUser().getSurname(),TextAlignment.LEFT));
-            table.addCell(createCell(userInCourse.getUser().getForename(),TextAlignment.LEFT));
-            table.addCell(createCell("",TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(), TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getSurname(), TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getForename(), TextAlignment.LEFT));
+            table.addCell(createCell("", TextAlignment.LEFT));
         }
 
         return table;
     }
-    protected Cell createCell(String content, TextAlignment textAlignment)
-    {
+
+    protected Cell createCell(String content, TextAlignment textAlignment) {
         Cell cell = new Cell();
         cell.add(new Paragraph(content));
         cell.setTextAlignment(textAlignment);
         return cell;
     }
 
-    protected Cell createHeaderCell(String content)
-    {
-        Cell cell = createCell(content,TextAlignment.LEFT);
+    protected Cell createHeaderCell(String content) {
+        Cell cell = createCell(content, TextAlignment.LEFT);
         cell.setBold();
         return cell;
     }
 
-    protected Table  getKreuzelListTable(ExerciseSheet exerciseSheet)  {
+    protected Table getKreuzelListTable(ExerciseSheet exerciseSheet) {
 
         String forename = getLocaleMessage("kreuzelList.forename");
         String surename = getLocaleMessage("kreuzelList.surname");
@@ -253,21 +248,20 @@ public class PdfService extends AbstractService {
                 .count();
 
         List<Example> exampleList = exerciseSheet.getExamples().stream()
-                .filter(example -> example.getParentExample()==null)
+                .filter(example -> example.getParentExample() == null)
                 .sorted(Comparator.comparing(Example::getOrder))
                 .collect(Collectors.toList());
 
         List<Example> examplesInTable = new ArrayList<>();
 
-        float [] widths = new float[(int) (exampleNumber+3)];
+        float[] widths = new float[(int) (exampleNumber + 3)];
         Arrays.fill(widths, (float) 1);
         widths[0] = (float) 5;
         widths[1] = (float) 5;
         widths[2] = (float) 5;
 
         int absoluteTableWidth = 0;
-        for(float width: widths)
-        {
+        for (float width : widths) {
             absoluteTableWidth = (int) (absoluteTableWidth + (width * 25));
         }
 
@@ -309,28 +303,27 @@ public class PdfService extends AbstractService {
             if (!ECourseRole.Student.equals(userInCourse.getRole()))
                 continue;
 
-            table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(),TextAlignment.LEFT));
-            table.addCell(createCell(userInCourse.getUser().getSurname(),TextAlignment.LEFT));
-            table.addCell(createCell(userInCourse.getUser().getForename(),TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(), TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getSurname(), TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getForename(), TextAlignment.LEFT));
 
-            for(Example example : examplesInTable)
-            {
+            for (Example example : examplesInTable) {
                 Optional<FinishesExample> finishesExample = example.getExamplesFinishedByUser().stream()
                         .filter(finishesExample1 -> finishesExample1.getUser().getMatriculationNumber().equals(userInCourse.getUser().getMatriculationNumber()))
                         .findFirst();
 
-                if(finishesExample.isPresent() && !(EFinishesExampleState.NO.equals(finishesExample.get().getState())) )
+                if (finishesExample.isPresent() && !(EFinishesExampleState.NO.equals(finishesExample.get().getState())))
                     table.addCell(getKreuzelCell(true));
                 else
                     table.addCell(getKreuzelCell(false));
             }
         }
 
-       return table;
+        return table;
     }
 
 
-    private  void addEmptyLine(Paragraph paragraph, int number) {
+    private void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Text("\n"));
         }
@@ -341,8 +334,7 @@ public class PdfService extends AbstractService {
         return createCell(text, TextAlignment.CENTER);
     }
 
-    private String getLocaleMessage(String code)
-    {
+    private String getLocaleMessage(String code) {
         return resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
     }
 
