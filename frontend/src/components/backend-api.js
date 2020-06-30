@@ -185,7 +185,7 @@ export default {
         )
     },
     deleteExampleValidator(id){
-        return axios.delete(`/example/validator/${id}`);
+        return axios.delete(`/example/${id}/validator`);
     },
     getExampleValidator(id){
         return axios.get(`/example/${id}/validator`,{

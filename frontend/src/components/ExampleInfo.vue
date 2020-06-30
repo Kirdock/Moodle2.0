@@ -262,7 +262,7 @@ export default {
                 this.$refs[`validator${this._uid}`].value = '';
                 try{
                     await this.$store.dispatch('addExampleValidator', formData);
-                    this.value.validator = file.name;
+                    this.$set(this.value, 'validator', file.name);
                     this.$bvToast.toast(this.$t('validator.saved'), {
                         title: this.$t('success'),
                         variant: 'success',
@@ -284,6 +284,7 @@ export default {
         async deleteValidator(){
             try{
                 await this.$store.dispatch('deleteExampleValidator', this.value.id);
+                this.value.validator = undefined;
                 this.$bvToast.toast(this.$t('validator.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',

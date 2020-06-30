@@ -47,9 +47,9 @@
                                         {{stateType.value}}
                                     </option>
                                 </select>
-                                <label class="control-label" v-else>
+                                <template v-else>
                                     {{state === 'n' ? '' : state === 'y' ? 'X' : 'O'}}
-                                </label>
+                                </template>
                             </td>
                         </tr>
                     </tbody>
