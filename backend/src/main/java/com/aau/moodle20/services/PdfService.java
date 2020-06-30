@@ -4,6 +4,7 @@ import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.exception.ServiceValidationException;
+import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -19,6 +20,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -88,31 +90,78 @@ public class PdfService extends AbstractService {
         doc.setLeftMargin(50);
         doc.setRightMargin(50);
 
-
+        // add title
         Paragraph titleParagraph = getTitleParagraph(exerciseSheet.getName());
         titleParagraph.setFont(font).setFontSize(16);
         titleParagraph.setBold();
         doc.add(titleParagraph);
 
+        // add first line
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-
         Table table = new Table(2);
-        //table.addCell(getCell("Text to the left", TextAlignment.LEFT));
-        table.addCell(getCell(getLocaleMessage("exerciseSheet.issueDate") +": "+ exerciseSheet.getSubmissionDate().format(dateFormatter), TextAlignment.LEFT));
+        table.addCell(getCell(getLocaleMessage("exerciseSheet.issueDate") +": "+ exerciseSheet.getIssueDate().format(dateFormatter), TextAlignment.LEFT));
         table.addCell(getCell(exerciseSheet.getTotalPoints() + " " + getLocaleMessage("exerciseSheet.points"), TextAlignment.RIGHT));
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
         table.setWidth(UnitValue.createPercentValue(100));
         doc.add(table);
 
-        Paragraph description = new Paragraph();
-        addEmptyLine(description,1);
-        description.add(exerciseSheet.getDescription());
-        doc.add(description);
+        addEmptyLinesToDocument(doc,1);
+        addHtmlToPdfDocument(exerciseSheet.getDescription(),doc);
+        addEmptyLinesToDocument(doc,1);
+        List<Example> sortedExamples = exerciseSheet.getExamples().stream()
+                .filter(example -> example.getParentExample()==null)
+                .sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
+        for(Example example: sortedExamples)
+        {
+            if(example.getSubExamples().isEmpty())
+            {
+                addExampleHeader(example.getName(), "("+example.getPoints()+" "+getLocaleMessage("exerciseSheet.points")+")",doc);
+                addHtmlToPdfDocument(example.getDescription(),doc);
+                addEmptyLinesToDocument(doc,1);
+            }else
+            {
+                addExampleHeader(example.getName(), "("+example.getPoints()+" "+getLocaleMessage("exerciseSheet.points")+")",doc);
+                addHtmlToPdfDocument(example.getDescription(),doc);
+                addEmptyLinesToDocument(doc,1);
+                List<Example> subExamples = example.getSubExamples().stream().sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
+                for(Example subExample : subExamples)
+                {
+                    addExampleHeader(subExample.getName(), "("+subExample.getPoints()+" "+getLocaleMessage("exerciseSheet.points")+")",doc);
+                    addHtmlToPdfDocument(subExample.getDescription(),doc);
+                    addEmptyLinesToDocument(doc,1);
+                }
+            }
+        }
+
 
         doc.close();
 
         return baos.toByteArray();
+    }
+
+    protected void addEmptyLinesToDocument(Document document,Integer number)
+    {
+        Paragraph emptyLine = new Paragraph();
+        emptyLine.setFontSize(12);
+        addEmptyLine(emptyLine,number);
+        document.add(emptyLine);
+    }
+
+    protected void addHtmlToPdfDocument(String html, Document document)
+    {
+        List<IElement> elements = HtmlConverter.convertToElements(html);
+        for(IElement element: elements)
+            document.add((IBlockElement) element);
+    }
+
+    protected void addExampleHeader(String leftText, String rightText, Document document)
+    {
+        Table table = new Table(2);
+        table.addCell(getCell(leftText, TextAlignment.LEFT));
+        table.addCell(getCell(rightText, TextAlignment.RIGHT));
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        table.setWidth(UnitValue.createPercentValue(100));
+        document.add(table);
     }
 
     protected Cell getCell(String text, TextAlignment alignment) {
