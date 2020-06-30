@@ -124,7 +124,9 @@ export default {
                 this.$refs[`file${this._uid}`].value = '';
                 try{
                     await this.$store.dispatch('addExampleAttachment', formData);
-                    this.value.remainingUploadCount--;
+                    if(this.value.remainingUploadCount > 0){
+                        this.value.remainingUploadCount--;
+                    }
                     this.value.hasAttachment = true;
                     this.$bvToast.toast(this.$t('attachment.saved'), {
                         title: this.$t('success'),

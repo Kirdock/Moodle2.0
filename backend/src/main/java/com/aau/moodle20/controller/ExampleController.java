@@ -56,13 +56,13 @@ public class ExampleController {
     }
 
     @PutMapping(value = "/example")
-    public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody ExampleRequest createExampleRequest) throws ServiceValidationException {
+    public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody ExampleRequest createExampleRequest) throws ServiceValidationException, IOException {
         ExampleResponseObject exampleResponseObject = exampleService.createExample(createExampleRequest);
         return ResponseEntity.ok(exampleResponseObject);
     }
 
     @PostMapping(value = "/example")
-    public ResponseEntity<?> updateExample(@Valid @RequestBody ExampleRequest updateExampleRequest) throws ServiceValidationException {
+    public ResponseEntity<?> updateExample(@Valid @RequestBody ExampleRequest updateExampleRequest) throws ServiceValidationException, IOException {
         exampleService.updateExample(updateExampleRequest);
         return ResponseEntity.ok("Example successfully updated");
     }

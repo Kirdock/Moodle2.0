@@ -83,9 +83,10 @@ public class ExerciseSheetService extends AbstractService{
 
         Comparator<UserInCourse> userInCourseComparatorSureName = Comparator.comparing(userInCourse -> userInCourse.getUser().getSurname());
         Comparator<UserInCourse> userInCourseComparatorForename = Comparator.comparing(userInCourse -> userInCourse.getUser().getForename());
+        Comparator<UserInCourse> userInCourseComparatorMatriculationNumber = Comparator.comparing(userInCourse -> userInCourse.getUser().getMatriculationNumber());
 
         List<UserInCourse> sortedUserInCourse = exerciseSheet.getCourse().getStudents().stream()
-                .sorted(userInCourseComparatorSureName.thenComparing(userInCourseComparatorForename))
+                .sorted(userInCourseComparatorSureName.thenComparing(userInCourseComparatorForename).thenComparing(userInCourseComparatorMatriculationNumber))
                 .collect(Collectors.toList());
         for(UserInCourse userInCourse: sortedUserInCourse)
         {

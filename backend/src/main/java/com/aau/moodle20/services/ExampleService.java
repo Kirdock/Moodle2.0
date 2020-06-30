@@ -25,8 +25,7 @@ import java.util.stream.Collectors;
 public class ExampleService extends AbstractService{
 
     @Transactional
-    public ExampleResponseObject createExample (ExampleRequest createExampleRequest) throws ServiceValidationException
-    {
+    public ExampleResponseObject createExample (ExampleRequest createExampleRequest) throws ServiceValidationException, IOException {
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
         Example parentExample = null;
@@ -39,6 +38,9 @@ public class ExampleService extends AbstractService{
             List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_Id(createExampleRequest.getParentId());
             finishesExampleRepository.deleteAll(finishesExamples);
             parentExample.setPoints(0);
+            if(parentExample.getValidator()!=null && !parentExample.getValidator().isEmpty())
+                deleteExampleValidator(parentExample.getId());
+
             exampleRepository.save(parentExample);
         }
 
@@ -75,13 +77,16 @@ public class ExampleService extends AbstractService{
     }
 
     @Transactional
-    public void updateExample(ExampleRequest updateExampleRequest) throws ServiceValidationException {
+    public void updateExample(ExampleRequest updateExampleRequest) throws ServiceValidationException, IOException {
         List<SupportFileType> supportFileTypes;
         if (updateExampleRequest.getSubmitFile() != null && updateExampleRequest.getSubmitFile()) {
             if (updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty())
                 throw new ServiceValidationException("Error: supported file types must not be null!");
         }
         Example example = readExample(updateExampleRequest.getId());
+        if(!updateExampleRequest.getSubmitFile() && (example.getValidator()!=null && !example.getValidator().isEmpty()) )
+            deleteExampleValidator(example.getId());
+
         example.fillValuesFromRequestObject(updateExampleRequest);
         supportFileTypes = createSupportedFileTypesEntries(example, updateExampleRequest);
         supportFileTypeRepository.saveAll(supportFileTypes);

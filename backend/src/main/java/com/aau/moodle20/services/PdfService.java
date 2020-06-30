@@ -152,12 +152,17 @@ public class PdfService extends AbstractService {
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
 
         table.addHeaderCell(createHeaderCell(matriculationNumber));
-        table.addHeaderCell(createHeaderCell(forename));
         table.addHeaderCell(createHeaderCell(surname));
+        table.addHeaderCell(createHeaderCell(forename));
         table.addHeaderCell(createHeaderCell(signature));
 
+        Comparator<UserInCourse> comparatorSurname = Comparator.comparing(userInCourse -> userInCourse.getUser().getSurname());
+        Comparator<UserInCourse> comparatorForename = Comparator.comparing(userInCourse -> userInCourse.getUser().getForename());
+        Comparator<UserInCourse> comparatorMatriculationNumber = Comparator.comparing(userInCourse -> userInCourse.getUser().getMatriculationNumber());
+
+
         List<UserInCourse> userInCourses = course.getStudents().stream()
-                .sorted(Comparator.comparing(userInCourse -> userInCourse.getUser().getSurname()))
+                .sorted(comparatorSurname.thenComparing(comparatorForename).thenComparing(comparatorMatriculationNumber))
                 .collect(Collectors.toList());
 
         for (UserInCourse userInCourse : userInCourses) {
@@ -166,8 +171,8 @@ public class PdfService extends AbstractService {
                 continue;
 
             table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(),TextAlignment.LEFT));
-            table.addCell(createCell(userInCourse.getUser().getForename(),TextAlignment.LEFT));
             table.addCell(createCell(userInCourse.getUser().getSurname(),TextAlignment.LEFT));
+            table.addCell(createCell(userInCourse.getUser().getForename(),TextAlignment.LEFT));
             table.addCell(createCell("",TextAlignment.LEFT));
         }
 
