@@ -6,6 +6,7 @@ import com.aau.moodle20.entity.*;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
@@ -87,8 +88,10 @@ public class PdfService extends AbstractService {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
         Document doc = new Document(pdfDoc);
+        pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new FooterPageEventHandler(doc));
         doc.setLeftMargin(50);
         doc.setRightMargin(50);
+        doc.setBottomMargin(50);
 
         // add title
         Paragraph titleParagraph = getTitleParagraph(exerciseSheet.getName());
