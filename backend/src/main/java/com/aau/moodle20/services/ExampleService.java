@@ -41,7 +41,13 @@ public class ExampleService extends AbstractService{
             if(parentExample.getValidator()!=null && !parentExample.getValidator().isEmpty())
                 deleteExampleValidator(parentExample.getId());
 
+            parentExample.setSubmitFile(Boolean.FALSE);
+            supportFileTypeRepository.deleteAll(parentExample.getSupportFileTypes());
+            parentExample.setCustomFileTypes(null);
+
             exampleRepository.save(parentExample);
+            exampleRepository.flush();
+            supportFileTypeRepository.flush();
         }
 
         example.fillValuesFromRequestObject(createExampleRequest);
