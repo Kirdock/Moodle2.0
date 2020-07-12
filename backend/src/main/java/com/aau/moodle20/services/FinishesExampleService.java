@@ -10,7 +10,9 @@ import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
-import org.apache.maven.cli.CliRequest;
+import com.aau.moodle20.validation.IValidator;
+import com.aau.moodle20.validation.ValidationLoader;
+import com.aau.moodle20.validation.Violation;
 import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
@@ -84,10 +86,11 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public void setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException {
+    public List<Violation> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException, ClassNotFoundException {
         if (file.isEmpty())
             throw new ServiceValidationException("Error: given file is empty");
 
+        List<Violation> violations = new ArrayList<>();
         UserDetailsImpl userDetails = getUserDetails();
         Example example = readExample(exampleId);
 
@@ -111,24 +114,32 @@ public class FinishesExampleService extends AbstractService{
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
         // zip => maven project
-        if (FileConstants.ZipFileExtension.equals(extension)) {
-            String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
-            validateMavenProject(filePath, example);
-        }
+       // if (FileConstants.ZipFileExtension.equals(extension)) {
+        String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
+           violations =  excectueValidator(filePath, example);
+       // }
 
         finishesExample.setFileName(file.getOriginalFilename());
         if (finishesExample.getRemainingUploadCount() > 0)
             finishesExample.setRemainingUploadCount(finishesExample.getRemainingUploadCount() - 1);
         finishesExampleRepository.save(finishesExample);
+
+        return violations;
     }
 
-    protected void validateMavenProject(String filePath, Example example) throws IOException {
+    protected List<Violation> excectueValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
         String destDir = FileConstants.UNZIP_DIR_MAVEN_PROJECT +"/"+example.getId();
+        String validatorDir = FileConstants.validatorDir + createExampleAttachmentDir(example);
+        validatorDir = validatorDir + "/"+ example.getValidator();
 
-        unzipMavenProject(filePath,new File(destDir));
-        installMavenProject(destDir);
-        executeValidator(destDir);
-        deleteMavenProject(destDir);
+        ValidationLoader validationLoader = new ValidationLoader();
+        IValidator validator = validationLoader.loadValidator(validatorDir,"com.aau.moodle20.validation.IValidator", IValidator.class);
+        return validator.validate(example,filePath);
+
+//        unzipMavenProject(filePath,new File(destDir));
+//        installMavenProject(destDir);
+//        executeValidator(destDir);
+//        deleteMavenProject(destDir);
     }
 
     protected void installMavenProject(String destDir) throws ServiceValidationException

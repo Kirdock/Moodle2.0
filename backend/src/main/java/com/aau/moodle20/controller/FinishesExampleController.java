@@ -7,6 +7,7 @@ import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.services.FinishesExampleService;
+import com.aau.moodle20.validation.Violation;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -43,9 +44,8 @@ public class FinishesExampleController {
     }
 
     @PostMapping(path = "/user/kreuzel/attachment")
-    public ResponseEntity<?> setKreuzelUserAttachment(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws IOException {
-        finishesExampleService.setKreuzelUserAttachment(file,exampleId);
-        return ResponseEntity.ok(new MessageResponse("Attachment for kreuzel was successfully set!"));
+    public ResponseEntity<List<Violation>> setKreuzelUserAttachment(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws IOException, ClassNotFoundException {
+        return ResponseEntity.ok(finishesExampleService.setKreuzelUserAttachment(file,exampleId));
     }
 
     @GetMapping(path = "/user/kreuzel/attachment/{exampleId}")
