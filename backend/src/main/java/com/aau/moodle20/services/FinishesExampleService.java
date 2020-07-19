@@ -11,7 +11,7 @@ import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.validation.IValidator;
-import com.aau.moodle20.validation.ValidationLoader;
+import com.aau.moodle20.validation.ValidatorLoader;
 import com.aau.moodle20.validation.Violation;
 import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -113,11 +113,9 @@ public class FinishesExampleService extends AbstractService{
         saveFileToDisk(file, example);
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-        // zip => maven project
-       // if (FileConstants.ZipFileExtension.equals(extension)) {
+
         String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
-           violations =  excectueValidator(filePath, example);
-       // }
+        violations =  excectueValidator(filePath, example);
 
         finishesExample.setFileName(file.getOriginalFilename());
         if (finishesExample.getRemainingUploadCount() > 0)
@@ -128,13 +126,16 @@ public class FinishesExampleService extends AbstractService{
     }
 
     protected List<Violation> excectueValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
-        String destDir = FileConstants.UNZIP_DIR_MAVEN_PROJECT +"/"+example.getId();
+        List<Violation> violations = new ArrayList<>();
         String validatorDir = FileConstants.validatorDir + createExampleAttachmentDir(example);
         validatorDir = validatorDir + "/"+ example.getValidator();
 
-        ValidationLoader validationLoader = new ValidationLoader();
-        IValidator validator = validationLoader.loadValidator(validatorDir,"com.aau.moodle20.validation.IValidator", IValidator.class);
-        return validator.validate(example,filePath);
+        ValidatorLoader validationLoader = new ValidatorLoader();
+        IValidator validator = validationLoader.loadValidator(validatorDir);
+        if(validator!=null)
+            violations = validator.validate(example,filePath);
+
+        return violations; 
 
 //        unzipMavenProject(filePath,new File(destDir));
 //        installMavenProject(destDir);

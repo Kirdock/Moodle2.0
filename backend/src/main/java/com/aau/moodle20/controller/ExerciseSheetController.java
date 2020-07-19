@@ -79,7 +79,7 @@ public class ExerciseSheetController {
                 .body(new InputStreamResource(bis));
     }
 
-    @GetMapping(value = "/exerciseSheet/{id}/document")
+    @GetMapping(value = "/exerciseSheetAssigned/{id}/pdf")
     public ResponseEntity<InputStreamResource> getExerciseSheetDocument(@PathVariable("id") long exerciseSheetId) throws IOException {
         ByteArrayInputStream bis = pdfService.generateExerciseSheetDocument(exerciseSheetId);
         HttpHeaders headers = new HttpHeaders();
