@@ -314,11 +314,7 @@ public class PdfService extends AbstractService {
                 Optional<FinishesExample> finishesExample = example.getExamplesFinishedByUser().stream()
                         .filter(finishesExample1 -> finishesExample1.getUser().getMatriculationNumber().equals(userInCourse.getUser().getMatriculationNumber()))
                         .findFirst();
-
-                if (finishesExample.isPresent() && !(EFinishesExampleState.NO.equals(finishesExample.get().getState())))
-                    table.addCell(getKreuzelCell(true));
-                else
-                    table.addCell(getKreuzelCell(false));
+                 table.addCell(getKreuzelCell(finishesExample));
             }
         }
 
@@ -332,8 +328,16 @@ public class PdfService extends AbstractService {
         }
     }
 
-    private Cell getKreuzelCell(boolean checked) {
-        String text = checked ? "X" : " ";
+    private Cell getKreuzelCell( Optional<FinishesExample> finishesExample) {
+
+        String text = " ";
+        if(finishesExample.isPresent())
+        {
+            if(EFinishesExampleState.YES.equals(finishesExample.get().getState()))
+                text = "X";
+            else if(EFinishesExampleState.MAYBE.equals(finishesExample.get().getState()))
+                text = "O";
+        }
         return createCell(text, TextAlignment.CENTER);
     }
 
