@@ -42,14 +42,15 @@
                                 {{kreuzel.forename}}
                             </td>
                             <td v-for="(state, index) in kreuzel.states" :key="index">
-                                <select v-if="editMode" class="form-control" v-model="kreuzel.states[index]" style="width: 60px">
+                                <select v-if="editMode" class="form-control" v-model="state.type" style="width: 60px">
                                     <option v-for="stateType in stateTypes" :value="stateType.key" :key="stateType.key">
                                         {{stateType.value}}
                                     </option>
                                 </select>
                                 <template v-else>
-                                    {{state === 'n' ? '' : state === 'y' ? 'X' : 'O'}}
+                                    {{state.type === 'n' ? '' : state.type === 'y' ? 'X' : 'O'}}
                                 </template>
+                                <textarea v-if="state.description" class="form-control" readonly="true" :value="state.description"></textarea>
                             </td>
                         </tr>
                     </tbody>
@@ -138,7 +139,7 @@ export default {
                         data.push({
                             matriculationNumber: kreuzel.matriculationNumber,
                             exampleId: this.kreuzelInfo.examples[index].id,
-                            state
+                            state: state.type
                         })
                     });
                 }
