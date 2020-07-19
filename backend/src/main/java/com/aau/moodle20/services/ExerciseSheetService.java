@@ -7,10 +7,7 @@ import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceValidationException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
-import com.aau.moodle20.payload.response.ExampleResponseObject;
-import com.aau.moodle20.payload.response.ExerciseSheetKreuzelResponse;
-import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
-import com.aau.moodle20.payload.response.KreuzelCourseResponse;
+import com.aau.moodle20.payload.response.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -103,18 +100,25 @@ public class ExerciseSheetService extends AbstractService{
     return response;
     }
 
-    protected List<String> getExampleStatesOfExerciseSheet(List<Example> examplesOfExerciseSheet,User user)
+    protected List<KreuzelCourseState> getExampleStatesOfExerciseSheet(List<Example> examplesOfExerciseSheet, User user)
     {
-        List<String> states = new ArrayList<>();
+        List<KreuzelCourseState> states = new ArrayList<>();
         for(Example example: examplesOfExerciseSheet)
         {
+            KreuzelCourseState state = new KreuzelCourseState();
+
            Optional<FinishesExample> optFinishesExample = example.getExamplesFinishedByUser().stream()
                    .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(user.getMatriculationNumber()))
                    .findFirst();
-           if(optFinishesExample.isPresent())
-               states.add(optFinishesExample.get().getState().getRole());
-           else
-               states.add(EFinishesExampleState.NO.getRole());
+           if(optFinishesExample.isPresent()) {
+               state.setType(optFinishesExample.get().getState().getRole());
+               state.setDescription(optFinishesExample.get().getDescription());
+           }
+           else {
+               state.setType(EFinishesExampleState.NO.getRole());
+               state.setDescription("");
+           }
+            states.add(state);
         }
         return states;
     }

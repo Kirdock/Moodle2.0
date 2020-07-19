@@ -15,7 +15,7 @@ public class KreuzelCourseResponse {
     private EFinishesExampleState state;
     private String exampleName;
     private Long exampleId;
-    private List<String> states;
+    private List<KreuzelCourseState> states;
 
     public String getExerciseSheetName() {
         return exerciseSheetName;
@@ -73,11 +73,11 @@ public class KreuzelCourseResponse {
         this.exampleId = exampleId;
     }
 
-    public List<String> getStates() {
+    public List<KreuzelCourseState> getStates() {
         return states;
     }
 
-    public void setStates(List<String> states) {
+    public void setStates(List<KreuzelCourseState> states) {
         this.states = states;
     }
 }
