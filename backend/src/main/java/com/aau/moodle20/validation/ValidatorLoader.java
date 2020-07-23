@@ -38,42 +38,4 @@ public class ValidatorLoader {
 
         return validator;
     }
-    
-
-
-   /* for (File jar : jarDir.listFiles()) {
-        try {
-            URLClassLoader loader = URLClassLoader.newInstance(
-                    new URL[] { jar.toURI().toURL() },
-                    getClass().getClassLoader()
-            );
-            Class classToLoad = Class.forName(classpath, true, loader);
-            //Class<? extends IValidator> newClass = classToLoad.asSubclass(parentClass);
-            // Apparently its bad to use Class.newInstance, so we use
-            // newClass.getConstructor() instead
-            Object instance = classToLoad.newInstance();
-            //Constructor<? extends IValidator> constructor = newClass.getConstructor();
-            return (IValidator) instance;
-
-        } catch (ClassNotFoundException e) {
-            // There might be multiple JARs in the directory,
-            // so keep looking
-            continue;
-        } catch (MalformedURLException /*| NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-    }*/
-
-//    public void addValidatorJarToClasspath(String directory) throws MalformedURLException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-//        File f = new File("./backend/attachments/validators/");
-//        URL url = f.toURI().toURL();
-//
-//
-//
-////        Class urlClass = URLClassLoader.class;
-////        Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-////        method.setAccessible(true);
-////        method.invoke(urlClassLoader, new Object[]{url});
-//    }
-
 }
