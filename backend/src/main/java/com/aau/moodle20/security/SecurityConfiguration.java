@@ -67,12 +67,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .cors()
                 .and()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
-                .and()
                 .authorizeRequests()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/h2-console/*").permitAll()
-                .antMatchers("/api/*").authenticated() // protect all other requests
+                .anyRequest().authenticated() // protect all other requests
+                .and()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 .headers().frameOptions().disable()
                 .and()

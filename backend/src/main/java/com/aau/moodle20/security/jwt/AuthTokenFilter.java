@@ -49,31 +49,19 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             }
         } catch (SignatureException e) {
             logger.error("Invalid JWT signature: {}", e.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write("Invalid JWT signature");
         } catch (MalformedJwtException e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write("Invalid JWT token");
         } catch (ExpiredJwtException e) {
             logger.error("JWT token is expired: {}", e.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write("JWT token is expired");
 
         } catch (UnsupportedJwtException e) {
             logger.error("JWT token is unsupported: {}", e.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write("JWT token is unsupported");
 
         } catch (IllegalArgumentException e) {
             logger.error("JWT claims string is empty: {}", e.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write("JWT claims string is empty");
 
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write("Cannot set user authentication");
         }
 
         filterChain.doFilter(request, response);
