@@ -44,7 +44,7 @@ public class FinishesExampleController {
     }
 
     @PostMapping(path = "/user/kreuzel/attachment")
-    public ResponseEntity<List<Violation>> setKreuzelUserAttachment(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws IOException, ClassNotFoundException {
+    public ResponseEntity<List<? extends Violation>> setKreuzelUserAttachment(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws IOException, ClassNotFoundException {
         return ResponseEntity.ok(finishesExampleService.setKreuzelUserAttachment(file,exampleId));
     }
 

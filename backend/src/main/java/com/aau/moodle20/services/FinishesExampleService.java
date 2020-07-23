@@ -86,11 +86,11 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public List<Violation> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException, ClassNotFoundException {
+    public List<? extends Violation> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException, ClassNotFoundException {
         if (file.isEmpty())
             throw new ServiceValidationException("Error: given file is empty");
 
-        List<Violation> violations = new ArrayList<>();
+        List<? extends Violation> violations = new ArrayList<>();
         UserDetailsImpl userDetails = getUserDetails();
         Example example = readExample(exampleId);
 
@@ -125,15 +125,15 @@ public class FinishesExampleService extends AbstractService{
         return violations;
     }
 
-    protected List<Violation> excectueValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
-        List<Violation> violations = new ArrayList<>();
+    protected List<? extends Violation> excectueValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
+        List<? extends Violation> violations = new ArrayList<>();
         String validatorDir = FileConstants.validatorDir + createExampleAttachmentDir(example);
         validatorDir = validatorDir + "/"+ example.getValidator();
 
         ValidatorLoader validationLoader = new ValidatorLoader();
         IValidator validator = validationLoader.loadValidator(validatorDir);
         if(validator!=null)
-            violations = validator.validate(example,filePath);
+            violations = validator.validate(filePath);
 
         return violations; 
 

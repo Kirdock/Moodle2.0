@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IValidator {
 
-    List<Violation> validate(Example example, String fileDir);
+    List<? extends Violation> validate(String fileDir);
 }
