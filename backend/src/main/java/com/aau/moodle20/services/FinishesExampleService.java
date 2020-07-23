@@ -39,7 +39,7 @@ public class FinishesExampleService extends AbstractService{
     public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceValidationException {
         UserDetailsImpl userDetails = getUserDetails();
         for (UserKreuzelRequest userKreuzelRequest : userKreuzelRequests) {
-            updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription());
+            updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription(), false);
         }
     }
 
@@ -48,31 +48,29 @@ public class FinishesExampleService extends AbstractService{
     {
         for(UserKreuzeMultilRequest userKreuzeMultilRequest: userKreuzeMultilRequests)
         {
-            updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(),userKreuzeMultilRequest.getMatriculationNumber(),userKreuzeMultilRequest.getState(),null);
+            updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(),userKreuzeMultilRequest.getMatriculationNumber(),userKreuzeMultilRequest.getState(),null, true);
         }
     }
 
-    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description) throws ServiceValidationException
-    {
+    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) throws ServiceValidationException {
         FinishesExample finishesExample = null;
         Example example = readExample(exampleId);
         User user = readUser(matriculationNumber);
-        if(!example.getSubExamples().isEmpty())
+        if (!example.getSubExamples().isEmpty())
             throw new ServiceValidationException("Error: Example has sub-examples and can therefore not be kreuzelt");
 
-        Optional<FinishesExample> optionalFinishesExample =  finishesExampleRepository
+        Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
                 .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
         //update
-        if(optionalFinishesExample.isPresent())
-        {
+        if (optionalFinishesExample.isPresent()) {
             finishesExample = optionalFinishesExample.get();
             finishesExample.setState(state);
-            finishesExample.setDescription(description);
+            if (!kreuzelMulti)
+                finishesExample.setDescription(description);
         }
         //Create
-        else
-        {
-            FinishesExampleKey finishesExampleKey = new FinishesExampleKey(matriculationNumber,exampleId);
+        else {
+            FinishesExampleKey finishesExampleKey = new FinishesExampleKey(matriculationNumber, exampleId);
             finishesExample = new FinishesExample();
             finishesExample.setId(finishesExampleKey);
             finishesExample.setExample(example);
