@@ -94,6 +94,18 @@ public class PdfService extends AbstractService {
         doc.setBottomMargin(50);
 
         // add title
+        List<ExerciseSheet> exerciseSheetsOfCourse = exerciseSheet.getCourse().getExerciseSheets().stream()
+                .sorted(Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName))
+                .collect(Collectors.toList());
+        int exerciseSheetNumber = 1;
+        for(ExerciseSheet exerciseSheet1: exerciseSheetsOfCourse)
+        {
+            if(exerciseSheet1.equals(exerciseSheet))
+                break;
+            exerciseSheetNumber++;
+        }
+
+
         Paragraph titleParagraph = getTitleParagraph(exerciseSheet.getName());
         titleParagraph.setFont(font).setFontSize(16);
         titleParagraph.setBold();
@@ -115,17 +127,21 @@ public class PdfService extends AbstractService {
                 .filter(example -> example.getParentExample() == null)
                 .sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
         for (Example example : sortedExamples) {
+
+            String exampleText = exerciseSheetNumber+"."+(example.getOrder()+1) +" "+ example.getName();
             if (example.getSubExamples().isEmpty()) {
-                addExampleHeader(example.getName(), "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
+                addExampleHeader(exampleText, "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
                 addHtmlToPdfDocument(example.getDescription(), doc);
                 addEmptyLinesToDocument(doc, 1);
             } else {
-                addExampleHeader(example.getName(), "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
+                addExampleHeader(exampleText, "", doc);
                 addHtmlToPdfDocument(example.getDescription(), doc);
                 addEmptyLinesToDocument(doc, 1);
                 List<Example> subExamples = example.getSubExamples().stream().sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
                 for (Example subExample : subExamples) {
-                    addExampleHeader(subExample.getName(), "(" + subExample.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
+                    String subExampleText = exerciseSheetNumber+"."+(example.getOrder()+1) +"."+ (subExample.getOrder() +1) +" "+subExample.getName();
+
+                    addExampleHeader(subExampleText, "(" + subExample.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
                     addHtmlToPdfDocument(subExample.getDescription(), doc);
                     addEmptyLinesToDocument(doc, 1);
                 }
