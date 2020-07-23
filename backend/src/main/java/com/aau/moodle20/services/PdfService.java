@@ -162,6 +162,9 @@ public class PdfService extends AbstractService {
     }
 
     protected void addHtmlToPdfDocument(String html, Document document) {
+        if(html == null)
+            return;
+        
         List<IElement> elements = HtmlConverter.convertToElements(html);
         for (IElement element : elements) {
             element.setProperty(Property.OVERFLOW_X, OverflowPropertyValue.FIT);
