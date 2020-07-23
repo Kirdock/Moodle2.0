@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 public class PdfService extends AbstractService {
 
     private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 7;
+    private final Float exampleHeaderFontSize = 13f;
+    private final Float subExampleHeaderFontSize = 11f;
     private ResourceBundleMessageSource resourceBundleMessageSource;
 
     public PdfService(ResourceBundleMessageSource resourceBundleMessageSource) {
@@ -130,18 +132,18 @@ public class PdfService extends AbstractService {
 
             String exampleText = exerciseSheetNumber+"."+(example.getOrder()+1) +" "+ example.getName();
             if (example.getSubExamples().isEmpty()) {
-                addExampleHeader(exampleText, "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
+                addExampleHeader(exampleText, "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", exampleHeaderFontSize, doc);
                 addHtmlToPdfDocument(example.getDescription(), doc);
                 addEmptyLinesToDocument(doc, 1);
             } else {
-                addExampleHeader(exampleText, "", doc);
+                addExampleHeader(exampleText, "", exampleHeaderFontSize,doc);
                 addHtmlToPdfDocument(example.getDescription(), doc);
                 addEmptyLinesToDocument(doc, 1);
                 List<Example> subExamples = example.getSubExamples().stream().sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
                 for (Example subExample : subExamples) {
                     String subExampleText = exerciseSheetNumber+"."+(example.getOrder()+1) +"."+ (subExample.getOrder() +1) +" "+subExample.getName();
 
-                    addExampleHeader(subExampleText, "(" + subExample.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", doc);
+                    addExampleHeader(subExampleText, "(" + subExample.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", subExampleHeaderFontSize,doc);
                     addHtmlToPdfDocument(subExample.getDescription(), doc);
                     addEmptyLinesToDocument(doc, 1);
                 }
@@ -164,7 +166,7 @@ public class PdfService extends AbstractService {
     protected void addHtmlToPdfDocument(String html, Document document) {
         if(html == null)
             return;
-        
+
         List<IElement> elements = HtmlConverter.convertToElements(html);
         for (IElement element : elements) {
             element.setProperty(Property.OVERFLOW_X, OverflowPropertyValue.FIT);
@@ -172,9 +174,9 @@ public class PdfService extends AbstractService {
         }
     }
 
-    protected void addExampleHeader(String leftText, String rightText, Document document) {
+    protected void addExampleHeader(String leftText, String rightText, Float fontSize,Document document) {
         Table table = new Table(2);
-        table.addCell(getCell(leftText, TextAlignment.LEFT).setFontSize(13).setBold());
+        table.addCell(getCell(leftText, TextAlignment.LEFT).setFontSize(fontSize).setBold());
         table.addCell(getCell(rightText, TextAlignment.RIGHT));
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
         table.setWidth(UnitValue.createPercentValue(100));
