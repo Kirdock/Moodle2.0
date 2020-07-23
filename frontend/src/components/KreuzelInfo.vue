@@ -52,7 +52,7 @@
                             <label :for="`kInfoDescription${_uid}`" class="control-label required">
                                 {{$t('reason')}}:
                             </label>
-                            <input :for="`kInfoDescription${_uid}`" type="text" class="form-control" v-model="value.submitDescription" :disabled="deadlineReached" required>
+                            <textarea :for="`kInfoDescription${_uid}`" class="form-control" v-model="value.submitDescription" :disabled="deadlineReached" required maxlength="200"> </textarea>
                         </div>
                     </div>
                 </template>
