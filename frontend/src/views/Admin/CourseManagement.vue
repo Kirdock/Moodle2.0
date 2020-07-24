@@ -236,6 +236,9 @@
                                         }">
                                             <span class="fa fa-edit fa-2x"></span>
                                         </router-link>
+                                        <a href="#" :title="$t('download')" @click.prevent="getExerciseSheetPdf(sheet.id)">
+                                            <span class="fa fa-eye fa-2x"></span>
+                                        </a>
                                         <a href.prevent="#" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'" @click="selectedDeleteExerciseSheet = sheet.id">
                                             <span class="fa fa-trash fa-2x"></span>
                                         </a>
@@ -956,6 +959,19 @@ export default {
             catch{
                 this.$bvToast.toast(this.$t('semester.error.get'), {
                     title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }
+        },
+        async getExerciseSheetPdf(id){
+            try{
+                const response = await this.$store.dispatch('getExerciseSheetPdf', id);
+                fileManagement.download(response);
+            }
+            catch{
+                this.$bvToast.toast(this.$t('exerciseSheet.error.get'), {
+                    title: 'Fehler',
                     variant: 'danger',
                     appendToast: true
                 });

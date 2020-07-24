@@ -8,7 +8,7 @@
                 </div>
                 <div class="form-group">
                     <label :for="`eInfoDescription${_uid}`" class="control-label" :class="value.subExamples.length === 0 ? 'required' : ''">{{ $t('description') }}</label>
-                    <editor :id="`eInfoDescription${_uid}`" v-model="value.description" :required="value.subExamples.length === 0" ></editor>
+                    <editor :id="`eInfoDescription${_uid}`" :ref="`editor${_uid}`" v-model="value.description" :required="value.subExamples.length === 0" ></editor>
                 </div>
                 <div v-if="value.subExamples.length === 0">
                     <div class="form-group">
@@ -195,10 +195,14 @@ export default {
     methods:{
         setExample(example){
             this.setSelectedExample(example);
+            this.$refs[`editor${this._uid}`].forceUpdate(example.description);
             this.$nextTick(()=>{ //else selectedExample isn't changed in time and file types of selectedExample before are being used
                 this.setFileTypes();
             });
             
+        },
+        forceUpdate(value){
+            this.$refs[`editor${this._uid}`].forceUpdate(value);
         },
         async getFileTypes(){
             try{

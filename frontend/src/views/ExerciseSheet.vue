@@ -144,9 +144,7 @@ export default {
             let total = 0;
             for(let example of this.sheetInfo.examples){
                 if(example.subExamples.length !== 0){
-                    for(let subExample of example.subExamples){
-                        total++;
-                    }
+                    total += example.subExamples.length;
                 }
                 else{
                     total++;

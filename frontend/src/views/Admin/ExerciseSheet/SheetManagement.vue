@@ -39,16 +39,16 @@
                     </div>
                 </b-tab>
                 
-                <b-tab class="item" v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample()">
+                <b-tab class="item" v-for="(example, index) in sheetInfo.examples" :key="example.id" :title="example.name" @click="setSelectedExample(undefined, {example, index})">
                     <div style="margin-top: 10px; font-size: 30px" v-if="isSubExample">
-                        <a href="#" @click.prevent="setSelectedExample()">
+                        <a href="#" @click.prevent="setSelectedExample(undefined, {example, index})">
                             {{example.name}}
                         </a>
                         <span class="fas fa-chevron-right"></span>
                         <span>{{selectedExample.name}}</span>
                     </div>
                     <form @submit.prevent="updateExample(selectedExample || example)" :ref="`formExample${index}`">
-                        <example-info :uploadCount="sheetInfo.uploadCount" :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
+                        <example-info :ref="`eInfo${index}`" :uploadCount="sheetInfo.uploadCount" :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
                         <div class="form-inline" style="margin-left: 10px; margin-top: 10px" v-if="!isSubExample">
                             <button class="btn btn-primary" type="submit">
                                 <span class="fa fa-sync fa-spin"  v-if="example.loading"></span>
@@ -239,6 +239,7 @@ export default {
         buildExample(name, order, isParent){
             return {
                 name: `${name} ${order+1}`,
+                description: '',
                 parentId: isParent ? undefined : this.sheetInfo.examples[this.activeTab -1].id,
                 exerciseSheetId: this.sheetId,
                 weighting: 1,
@@ -267,8 +268,15 @@ export default {
                 });
             }
         },
-        setSelectedExample(example){
+        setSelectedExample(example, parentInfo){
             this.selectedExample = example;
+            if(parentInfo){
+                let child = this.$refs[`eInfo${parentInfo.index}`];
+                if(Array.isArray(child)){
+                    child = child[0];
+                }
+                child.forceUpdate(parentInfo.example.description);
+            }
         }
     }
 }

@@ -1,7 +1,8 @@
 <template>
     <div>
-        <div :id="`summernote_${_uid}`">
-        </div>
+        <textarea :id="`summernote_${_uid}`">
+            {{value}}
+        </textarea>
     </div>
 </template>
 
@@ -16,7 +17,7 @@
         props: ['value', 'required'],
         data(){
             return {
-                
+                triggerByForceUpdate: false
             }
         },
         computed:{
@@ -37,16 +38,18 @@
             const vm = this;
             $(document).ready(()=> {
                 $(`#summernote_${vm._uid}`).summernote(vm.options);
-                vm.$nextTick(()=>{
-                    setTimeout(()=>{
-                        $(`#summernote_${vm._uid}`).summernote('code', vm.value || '');
-                    },500)
-                });
             });
         },
         methods:{
             update(value){
-                this.$emit('input', value);
+                if(!this.triggerByForceUpdate){
+                    this.$emit('input', value);
+                }
+                this.triggerByForceUpdate = false;
+            },
+            forceUpdate(value){ //called from parent, if v-model changes
+                this.triggerByForceUpdate = true;
+                $(`#summernote_${this._uid}`).summernote('code', value);
             }
         },
         watch:{
