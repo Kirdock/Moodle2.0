@@ -2,6 +2,7 @@ package com.aau.moodle20.payload.response;
 
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.Example;
+import com.aau.moodle20.entity.ViolationHistory;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class ExampleResponseObject {
     private Boolean hasAttachment;
     private Integer uploadCount;
     private Integer remainingUploadCount;
+    private List<ViolationHistoryResponse> result;
 
 
     public ExampleResponseObject(){
@@ -189,5 +191,13 @@ public class ExampleResponseObject {
 
     public void setRemainingUploadCount(Integer remainingUploadCount) {
         this.remainingUploadCount = remainingUploadCount;
+    }
+
+    public List<ViolationHistoryResponse> getResult() {
+        return result;
+    }
+
+    public void setResult(List<ViolationHistoryResponse> result) {
+        this.result = result;
     }
 }

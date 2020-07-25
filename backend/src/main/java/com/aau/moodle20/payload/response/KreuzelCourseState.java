@@ -1,9 +1,15 @@
 package com.aau.moodle20.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.util.List;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class KreuzelCourseState {
 
     private String type;
     private String description;
+    private List<ViolationHistoryResponse> result;
 
     public String getType() {
         return type;
@@ -19,5 +25,13 @@ public class KreuzelCourseState {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<ViolationHistoryResponse> getResult() {
+        return result;
+    }
+
+    public void setResult(List<ViolationHistoryResponse> result) {
+        this.result = result;
     }
 }

@@ -10,9 +10,10 @@ import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
+import com.aau.moodle20.payload.response.ViolationResponse;
 import com.aau.moodle20.validation.IValidator;
 import com.aau.moodle20.validation.ValidatorLoader;
-import com.aau.moodle20.validation.Violation;
+import com.aau.moodle20.entity.Violation;
 import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -84,7 +86,7 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public List<? extends Violation> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException, ClassNotFoundException {
+    public List<ViolationResponse> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException, ClassNotFoundException {
         if (file.isEmpty())
             throw new ServiceValidationException("Error: given file is empty");
 
@@ -110,17 +112,29 @@ public class FinishesExampleService extends AbstractService{
 
         saveFileToDisk(file, example);
         String fileName = file.getOriginalFilename();
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+//        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 
         String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
         violations =  excectueValidator(filePath, example);
 
+
+
         finishesExample.setFileName(file.getOriginalFilename());
         if (finishesExample.getRemainingUploadCount() > 0)
             finishesExample.setRemainingUploadCount(finishesExample.getRemainingUploadCount() - 1);
-        finishesExampleRepository.save(finishesExample);
+        finishesExampleRepository.saveAndFlush(finishesExample);
 
-        return violations;
+        ViolationHistory violationHistory = new ViolationHistory();
+        violationHistory.setViolations(new HashSet<>(violations));
+        violationHistory.setDate(LocalDateTime.now());
+        violationHistoryRepository.saveAndFlush(violationHistory);
+
+        violationHistory.setFinishesExample(finishesExample);
+        violationHistory.getViolations().forEach(violation -> violation.setViolationHistory(violationHistory));
+
+        violationHistoryRepository.save(violationHistory);
+
+        return violations.stream().map(Violation::createViolationResponse).collect(Collectors.toList());
     }
 
     protected List<? extends Violation> excectueValidator(String filePath, Example example) throws IOException, ClassNotFoundException {

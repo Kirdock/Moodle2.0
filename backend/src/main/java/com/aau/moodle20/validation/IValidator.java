@@ -1,6 +1,6 @@
 package com.aau.moodle20.validation;
 
-import com.aau.moodle20.entity.Example;
+import com.aau.moodle20.entity.Violation;
 
 import java.util.List;
 

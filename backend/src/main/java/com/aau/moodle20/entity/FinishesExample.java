@@ -5,6 +5,10 @@ import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 
 import javax.persistence.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name ="finishes_example")
@@ -33,6 +37,9 @@ public class FinishesExample {
     private Boolean hasPresented = false;
     private EFinishesExampleState state ;
     private Integer remainingUploadCount;
+
+    @OneToMany(mappedBy = "finishesExample", fetch = FetchType.LAZY)
+    private Set<ViolationHistory> violationHistories;
 
     public FinishesExample()
     {
@@ -116,6 +123,18 @@ public class FinishesExample {
 
     public void setRemainingUploadCount(Integer remainingUploadCount) {
         this.remainingUploadCount = remainingUploadCount;
+    }
+
+    public Set<ViolationHistory> getViolationHistories() {
+        return violationHistories;
+    }
+
+    public List<ViolationHistory> getViolationHistoryList() {
+        return violationHistories.stream().sorted(Comparator.comparing(ViolationHistory::getDate)).collect(Collectors.toList());
+    }
+
+    public void setViolationHistories(Set<ViolationHistory> violationHistories) {
+        this.violationHistories = violationHistories;
     }
 
     public FinishesExampleResponse getFinishesExampleResponse() {

@@ -113,6 +113,10 @@ public class ExerciseSheetService extends AbstractService{
            if(optFinishesExample.isPresent()) {
                state.setType(optFinishesExample.get().getState().getRole());
                state.setDescription(optFinishesExample.get().getDescription());
+
+               List<ViolationHistoryResponse> violationHistoryResponses = optFinishesExample.get().getViolationHistoryList().stream()
+                       .map(ViolationHistory::createViolationHistoryResponse).collect(Collectors.toList());
+               state.setResult(violationHistoryResponses);
            }
            else {
                state.setType(EFinishesExampleState.NO.getRole());

@@ -103,7 +103,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         ApiError apiError = null;
-       if(ex instanceof AccessDeniedException)
+       if(ex instanceof AccessDeniedException)//TODO make own method for accessdenied execption
        {
            apiError = new ApiError(
                    HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), "error occurred");

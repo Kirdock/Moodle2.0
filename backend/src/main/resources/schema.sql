@@ -108,3 +108,22 @@ CREATE TABLE IF NOT EXISTS SUPPORT_FILE_TYPE
     CONSTRAINT FOREIGN_KEY_EXAMPLE_01 FOREIGN KEY (example_id) references EXAMPLE on delete cascade,
     CONSTRAINT FOREIGN_KEY_FILE_TYPE_01 FOREIGN KEY (file_type_id) references FILE_TYPE on delete cascade
 );
+
+
+
+CREATE TABLE IF NOT EXISTS VIOLATION_HISTORY
+(
+    id   INT AUTO_INCREMENT PRIMARY KEY,
+    date datetime,
+    example_id       INT,
+    matriculation_Number VARCHAR(20),
+    CONSTRAINT FOREIGN_KEY_FINISH_EXAMPLE_VIOLATION_HISTORY_01 FOREIGN KEY (example_id,matriculation_Number) references FINISHES_EXAMPLE(example_id,matriculation_Number) on delete cascade
+);
+
+CREATE TABLE IF NOT EXISTS VIOLATION
+(
+    id     INT AUTO_INCREMENT PRIMARY KEY,
+    result CLOB,
+    violation_history_id       INT,
+    CONSTRAINT FOREIGN_KEY_VIOLATION_HISTORY_01 FOREIGN KEY (violation_history_id) references VIOLATION_HISTORY on delete cascade
+);

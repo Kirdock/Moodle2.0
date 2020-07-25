@@ -45,6 +45,12 @@ public class AbstractService {
     @Autowired
     UserInCourseRepository userInCourseRepository;
 
+    @Autowired
+    ViolationHistoryRepository violationHistoryRepository;
+
+    @Autowired
+    ViolationRepository violationRepository;
+
 
     protected Semester readSemester(Long semesterId) throws ServiceValidationException {
         Optional<Semester> optionalSemester = semesterRepository.findById(semesterId);

@@ -3,6 +3,7 @@ package com.aau.moodle20.entity;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
+import com.aau.moodle20.payload.response.ViolationHistoryResponse;
 
 import javax.persistence.*;
 import java.util.*;
@@ -267,6 +268,11 @@ public class Example {
                 exampleResponseObject.setSubmitDescription(optionalFinishesExample.get().getDescription());
                 exampleResponseObject.setHasAttachment(optionalFinishesExample.get().getFileName() != null ? Boolean.TRUE : Boolean.FALSE);
                 exampleResponseObject.setRemainingUploadCount(optionalFinishesExample.get().getRemainingUploadCount());
+
+                List<ViolationHistoryResponse> violationHistoryResponses = optionalFinishesExample.get().getViolationHistoryList().stream()
+                        .map(ViolationHistory::createViolationHistoryResponse).collect(Collectors.toList());
+                exampleResponseObject.setResult(violationHistoryResponses);
+
             } else {
                 exampleResponseObject.setState(EFinishesExampleState.NO);
             }
