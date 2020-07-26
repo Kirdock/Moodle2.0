@@ -80,6 +80,9 @@
                 <a href="#" @click.prevent="downloadFile(value.id)" :title="$t('download')" v-if="value.hasAttachment">
                     <span class="fa fa-download fa-2x"></span>
                 </a>
+                <a href="#" @click.prevent="setSelectedKreuzelResult(value.result)" :title="$t('result')" v-if="value.result.length !== 0">
+                    <span class="fa fa-list fa-2x"></span>
+                </a>
             </template>
         </td>
     </tr>
@@ -87,9 +90,13 @@
 
 <script>
 import {fileManagement} from '@/plugins/global';
+import KreuzelResult from '@/components/KreuzelResult.vue';
 export default {
     name: 'kreuzel-info',
-    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload'],
+    components:{
+        KreuzelResult
+    },
+    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload', 'setSelectedKreuzelResult'],
     data(){
         return {
             loadingFileUpload: false

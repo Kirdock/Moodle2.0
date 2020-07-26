@@ -874,8 +874,7 @@ export default {
             }
             finally{
                 this.loading_delete = false;
-            };
-            
+            }
         },
         async getCourse(courseId){
             this.getCourseUsers(courseId);

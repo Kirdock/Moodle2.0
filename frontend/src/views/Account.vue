@@ -71,7 +71,7 @@ export default {
           variant: 'danger',
           appendToast: true
         });
-      };
+      }
     },
     async updateUser(){
       this.loading_updateInformation = true;

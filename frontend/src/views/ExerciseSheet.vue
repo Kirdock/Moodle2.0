@@ -39,8 +39,8 @@
                 </thead>
                 <tbody>
                     <template v-for="example in sheetInfo.examples">
-                        <kreuzel-info :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" :key="example.id" :isParent="true" :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
-                        <kreuzel-info :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" v-for="subExample in example.subExamples" :key="subExample.id" :isParent="false" :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
+                        <kreuzel-info :setSelectedKreuzelResult="setSelectedKreuzelResult" :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" :key="example.id" :isParent="true" :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
+                        <kreuzel-info :setSelectedKreuzelResult="setSelectedKreuzelResult" :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" v-for="subExample in example.subExamples" :key="subExample.id" :isParent="false" :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
                     </template>
                     <tr style="font-weight: bold">
                         <td>
@@ -70,16 +70,21 @@
                 </button>
             </div>
         </form>
+        <b-modal id="modal-kreuzelResult" :title="$t('kreuzel.name')" size="xl" hide-footer>
+            <kreuzel-list v-model="selectedKreuzelResult"></kreuzel-list>
+        </b-modal>
     </div>
 </template>
 
 <script>
 import {exampleManagement, calcManagement} from '@/plugins/global';
 import kreuzelInfo from '@/components/KreuzelInfo.vue';
+import kreuzelResult from '@/components/KreuzelResult.vue';
 
 export default {
     components:{
-        'kreuzel-info': kreuzelInfo
+        'kreuzel-info': kreuzelInfo,
+        'kreuzel-result': kreuzelResult
     },
     props: ['exerciseSheetId', 'courseId'],
     data(){
@@ -88,9 +93,11 @@ export default {
             loading: false,
             supportedFileTypes: undefined,
             hasSubExamples: false,
-            deadlineReached: false
+            deadlineReached: false,
+            selectedKreuzelResult: {}
         }
     },
+    
     computed:{
         mandatory(){
             let total = 0;
@@ -256,6 +263,10 @@ export default {
                     }
                 }
             }
+        },
+        setSelectedKreuzelResult(result){
+            this.selectedKreuzelResult = result;
+            this.$bvModal.show('modal-kreuzelResult');
         }
     }
 }

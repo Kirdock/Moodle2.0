@@ -326,6 +326,7 @@ export default {
             }
             this.value.customFileTypes.push(type);
             this.selectedfileTypes.push({name: type, value: type});
+            document.getElementById(`eInfoSupportedFileTypes${this._uid}`).removeAttribute('required');
         },
         fileTypesChanged(fileTypes){
             this.value.supportedFileTypes = fileTypes.filter(type => type.id !== undefined).map(type => type.id);

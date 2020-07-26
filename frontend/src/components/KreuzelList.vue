@@ -51,6 +51,9 @@
                                     {{state.type === 'n' ? '' : state.type === 'y' ? 'X' : 'O'}}
                                 </template>
                                 <textarea v-if="state.description" class="form-control" readonly="true" :value="state.description"></textarea>
+                                <a href="#" @click.prevent="setSelectedKreuzelResult(state.result)" :title="$t('result')" v-if="state.result && state.result.length !== 0">
+                                    <span class="fa fa-list fa-2x"></span>
+                                </a>
                             </td>
                         </tr>
                     </tbody>
@@ -61,20 +64,28 @@
                 {{$t('save')}}
             </button>
         </template>
+        <b-modal id="modal-kreuzelResult" :title="$t('kreuzel.name')" size="xl" hide-footer>
+            <kreuzel-list v-model="selectedKreuzelResult"></kreuzel-list>
+        </b-modal>
     </div>
 </template>
 
 
 <script>
 import {fileManagement} from '@/plugins/global';
+import kreuzelResult from '@/components/KreuzelResult.vue';
 export default {
     name: 'kreuzel-list',
+    components:{
+        'kreuzel-result': kreuzelResult
+    },
     props: ['exerciseSheets'],
     data(){
         return {
             kreuzelInfo: {},
             selectedExerciseSheet: undefined,
-            editMode: false
+            editMode: false,
+            selectedKreuzelResult: {}
         }
     },
     computed:{
@@ -157,6 +168,10 @@ export default {
                     appendToast: true
                 });
             }
+        },
+        setSelectedKreuzelResult(result){
+            this.selectedKreuzelResult = result;
+            this.$bvModal.show('modal-kreuzelResult');
         }
     }
 }
