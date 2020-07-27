@@ -18,7 +18,6 @@ public class ExampleRequest {
     private Boolean mandatory;
     @NotNull
     private Integer order;
-    @NotNull
     private List<Long> supportedFileTypes;
     private Boolean submitFile;
     private List<String> customFileTypes;

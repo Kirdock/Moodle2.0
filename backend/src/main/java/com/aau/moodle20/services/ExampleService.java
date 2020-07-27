@@ -42,7 +42,8 @@ public class ExampleService extends AbstractService{
                 deleteExampleValidator(parentExample.getId());
 
             parentExample.setSubmitFile(Boolean.FALSE);
-            supportFileTypeRepository.deleteAll(parentExample.getSupportFileTypes());
+            if (parentExample.getSupportFileTypes() != null)
+                supportFileTypeRepository.deleteAll(parentExample.getSupportFileTypes());
             parentExample.setCustomFileTypes(null);
 
             exampleRepository.save(parentExample);
@@ -65,6 +66,9 @@ public class ExampleService extends AbstractService{
 
     protected List<SupportFileType> createSupportedFileTypesEntries(Example example, ExampleRequest abstractExampleRequest) {
         List<SupportFileType> supportFileTypes = new ArrayList<>();
+        if(abstractExampleRequest.getSupportedFileTypes()==null)
+            return supportFileTypes;
+
         for (Long fileTypeId : abstractExampleRequest.getSupportedFileTypes()) {
             Optional<FileType> optionalFileType = fileTypeRepository.findById(fileTypeId);
             if (optionalFileType.isPresent()) {
