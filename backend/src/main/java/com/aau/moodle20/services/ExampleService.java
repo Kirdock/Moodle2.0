@@ -32,6 +32,12 @@ public class ExampleService extends AbstractService{
         Example example = new Example();
         Example parentExample = null;
 
+        if (createExampleRequest.getSubmitFile() != null && createExampleRequest.getSubmitFile()) {
+            if ((createExampleRequest.getSupportedFileTypes() == null || createExampleRequest.getSupportedFileTypes().isEmpty()) &&
+                    (createExampleRequest.getCustomFileTypes() == null || createExampleRequest.getCustomFileTypes().isEmpty()))
+                throw new ServiceValidationException("Error:either supported file types or custom file types  must be specified!");
+        }
+
         // if this is an subExample remove all finishesExample entries of parentExample
         // and set points to 0
         if(createExampleRequest.getParentId()!=null)
@@ -92,8 +98,9 @@ public class ExampleService extends AbstractService{
     public void updateExample(ExampleRequest updateExampleRequest) throws ServiceValidationException, IOException {
         List<SupportFileType> supportFileTypes;
         if (updateExampleRequest.getSubmitFile() != null && updateExampleRequest.getSubmitFile()) {
-            if (updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty())
-                throw new ServiceValidationException("Error: supported file types must not be null!");
+            if ((updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty()) &&
+                    (updateExampleRequest.getCustomFileTypes() == null || updateExampleRequest.getCustomFileTypes().isEmpty()))
+                throw new ServiceValidationException("Error:either supported file types or custom file types  must be specified!");
         }
         Example example = readExample(updateExampleRequest.getId());
         if(!updateExampleRequest.getSubmitFile() && (example.getValidator()!=null && !example.getValidator().isEmpty()) )
