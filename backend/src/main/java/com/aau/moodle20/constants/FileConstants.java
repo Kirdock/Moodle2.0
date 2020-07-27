@@ -14,4 +14,8 @@ public class FileConstants {
     public static final String MediaType_ZIP_ARCHIVE = "application/zip";
 
     public static final String UNZIP_DIR_MAVEN_PROJECT = attachmentsDir +"/unzipMaven";
+
+    public static final String VALIDATOR_INTERFACE_PATH = "./backend/src/main/java/com/aau/moodle20/validation/IValidator.java";
+    public static final String VIOLATION_PATH = "./backend/src/main/java/com/aau/moodle20/entity/Violation.java";
+
 }
