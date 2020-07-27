@@ -215,6 +215,14 @@ export default {
     },
     getCoursePresented(courseId){
         return axios.get(`/course/${courseId}/presented`);
+    },
+    getValidatorSkeleton(){
+        return axios.get(`/validator/skeleton`,{
+            responseType: 'blob',
+            headers:{
+                'Accept-Language': i18n.locale
+            }
+        });
     }
 }
 

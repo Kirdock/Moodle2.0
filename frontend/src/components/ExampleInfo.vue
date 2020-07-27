@@ -49,6 +49,11 @@
                                     {{$t('submitFile')}}
                                     <input type="file" class="d-none" :id="`validator${_uid}`" :ref="`validator${_uid}`" accept=".jar" @change="submitValidator()"/>
                                 </label>
+                                <button type="button" class="btn btn-primary" @click="getValidatorSkeleton()" style="margin-left: 10px">
+                                    <span class="fa fa-sync fa-spin" v-if="loading_skeleton"></span>
+                                    <span class="fa fa-download"></span>
+                                    {{$t('validator.skeleton')}}
+                                </button>
                                 <template v-if="value.validator">
                                     <a href="#" @click.prevent="downloadValidator()" :title="$t('download')" style="margin-left: 10px">
                                         <span class="fa fa-download fa-2x"></span>
@@ -189,7 +194,8 @@ export default {
             selectedExample_delete: undefined,
             selectedfileTypes: [],
             fileTypes: [],
-            loadingValidatorUpload: false
+            loadingValidatorUpload: false,
+            loading_skeleton: false
         }
     },
     methods:{
@@ -338,6 +344,25 @@ export default {
                 document.getElementById(`eInfoSupportedFileTypes${this._uid}`).removeAttribute('required');
             }
             
+        },
+        async getValidatorSkeleton(){
+            this.loading_skeleton = true;
+            try{
+                const response = await this.$store.dispatch('getValidatorSkeleton');
+                console.log(response)
+                fileManagement.download(response);
+            }
+            catch (e){
+                console.log(e)
+                this.$bvToast.toast(this.$t('validator.error.skeletonDownload'), {
+                    title: this.$t('error'),
+                    variant: 'danger',
+                    appendToast: true
+                });
+            }
+            finally{
+                this.loading_skeleton = false;
+            }
         }
     }
 }

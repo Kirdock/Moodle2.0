@@ -261,12 +261,14 @@ const messages = {
         username: 'Benutzername',
         validator: {
             name: 'Validator',
+            skeleton: 'Validator-Skelett',
             deleted: 'Validator wurde gelöscht',
             saved: 'Validator wurde gespeichert',
             error: {
                 delete: 'Validator konnte nicht gelöscht werden',
                 get: 'Validator konnte nicht geladen werden',
-                save: 'Validator konnte nicht gespeichert werden'
+                save: 'Validator konnte nicht gespeichert werden',
+                skeletonDownload: 'Validator-Skelett konnte nicht heruntergeladen werden'
             }
         },
         view: 'Ansehen',
@@ -531,12 +533,14 @@ const messages = {
         username: 'Username',
         validator: {
             name: 'Validator',
+            skeleton: 'Validator skeleton',
             deleted: 'Validator deleted',
             saved: 'Validator saved',
             error: {
                 delete: 'Validator could not be deleted',
                 get: 'Validator could not be loaded',
-                save: 'Validator could not be saved'
+                save: 'Validator could not be saved',
+                skeletonDownload: 'Validator skeleton could not be downloaded'
             }
         },
         view: 'View',

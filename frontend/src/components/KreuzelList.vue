@@ -60,7 +60,8 @@
                 </table>
             </div>
             <button class="btn btn-primary" @click="saveKreuzel()">
-                <span class="fa fa-save"></span>
+                <span class="fa fa-sync fa-spin"  v-if="loading"></span>
+                <span class="fa fa-save" v-else></span>
                 {{$t('save')}}
             </button>
         </template>
@@ -85,7 +86,8 @@ export default {
             kreuzelInfo: {},
             selectedExerciseSheet: undefined,
             editMode: false,
-            selectedKreuzelResult: {}
+            selectedKreuzelResult: {},
+            loading: false
         }
     },
     computed:{
@@ -144,6 +146,7 @@ export default {
         },
         async saveKreuzel(){
             try{
+                this.loading = true;
                 let data = [];
                 for(let kreuzel of this.kreuzelInfo.kreuzel){
                     kreuzel.states.forEach((state, index) =>{
@@ -167,6 +170,9 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
+            }
+            finally{
+                this.loading = false;
             }
         },
         setSelectedKreuzelResult(result){

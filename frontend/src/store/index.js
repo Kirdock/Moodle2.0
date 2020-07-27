@@ -277,6 +277,9 @@ export default new Vuex.Store({
     },
     getCoursePresented({commit}, courseId){
       return api.getCoursePresented(courseId);
+    },
+    getValidatorSkeleton({commit}){
+      return api.getValidatorSkeleton();
     }
   },
   modules: {
@@ -286,7 +289,7 @@ export default new Vuex.Store({
     locale: state => state.settings.locale,
     isLoggedIn: state => state.loggedIn,
     decodedToken: state => state.userInfo,
-    token: state=> state.token
+    token: state => state.token
   }
 });
 
