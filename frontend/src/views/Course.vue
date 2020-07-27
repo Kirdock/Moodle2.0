@@ -48,8 +48,9 @@
                         {{exerciseSheet.minPoints || 0}}
                     </td>
                     <td>
-                        <a href="#" :title="$t('download')" @click.prevent="getExerciseSheetPdf(exerciseSheet.id)">
-                            <span class="fa fa-eye fa-2x"></span>
+                        <a href="#" :title="$t('download')" @click.prevent="getExerciseSheetPdf(exerciseSheet)">
+                            <span class="fa fa-sync fa-spin fa-2x" v-if="exerciseSheet.loadingPdf"></span>
+                            <span class="fa fa-eye fa-2x" v-else></span>
                         </a>
                         <router-link :title="$t('edit')" :to="{
                                             name: 'ExerciseSheet',
@@ -90,7 +91,10 @@ export default {
     props: ['id'],
     data(){
         return {
-            courseInfo: {}
+            courseInfo: {},
+            loading: {
+                pdf: false
+            }
         }
     },
     computed:{
@@ -132,9 +136,10 @@ export default {
                 });
             }
         },
-        async getExerciseSheetPdf(id){
+        async getExerciseSheetPdf(sheet){
+            this.$set(sheet, 'loadingPdf', true);
             try{
-                const response = await this.$store.dispatch('getExerciseSheetPdf', id);
+                const response = await this.$store.dispatch('getExerciseSheetPdf', sheet.id);
                 fileManagement.download(response);
             }
             catch{
@@ -143,6 +148,9 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
+            }
+            finally{
+                sheet.loadingPdf = false;
             }
         }
     }

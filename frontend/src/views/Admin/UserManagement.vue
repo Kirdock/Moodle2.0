@@ -11,7 +11,8 @@
         <div class="form-horizontal col-md-12">
             <div class="form-inline">
                 <button class="btn btn-primary" v-b-modal="'modal-new-user'" style="margin-right: 10px">
-                    <span class="fa fa-plus"></span>
+                    <span class="fa fa-sync fa-spin" v-if="loading.createUser"></span>
+                    <span class="fa fa-plus" v-else></span>
                     {{$t('new')}}
                 </button>
                 <b-modal id="modal-new-user" :title="$t('user.title.new')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="createUser" @hidden="resetUserInfo">
@@ -20,7 +21,7 @@
                     </form>
                 </b-modal>
                 <label class="btn btn-primary" style="margin-right: 10px">
-                    <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
+                    <span class="fa fa-sync fa-spin" v-if="loading.fileUpload"></span>
                     <span class="fas fa-upload" v-else></span>
                     {{ $t('uploadCSV') }}
                     <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitUsers()"/>
@@ -97,8 +98,10 @@ export default {
             userInfo: {},
             selectedUser: undefined,
             users: [],
-            loadingCreateUser: false,
-            loadingFileUpload: false,
+            loading: {
+                createUser: false,
+                fileUpload: false,
+            },
             searchText: undefined,
             isAdmin: false
         }
@@ -122,7 +125,7 @@ export default {
             this.userInfo = {};
         },
         async submitUsers(){
-            this.loadingFileUpload = true;
+            this.loading.fileUpload = true;
             const formData = new FormData();
             formData.append('file',this.$refs.file.files[0]);
             formData.append('isAdmin', this.isAdmin)
@@ -143,7 +146,7 @@ export default {
                 });
             }
             finally{
-                this.loadingFileUpload = false;
+                this.loading.fileUpload = false;
             }
         },
         async createUser(modal){
@@ -154,7 +157,7 @@ export default {
                 this.$refs.formCreate.reportValidity();
             }
             else{
-                this.loadingCreateUser = true;
+                this.loading.createUser = true;
                 try{
                     await this.$store.dispatch('createUser', this.userInfo);
                     this.$bvModal.hide('modal-new-user');
@@ -184,7 +187,7 @@ export default {
                     });
                 }
                 finally{
-                    this.loadingCreateUser = false;
+                    this.loading.createUser = false;
                 }
             }
         },

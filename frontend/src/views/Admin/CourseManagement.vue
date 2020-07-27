@@ -30,7 +30,8 @@
             </div>
             <div class="col-md-4" style="margin-top: 31px">
                 <button class="btn btn-primary" v-b-modal="'modal-new-course'" style="margin-right: 10px" v-show="selectedSemester_edit !== undefined">
-                    <span class="fa fa-plus"></span>
+                    <span class="fa fa-sync fa-spin"  v-if="loading.createCourse"></span>
+                    <span class="fa fa-plus" v-else></span>
                     {{ $t('new') }}
                 </button>
                 <b-modal id="modal-new-course" :title="$t('course.title.create')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="createCourse">
@@ -40,7 +41,8 @@
                     </form>
                 </b-modal>
                 <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId" @click="courseCopyId = semestersWithoutSelected[0].id">
-                    <span class="fa fa-copy"></span>
+                    <span class="fa fa-sync fa-spin"  v-if="loading.copyCourse"></span>
+                    <span class="fa fa-copy" v-else></span>
                     {{ $t('copy') }}
                 </button>
                 <b-modal id="modal-copy-course" :title="$t('course.question.copy')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="copyCourse(selectedCourseId, courseCopyId)">
@@ -53,9 +55,8 @@
                 </b-modal>
 
                 <button class="btn btn-danger" v-b-modal="'modal-delete-course'" v-show="selectedCourseId">
-                    <span class="fa fa-sync fa-spin" v-if="loading_delete"></span>
+                    <span class="fa fa-sync fa-spin" v-if="loading.deleteCourse"></span>
                     <span class="fa fa-trash" v-else></span>
-                    
                     {{ $t('delete') }}
                 </button>
                 <b-modal id="modal-delete-course" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteCourse(selectedCourse.id)">
@@ -72,7 +73,7 @@
                         
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">
-                                <span class="fa fa-sync fa-spin" v-if="loading_edit"></span>
+                                <span class="fa fa-sync fa-spin" v-if="loading.updateCourse"></span>
                                 <span class="fa fa-save" v-else></span>
                                 {{ $t('save') }}
                             </button>
@@ -97,15 +98,15 @@
                         </div>
                         <div class="form-group">
                             <button class="btn btn-primary" type="button" @click="getAttendanceList(selectedCourseId)">
-                                <span class="fa fa-sync fa-spin" v-if="loading_attendanceList"></span>
-                                <span class="fas fa-list" v-else></span>
+                                <span class="fa fa-sync fa-spin" v-if="loading.attendanceList"></span>
+                                <span class="fas fa-download" v-else></span>
                                 {{$t('attendance.list')}}
                             </button>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="btn btn-primary">
-                            <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
+                            <span class="fa fa-sync fa-spin" v-if="loading.fileUpload"></span>
                             <span class="fas fa-upload" v-else></span>
                             {{ $t('uploadCSV') }}
                             <input type="file" class="d-none" id="file" ref="file" accept=".csv" @change="submitUsers()"/>
@@ -191,7 +192,7 @@
                     </table>
                     <div class="form-inline">
                         <button class="btn btn-primary" @click="updateCourseUsers()">
-                            <span class="fa fa-sync fa-spin" v-if="loading_edit_updateUsers"></span>
+                            <span class="fa fa-sync fa-spin" v-if="loading.updateUsers"></span>
                             <span class="fa fa-save" v-else></span>
                             {{ $t('save') }}
                         </button>
@@ -202,7 +203,8 @@
                 <div class="form-horizontal">
                     <div class="form-group col-md-6">
                         <button class="btn btn-primary" v-b-modal="'modal-new-exerciseSheet'">
-                            <span class="fa fa-plus"></span>
+                            <span class="fa fa-sync fa-spin"  v-if="loading.createExerciseSheet"></span>
+                            <span class="fa fa-plus" v-else></span>
                             {{$t('new')}}
                         </button>
                         <b-modal id="modal-new-exerciseSheet" :title="$t('exerciseSheet.title.create')" :ok-title="$t('confirm')" :cancel-title="$t('cancel')" @ok="createExerciseSheet">
@@ -219,7 +221,7 @@
                                 <th scope="col">{{$t('actions')}}</th>
                             </thead>
                             <tbody>
-                                <tr v-for="sheet in selectedCourse.exerciseSheets" :key="sheet.id">
+                                <tr v-for="(sheet, index) in selectedCourse.exerciseSheets" :key="sheet.id">
                                     <td>
                                         {{sheet.name}}
                                     </td>
@@ -239,8 +241,9 @@
                                         <a href="#" :title="$t('download')" @click.prevent="getExerciseSheetPdf(sheet.id)">
                                             <span class="fa fa-eye fa-2x"></span>
                                         </a>
-                                        <a href.prevent="#" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'" @click="selectedDeleteExerciseSheet = sheet.id">
-                                            <span class="fa fa-trash fa-2x"></span>
+                                        <a href.prevent="#" :title="$t('delete')" v-b-modal="'modal-delete-exerciseSheet'" @click="selectedDeleteExerciseSheet = {sheet, index}">
+                                            <span class="fa fa-sync fa-spin fa-2x"  v-if="sheet.deleteLoading"></span>
+                                            <span class="fa fa-trash fa-2x" v-else></span>
                                         </a>
                                     </td>
                                 </tr>
@@ -266,7 +269,7 @@
                         </div>
                         <div class="col-md-2"> 
                             <button class="btn btn-primary" type="submit">
-                                <span class="fa fa-sync fa-spin" v-if="loading_presets"></span>
+                                <span class="fa fa-sync fa-spin" v-if="loading.presets"></span>
                                 <span class="fa fa-save" v-else></span>
                                 {{ $t('save') }}
                             </button>
@@ -282,7 +285,9 @@
             <div class="form-horizontal">
                 <div class="form-inline">
                     <div class="form-group">
-                        <label for="presentedUser" class="control-label">{{ $t('student') }}</label>
+                        <label for="presentedUser" class="control-label">
+                            {{ $t('student') }} <span class="fa fa-sync fa-spin" v-if="loading.presentations"></span>
+                        </label>
                         <multiselect v-model="presentedUser" id="presentedUser" open-direction="bottom" @input="getUserKreuzel"
                                     :custom-label="userFormat"
                                     :placeholder="$t('typeToSearch')"
@@ -389,7 +394,8 @@
                             </td>
                             <td>
                                 <a href="#" :title="$t('delete')" @click.prevent="updatePresented({matriculationNumber: presented.matriculationNumber}, {exampleId: presented.exampleId}, false, index)">
-                                    <span class="fa fa-trash fa-2x"></span>
+                                    <span class="fa fa-sync fa-spin fa-2x" v-if="presented.deleteLoading"></span>
+                                    <span class="fa fa-trash fa-2x" v-else></span>
                                 </a>
                             </td>
                         </tr>
@@ -423,10 +429,6 @@ export default {
     data(){
         return {
             courseInfo_create: {},
-            loading_create: false,
-            loading_edit: false,
-            loading_delete: false,
-            loading_edit_updateUsers: false,
             selectedSemester_edit: undefined,
             selectedCourse: {},
             selectedCourseId: undefined,
@@ -438,11 +440,18 @@ export default {
             semesters: [],
             exerciseSheet_create: {},
             users: [],
-            loadingFileUpload: false,
-            loading_presets: false,
+            loading: {
+                fileUpload: false,
+                presets: false,
+                createCourse: false,
+                updateCourse: false,
+                updateUsers: false,
+                deleteCourse: false,
+                attendanceList: false,
+                presentations: false
+            },
             selectedCourseTemplate: undefined,
             selectedDeleteExerciseSheet: undefined,
-            loading_attendanceList: false,
             presentedUser: undefined,
             presentedExample: {},
             presentedExerciseSheet: undefined,
@@ -552,8 +561,11 @@ export default {
         },
         async updatePresented(user, example, hasPresented, index){
             try{
+                if(!hasPresented){
+                    this.$set(this.selectedCourse.presented[index], 'deleteLoading', true);
+                }
                 await this.$store.dispatch('updatePresented', {matriculationNumber: user.matriculationNumber, exampleId: example.exampleId, hasPresented});
-                if(index){
+                if(index !== undefined){
                     this.selectedCourse.presented.splice(index,1);
                 }
                 else{
@@ -577,7 +589,12 @@ export default {
                 });
             }
             catch{
-                this.$bvToast.toast(hasPresented ? this.$t('presentation.error.save') : this.$t('presentation.error.delete'), {
+                let message = this.$t('presentation.error.save');
+                if(index !== undefined){
+                    this.$set(this.selectedCourse.presented[index], 'deleteLoading', undefined);
+                    message = this.$t('presentation.error.delete');
+                }
+                this.$bvToast.toast(message, {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
@@ -594,6 +611,7 @@ export default {
             return `${user.matriculationNumber} ${user.surname} ${user.forename}`;
         },
         async getUserKreuzel(){
+            this.loading.presentations = true;
             try{
                 this.presentedExample = {};
                 const response = await this.$store.dispatch('getUserKreuzel', {matriculationNumber: this.presentedUser.matriculationNumber, courseId: this.selectedCourseId});
@@ -608,9 +626,12 @@ export default {
                     appendToast: true
                 });
             }
+            finally{
+                this.loading.presentations = false;
+            }
         },
         async getAttendanceList(courseId){
-            this.loading_attendanceList = true;
+            this.loading.attendanceList = true;
             try{
                 const response = await this.$store.dispatch('getAttendanceList', courseId);
                 fileManagement.download(response);
@@ -623,7 +644,7 @@ export default {
                 });
             }
             finally{
-                this.loading_attendanceList = false;
+                this.loading.attendanceList = false;
             }
         },
         async getUsers(){
@@ -640,7 +661,7 @@ export default {
             }
         },
         async submitUsers(){
-            this.loadingFileUpload = true;
+            this.loading.fileUpload = true;
             const formData = new FormData();
             formData.append('file',this.$refs.file.files[0]);
             formData.append('id', this.selectedCourseId)
@@ -662,7 +683,7 @@ export default {
                 });
             }
             finally{
-                this.loadingFileUpload = false;
+                this.loading.fileUpload = false;
             }
         },
         resetExerciseSheet(){
@@ -678,6 +699,7 @@ export default {
                 this.$refs.exerciseSheet.reportValidity();
             }
             else{
+                this.loading.createExerciseSheet = true;
                 this.exerciseSheet_create.courseId = this.selectedCourseId;
                 this.exerciseSheet_create.description = this.selectedCourse.descriptionTemplate;
                 try{
@@ -701,14 +723,18 @@ export default {
                         appendToast: true
                     });
                 }
+                finally{
+                    this.loading.createExerciseSheet = false;
+                }
             }
         },
-        async deleteExerciseSheet(sheetId){
+        async deleteExerciseSheet(selectedSheetData){
+            this.$set(selectedSheetData.sheet,'deleteLoading', true);
             const courseId = this.selectedCourseId;
             try{
-                await this.$store.dispatch('deleteExerciseSheet', sheetId);
+                await this.$store.dispatch('deleteExerciseSheet', selectedSheetData.sheet.id);
                 if(courseId === this.selectedCourseId){
-                    this.getExerciseSheets(this.selectedCourseId);
+                    this.selectedCourse.exerciseSheets.splice(selectedSheetData.index,1);
                 }
                 
                 this.$bvToast.toast(this.$t('exerciseSheet.deleted'), {
@@ -719,6 +745,7 @@ export default {
                 
             }
             catch{
+                this.$set(selectedSheetData.sheet,'deleteLoading', false);
                 this.$bvToast.toast(this.$t('exerciseSheet.error.delete'), {
                     title: this.$t('error'),
                     variant: 'danger',
@@ -742,7 +769,7 @@ export default {
             }
         },
         async updateCourseUsers(){
-            this.loading_edit_updateUsers = true;
+            this.loading.updateUsers = true;
             const id = this.selectedCourse.id;
             const data = this.courseUsers.filter(user => user.courseRole !== user.oldRole).map(user =>{
                 return {
@@ -767,7 +794,7 @@ export default {
                 });
             }
             finally{
-                this.loading_edit_updateUsers = false;
+                this.loading.updateUsers = false;
             }
         },
         async createCourse(modal){
@@ -777,7 +804,7 @@ export default {
             }
             else{
                 this.courseInfo_create.semesterId = this.selectedSemester_edit;
-                this.loading_create = true;
+                this.loading.createCourse = true;
                 try{
                     const response = await this.$store.dispatch('createCourse',this.courseInfo_create);
                     this.$bvToast.toast(this.$t('course.created'), {
@@ -802,12 +829,12 @@ export default {
                     });
                 }
                 finally{
-                    this.loading_create = false;
+                    this.loading.createCourse = false;
                 }
             }
         },
         async updateCourse(){
-            this.loading_edit = true;
+            this.loading.updateCourse = true;
             const {exerciseSheets, ...data} = this.selectedCourse;
             try{
                 await this.$store.dispatch('updateCourse', data);
@@ -825,11 +852,11 @@ export default {
                 });
             }
             finally{
-                this.loading_edit = false;
+                this.loading.updateCourse = false;
             }
         },
         async savePresets(){
-            this.loading_presets = true;
+            this.loading.presets = true;
             try{
                 await this.$store.dispatch('updateCoursePresets', {id: this.selectedCourse.id, description: this.selectedCourseTemplate, uploadCount: this.selectedCourse.uploadCount});
                 this.selectedCourse.descriptionTemplate = this.selectedCourseTemplate;
@@ -847,11 +874,11 @@ export default {
                 });
             }
             finally{
-                this.loading_presets = false;
+                this.loading.presets = false;
             }
         },
         async copyCourse(courseId, semesterId){
-            this.loading_delete = true;
+            this.loading.copyCourse = true;
             try{
                 const response = await this.$store.dispatch('copyCourse', {courseId, semesterId});
                 this.selectedSemester_edit = semesterId;
@@ -873,7 +900,7 @@ export default {
                 });
             }
             finally{
-                this.loading_delete = false;
+                this.loading.copyCourse = false;
             }
         },
         async getCourse(courseId){
@@ -908,7 +935,7 @@ export default {
             }
         },
         async deleteCourse(id){
-            this.loading_delete = true;
+            this.loading.deleteCourse = true;
             try{
                 await this.$store.dispatch('deleteCourse',{id});
                 if(id === this.selectedCourseId){
@@ -929,7 +956,7 @@ export default {
                 });
             }
             finally{
-                this.loading_delete = false;
+                this.loading.deleteCourse = false;
             }
         },
         async getCourseUsers(courseId){

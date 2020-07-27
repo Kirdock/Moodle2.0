@@ -2,7 +2,7 @@
     <div class="kreuzelList">
         <div class="form-group">
             <label :for="`exerciseSheets_${_uid}`" class="control-label">
-                {{$t('exerciseSheet.name')}}
+                {{$t('exerciseSheet.name')}} <span class="fa fa-sync fa-spin" v-if="loading.exerciseSheet"></span>
             </label>
             <select class="form-control" v-model="selectedExerciseSheet" @change="getKreuzel()">
                 <option v-for="sheet in exerciseSheets" :value="sheet.id" :key="sheet.id">
@@ -13,7 +13,8 @@
         <template v-if="selectedExerciseSheet !== undefined">
             <div class="form-group">
                 <button class="btn btn-primary" @click="getKreuzelList()">
-                    <span class="fa fa-download"></span>
+                    <span class="fa fa-sync fa-spin" v-if="loading.pdf"></span>
+                    <span class="fa fa-download" v-else></span>
                     {{$t('pdf')}}
                 </button>
             </div>
@@ -60,7 +61,7 @@
                 </table>
             </div>
             <button class="btn btn-primary" @click="saveKreuzel()">
-                <span class="fa fa-sync fa-spin"  v-if="loading"></span>
+                <span class="fa fa-sync fa-spin"  v-if="loading.save"></span>
                 <span class="fa fa-save" v-else></span>
                 {{$t('save')}}
             </button>
@@ -87,7 +88,11 @@ export default {
             selectedExerciseSheet: undefined,
             editMode: false,
             selectedKreuzelResult: {},
-            loading: false
+            loading: {
+                save: false,
+                exerciseSheet: false,
+                pdf: false
+            }
         }
     },
     computed:{
@@ -119,6 +124,7 @@ export default {
     },
     methods:{
         async getKreuzel(){
+            this.loading.exerciseSheet = true;
             try{
                 const response = await this.$store.dispatch('getKreuzel', this.selectedExerciseSheet);
                 this.kreuzelInfo = response.data;
@@ -130,8 +136,12 @@ export default {
                     appendToast: true
                 });
             }
+            finally{
+                this.loading.exerciseSheet = false;
+            }
         },
         async getKreuzelList(){
+            this.loading.pdf = true;
             try{
                 const response = await this.$store.dispatch('getKreuzelList', this.selectedExerciseSheet);
                 fileManagement.download(response);
@@ -143,10 +153,13 @@ export default {
                     appendToast: true
                 });
             }
+            finally{
+                this.loading.pdf = false;
+            }
         },
         async saveKreuzel(){
             try{
-                this.loading = true;
+                this.loading.save = true;
                 let data = [];
                 for(let kreuzel of this.kreuzelInfo.kreuzel){
                     kreuzel.states.forEach((state, index) =>{
@@ -172,7 +185,7 @@ export default {
                 });
             }
             finally{
-                this.loading = false;
+                this.loading.save = false;
             }
         },
         setSelectedKreuzelResult(result){

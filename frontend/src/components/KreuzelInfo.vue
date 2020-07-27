@@ -69,7 +69,7 @@
         <td>
             <template v-if="value.submitFile">
                 <label class="btn btn-primary">
-                    <span class="fa fa-sync fa-spin" v-if="loadingFileUpload"></span>
+                    <span class="fa fa-sync fa-spin" v-if="loading.fileUpload"></span>
                     <span class="fas fa-upload" v-else></span>
                     {{$t('submitFile')}}
                     <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached"/>
@@ -78,7 +78,8 @@
                     <span class="fas fa-exclamation-circle" v-show="value.state !== 'n' && !value.hasAttachment"></span>
                 </a>
                 <a href="#" @click.prevent="downloadFile(value.id)" :title="$t('download')" v-if="value.hasAttachment">
-                    <span class="fa fa-download fa-2x"></span>
+                    <span class="fa fa-sync fa-spin fa-2x" v-if="loading.fileDownload"></span>
+                    <span class="fa fa-download fa-2x" v-else></span>
                 </a>
                 <a href="#" @click.prevent="setSelectedKreuzelResult(value.result)" :title="$t('result')" v-if="value.result.length !== 0">
                     <span class="fa fa-list fa-2x"></span>
@@ -99,7 +100,10 @@ export default {
     props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload', 'setSelectedKreuzelResult'],
     data(){
         return {
-            loadingFileUpload: false
+            loading: {
+                fileUpload: false,
+                fileDownload: false
+            }
         }
     },
     created(){
@@ -124,7 +128,7 @@ export default {
                 });
             }
             else{
-                this.loadingFileUpload = true;
+                this.loading.fileUpload = true;
                 const formData = new FormData();
                 formData.append('file',this.$refs[`file${this._uid}`].files[0]);
                 formData.append('id', this.value.id);
@@ -149,11 +153,12 @@ export default {
                     });
                 }
                 finally{
-                    this.loadingFileUpload = false;
+                    this.loading.fileUpload = false;
                 }
             }
         },
         async downloadFile(id){
+            this.loading.fileDownload = true;
             try{
                 const response = await this.$store.dispatch('getExampleAttachment', id);
                 fileManagement.download(response);
@@ -164,6 +169,9 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
+            }
+            finally{
+                this.loading.fileDownload = false;
             }
         }
     }

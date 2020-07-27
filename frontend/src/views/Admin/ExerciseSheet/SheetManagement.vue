@@ -30,7 +30,7 @@
                             <es-info v-model="sheetInfo"></es-info>
                             <div class="form-inline" style="margin-top: 10px">
                                 <button class="btn btn-primary" type="submit">
-                                    <span class="fa fa-sync fa-spin" v-if="loading_updateInformation"></span>
+                                    <span class="fa fa-sync fa-spin" v-if="loading.updateInformation"></span>
                                     <span class="fa fa-save" v-else></span>
                                     {{ $t('save') }}
                                 </button>
@@ -48,7 +48,7 @@
                         <span>{{selectedExample.name}}</span>
                     </div>
                     <form @submit.prevent="updateExample(selectedExample || example)" :ref="`formExample${index}`">
-                        <example-info :ref="`eInfo${index}`" :uploadCount="sheetInfo.uploadCount" :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example" :deleteExample="deleteExample"></example-info>
+                        <example-info :ref="`eInfo${index}`" :uploadCount="sheetInfo.uploadCount" :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example"></example-info>
                         <div class="form-inline" style="margin-left: 10px; margin-top: 10px" v-if="!isSubExample">
                             <button class="btn btn-primary" type="submit">
                                 <span class="fa fa-sync fa-spin"  v-if="example.loading"></span>
@@ -56,7 +56,8 @@
                                 {{ $t('save') }}
                             </button>
                             <button class="btn btn-danger" style="margin-left: 10px" v-b-modal="'modal-delete-example'" type="button" @click="setDeleteExample(example.id, index, sheetInfo.examples)">
-                                <span class="fa fa-trash"></span>
+                                <span class="fa fa-sync fa-spin"  v-if="example.deleteLoading"></span>
+                                <span class="fa fa-trash" v-else></span>
                                 {{$t('delete')}}
                             </button>
                         </div>
@@ -65,7 +66,7 @@
                 
                 <template v-slot:tabs-end class="fixed">
                     <b-nav-item role="presentation" @click.prevent="createExample()" href="#">
-                        <span class="fa fa-sync fa-spin" v-if="loading_createExample"></span>
+                        <span class="fa fa-sync fa-spin" v-if="loading.createExample"></span>
                         <span class="fa fa-plus" v-else></span>
                         {{$t('example.new')}}
                     </b-nav-item>
@@ -139,8 +140,11 @@ export default {
         return {
             sheetInfo: {},
             selectedExample: undefined,
-            loading_updateInformation: false,
-            loading_createExample: false,
+            loading: {
+                createExample: false,
+                deleteExample: false,
+                updateInformation: false
+            },
             activeTab: 0,
             selectedDeleteExample: {}
         }
@@ -169,7 +173,7 @@ export default {
             }
         },
         async updateInfo(){
-            this.loading_updateInformation = true;
+            this.loading.updateInformation = true;
             const {examples, ...data} = this.sheetInfo;
             try{
                 await this.$store.dispatch('updateExerciseSheet', data);
@@ -186,7 +190,7 @@ export default {
                     appendToast: true
                 });
             }finally{
-                this.loading_updateInformation = false;
+                this.loading.updateInformation = false;
             }
         },
         setDeleteExample(id, index, array){
@@ -217,7 +221,7 @@ export default {
             }
         },
         async createExample(){
-            this.loading_createExample = true;
+            this.loading.createExample = true;
             const example = this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length, true);
             try{
                 const response = await this.$store.dispatch('createExample', example);
@@ -233,7 +237,7 @@ export default {
                 });
             }
             finally{
-                this.loading_createExample = false;
+                this.loading.createExample = false;
             }
         },
         buildExample(name, order, isParent){
@@ -252,6 +256,7 @@ export default {
         },
         async deleteExample(id, index){
             try{
+                this.$set(this.selectedDeleteExample.array[index], 'deleteLoading', true);
                 await this.$store.dispatch('deleteExample', id);
                 orderManagement.deletedAt(this.selectedDeleteExample.array, index);
                 this.$bvToast.toast(this.$t('example.deleted'), {
@@ -261,6 +266,7 @@ export default {
                 });
             }
             catch{
+                this.$set(this.selectedDeleteExample.array[index], 'deleteLoading',undefined);
                 this.$bvToast.toast(this.$t('example.error.delete'), {
                     title: this.$t('error'),
                     variant: 'danger',

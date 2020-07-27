@@ -44,22 +44,24 @@
                             </label>
                             <div class="form-inline" :id="`validatorGroup${_uid}`">
                                 <label class="btn btn-primary">
-                                    <span class="fa fa-sync fa-spin" v-if="loadingValidatorUpload"></span>
+                                    <span class="fa fa-sync fa-spin" v-if="loading.validatorUpload"></span>
                                     <span class="fas fa-upload" v-else></span>
                                     {{$t('submitFile')}}
                                     <input type="file" class="d-none" :id="`validator${_uid}`" :ref="`validator${_uid}`" accept=".jar" @change="submitValidator()"/>
                                 </label>
                                 <button type="button" class="btn btn-primary" @click="getValidatorSkeleton()" style="margin-left: 10px">
-                                    <span class="fa fa-sync fa-spin" v-if="loading_skeleton"></span>
+                                    <span class="fa fa-sync fa-spin" v-if="loading.skeleton"></span>
                                     <span class="fa fa-download"></span>
                                     {{$t('validator.skeleton')}}
                                 </button>
                                 <template v-if="value.validator">
                                     <a href="#" @click.prevent="downloadValidator()" :title="$t('download')" style="margin-left: 10px">
-                                        <span class="fa fa-download fa-2x"></span>
+                                        <span class="fa fa-sync fa-spin fa-2x"  v-if="loading.validatorDownload"></span>
+                                        <span class="fa fa-download fa-2x" v-else></span>
                                     </a>
                                     <a href="#" @click.prevent="deleteValidator()" :title="$t('delete')" style="margin-left: 10px">
-                                        <span class="fa fa-trash fa-2x"></span>
+                                        <span class="fa fa-sync fa-spin fa-2x"  v-if="loading.validatorDelete"></span>
+                                        <span class="fa fa-trash fa-2x" v-else></span>
                                     </a>
                                 </template>
                             </div>
@@ -101,7 +103,8 @@
             <div class="form-horizontal offset-md-2 col-md-5" v-if="!isSubExample">
                 <h1 :id="`eInfoHeader${_uid}`">{{$t('subExamples.name')}}</h1>
                 <button class="btn btn-primary" type="button" style="margin-top: 10px" @click="newSubExample()">
-                    <span class="fa fa-plus"></span>
+                    <span class="fa fa-sync fa-spin" v-if="loading.newSubExample"></span>
+                    <span class="fa fa-plus" v-else></span>
                     {{$t('new')}}
                 </button>
                 <table class="table table-hover" :aria-describedby="`eInfoHeader${_uid}`">
@@ -124,7 +127,8 @@
                                     <span class="fa fa-edit fa-2x"></span>
                                 </a>
                                 <a href="#" :title="$t('delete')" v-b-modal="'modal-delete-example'" type="button" @click.prevent="setDeleteExample(subExample.id, exampleIndex, value.subExamples)">
-                                    <span class="fa fa-trash fa-2x"></span>
+                                    <span class="fa fa-sync fa-spin fa-2x"  v-if="subExample.deleteLoading"></span>
+                                    <span class="fa fa-trash fa-2x" v-else></span>
                                 </a>
                             </td>
                         </tr>
@@ -151,7 +155,7 @@ import Editor from '@/components/Editor.vue';
 
 export default {
     name: 'example-info',
-    props: ['value', 'setSelectedExample', 'isSubExample', 'deleteExample', 'setDeleteExample', 'buildExample', 'uploadCount'],
+    props: ['value', 'setSelectedExample', 'isSubExample', 'setDeleteExample', 'buildExample', 'uploadCount'],
     components: {
         Multiselect,
         Editor
@@ -194,8 +198,13 @@ export default {
             selectedExample_delete: undefined,
             selectedfileTypes: [],
             fileTypes: [],
-            loadingValidatorUpload: false,
-            loading_skeleton: false
+            loading: {
+                skeleton: false,
+                newSubExample: false,
+                validatorUpload: false,
+                validatorDownload: false,
+                validatorDelete: false
+            }
         }
     },
     methods:{
@@ -241,6 +250,7 @@ export default {
             }
         },
         async newSubExample(){
+            this.loading.newSubExample = true;
             if(this.value.subExamples.length === 0){
                 this.value.mandatory = this.value.submitFile = false;
                 this.value.customFileTypes = [];
@@ -260,10 +270,13 @@ export default {
                     appendToast: true
                 });
             }
+            finally{
+                this.loading.newSubExample = false;
+            }
             
         },
         async submitValidator(){
-            this.loadingValidatorUpload = true;
+            this.loading.validatorUpload = true;
             const file = this.$refs[`validator${this._uid}`].files[0];
             if(file.name.toLowerCase().endsWith('.jar')){
                 const formData = new FormData();
@@ -287,12 +300,13 @@ export default {
                     });
                 }
                 finally{
-                    this.loadingValidatorUpload = false;
+                    this.loading.validatorUpload = false;
                 }
             }
         },
         async deleteValidator(){
             try{
+                this.loading.validatorDelete = true;
                 await this.$store.dispatch('deleteExampleValidator', this.value.id);
                 this.value.validator = undefined;
                 this.$bvToast.toast(this.$t('validator.deleted'), {
@@ -308,9 +322,13 @@ export default {
                     appendToast: true
                 });
             }
+            finally{
+                this.loading.validatorDelete = false;
+            }
         },
         async downloadValidator(){
             try{
+                this.loading.validatorDownload = true;
                 const response = await this.$store.dispatch('getExampleValidator', this.value.id);
                 fileManagement.download(response);
             }
@@ -320,6 +338,9 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
+            }
+            finally{
+                this.loading.validatorDownload = false;
             }
         },
         addCustomFileType(test){
@@ -346,14 +367,12 @@ export default {
             
         },
         async getValidatorSkeleton(){
-            this.loading_skeleton = true;
+            this.loading.skeleton = true;
             try{
                 const response = await this.$store.dispatch('getValidatorSkeleton');
-                console.log(response)
                 fileManagement.download(response);
             }
-            catch (e){
-                console.log(e)
+            catch{
                 this.$bvToast.toast(this.$t('validator.error.skeletonDownload'), {
                     title: this.$t('error'),
                     variant: 'danger',
@@ -361,7 +380,7 @@ export default {
                 });
             }
             finally{
-                this.loading_skeleton = false;
+                this.loading.skeleton = false;
             }
         }
     }
