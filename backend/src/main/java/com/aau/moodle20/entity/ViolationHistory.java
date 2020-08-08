@@ -2,12 +2,9 @@ package com.aau.moodle20.entity;
 
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
 import com.aau.moodle20.payload.response.ViolationResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +25,7 @@ public class ViolationHistory {
             cascade = CascadeType.PERSIST,
             fetch = FetchType.LAZY
     )
-    private Set<Violation> violations;
+    private Set<ViolationEntity> violations;
 
     @JoinColumns({
             @JoinColumn(name="example_id", referencedColumnName="example_id"),
@@ -53,11 +50,11 @@ public class ViolationHistory {
         this.date = date;
     }
 
-    public Set<Violation> getViolations() {
+    public Set<ViolationEntity> getViolations() {
         return violations;
     }
 
-    public void setViolations(Set<Violation> violations) {
+    public void setViolations(Set<ViolationEntity> violations) {
         this.violations = violations;
     }
 
@@ -73,7 +70,7 @@ public class ViolationHistory {
     {
         ViolationHistoryResponse response = new ViolationHistoryResponse();
         response.setDate(getDate());
-        List<ViolationResponse> violations = getViolations().stream().map(Violation::createViolationResponse).collect(Collectors.toList());
+        List<ViolationResponse> violations = getViolations().stream().map(ViolationEntity::createViolationResponse).collect(Collectors.toList());
         response.setViolations(violations);
 
         return response;

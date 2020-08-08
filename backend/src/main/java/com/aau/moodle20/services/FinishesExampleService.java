@@ -11,15 +11,16 @@ import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.ViolationResponse;
-import com.aau.moodle20.validation.IValidator;
 import com.aau.moodle20.validation.ValidatorLoader;
-import com.aau.moodle20.entity.Violation;
+import com.aau.moodle20.entity.ViolationEntity;
 import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import validation.IValidator;
+import validation.Violation;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -90,7 +91,7 @@ public class FinishesExampleService extends AbstractService{
         if (file.isEmpty())
             throw new ServiceValidationException("Error: given file is empty");
 
-        List<? extends Violation> violations = new ArrayList<>();
+        List<? extends Violation> violations;
         UserDetailsImpl userDetails = getUserDetails();
         Example example = readExample(exampleId);
 
@@ -125,7 +126,7 @@ public class FinishesExampleService extends AbstractService{
         finishesExampleRepository.saveAndFlush(finishesExample);
 
         ViolationHistory violationHistory = new ViolationHistory();
-        violationHistory.setViolations(new HashSet<>(violations));
+        violationHistory.setViolations(createViolationEntities(violations));
         violationHistory.setDate(LocalDateTime.now());
         violationHistoryRepository.saveAndFlush(violationHistory);
 
@@ -134,7 +135,27 @@ public class FinishesExampleService extends AbstractService{
 
         violationHistoryRepository.save(violationHistory);
 
-        return violations.stream().map(Violation::createViolationResponse).collect(Collectors.toList());
+        return violations.stream().map(this::createViolationResponse).collect(Collectors.toList());
+    }
+
+
+    protected ViolationResponse createViolationResponse(Violation violation)
+    {
+        ViolationResponse response = new ViolationResponse();
+        response.setResult(violation.getResult());
+        return response;
+    }
+
+    protected  Set<ViolationEntity> createViolationEntities(List<? extends Violation> violations)
+    {
+        Set<ViolationEntity> violationEntities = new HashSet<>();
+        for(Violation violation: violations)
+        {
+            ViolationEntity entity = new ViolationEntity();
+            entity.setResult(violation.getResult());
+            violationEntities.add(entity);
+        }
+        return violationEntities;
     }
 
     protected List<? extends Violation> excectueValidator(String filePath, Example example) throws IOException, ClassNotFoundException {

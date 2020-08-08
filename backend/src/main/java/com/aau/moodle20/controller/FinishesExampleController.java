@@ -8,7 +8,6 @@ import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.payload.response.ViolationResponse;
 import com.aau.moodle20.services.FinishesExampleService;
-import com.aau.moodle20.entity.Violation;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

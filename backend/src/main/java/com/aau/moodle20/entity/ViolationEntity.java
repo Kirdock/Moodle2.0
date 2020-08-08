@@ -9,7 +9,7 @@ import javax.persistence.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name ="violation")
-public class Violation {
+public class ViolationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,11 +20,11 @@ public class Violation {
     @JoinColumn(name = "violation_history_id", referencedColumnName = "id")
     private ViolationHistory violationHistory;
 
-    public Violation()
+    public ViolationEntity()
     {
     }
 
-    public Violation(String result)
+    public ViolationEntity(String result)
     {
         this.result = result;
     }

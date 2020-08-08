@@ -152,7 +152,13 @@
 			<artifactId>maven-compat</artifactId>
 			<version>3.6.3</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.aau</groupId>
+            <artifactId>validationSDK</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 	<build>
   <plugins>

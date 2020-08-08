@@ -1,6 +1,8 @@
 package com.aau.moodle20.validation;
 
 
+import validation.IValidator;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
