@@ -145,7 +145,7 @@ router.beforeEach((to, from, next) => {
       }
     }
     else if(to.matched.some(record => record.name === 'Login') && store.getters.isLoggedIn){
-      next('/');
+      next('/Courses');
     }
     else{
       next();

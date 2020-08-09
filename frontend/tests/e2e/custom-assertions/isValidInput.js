@@ -10,26 +10,27 @@
  * @param {object} stateValue
  */
 exports.assertion = function isValidInput (selector, stateAttr, stateValue) {
-    this.message = 'Testing if element <' + selector + '> has ValidityState ' + stateAttr + ': ' + stateValue
-    this.expected = stateValue
-  
+    this.message = 'Testing if element <' + (selector.selector || selector) + '> has ValidityState ' + stateAttr + ': ' + stateValue
+    this.expected = stateValue;
+    
     this.pass = function(val){
-      console.log('val', val, 'expected', this.expected)
       return val === this.expected;
     }
     this.value = function(res){
       return res.value[stateAttr];
     }
-    
   
     this.command = function (cb) {
-      var self = this
       return this.api.execute(
         function (selector){
-          return document.querySelector(selector).validity
+          const index = selector.index || 0;
+          if (typeof selector === 'object' && selector.selector) {
+            selector = selector.selector
+          }
+          return document.querySelectorAll(selector)[index].validity;
         },
         [selector],
-        cb //or just cb?
+        cb
       )
     }
 }

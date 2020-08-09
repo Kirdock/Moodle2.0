@@ -1,3 +1,6 @@
+const loginPage = 'Login',
+      coursesPage = 'Courses';
+
 module.exports = {
   'login with empty input': browser => {
     const data = [
@@ -32,10 +35,10 @@ module.exports = {
         }
       }
     ];
-    browser.init()
+    browser.url(browser.launchUrl).pause(2000)
       .assert.elementPresent('a[href="/Login"]')
       .click('a[href="/Login"]')
-      .assert.urlEquals('http://localhost:8080/Login')
+      .assert.urlEquals(browser.launchUrl + loginPage)
 
     for (user of data){
       browser
@@ -46,7 +49,8 @@ module.exports = {
       .assert.isValidInput('input#user', 'valid', user.username.valid)
       .assert.isValidInput('input#password', 'valid', user.password.valid)
       .click('button[type=submit]')
-      .assert.not.elementPresent('.b-toast[role=alert]')
+      .assert.not.errorPresent()
+      .assert.urlEquals(browser.launchUrl + loginPage)
     }
   },
   'login wrong credentials': browser => {
@@ -57,10 +61,6 @@ module.exports = {
       }
     ];
 
-    browser
-      .url('http://localhost:8080/Login')
-      .waitForElementVisible('body');
-
     for(const credential of credentials){
       browser.clearValue2('input#user')
       .clearValue2('input#password')
@@ -69,13 +69,15 @@ module.exports = {
       .assert.isValidInput('input#password', 'valid', true)
       .assert.isValidInput('input#user', 'valid', true)
       .click('button[type=submit]')
-      .assert.elementPresent('.b-toast[role=alert]')
-      .click('button.close.ml-auto.mb-1') //remove toast message
-      .assert.not.elementPresent('.b-toast[role=alert]')
-      .assert.urlEquals('http://localhost:8080/Login')
+      .assert.errorPresent()
+      .closeToast()
+      .assert.urlEquals(browser.launchUrl + loginPage)
     }
   },
-  'login': browser => {
+  'login as admin': browser => {
     browser.loginAsAdmin()
+    .url(browser.launchUrl + loginPage)
+    .assert.urlEquals(browser.launchUrl + coursesPage)
+
   },
 }

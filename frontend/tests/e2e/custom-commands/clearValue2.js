@@ -1,6 +1,7 @@
 /**
  * A better `clearValue` for inputs having a more complex interaction.
  * Why? clearValue is reset if setValue is called after.
+ * Why not setValue with empty string? Because setValue appends text instead of replacing
  * Example:
  *  browser.setValue('input#user', 'adminUser')
  *  .setValue('input#password','')
