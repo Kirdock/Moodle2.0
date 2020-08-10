@@ -464,9 +464,12 @@ export default {
             }
         }
     },
-    created(){
+    async created(){
         this.showExerciseSheet = this.$t('all');
         this.resetExerciseSheet();
+        if(this.$store.getters.userInfo.isAdmin){
+            await this.getUsers();
+        }
         if(this.$route.query.courseId){
             this.selectedCourseId = this.$route.query.courseId;
             this.getCourse(this.selectedCourseId);
@@ -474,9 +477,7 @@ export default {
         else{
             this.getSemesters();
         }
-        if(this.$store.getters.userInfo.isAdmin){
-            this.getUsers();
-        }
+        
     },
     computed: {
         roles(){

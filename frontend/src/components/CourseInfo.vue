@@ -64,12 +64,6 @@ export default {
     },
     created(){
         this.setOwner();
-        this.$nextTick(()=>{
-            const multiselect = document.getElementById(`cInfoOwner${this._uid}`);
-            if(multiselect){
-                multiselect.setAttribute('required', true);
-            }
-        })
     },
     methods: {
         userFormat(user){
@@ -84,6 +78,14 @@ export default {
         },
         setOwner(){
             this.owner = this.users.find(user => user.matriculationNumber == this.value.owner);
+            if(!this.owner){
+                this.$nextTick(()=>{
+                    const multiselect = document.getElementById(`cInfoOwner${this._uid}`);
+                    if(multiselect){
+                        multiselect.setAttribute('required', true);
+                    }
+                })
+            }
         }
     },
     watch:{
