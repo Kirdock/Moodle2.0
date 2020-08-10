@@ -12,7 +12,7 @@ module.exports = {
         const courses = [
             {
                 owner: {
-                    value: 1,
+                    value: 'owner',
                     valid: true
                 },
                 number: {
@@ -51,7 +51,7 @@ module.exports = {
                 }
             }
             if(owner.value !== undefined){
-                modal_new.setMultiSelect('@owner',owner.value)
+                modal_new.setMultiSelect('@owner',0,owner.value)
             }
             modal_new.assert.isValidInput(`@ownerInput`, 'valid', owner.valid);
             modal_new.submit();

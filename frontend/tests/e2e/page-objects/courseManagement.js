@@ -41,7 +41,7 @@ module.exports = {
             selector: '.modal',
             commands: [modalCommands],
             elements: {
-                owner: '.course_info',
+                owner: '.course_info .multiselect',
                 ownerInput: {
                     selector: '.course_info input[type="text"]',
                     index: 0
