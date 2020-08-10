@@ -8,6 +8,7 @@ import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -164,10 +165,20 @@ public class ExampleService extends AbstractService{
         }
 
         String validatorFilePath = getValidatorFilePath(example);
+        clearDirectory(validatorFilePath);
         saveFile(validatorFilePath,validatorFile);
         example.setValidator(validatorFile.getOriginalFilename());
         example.setSubmitFile(Boolean.TRUE);
         exampleRepository.save(example);
+    }
+
+    protected void clearDirectory(String filePath) throws IOException
+    {
+        File fileToBeDeleted= new File(filePath);
+        // if path does not exists create it
+        if(fileToBeDeleted.exists()) {
+            FileUtils.cleanDirectory(fileToBeDeleted);
+        }
     }
 
     public Example getExampleValidator(Long exampleId) throws ServiceValidationException, IOException {
