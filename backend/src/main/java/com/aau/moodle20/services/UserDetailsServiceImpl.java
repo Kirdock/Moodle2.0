@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +53,8 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
 
     @Value("${studentEmailPostfix}")
     private String studentEmailPostFix;
+
+    private Pattern matriculationPattern = Pattern.compile("^[0-9]{8}$");
 
     @Override
     @Transactional
@@ -87,7 +91,7 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
 
 
     public List<User> registerUsers(MultipartFile file) throws UserException {
-        //TODO add validation
+
         List<User> users = new ArrayList<>();
         List<User> allGivenUsers = new ArrayList<>();
         List<String> lines = readLinesFromFile(file);
@@ -105,13 +109,20 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
             user.setAdmin(Boolean.FALSE);
             user.setPassword(password);
             user.setEmail(user.getUsername()+"@"+studentEmailPostFix);
+
+            Matcher matcher = matriculationPattern.matcher(user.getMatriculationNumber());
+            if(!matcher.matches())
+                continue;
+
+            if (userRepository.existsByMatriculationNumber(user.getMatriculationNumber()) ||
+                    userRepository.existsByUsername(user.getUsername()))
+                continue;
+
             users.add(user);
         }
 
         allGivenUsers.addAll(users);
 
-        // remove users which already exists
-        users.removeIf(user -> userRepository.existsByMatriculationNumber(user.getMatriculationNumber()));
         userRepository.saveAll(users);
 
         return allGivenUsers;

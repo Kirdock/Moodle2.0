@@ -1,6 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.FinishesExample;
+import com.aau.moodle20.entity.User;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
@@ -26,6 +27,7 @@ import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController()
 @RequestMapping("/api")
@@ -100,10 +102,9 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
-    public ResponseEntity<?> registerUsers(@Valid  @RequestParam("file") MultipartFile file) throws UserException {
-
-        userDetailsService.registerUsers(file);
-        return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
+    public ResponseEntity<List<UserResponseObject>> registerUsers(@Valid @RequestParam("file") MultipartFile file) throws UserException {
+        List<User> users = userDetailsService.registerUsers(file);
+        return ResponseEntity.ok(users.stream().map(User::createUserResponseObject).collect(Collectors.toList()));
     }
 
     // delete api -------------------------------------------------------------------------
