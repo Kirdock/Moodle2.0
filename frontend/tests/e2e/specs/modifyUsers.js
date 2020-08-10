@@ -54,6 +54,37 @@ module.exports = {
         }
         // browser.end();
     },
+    'Create: reopen': browser => {
+        const page = browser.page.userManagement();
+        page.showModalNew();
+        const modalNew = page.section.modal_new;
+        const user = {
+            username: 'TestStudent',
+            surname: 'mySurname',
+            forename: 'myForename',
+            isAdmin: false,
+            email: 'testEmail@com',
+            matriculationNumber: '98765432'
+        }
+        
+
+        const {isAdmin, ...keys} = user;
+        for(const data in keys){
+            modalNew
+            .clearValue2(`@${data}`)
+            .setValue(`@${data}`, user[data])
+            .assert.isValidInput(`@${data}`, 'valid', true)
+        }
+        modalNew
+        .setCheckbox(`@isAdmin`, isAdmin)
+        .cancel();
+
+        page.showModalNew();
+        for(const data in keys){
+            modalNew.assert.value(`@${data}`,'');
+        }
+        modalNew.expect.element(`@isAdmin`).to.not.be.selected
+    },
     'Create: Valid input': browser =>{
         const page = browser.page.userManagement();
         page.showModalNew();
@@ -137,6 +168,7 @@ module.exports = {
         const matriculationNumber = '98765432';
         page
         .setValue('@searchBar',matriculationNumber)
+        .assert.elementCount('@tableEntries',1)
         .assert.containsText('@firstTableCell', matriculationNumber)
         .showModalDelete()
 
@@ -167,6 +199,19 @@ module.exports = {
             creation
             .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
             .assert.successPresent();
+        }
+        // .assert.containsText('@tableEntries', 'Klaus')
+    },
+    'upload CSV file right admin': browser => {
+        const page = browser.page.userManagement();
+        const creation = page.section.creation;
+        const files = ['usersRight'];
+        creation.setCheckbox('@isAdmin', true);
+        for(const fileName of files){
+            creation
+            .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
+            .assert.successPresent()
+            .closeToast()
         }
         // .assert.containsText('@tableEntries', 'Klaus')
     },

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="course_info">
         <div class="form-group" v-if="$store.getters.userInfo.isAdmin">
             <label :for="`cInfoOwner${_uid}`" class="control-label required">{{ $t('owner') }}</label>
             <multiselect v-model="owner" :id="`cInfoOwner${_uid}`" open-direction="bottom" @input="ownerChanged"
@@ -17,7 +17,6 @@
                         :max-height="600"
                         deselect-label=""
                         :show-no-results="false"
-                        required
                         >
             </multiselect>
         </div>
@@ -65,6 +64,12 @@ export default {
     },
     created(){
         this.setOwner();
+        this.$nextTick(()=>{
+            const multiselect = document.getElementById(`cInfoOwner${this._uid}`);
+            if(multiselect){
+                multiselect.setAttribute('required', true);
+            }
+        })
     },
     methods: {
         userFormat(user){
@@ -72,6 +77,10 @@ export default {
         },
         ownerChanged(ownerUser){
             this.value.owner = ownerUser.matriculationNumber;
+            const multiselect = document.getElementById(`cInfoOwner${this._uid}`);
+            if(multiselect){
+                multiselect.removeAttribute('required');
+            }
         },
         setOwner(){
             this.owner = this.users.find(user => user.matriculationNumber == this.value.owner);

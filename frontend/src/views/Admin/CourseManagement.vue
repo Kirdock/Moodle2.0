@@ -29,7 +29,7 @@
                 </div>
             </div>
             <div class="col-md-4" style="margin-top: 31px">
-                <button class="btn btn-primary" v-b-modal="'modal-new-course'" style="margin-right: 10px" v-show="selectedSemester_edit !== undefined">
+                <button class="btn btn-primary" @click="setNewCourse()" style="margin-right: 10px" v-if="selectedSemester_edit !== undefined">
                     <span class="fa fa-sync fa-spin"  v-if="loading.createCourse"></span>
                     <span class="fa fa-plus" v-else></span>
                     {{ $t('new') }}
@@ -40,7 +40,7 @@
                         <course-info v-model="courseInfo_create" :users="users"></course-info>
                     </form>
                 </b-modal>
-                <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId" @click="courseCopyId = semestersWithoutSelected[0].id">
+                <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-if="selectedCourseId" @click="courseCopyId = semestersWithoutSelected[0].id">
                     <span class="fa fa-sync fa-spin"  v-if="loading.copyCourse"></span>
                     <span class="fa fa-copy" v-else></span>
                     {{ $t('copy') }}
@@ -54,7 +54,7 @@
                     </select>
                 </b-modal>
 
-                <button class="btn btn-danger" v-b-modal="'modal-delete-course'" v-show="selectedCourseId">
+                <button class="btn btn-danger" v-b-modal="'modal-delete-course'" v-if="selectedCourseId">
                     <span class="fa fa-sync fa-spin" v-if="loading.deleteCourse"></span>
                     <span class="fa fa-trash" v-else></span>
                     {{ $t('delete') }}
@@ -531,6 +531,10 @@ export default {
         }
     },
     methods:{
+        setNewCourse(){
+            this.courseInfo_create = {};
+            this.$bvModal.show('modal-new-course');
+        },
         setSortOrder(index){
             if(this.sortOrder.index !== index){
                 this.sortOrder = {
@@ -939,7 +943,8 @@ export default {
             try{
                 await this.$store.dispatch('deleteCourse',{id});
                 if(id === this.selectedCourseId){
-                    this.selectedCourse = undefined;
+                    this.selectedCourse = {};
+                    this.setCourseQuery();
                 }
                 this.$bvToast.toast(this.$t('course.deleted'), {
                     title: this.$t('success'),
@@ -1011,7 +1016,9 @@ export default {
         '$route.query.courseId': function(newValue, oldValue){
             if(newValue !== this.selectedCourseId){
                 this.selectedCourseId = newValue;
-                this.getCourse(this.selectedCourseId)
+                if(newValue !== undefined){
+                    this.getCourse(this.selectedCourseId)
+                }
             }
         }
     }
