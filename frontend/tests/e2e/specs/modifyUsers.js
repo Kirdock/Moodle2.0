@@ -85,15 +85,61 @@ module.exports = {
             page.userModalNotPresent()
         }
     },
+    'modal_delete close test': browser =>{
+        const page = browser.page.userManagement();
+        browser.pause(2000) //wait till table is loaded
+        
+        browser.execute(function(selector){
+            return document.querySelectorAll(selector).length;
+        },[page.elements.tableEntries.selector],function(result){
+            runCloseTest(result.value)
+        })
+        function runCloseTest(count){
+            const deleteModal = page.section.modal_delete;
+            const modalCloseVariants = ['cancel', 'cancelX', 'cancelClick'];
+            for(const variant of modalCloseVariants){
+                page.showModalDelete();
+                deleteModal.pause(1000)[variant]();
+                page.deleteModalNotPresent();
+                page.assert.not.toastPresent()
+            }
+            page.assert.elementCount(page.elements.tableEntries.selector, count)
+        }
+    },
+    'modal_edit close test': browser =>{
+        const page = browser.page.userManagement();
+        const modalNew = page.section.modal_new;
+        browser.pause(2000) //wait till table is loaded
+        
+        browser.execute(function(selector){
+            return document.querySelectorAll(selector).length;
+        },[page.elements.tableEntries.selector],function(result){
+            runCloseTest(result.value)
+        })
+        
+        function runCloseTest(count){
+            page.pause(2000);
+            const modalCloseVariants = ['cancel', 'cancelX', 'cancelClick'];
+            for(const variant of modalCloseVariants){
+                page.showModalNew();
+                modalNew.pause(1000)[variant]();
+                page.deleteModalNotPresent();
+                page
+                .assert.not.toastPresent()
+                .assert.elementPresent('@tableEntries')
+            }
+            page.assert.elementCount(page.elements.tableEntries.selector, count)
+        }
+    },
     'Delete user': browser =>{
         const page = browser.page.userManagement();
+        const deleteModal = page.section.modal_delete;
         const matriculationNumber = '98765432';
         page
         .setValue('@searchBar',matriculationNumber)
         .assert.containsText('@firstTableCell', matriculationNumber)
         .showModalDelete()
 
-        const deleteModal = page.section.modal_delete;
         deleteModal.pause(1000).submit() //without pause, button click is not triggered
 
         page
@@ -101,7 +147,7 @@ module.exports = {
         page
         .assert.successPresent()
         .closeToast()
-        .assert.not.elementPresent('@firstTableEntry')
+        .assert.not.elementPresent('@tableEntries')
     },
     'upload CSV file wrong': browser => {
         const creation = browser.page.userManagement().section.creation;

@@ -17,6 +17,6 @@ exports.assertion = function () {
     }
     
     this.command = function (cb) {
-      this.api.isVisible({selector, suppressNotFoundErrors: true}, cb)
+      this.api.isVisible({selector, suppressNotFoundErrors: true, timeout: 2000}, cb)
     }
 }

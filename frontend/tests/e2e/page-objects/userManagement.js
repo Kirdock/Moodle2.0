@@ -9,14 +9,7 @@
  *
  */
 
-const modalCommands = {
-    submit: function() {
-        return this.click('@submitButton');
-    },
-    cancel: function(){
-        return this.click('@cancelButton');
-    }
-}
+const modalCommands = require('./../modalCommands.js');
 
 const userCommands = {
     showModalNew: function(){
@@ -47,7 +40,7 @@ module.exports = {
     commands: [userCommands],
     elements: {
         searchBar: '#searchText',
-        firstTableEntry: 'table tr',
+        tableEntries: 'table tr',
         firstTableCell: 'table tr:nth-child(1) td:first-child', 
         rowEditButton: {
             selector: 'table tr:nth-child(1) td:last-child a',
@@ -75,9 +68,7 @@ module.exports = {
             selector: '#modal-delete-user',
             commands: [modalCommands],
             elements: {
-                submitButton: '.modal-footer button.btn.btn-primary',
-                cancelButton: '.modal-footer button.btn.btn-secondary',
-                closeButton: 'button.close'
+                submitButton: '.modal-footer button.btn.btn-primary'
             }
         },
         modal_new: {
@@ -103,8 +94,6 @@ module.exports = {
                 },
                 email: '.user_info input[type="email"]',
                 submitButton: '.modal-footer button.btn.btn-primary',
-                cancelButton: '.modal-footer button.btn.btn-secondary',
-                closeButton: 'button.close'
             }
         }
     }
