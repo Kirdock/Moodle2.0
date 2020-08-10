@@ -63,10 +63,10 @@
                             {{user.isAdmin ? $t('yes') : $t('no')}}
                         </td>
                         <td>
-                            <a href="#" v-b-modal="'modal-edit-user'" :title="$t('edit')" @click.prevent="userInfo = {...user}; selectedUser = user" >
+                            <a href="#" :title="$t('edit')" @click.prevent="setEdit(user)" >
                                 <span class="fa fa-edit fa-2x"></span>
                             </a>
-                            <a href="#" v-b-modal="'modal-delete-user'" :title="$t('delete')" @click.prevent="selectedUser = user">
+                            <a href="#" :title="$t('delete')" @click.prevent="setDelete(user)">
                                 <span class="fa fa-trash fa-2x"></span>
                             </a>
                         </td>
@@ -123,6 +123,15 @@ export default {
     methods:{
         resetUserInfo(){
             this.userInfo = {};
+        },
+        setEdit(user){
+            this.userInfo = {...user};
+            this.selectedUser = user;
+            this.$bvModal.show('modal-edit-user');
+        },
+        setDelete(user){
+            this.selectedUser = user;
+            this.$bvModal.show('modal-delete-user');
         },
         async submitUsers(){
             this.loading.fileUpload = true;

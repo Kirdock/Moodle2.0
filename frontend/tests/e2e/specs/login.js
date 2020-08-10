@@ -2,6 +2,12 @@ const loginPage = 'Login',
       coursesPage = 'Courses';
 
 module.exports = {
+  before: browser =>{
+    browser.url(browser.launchUrl)
+      .assert.elementPresent('a[href="/Login"]')
+      .click('a[href="/Login"]')
+      .assert.urlEquals(browser.launchUrl + loginPage);
+  },
   'login with empty input': browser => {
     const data = [
       {
@@ -35,10 +41,7 @@ module.exports = {
         }
       }
     ];
-    browser.url(browser.launchUrl).pause(2000)
-      .assert.elementPresent('a[href="/Login"]')
-      .click('a[href="/Login"]')
-      .assert.urlEquals(browser.launchUrl + loginPage)
+    
 
     for (user of data){
       browser
@@ -53,7 +56,7 @@ module.exports = {
       .assert.urlEquals(browser.launchUrl + loginPage)
     }
   },
-  'login wrong credentials': browser => {
+  'wrong credentials': browser => {
     const credentials = [
       {
         username: 'admin',
@@ -78,6 +81,7 @@ module.exports = {
     browser.loginAsAdmin()
     .url(browser.launchUrl + loginPage)
     .assert.urlEquals(browser.launchUrl + coursesPage)
+    .assert.not.elementPresent('a[href="/Login"]');
 
   },
 }

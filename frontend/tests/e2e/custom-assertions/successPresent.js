@@ -2,10 +2,10 @@
  * A custom Nightwatch assertion. The assertion name is the filename.
  *
  * Example usage:
- *   browser.assert.errorPresent()
+ *   browser.assert.successPresent()
  */
 exports.assertion = function () {
-    const selector = '.b-toast-danger';
+    const selector = '.b-toast-success';
     this.message = `Testing if element <${selector}> is ${this.negate ? 'not ' : ''}present`
     this.expected = !this.negate;
   

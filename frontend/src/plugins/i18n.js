@@ -249,7 +249,7 @@ const messages = {
             },
             title: {
                 new: 'Neuen Benutzer anlegen',
-                edit: 'Edit user'
+                edit: 'Benutzer bearbeiten'
             }
         },
         users: {

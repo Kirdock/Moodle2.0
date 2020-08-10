@@ -3,8 +3,8 @@ module.exports = {
         this
         .url(this.launchUrl + 'Login')
         .waitForElementVisible('body')
-        .setValue('input#user','admin')
-        .setValue('input#password','admin')
+        .setValue('input#user','TestOwner')
+        .setValue('input#password','password')
         .click('button[type=submit]')
         .assert.urlEquals(this.launchUrl + 'Courses')
     }

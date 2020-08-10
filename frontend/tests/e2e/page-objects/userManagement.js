@@ -13,9 +13,8 @@ const modalCommands = {
     submit: function() {
         return this.click('@submitButton');
     },
-    isPresent: function(){
-        return this.expect.section('@modal_new').to.be.visible;
-        // return this.elementPresent('@submitButton');
+    cancel: function(){
+        return this.click('@cancelButton');
     }
 }
 
@@ -23,6 +22,22 @@ const userCommands = {
     showModalNew: function(){
         this.section.creation.click('@newButton');
         return this.section.modal_new.waitForElementVisible('@submitButton', 1000);
+    },
+    showModalDelete: function(){
+        this.click('@rowDeleteButton');
+        return this.section.modal_delete.waitForElementVisible('@submitButton',1000);
+    },
+    isUserModalPresent: function(){
+        return this.expect.section('@modal_new').to.be.visible;
+    },
+    userModalNotPresent: function(){
+        return this.expect.section('@modal_new').to.not.be.present;
+    },
+    deleteModalPresent: function(){
+        return this.expect.section('@modal_delete').to.be.visible;
+    },
+    deleteModalNotPresent: function(){
+        return this.expect.section('@modal_delete').to.not.be.present;
     }
 };
 
@@ -30,13 +45,19 @@ const userCommands = {
 module.exports = {
     url: '/Admin/UserManagement',
     commands: [userCommands],
-  
-    // A page object can have elements
     elements: {
-        searchBar: '#searchText'
+        searchBar: '#searchText',
+        firstTableEntry: 'table tr',
+        firstTableCell: 'table tr:nth-child(1) td:first-child', 
+        rowEditButton: {
+            selector: 'table tr:nth-child(1) td:last-child a',
+            index: 0
+        },
+        rowDeleteButton: {
+            selector: 'table tr:nth-child(1) td:last-child a',
+            index: 1
+        }
     },
-  
-    // Or a page objects can also have sections
     sections: {
         creation: {
             selector: '.form-horizontal .form-inline',
@@ -46,35 +67,41 @@ module.exports = {
                     selector: 'button',
                     index: 0
                 },
-                uploadButton: {
-                    selector: 'button',
-                    index: 1
-                },
-                isAdmin: 'input'
+                uploadButton: 'input[type="file"]',
+                isAdmin: 'input[type="checkbox"]',
             },
         },
-        modal_new: {
-            selector: '#modal-new-user',
+        modal_delete: {
+            selector: '#modal-delete-user',
             commands: [modalCommands],
             elements: {
-                isAdmin: '#modal-new-user input[type="checkbox"]',
+                submitButton: '.modal-footer button.btn.btn-primary',
+                cancelButton: '.modal-footer button.btn.btn-secondary',
+                closeButton: 'button.close'
+            }
+        },
+        modal_new: {
+            selector: '.modal',
+            commands: [modalCommands],
+            elements: {
+                isAdmin: '.user_info input[type="checkbox"]',
                 username: {
-                    selector: '#modal-new-user input[type="text"]',
+                    selector: '.user_info input[type="text"]',
                     index: 0
                 },
                 matriculationNumber: {
-                    selector: '#modal-new-user input[type="text"]',
+                    selector: '.user_info input[type="text"]',
                     index: 1
                 },
                 surname: {
-                    selector: '#modal-new-user input[type="text"]',
+                    selector: '.user_info input[type="text"]',
                     index: 2
                 },
                 forename: {
-                    selector: '#modal-new-user input[type="text"]',
+                    selector: '.user_info input[type="text"]',
                     index: 3
                 },
-                email: '#modal-new-user input[type="email"]',
+                email: '.user_info input[type="email"]',
                 submitButton: '.modal-footer button.btn.btn-primary',
                 cancelButton: '.modal-footer button.btn.btn-secondary',
                 closeButton: 'button.close'
