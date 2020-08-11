@@ -34,10 +34,30 @@ function courseExists(self, browser, number, create, performAfter){
 }
 
 module.exports = {
-    before: browser => {
-        browser
-        .loginAsAdmin()
-        .page.courseManagement().navigate().pause(2000);
+    before: (browser, done) => {
+        const page = browser
+            .loginAsAdmin()
+            .page.courseManagement()
+        page.navigate();
+        //check if semester exists
+        browser.getValue(page.elements.selectSemester.selector,function(result){
+            if(result.value === ''){
+                const semester = require('./modifySemester.js')
+                browser.page.semesterManagement().navigate();
+                browser.perform(() =>{
+                    semester['create semester'](browser);
+                }).perform(()=>{
+                    page.navigate();
+                    page.pause(1000, function(){
+                        done();
+                    });
+                })
+            }
+            else{
+                page.pause(1000);
+                done();
+            }
+        });
     },
     'create course invalid': browser => {
         const page = browser.page.courseManagement();

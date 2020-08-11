@@ -112,6 +112,9 @@ module.exports = {
                 description: '.tab-pane .course_info .note-editable',
                 submitButton: '.tab-pane .course_info button.btn.btn-primary',
             }
+        },
+        assignedUsers: {
+            selector: '#assignedUsers'
         }
     }
 }
