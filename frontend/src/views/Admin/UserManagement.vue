@@ -140,12 +140,14 @@ export default {
             formData.append('isAdmin', this.isAdmin)
             this.$refs.file.value = '';
             try{
-                await this.$store.dispatch('createUsers', formData);
+                const response = await this.$store.dispatch('createUsers', formData);
                 this.$bvToast.toast(this.$t('user.created'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
+                this.users.push(...response.data);
+                this.users.sort((a,b) => a.matriculationNumber.localeCompare(b.matriculationNumber));
             }
             catch{
                 this.$bvToast.toast(this.$t('user.create.error'), {
@@ -175,7 +177,8 @@ export default {
                         variant: 'success',
                         appendToast: true
                     });
-                    this.getUsers();
+                    this.users.push(this.userInfo);
+                    this.users.sort((a,b) => a.matriculationNumber.localeCompare(b.matriculationNumber));
                 }
                 catch(error){
                     const status = error.response.data.errorResponseCode;

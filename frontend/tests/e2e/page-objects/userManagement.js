@@ -41,15 +41,19 @@ module.exports = {
     elements: {
         searchBar: '#searchText',
         tableEntries: 'table tr',
-        firstTableCell: 'table tr:nth-child(1) td:first-child', 
+        firstTableCell: 'table tr:first-child td:first-child',
         rowEditButton: {
-            selector: 'table tr:nth-child(1) td:last-child a',
+            selector: 'table tr:first-child td:last-child a',
             index: 0
         },
         rowDeleteButton: {
-            selector: 'table tr:nth-child(1) td:last-child a',
+            selector: 'table tr:first-child td:last-child a',
             index: 1
-        }
+        },
+        tableCellmatriculationNumber: 'table tr:first-child td:nth-child(1)',
+        tableCellsurname: 'table tr:first-child td:nth-child(2)',
+        tableCellforename: 'table tr:first-child td:nth-child(3)',
+        tableCellisAdmin: 'table tr:first-child td:nth-child(4)'
     },
     sections: {
         creation: {
