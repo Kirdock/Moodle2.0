@@ -1,10 +1,43 @@
 const Path = require('path');
-const { pathToFileURL } = require('url');
+const testCourse = {
+    owner: {
+        index: undefined,
+        value: 'Owner'
+    },
+    number: '000.001',
+    name: 'Mein erster Kurs',
+    minKreuzel: '20',
+    minPoints: '30',
+    description: 'Meine Kursbeschreibung'
+}
+
+function courseExists(self, browser, number, create, performAfter){
+    //create === true: create it
+    //create === false: delete it
+    const page = browser.page.courseManagement();
+    browser.element('xpath', `${page.elements.selectCourseX.selector}/option[contains(text(),"${number}")]`, function(result){
+        if (result.value && result.value.ELEMENT) {
+            // Element is present
+            if(!create){
+                browser.log('Course already available. Course will now be deleted')
+                self['delete course'](browser, number);
+            }
+            performAfter();
+        } else {
+            if(create){
+                browser.log('Course does not exist. Course will now be created')
+                self['create course'](browser);
+            }
+            performAfter();
+        }
+    });
+}
+
 module.exports = {
     before: browser => {
         browser
         .loginAsAdmin()
-        .page.courseManagement().navigate();
+        .page.courseManagement().navigate().pause(2000);
     },
     'create course invalid': browser => {
         const page = browser.page.courseManagement();
@@ -63,22 +96,62 @@ module.exports = {
         page.expect.element('@container').to.not.be.present;
         page.assert.not.urlContains('?courseId=');
     },
-    'create course valid': browser => {
+    'create course': function (browser) {
         const page = browser.page.courseManagement();
-        const modal_new = page.section.modal_new;
-        page.showNewModal();
-        modal_new.setMultiSelect('@owner',1);
-        modal_new
-            .setValue('@number', '000.001')
-            .setValue('@name','TestCourse')
-            .setValue('@minKreuzel',20)
-            .setValue('@minPoints',30)
-            .setValue('@description','Meine Kursbeschreibung')
-            .submit();
-        page.assert.successPresent();
-        page.closeToast();
-        page.waitForElementVisible('@container');
-        page.assert.urlContains('?courseId=');
+
+        courseExists(this,browser, testCourse.number, false, create)
+        
+        function create(){
+            const modal_new = page.section.modal_new;
+            const courseInfo = page.section.courseInfo;
+            page.showNewModal();
+            page.pause(1000);
+            const courses = [testCourse]
+
+            for(const course of courses){
+                modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
+                modal_new
+                    .setValue('@number', course.number)
+                    .setValue('@name', course.name)
+                    .setValue('@minKreuzel', course.minKreuzel)
+                    .setValue('@minPoints', course.minPoints)
+                    .setValue('@description', course.description)
+                    .submit();
+                page.assert.successPresent();
+                page.closeToast();
+                page.waitForElementVisible('@container');
+                page.assert.urlContains('?courseId=');
+                courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
+                    .assert.value('@number', course.number)
+                    .assert.value('@name', course.name)
+                    .assert.containsText('@description', course.description)
+                    .assert.value('@minKreuzel', course.minKreuzel)
+                    .assert.value('@minPoints', course.minPoints)
+            }
+        }
+    },
+    'delete course': function(browser, number){
+        number = number || testCourse.number;
+        courseExists(this,browser, number, true, deleteCourse);
+
+        function deleteCourse(){
+            const page = browser.page.courseManagement();
+            const deleteModal = page.section.modal_delete;
+            page.selectCourse(number)
+            page.showDeleteModal();
+            deleteModal.pause(1000).submit() //without pause, button click is not triggered
+
+            page
+                .modalDeleteNotPresent();
+            page
+                .assert.successPresent()
+                .closeToast()
+                .assert.not.elementPresent('@container')
+                .assert.not.elementPresent('@deleteButton')
+                .expect.element('@copyButton').to.not.be.present
+            page.assert.not.urlContains('?courseId=');
+
+        }
     },
     'modal_new close test': browser =>{
         const page = browser.page.courseManagement();
@@ -93,15 +166,17 @@ module.exports = {
         }
         page.expect.element('@container').to.not.be.present;
     },
-    'Select course': browser => {
+    'select course': browser => {
         const page = browser.page.courseManagement();
-        page.pause(2000)
-            .expect.element('@deleteButton').to.not.be.present
-        page.expect.element('@copyButton').to.not.be.present
-        page.selectCourse(1);
-        page.waitForElementVisible('@container')
-            .expect.element('@deleteButton').to.be.present
-        page.expect.element('@copyButton').to.be.present
-        page.assert.urlContains('?courseId=');
+        courseExists(this, browser, testCourse.number, true, selectCourse)
+        function selectCourse(){
+            page.expect.element('@deleteButton').to.not.be.present
+            page.expect.element('@copyButton').to.not.be.present
+            page.selectCourse(testCourse.number);
+            page.waitForElementVisible('@container')
+                .expect.element('@deleteButton').to.be.present
+            page.expect.element('@copyButton').to.be.present
+            page.assert.urlContains('?courseId=');
+        }
     }
 }

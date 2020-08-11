@@ -5,8 +5,8 @@ module.exports = class {
         }
         const self = this;
         this.api.element('css selector',selector, function (res) {
-            self.api.moveTo(res.value.ELEMENT, 0, 0, function() {
-                self.api.mouseButtonClick(1);
+            self.api.moveTo(res.value.ELEMENT, 2, 2, function() {
+                self.api.mouseButtonClick(0);
                 if(value === undefined){
                     self.api.click(`${selector} .multiselect__element:nth-child(${index+1})>span`)
                 }

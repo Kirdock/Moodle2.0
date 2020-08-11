@@ -1,4 +1,4 @@
-    const Path = require('path');
+const Path = require('path');
 const admin = {
     matriculationNumber: '00000000'
 }
@@ -12,6 +12,8 @@ const testUser = { //will be used for creating, deleting, editing
 }
 
 function userExists(self, browser, matriculationNumber, create, performAfter){
+    //create === true: create it
+    //create === false: delete it
     const page = browser.page.userManagement();
     page
         .clearValue2('@searchBar')
@@ -26,17 +28,13 @@ function userExists(self, browser, matriculationNumber, create, performAfter){
                 browser.log('User already available. User will now be deleted')
                 self['delete user'](browser, matriculationNumber);
             }
-            if(performAfter){
-                performAfter();
-            }
+            performAfter();
         } else {
             if(create){
                 browser.log('User does not exist. User will now be created')
                 self['create user'](browser);
             }
-            if(performAfter){
-                performAfter();
-            }
+            performAfter();
         }
     });
 }
@@ -337,11 +335,12 @@ module.exports = {
         for(const fileName of files){
             creation
             .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
-            .assert.errorPresent()
+            .assert.toastPresent()
+            .assert.not.successPresent()
             .closeToast();
         }
     },
-    'upload CSV file right': function(browser) {
+    'upload CSV file right': function(browser, isAdmin = false) {
         const page = browser.page.userManagement();
         const creation = page.section.creation;
         const files = ['usersRight'];
@@ -352,20 +351,24 @@ module.exports = {
                 matriculationNumber: '88888888',
                 surname: 'Strießnig',
                 forename: 'Klaus',
+                isAdmin
             },
             {
                 username: 'ppipp',
                 matriculationNumber: '87596328',
                 surname: 'Pipp',
-                forename: 'Peter'
+                forename: 'Peter',
+                isAdmin
             },
             {
                 username: 'TestOwner',
                 matriculationNumber: '00000001',
                 surname: 'TestOwnerN',
-                forename: 'TestOwnerV'
+                forename: 'TestOwnerV',
+                isAdmin
             }
         ]
+        creation.setCheckbox('@isAdmin', isAdmin);
         let i = -1;
         iterate();
         function iterate(){
@@ -385,18 +388,8 @@ module.exports = {
             }
         }
     },
-    'upload CSV file right admin': browser => {
-        const page = browser.page.userManagement();
-        const creation = page.section.creation;
-        const files = ['usersRight'];
-        creation.setCheckbox('@isAdmin', true);
-        for(const fileName of files){
-            creation
-            .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
-            .assert.successPresent()
-            .closeToast()
-        }
-        // .assert.containsText('@tableEntries', 'Klaus')
+    'upload CSV file right admin': function(browser) {
+        this["upload CSV file right"](browser, true);
     },
     'Edit: invalid input': function(browser) {
         const page = browser.page.userManagement();

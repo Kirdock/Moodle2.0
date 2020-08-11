@@ -533,7 +533,9 @@ export default {
     },
     methods:{
         setNewCourse(){
-            this.courseInfo_create = {};
+            for(const key in this.courseInfo_create){ //this.courseInfo_create = {} kills reference
+                this.courseInfo_create[key] = undefined;
+            }
             this.$bvModal.show('modal-new-course');
         },
         setSortOrder(index){
