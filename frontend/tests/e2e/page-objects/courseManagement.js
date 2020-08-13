@@ -1,7 +1,7 @@
 const modalCommands = require('./../modalCommands.js');
 const createCommands = {
     selectCourse: function(value){
-        this.click('xpath',`//select[@id="selectedCourse"]/option[contains(text(),"${value}")]`);
+        this.click('xpath',`//select[@id="selectedCourse"]/option[contains(text(),"${value}")]`).pause(2000);
     },
     showNewModal: function(){
         this.click('@newButton');
@@ -36,6 +36,7 @@ module.exports = {
         },
         deleteButton: 'button.btn-danger',
         selectSemester: '#courseSemester_edit',
+        selectSemesterOption: '#courseSemester_edit option',
         selectCourse: '#selectedCourse',
         selectCourseX: '//select[@id="selectedCourse"]',
         container: '.tabs'
@@ -78,7 +79,7 @@ module.exports = {
             }
         },
         courseInfo: {
-            selector: '.tab-pane .course_info',
+            selector: '#courseInfo',
             commands: [
                 {
                     submit: function() {
@@ -87,30 +88,30 @@ module.exports = {
                 }
             ],
             elements: {
-                owner: '.tab-pane .course_info .multiselect',
-                ownerText: '.tab-pane .course_info .multiselect .multiselect__single',
+                owner: '#courseInfo .multiselect',
+                ownerText: '#courseInfo .multiselect .multiselect__single',
                 ownerInput: {
-                    selector: '.tab-pane .course_info input[type="text"]',
+                    selector: '#courseInfo input[type="text"]',
                     index: 0
                 },
                 number: {
-                    selector: '.tab-pane .course_info input[type="text"]',
+                    selector: '#courseInfo input[type="text"]',
                     index: 1
                 },
                 name: {
-                    selector: '.tab-pane .course_info input[type="text"]',
+                    selector: '#courseInfo input[type="text"]',
                     index: 2
                 },
                 minKreuzel: {
-                    selector: '.tab-pane .course_info input[type="number"]',
+                    selector: '#courseInfo input[type="number"]',
                     index: 0
                 },
                 minPoints: {
-                    selector: '.tab-pane .course_info input[type="number"]',
+                    selector: '#courseInfo input[type="number"]',
                     index: 1
                 },
-                description: '.tab-pane .course_info .note-editable',
-                submitButton: '.tab-pane .course_info button.btn.btn-primary',
+                description: '#courseInfo .note-editable',
+                submitButton: '#courseInfo button.btn.btn-primary',
             }
         },
         assignedUsers: {

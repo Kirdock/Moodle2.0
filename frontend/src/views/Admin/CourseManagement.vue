@@ -65,7 +65,7 @@
             </div>
         </div>
         <b-tabs content-class="mt-3" v-if="selectedCourse.id">
-            <b-tab :title="$t('information')" active>
+            <b-tab :title="$t('information')" id="courseInfo" active>
                 <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
                 <div class="form-horizontal col-md-4">
                     <form @submit.prevent="updateCourse()">
@@ -845,6 +845,12 @@ export default {
             const {exerciseSheets, ...data} = this.selectedCourse;
             try{
                 await this.$store.dispatch('updateCourse', data);
+                for(const course of this.courses){
+                    if(course.id === data.id){
+                        course.name = data.name;
+                        course.number = data.number;
+                    }
+                }
                 this.$bvToast.toast(this.$t('course.saved'), {
                     title: this.$t('success'),
                     variant: 'success',

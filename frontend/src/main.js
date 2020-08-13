@@ -30,7 +30,7 @@ Vue.use(FormCheckboxPlugin);
 Vue.component('b-nav-item', BNavItem);
 Vue.component('i-input', IntegerInput); //Global registration
 
-store.dispatch('initialiseStore', true).finally(()=>{
+store.dispatch('initialiseStore', true).catch().finally(()=>{
   i18n.locale = store.getters.locale;
 
   const app = new Vue({
