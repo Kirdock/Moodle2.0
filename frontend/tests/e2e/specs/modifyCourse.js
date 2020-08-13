@@ -10,27 +10,50 @@ const testCourse = {
     minPoints: '30',
     description: 'Meine Kursbeschreibung'
 }
+const testUsers = require('./../testUsers.js');
 
-function courseExists(self, browser, courseText, create, performAfter){
+function deSelectAssignedUser(browser){
+    const assignedUsers = browser.page.courseManagement().section.assignedUsers;
+    assignedUsers.selectRole(4);
+    browser.perform(function (done){
+        browser.elements('css selector', assignedUsers.elements.tableEntriesCheck.selector, function(result){
+            if (result.value && result.value.length !== 0) {
+                // Element is present
+                for(const element of result.value){
+                    browser.elementIdClick(element.ELEMENT) //reset
+                }
+                assignedUsers.assert.not.elementPresent('@tableEntries');
+            }
+            assignedUsers.submit();
+            assignedUsers.assert.successPresent();
+            assignedUsers.closeToast();
+            done();
+        });
+    })
+}
+
+function courseExists(self, browser, courseText, create){
     //create === true: create it
     //create === false: delete it
     const page = browser.page.courseManagement();
-    browser.element('xpath', `${page.elements.selectCourseX.selector}/option[contains(text(),"${courseText}")]`, function(result){
-        if (result.value && result.value.ELEMENT) {
-            // Element is present
-            if(!create){
-                browser.log('Course already available. Course will now be deleted')
-                self['delete course'](browser, courseText);
+    browser.perform(function (done){
+        browser.element('xpath', `${page.elements.selectCourseX.selector}/option[contains(text(),"${courseText}")]`, function(result){
+            if (result.value && result.value.ELEMENT) {
+                // Element is present
+                if(!create){
+                    browser.log('Course already available. Course will now be deleted')
+                    self['delete course'](browser, courseText);
+                }
+                done();
+            } else {
+                if(create){
+                    browser.log('Course does not exist. Course will now be created')
+                    self['create course'](browser);
+                }
+                done();
             }
-            performAfter();
-        } else {
-            if(create){
-                browser.log('Course does not exist. Course will now be created')
-                self['create course'](browser);
-            }
-            performAfter();
-        }
-    });
+        });
+    })
 }
 
 module.exports = {
@@ -59,15 +82,14 @@ module.exports = {
     'select course': function (browser) {
         const page = browser.page.courseManagement();
         page.navigate().pause(1000);
-        courseExists(this, browser, testCourse.number, true, selectCourse)
-        function selectCourse(){
-            page.expect.element('@deleteButton').to.not.be.present
-            page.expect.element('@copyButton').to.not.be.present
-            page.selectCourse(testCourse.number);
-            page.expect.element('@deleteButton').to.be.present
-            page.expect.element('@copyButton').to.be.present
-            page.assert.urlContains('?courseId=');
-        }
+        courseExists(this, browser, testCourse.number, true)
+
+        page.expect.element('@deleteButton').to.not.be.present
+        page.expect.element('@copyButton').to.not.be.present
+        page.selectCourse(testCourse.number);
+        page.expect.element('@deleteButton').to.be.present
+        page.expect.element('@copyButton').to.be.present
+        page.assert.urlContains('?courseId=');
     },
     'create course invalid': browser => {
         const page = browser.page.courseManagement();
@@ -130,94 +152,90 @@ module.exports = {
     'create course': function (browser) {
         const page = browser.page.courseManagement();
 
-        courseExists(this,browser, testCourse.number, false, create)
+        courseExists(this,browser, testCourse.number, false)
         
-        function create(){
-            const modal_new = page.section.modal_new;
-            const courseInfo = page.section.courseInfo;
-            page.showNewModal();
-            page.pause(1000);
-            const courses = [testCourse]
+        const modal_new = page.section.modal_new;
+        const courseInfo = page.section.courseInfo;
+        page.showNewModal();
+        page.pause(1000);
+        const courses = [testCourse]
 
-            for(const course of courses){
-                modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
-                modal_new
-                    .setValue('@number', course.number)
-                    .setValue('@name', course.name)
-                    .setValue('@minKreuzel', course.minKreuzel)
-                    .setValue('@minPoints', course.minPoints)
-                    .setValue('@description', course.description)
-                    .submit();
-                page.assert.successPresent();
-                page.closeToast();
-                page.pause(1000);
-                page.assert.urlContains('?courseId=');
-                courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
-                    .assert.value('@number', course.number)
-                    .assert.value('@name', course.name)
-                    .assert.containsText('@description', course.description)
-                    .assert.value('@minKreuzel', course.minKreuzel)
-                    .assert.value('@minPoints', course.minPoints)
-            }
+        for(const course of courses){
+            modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
+            modal_new
+                .setValue('@number', course.number)
+                .setValue('@name', course.name)
+                .setValue('@minKreuzel', course.minKreuzel)
+                .setValue('@minPoints', course.minPoints)
+                .setValue('@description', course.description)
+                .submit();
+            page.assert.successPresent();
+            page.closeToast();
+            page.pause(1000);
+            page.assert.urlContains('?courseId=');
+            courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
+                .assert.value('@number', course.number)
+                .assert.value('@name', course.name)
+                .assert.containsText('@description', course.description)
+                .assert.value('@minKreuzel', course.minKreuzel)
+                .assert.value('@minPoints', course.minPoints)
         }
     },
     'modify course invalid': function(browser, number){
         number = number || testCourse.number;
-        courseExists(this,browser, number, true, modifyCourse);
+        courseExists(this,browser, number, true);
 
-        function modifyCourse(){
-            const page = browser.page.courseManagement();
-            const courseInfo = page.section.courseInfo;
-            page.selectCourse(number);
+        const page = browser.page.courseManagement();
+        const courseInfo = page.section.courseInfo;
+        page.selectCourse(number);
 
-            const courseData = [
-                {
-                    owner: {
-                        value: 'admin',
-                        valid: true
-                    },
-                    number: {
-                        value: '123.985',
-                        valid: true
-                    },
-                    name: {
-                        value: 'TestCourse1',
-                        valid: true
-                    },
-                    minKreuzel:{
-                        value: 'abc',
-                        expected: '',
-                        valid: true
-                    },
-                    minPoints: {
-                        value: '120',
-                        valid: false
-                    },
-                    description: {
-                        value: 'My course description'
-                    }
+        const courseData = [
+            {
+                owner: {
+                    value: 'admin',
+                    valid: true
+                },
+                number: {
+                    value: '123.985',
+                    valid: true
+                },
+                name: {
+                    value: 'TestCourse1',
+                    valid: true
+                },
+                minKreuzel:{
+                    value: 'abc',
+                    expected: '',
+                    valid: true
+                },
+                minPoints: {
+                    value: '120',
+                    valid: false
+                },
+                description: {
+                    value: 'My course description'
                 }
-            ]
-            
-            for(const course of courseData){
-                const {owner, description, ...data} = course;
-
-                courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value);
-                courseInfo.assert.isValidInput(`@ownerInput`, 'valid', owner.valid);
-                courseInfo.clearValue('@description')
-                for(const key in data){
-                    courseInfo.clearValue2(`@${key}`)
-                        .setValue(`@${key}`, course[key].value)
-
-                    if(course[key].expected !== undefined){
-                        courseInfo.assert.value(`@${key}`,course[key].expected)
-                    }
-                    courseInfo.assert.isValidInput(`@${key}`, 'valid', course[key].valid)
-                }
-                
-                courseInfo.submit();
-                courseInfo.assert.not.toastPresent();
             }
+        ]
+        
+        for(const course of courseData){
+            const {owner, description, ...data} = course;
+
+            courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value);
+            courseInfo.assert.isValidInput(`@ownerInput`, 'valid', owner.valid);
+            courseInfo.clearValue('@description')
+            for(const key in data){
+                courseInfo.clearValue2(`@${key}`)
+                    .setValue(`@${key}`, course[key].value)
+
+                if(course[key].expected !== undefined){
+                    courseInfo.assert.value(`@${key}`,course[key].expected)
+                }
+                courseInfo.assert.isValidInput(`@${key}`, 'valid', course[key].valid)
+            }
+            
+            courseInfo.submit();
+            courseInfo.assert.not.toastPresent();
         }
     },
     'modify course': function(browser, courseText){
@@ -252,64 +270,56 @@ module.exports = {
                 }
             }
         ]
-        courseExists(self, browser, courseText, true, checkModifyCourse);
+        courseExists(self, browser, courseText, true);
+        courseExists(self, browser, `${courseData[0].number.value} ${courseData[0].name.value}`, false);
+        
+        const page = browser.page.courseManagement();
+        const courseInfo = page.section.courseInfo;
+        page.selectCourse(courseText);
+        
+        
+        for(const course of courseData){
+            const {owner, description, ...data} = course;
 
-        function checkModifyCourse(){
-            courseExists(self, browser, `${courseData[0].number.value} ${courseData[0].name.value}`, false, modifyCourse);
-        }
+            courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value);
+            courseInfo.assert.isValidInput(`@ownerInput`, 'valid', owner.valid);
+            courseInfo.clearValue('@description')
+            courseInfo.setValue('@description', description.value)
+            for(const key in data){
+                courseInfo.clearValue2(`@${key}`)
+                    .setValue(`@${key}`, course[key].value)
 
-        function modifyCourse(){
-            const page = browser.page.courseManagement();
-            const courseInfo = page.section.courseInfo;
-            page.selectCourse(courseText);
-            
-            
-            for(const course of courseData){
-                const {owner, description, ...data} = course;
-
-                courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value);
-                courseInfo.assert.isValidInput(`@ownerInput`, 'valid', owner.valid);
-                courseInfo.clearValue('@description')
-                courseInfo.setValue('@description', description.value)
-                for(const key in data){
-                    courseInfo.clearValue2(`@${key}`)
-                        .setValue(`@${key}`, course[key].value)
-
-                    if(course[key].expected !== undefined){
-                        courseInfo.assert.value(`@${key}`,course[key].expected)
-                    }
-                    courseInfo.assert.isValidInput(`@${key}`, 'valid', course[key].valid)
+                if(course[key].expected !== undefined){
+                    courseInfo.assert.value(`@${key}`,course[key].expected)
                 }
-                courseInfo.submit();
-                courseInfo.assert.successPresent();
-                courseInfo.closeToast();
-
-                page.assert.containsText('@selectCourse', `${course.number.value} ${course.name.value}`);
+                courseInfo.assert.isValidInput(`@${key}`, 'valid', course[key].valid)
             }
+            courseInfo.submit();
+            courseInfo.assert.successPresent();
+            courseInfo.closeToast();
+
+            page.assert.containsText('@selectCourse', `${course.number.value} ${course.name.value}`);
         }
     },
     'delete course': function(browser, courseText){
         courseText = courseText || testCourse.number;
-        courseExists(this,browser, courseText, true, deleteCourse);
+        courseExists(this,browser, courseText, true);
+        
+        const page = browser.page.courseManagement();
+        const deleteModal = page.section.modal_delete;
+        page.selectCourse(courseText)
+        page.showDeleteModal();
+        deleteModal.pause(1000).submit() //without pause, button click is not triggered
 
-        function deleteCourse(){
-            const page = browser.page.courseManagement();
-            const deleteModal = page.section.modal_delete;
-            page.selectCourse(courseText)
-            page.showDeleteModal();
-            deleteModal.pause(1000).submit() //without pause, button click is not triggered
-
-            page
-                .modalDeleteNotPresent();
-            page
-                .assert.successPresent()
-                .closeToast()
-                .assert.not.elementPresent('@container')
-                .assert.not.elementPresent('@deleteButton')
-                .expect.element('@copyButton').to.not.be.present
-            page.assert.not.urlContains('?courseId=');
-
-        }
+        page
+            .modalDeleteNotPresent();
+        page
+            .assert.successPresent()
+            .closeToast()
+            .assert.not.elementPresent('@container')
+            .assert.not.elementPresent('@deleteButton')
+            .expect.element('@copyButton').to.not.be.present
+        page.assert.not.urlContains('?courseId=');
     },
     'modal_new close test': browser =>{
         const page = browser.page.courseManagement();
@@ -324,5 +334,51 @@ module.exports = {
             page.assert.not.toastPresent()
         }
         page.expect.element('@container').to.not.be.present;
+    },
+    'assign users csv': function (browser){
+        const courseText = testCourse.number;
+        const page = browser.page.courseManagement();
+        const assignedUsers = page.section.assignedUsers;
+        const self = this;
+
+        courseExists(self, browser, courseText, true);
+
+        page.selectCourse(courseText);
+        page.selectTab(1);
+        deSelectAssignedUser(browser)
+
+        page.expect.section('@assignedUsers').to.be.visible;
+        assignedUsers.setValue('@uploadCsv', Path.resolve(`${__dirname}/testFiles/${'usersRight'}.csv`));
+        assignedUsers.selectRole(4);
+        assignedUsers.pause(1000)
+
+        for(const user of testUsers){
+            assignedUsers.userAssignedAsStudent(browser, user)
+        }
+    },
+    'assign users': function(browser, courseText) {
+        courseText = courseText || testCourse.number;
+        const page = browser.page.courseManagement();
+        const assignedUsers = page.section.assignedUsers;
+        const self = this;
+
+        courseExists(self, browser, courseText, true);
+        page.selectCourse(courseText);
+        page.selectTab(1);
+        this['assign users csv'](browser);
+        page.expect.section('@assignedUsers').to.be.visible;
+        deSelectAssignedUser(browser);
+            
+        assignedUsers.selectRole(0);
+        assignedUsers.setUserRoleByMatriculationNumber(browser, testUsers[0].matriculationNumber, 0);
+        assignedUsers.isUserAssigned(browser, testUsers[0].matriculationNumber, 'l');
+        assignedUsers.setUserRoleByMatriculationNumber(browser, testUsers[1].matriculationNumber, 1);
+        assignedUsers.isUserAssigned(browser, testUsers[1].matriculationNumber, 't');
+        assignedUsers.selectUserByMatriculationNumber(browser, testUsers[2].matriculationNumber);
+        assignedUsers.isUserAssigned(browser, testUsers[2].matriculationNumber, 's');
+        assignedUsers.submit();
+    },
+    after: browser =>{
+        browser.end();
     }
 }

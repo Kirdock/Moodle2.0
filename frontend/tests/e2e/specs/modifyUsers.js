@@ -2,6 +2,7 @@ const Path = require('path');
 const admin = {
     matriculationNumber: '00000000'
 }
+const testUsers = require('./../testUsers.js');
 const testUser = { //will be used for creating, deleting, editing
     username: 'TestStudent',
     surname: 'mySurname',
@@ -11,7 +12,7 @@ const testUser = { //will be used for creating, deleting, editing
     matriculationNumber: '98765432'
 }
 
-function userExists(self, browser, matriculationNumber, create, performAfter){
+function userExists(self, browser, matriculationNumber, create){
     //create === true: create it
     //create === false: delete it
     const page = browser.page.userManagement();
@@ -19,56 +20,61 @@ function userExists(self, browser, matriculationNumber, create, performAfter){
         .clearValue2('@searchBar')
         .setValue('@searchBar',matriculationNumber)
         .pause(1000) //wait for search
-    browser.element('css selector', page.elements.firstTableCell.selector, function(result){
-        page.clearValue2('@searchBar')
-
-        if (result.value && result.value.ELEMENT) {
-            // Element is present
-            if(!create){
-                browser.log('User already available. User will now be deleted')
-                self['delete user'](browser, matriculationNumber);
+    browser.perform(function (done){
+        browser.element('css selector', page.elements.firstTableCell.selector, function(result){
+            page.clearValue2('@searchBar')
+    
+            if (result.value && result.value.ELEMENT) {
+                // Element is present
+                if(!create){
+                    browser.log('User already available. User will now be deleted')
+                    self['delete user'](browser, matriculationNumber);
+                }
+                done();
+            } else {
+                if(create){
+                    browser.log('User does not exist. User will now be created')
+                    self['create user'](browser);
+                }
+                done();
             }
-            performAfter();
-        } else {
-            if(create){
-                browser.log('User does not exist. User will now be created')
-                self['create user'](browser);
-            }
-            performAfter();
-        }
+        });
     });
 }
 
 function userRightCreated(browser, user){
-    const page = browser.page.userManagement();
-    const modalNew = page.section.modal_new;
-    browser.log('Checking if user was created right')
-    page
-        .clearValue2('@searchBar')
-        .setValue('@searchBar',user.matriculationNumber)
-        .assert.elementCount('@tableEntries',1);
-    const {email, username, ...tableColumns} = user;
-    for(const data in tableColumns){ //table check
-        page.assert.containsText(`@tableCell${data}`, user[data] === true ? 'Ja' : user[data] === false ? 'Nein' : user[data])
-    }
+    browser.perform(function (done){
+        const page = browser.page.userManagement();
+        const modalNew = page.section.modal_new;
+        browser.log('Checking if user was created right')
+        page
+            .clearValue2('@searchBar')
+            .setValue('@searchBar',user.matriculationNumber)
+            .assert.elementCount('@tableEntries',1);
+        const {email, username, ...tableColumns} = user;
+        for(const data in tableColumns){ //table check
+            page.assert.containsText(`@tableCell${data}`, user[data] === true ? 'Ja' : user[data] === false ? 'Nein' : user[data])
+        }
 
-    page.click('@rowEditButton')
-        .isUserModalPresent()
+        page.click('@rowEditButton')
+            .isUserModalPresent()
 
-    for(const data in user){ //edit modal check
-        if(user[data] === true){
-            modalNew.expect.element(`@${data}`).to.be.selected;
+        for(const data in user){ //edit modal check
+            if(user[data] === true){
+                modalNew.expect.element(`@${data}`).to.be.selected;
+            }
+            else if(user[data] === false){
+                modalNew.expect.element(`@${data}`).to.not.be.selected;
+            }
+            else{
+                modalNew.assert.value(`@${data}`,user[data]);
+            }
         }
-        else if(user[data] === false){
-            modalNew.expect.element(`@${data}`).to.not.be.selected;
-        }
-        else{
-            modalNew.assert.value(`@${data}`,user[data]);
-        }
-    }
-    
-    modalNew.cancel();
-    page.clearValue2('@searchBar');
+        
+        modalNew.cancel();
+        page.clearValue2('@searchBar');
+        done();
+    })
 }
 
 
@@ -214,26 +220,24 @@ module.exports = {
         
 
         for(const user of userData){
-            userExists(this,browser,user.matriculationNumber, false, createUser);
+            userExists(this,browser,user.matriculationNumber, false);
 
-            function createUser(){
-                page.showModalNew();
-                const {isAdmin, ...keys} = user;
-                for(const data in keys){
-                    modalNew
-                        .clearValue2(`@${data}`)
-                        .setValue(`@${data}`, user[data])
-                        .assert.isValidInput(`@${data}`, 'valid', true)
-                }
+            page.showModalNew();
+            const {isAdmin, ...keys} = user;
+            for(const data in keys){
                 modalNew
-                    .setCheckbox(`@isAdmin`, isAdmin)
-                    .submit()
-                    .assert.successPresent()
-                    .closeToast()
-                page.userModalNotPresent();
-
-                userRightCreated(browser,user)
+                    .clearValue2(`@${data}`)
+                    .setValue(`@${data}`, user[data])
+                    .assert.isValidInput(`@${data}`, 'valid', true)
             }
+            modalNew
+                .setCheckbox(`@isAdmin`, isAdmin)
+                .submit()
+                .assert.successPresent()
+                .closeToast()
+            page.userModalNotPresent();
+
+            userRightCreated(browser,user);
         }
     },
     'modal_delete close test': browser =>{
@@ -287,26 +291,24 @@ module.exports = {
         const deleteModal = page.section.modal_delete;
         const matriculationNumber = matr || testUser.matriculationNumber;
 
-        userExists(this, browser, matriculationNumber, true, deleteUser)
+        userExists(this, browser, matriculationNumber, true)
 
-        function deleteUser(){
-            page
-                .clearValue2('@searchBar')
-                .setValue('@searchBar',matriculationNumber)
-                .assert.elementCount('@tableEntries',1)
-                .assert.containsText('@firstTableCell', matriculationNumber)
-                .showModalDelete()
+        page
+            .clearValue2('@searchBar')
+            .setValue('@searchBar',matriculationNumber)
+            .assert.elementCount('@tableEntries',1)
+            .assert.containsText('@firstTableCell', matriculationNumber)
+            .showModalDelete()
 
-            deleteModal.pause(1000).submit() //without pause, button click is not triggered
+        deleteModal.pause(1000).submit() //without pause, button click is not triggered
 
-            page
-                .deleteModalNotPresent();
-            page
-                .assert.successPresent()
-                .closeToast()
-                .assert.not.elementPresent('@tableEntries')
-                .clearValue2('@searchBar')
-        }
+        page
+            .deleteModalNotPresent();
+        page
+            .assert.successPresent()
+            .closeToast()
+            .assert.not.elementPresent('@tableEntries')
+            .clearValue2('@searchBar')
     },
     'delete admin': function(browser, matr) {
         const page = browser.page.userManagement();
@@ -345,47 +347,24 @@ module.exports = {
         const creation = page.section.creation;
         const files = ['usersRight'];
         const self = this;
-        const users = [
-            {
-                username: 'klstriessnig',
-                matriculationNumber: '88888888',
-                surname: 'Strießnig',
-                forename: 'Klaus',
-                isAdmin
-            },
-            {
-                username: 'ppipp',
-                matriculationNumber: '87596328',
-                surname: 'Pipp',
-                forename: 'Peter',
-                isAdmin
-            },
-            {
-                username: 'TestOwner',
-                matriculationNumber: '00000001',
-                surname: 'TestOwnerN',
-                forename: 'TestOwnerV',
-                isAdmin
-            }
-        ]
+        const users = testUsers;
+        for(const user of testUsers){
+            user.isAdmin = isAdmin;
+        }
         creation.setCheckbox('@isAdmin', isAdmin);
-        let i = -1;
-        iterate();
-        function iterate(){
-            i++;
-            userExists(self, browser, users[i].matriculationNumber, false, i === users.length-1 ? upload : iterate)
+
+        for(const user of users){
+            userExists(self, browser, user.matriculationNumber, false)
         }
         
-        function upload(){
-            for(const fileName of files){
-                creation
-                .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
-                .assert.successPresent();
-            }
-            
-            for(const user of users){
-                userRightCreated(browser, user)
-            }
+        for(const fileName of files){
+            creation
+            .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
+            .assert.successPresent();
+        }
+        
+        for(const user of users){
+            userRightCreated(browser, user)
         }
     },
     'upload CSV file right admin': function(browser) {
@@ -393,54 +372,52 @@ module.exports = {
     },
     'Edit: invalid input': function(browser) {
         const page = browser.page.userManagement();
-        userExists(this, browser, testUser.matriculationNumber, true, editUser)
+        userExists(this, browser, testUser.matriculationNumber, true)
         
-        function editUser(){
-            page.setValue('@searchBar',testUser.matriculationNumber)
-                .click('@rowEditButton')
-                .isUserModalPresent()
+        page.setValue('@searchBar',testUser.matriculationNumber)
+            .click('@rowEditButton')
+            .isUserModalPresent()
 
-            const modalUser = page.section.modal_new;
-            const notEditable = ['@matriculationNumber', '@username'];
-            for(const item of notEditable){
-                modalUser.expect.element(item).to.not.be.enabled;
+        const modalUser = page.section.modal_new;
+        const notEditable = ['@matriculationNumber', '@username'];
+        for(const item of notEditable){
+            modalUser.expect.element(item).to.not.be.enabled;
+        }
+
+        const userData = [
+            {
+                surname: {
+                    value: '',
+                    valid: false
+                },
+                forename: {
+                    value: 'myForename',
+                    valid: true
+                },
+                isAdmin: {
+                    value: false,
+                    valid: true
+                },
+                email: {
+                    value: 'testEmail@com',
+                    valid: true
+                },
             }
+        ]
 
-            const userData = [
-                {
-                    surname: {
-                        value: '',
-                        valid: false
-                    },
-                    forename: {
-                        value: 'myForename',
-                        valid: true
-                    },
-                    isAdmin: {
-                        value: false,
-                        valid: true
-                    },
-                    email: {
-                        value: 'testEmail@com',
-                        valid: true
-                    },
-                }
-            ]
-
-            for(const user of userData){
-                const {isAdmin, ...keys} = user;
-                for(const data in keys){
-                    modalUser
-                        .clearValue2(`@${data}`)
-                        .setValue(`@${data}`, user[data].value)
-                        .assert.isValidInput(`@${data}`, 'valid', user[data].valid)
-                }
+        for(const user of userData){
+            const {isAdmin, ...keys} = user;
+            for(const data in keys){
                 modalUser
-                    .setCheckbox(`@isAdmin`, isAdmin)
-                    .submit()
-                    .assert.not.errorPresent();
-                page.isUserModalPresent()
+                    .clearValue2(`@${data}`)
+                    .setValue(`@${data}`, user[data].value)
+                    .assert.isValidInput(`@${data}`, 'valid', user[data].valid)
             }
+            modalUser
+                .setCheckbox(`@isAdmin`, isAdmin)
+                .submit()
+                .assert.not.errorPresent();
+            page.isUserModalPresent()
         }
     }
 };

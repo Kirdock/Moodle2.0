@@ -304,6 +304,7 @@
                                     deselect-label=""
                                     :show-no-results="false"
                                     >
+                                    <span slot="noOptions">{{$t('listEmpty')}}</span>
                         </multiselect>
                     </div>
                     <div class="form-group">

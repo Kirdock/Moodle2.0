@@ -1,5 +1,9 @@
 const modalCommands = require('./../modalCommands.js');
 const createCommands = {
+    selectTab: function(index){
+        const element = `.tabs .nav-item:nth-child(${index+1})`;
+        this.click(element).pause(1000).assert.cssClassPresent(`${element} a`,'active');
+    },
     selectCourse: function(value){
         this.click('xpath',`//select[@id="selectedCourse"]/option[contains(text(),"${value}")]`).pause(2000);
     },
@@ -19,6 +23,88 @@ const createCommands = {
     },
     modalDeleteNotPresent: function(){
         return this.expect.section('@modal_delete').to.not.be.present;
+    }
+}
+const assignedUsersCommands = {
+    selectRole: function(index){
+        this.click(`#showRoles option:nth-child(${index+1})`).pause(2000)
+    },
+    userAssignedAsStudent: function(self, user){
+        self.perform(function (done){
+            self.element('xpath',`//div[@id="assignedUsers"]//table//tr[td[2][contains(text(),"${user.matriculationNumber}")] and td[3][contains(text(),"${user.surname}")] and td[4][contains(text(),"${user.forename}")]]/td/select`, function (result){
+                if(result.value.ELEMENT){
+                    self.elementIdAttribute(result.value.ELEMENT, 'value', function(selectedValue){
+                        if(selectedValue.value !== 's'){
+                            throw new Error('Wrong selected role');
+                        }
+                        else{
+                            self.logSuccess('User \033[33m ['+JSON.stringify(user)+']\033[0m created right')
+                            done();
+                        }
+                    })
+                }
+                else{
+                    throw new Error('User not found');
+                }
+            })
+        })
+    },
+    isUserAssigned(self, matriculationNumber, role){
+        self.perform(function (done){
+            self.element('xpath', `//div[@id="assignedUsers"]//table//tr[td[2][contains(text(),"${matriculationNumber}")]]`, function(row){
+                if(row.value.ELEMENT){
+                    self.perform(function(done2){
+                        self.elementIdElement(row.value.ELEMENT, 'css selector', 'input[type=checkbox]', function(checkbox){
+                            if(checkbox.value.ELEMENT){
+                                self.elementIdAttribute(checkbox.value.ELEMENT, 'checked', function(selectedValue){
+                                    if(selectedValue.value === true.toString()){
+                                        done2();
+                                    }
+                                    else{
+                                        throw new Error('Checkbox is not checked');
+                                    }
+                                });
+                            }
+                            else{
+                                throw new Error('Checkbox not found')
+                            }
+                        })
+                    }).perform(function (done2){
+                        self.elementIdElement(row.value.ELEMENT, 'css selector', 'select', function(dropdown){
+                            if(dropdown.value.ELEMENT){
+                                self.elementIdAttribute(dropdown.value.ELEMENT, 'value', function(selectedValue){
+                                    if(selectedValue.value && selectedValue.value === role){
+                                        done2();
+                                    }
+                                    else{
+                                        throw new Error(`User ${matriculationNumber} does not have a role but is selected`);
+                                    }
+                                })
+                            }
+                            else{
+                                throw new Error('Dropdown not found')
+                            }
+                        })
+                    }).perform(function (done2){
+                        self.logSuccess('User \033[33m ['+matriculationNumber+']\033[0m assigned right')
+                        done2();
+                        done();
+                    })
+                }
+                else{
+                    throw new Error('User not found')
+                }
+            })
+        })
+    },
+    setUserRoleByMatriculationNumber(self, matriculationNumber, index){
+        self.click('xpath',`//div[@id="assignedUsers"]//table//tr[td[2][contains(text(),"${matriculationNumber}")]]/td/select/option[${index+1}]`);
+    },
+    selectUserByMatriculationNumber(self, matriculationNumber){
+        self.click('xpath',`//div[@id="assignedUsers"]//table//tr[td[2][contains(text(),"${matriculationNumber}")]]/td[1]/input[@type="checkbox"]`);
+    },
+    submit: function(){
+        this.click('@submitButton')
     }
 }
 
@@ -115,7 +201,19 @@ module.exports = {
             }
         },
         assignedUsers: {
-            selector: '#assignedUsers'
+            selector: '#assignedUsers',
+            commands: [assignedUsersCommands],
+            elements: {
+                roleSelect: '#showRoles',
+                table: '#assignedUsers table',
+                tableEntries: '#assignedUsers table tr',
+                tableEntriesCheck: '#assignedUsers table tr input[type="checkbox"]',
+                uploadCsv: '#assignedUsers input[type=file]',
+                submitButton: {
+                    selector: '#assignedUsers button',
+                    index: 3
+                }
+            }
         }
     }
 }
