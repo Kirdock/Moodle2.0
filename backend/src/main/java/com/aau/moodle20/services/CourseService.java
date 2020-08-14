@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,6 +27,12 @@ import java.util.stream.Collectors;
 @Service
 public class CourseService extends AbstractService {
 
+
+    private ExampleService exampleService;
+
+    public CourseService( ExampleService exampleService) {
+        this.exampleService = exampleService;
+    }
 
     public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceValidationException {
 
@@ -79,8 +86,16 @@ public class CourseService extends AbstractService {
         courseRepository.save(course);
     }
 
-    public void deleteCourse(Long courseId) throws EntityNotFoundException {
+    @Transactional
+    public void deleteCourse(Long courseId) throws  IOException {
         Course course = readCourse(courseId);
+        Set<ExerciseSheet> exerciseSheets = course.getExerciseSheets();
+        for(ExerciseSheet exerciseSheet: exerciseSheets)
+        {
+            for(Example example: exerciseSheet.getExamples())
+                exampleService.deleteExampleValidator(example.getId());
+        }
+
         courseRepository.delete(course);
     }
 

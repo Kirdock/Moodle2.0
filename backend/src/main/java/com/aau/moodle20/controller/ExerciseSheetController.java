@@ -93,9 +93,8 @@ public class ExerciseSheetController {
     }
 
     @DeleteMapping(value = "/exerciseSheet/{id}")
-    public ResponseEntity<?> deleteExerciseSheet(@PathVariable("id") long id) {
+    public ResponseEntity<?> deleteExerciseSheet(@PathVariable("id") long id) throws IOException {
         exerciseSheetService.deleteExerciseSheet(id);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was successfully deleted!"));
-
     }
 }

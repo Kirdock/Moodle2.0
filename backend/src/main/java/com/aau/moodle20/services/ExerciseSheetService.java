@@ -10,6 +10,7 @@ import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,10 +24,11 @@ import java.util.stream.Collectors;
 public class ExerciseSheetService extends AbstractService{
 
     private PdfService pdfService;
+    private ExampleService exampleService;
 
-    public ExerciseSheetService(PdfService pdfService)
-    {
+    public ExerciseSheetService(PdfService pdfService, ExampleService exampleService) {
         this.pdfService = pdfService;
+        this.exampleService = exampleService;
     }
 
     public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceValidationException {
@@ -170,8 +172,14 @@ public class ExerciseSheetService extends AbstractService{
         return responseObject;
     }
 
-    public void deleteExerciseSheet(Long id) throws EntityNotFoundException {
+    @Transactional
+    public void deleteExerciseSheet(Long id) throws EntityNotFoundException, IOException {
         ExerciseSheet exerciseSheet = readExerciseSheet(id);
+        for(Example example: exerciseSheet.getExamples())
+        {
+            exampleService.deleteExampleValidator(example.getId());
+        }
+        exampleRepository.flush();
         exerciseSheetRepository.delete(exerciseSheet);
     }
 

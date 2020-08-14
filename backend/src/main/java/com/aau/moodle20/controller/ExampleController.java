@@ -94,7 +94,7 @@ public class ExampleController {
 
 
     @DeleteMapping(value = "/example/{id}")
-    public ResponseEntity<?> deleteExample(@PathVariable("id") long id) throws ServiceValidationException {
+    public ResponseEntity<?> deleteExample(@PathVariable("id") long id) throws ServiceValidationException, IOException {
         exampleService.deleteExample(id);
         return ResponseEntity.ok(new MessageResponse("Example was successfully deleted!"));
 

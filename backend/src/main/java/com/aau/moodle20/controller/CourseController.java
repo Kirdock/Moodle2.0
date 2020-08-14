@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController()
@@ -60,7 +61,7 @@ public class CourseController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @DeleteMapping(value = "/course/{courseId}")
-    public ResponseEntity<?> deleteCourse(@PathVariable("courseId") long courseId)  throws SemesterException {
+    public ResponseEntity<?> deleteCourse(@PathVariable("courseId") long courseId) throws IOException {
 
         courseService.deleteCourse(courseId);
         return ResponseEntity.ok(new MessageResponse("Course was successfully deleted!"));
