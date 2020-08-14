@@ -10,6 +10,7 @@ import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.request.UpdateUserRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
+import com.aau.moodle20.payload.response.RegisterMultipleUserResponse;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,14 +91,43 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
     }
 
 
-    public List<User> registerUsers(MultipartFile file) throws UserException {
-
-        List<User> users = new ArrayList<>();
-        List<User> allGivenUsers = new ArrayList<>();
-        List<String> lines = readLinesFromFile(file);
-
+    public RegisterMultipleUserResponse registerUsers(MultipartFile file) throws UserException {
+        List<User> users = getUserObjectsFromFile(file);
+        List<User> usersToBeSaves = new ArrayList<>();
+        RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
         String password = encoder.encode("password");//TODO should not be hardcoded
 
+        Integer lineNumber = 1;
+        for (User user : users) {
+            user.setPassword(password);
+
+            Matcher matcher = matriculationPattern.matcher(user.getMatriculationNumber());
+
+            boolean isValid = matcher.matches() &&
+                    (!userRepository.existsByMatriculationNumber(user.getMatriculationNumber()) &&
+                            !userRepository.existsByUsername(user.getUsername()));
+            if (!isValid) {
+                registerMultipleUserResponse.getFailedUsers().add(lineNumber);
+            } else
+                usersToBeSaves.add(user);
+
+            lineNumber++;
+        }
+
+        if(!registerMultipleUserResponse.getFailedUsers().isEmpty())
+        {
+            registerMultipleUserResponse.setMessage("The users in following line numbers could not be registered");
+        }else
+            registerMultipleUserResponse.setMessage("All users could be registered");
+
+        userRepository.saveAll(usersToBeSaves);
+
+        return registerMultipleUserResponse;
+    }
+
+    protected List<User> getUserObjectsFromFile(MultipartFile file) {
+        List<String> lines = readLinesFromFile(file);
+        List<User> users = new ArrayList<>();
 
         for (String line : lines) {
             String[] columns = line.split(";");
@@ -107,25 +137,29 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
             user.setSurname(columns[2]);
             user.setForename(columns[3]);
             user.setAdmin(Boolean.FALSE);
-            user.setPassword(password);
-            user.setEmail(user.getUsername()+"@"+studentEmailPostFix);
-
-            Matcher matcher = matriculationPattern.matcher(user.getMatriculationNumber());
-            if(!matcher.matches())
-                continue;
-
-            if (userRepository.existsByMatriculationNumber(user.getMatriculationNumber()) ||
-                    userRepository.existsByUsername(user.getUsername()))
-                continue;
+            user.setEmail(user.getUsername() + "@" + studentEmailPostFix);
 
             users.add(user);
         }
 
-        allGivenUsers.addAll(users);
+        return users;
+    }
 
-        userRepository.saveAll(users);
+    public List<User> registerMissingUsersFromFile(MultipartFile file)
+    {
+        registerUsers(file);
 
-        return allGivenUsers;
+        userRepository.flush();
+        List<User> users = getUserObjectsFromFile(file);
+        List<User> realUsers = new ArrayList<>();
+        for(User user: users)
+        {
+            if(userRepository.existsByMatriculationNumber(user.getMatriculationNumber()))
+            {
+                realUsers.add(user);
+            }
+        }
+        return realUsers;
     }
 
     /**

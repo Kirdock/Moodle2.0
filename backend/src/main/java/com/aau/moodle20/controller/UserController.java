@@ -4,10 +4,7 @@ import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.entity.User;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.*;
-import com.aau.moodle20.payload.response.ExampleResponseObject;
-import com.aau.moodle20.payload.response.JwtResponse;
-import com.aau.moodle20.payload.response.MessageResponse;
-import com.aau.moodle20.payload.response.UserResponseObject;
+import com.aau.moodle20.payload.response.*;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import com.aau.moodle20.services.FinishesExampleService;
 import com.aau.moodle20.services.UserDetailsServiceImpl;
@@ -102,9 +99,8 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
-    public ResponseEntity<List<UserResponseObject>> registerUsers(@Valid @RequestParam("file") MultipartFile file) throws UserException {
-        List<User> users = userDetailsService.registerUsers(file);
-        return ResponseEntity.ok(users.stream().map(User::createUserResponseObject).collect(Collectors.toList()));
+    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam("file") MultipartFile file) throws UserException {
+        return ResponseEntity.ok(userDetailsService.registerUsers(file));
     }
 
     // delete api -------------------------------------------------------------------------

@@ -77,7 +77,7 @@ public class UserCourseService extends AbstractService {
     @Transactional
     public void assignFile(MultipartFile file, Long courseId) throws ServiceValidationException {
         Course course = readCourse(courseId);
-        List<User> allGivenUsers = userDetailsService.registerUsers(file);
+        List<User> allGivenUsers = userDetailsService.registerMissingUsersFromFile(file);
         List<UserInCourse> userInCourses = new ArrayList<>();
 
         for (User user : allGivenUsers) {
