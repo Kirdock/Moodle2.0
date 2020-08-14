@@ -91,7 +91,7 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
     }
 
 
-    public RegisterMultipleUserResponse registerUsers(MultipartFile file) throws UserException {
+    public RegisterMultipleUserResponse registerUsers(MultipartFile file, Boolean isAdmin) throws UserException {
         List<User> users = getUserObjectsFromFile(file);
         List<User> usersToBeSaves = new ArrayList<>();
         RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
@@ -100,6 +100,8 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         Integer lineNumber = 1;
         for (User user : users) {
             user.setPassword(password);
+            if (isAdmin != null)
+                user.setAdmin(isAdmin);
 
             Matcher matcher = matriculationPattern.matcher(user.getMatriculationNumber());
 
@@ -147,7 +149,7 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
 
     public List<User> registerMissingUsersFromFile(MultipartFile file)
     {
-        registerUsers(file);
+        registerUsers(file,Boolean.FALSE);
 
         userRepository.flush();
         List<User> users = getUserObjectsFromFile(file);

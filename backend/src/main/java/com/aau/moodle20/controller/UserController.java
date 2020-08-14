@@ -99,8 +99,8 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
-    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam("file") MultipartFile file) throws UserException {
-        return ResponseEntity.ok(userDetailsService.registerUsers(file));
+    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "isAdmin",required = false) Boolean isAdmin) throws UserException {
+        return ResponseEntity.ok(userDetailsService.registerUsers(file, isAdmin));
     }
 
     // delete api -------------------------------------------------------------------------
