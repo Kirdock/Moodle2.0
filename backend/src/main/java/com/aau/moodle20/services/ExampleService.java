@@ -193,6 +193,22 @@ public class ExampleService extends AbstractService{
         return example;
     }
 
+    public void copyValidator(Example originalExample, Example copiedExample) throws IOException {
+        if (originalExample.getValidator() == null || originalExample.getValidator().isEmpty())
+            return;
+
+        String originalValidatorFilePath = getValidatorFilePath(originalExample);
+        String copiedValidatorFilePath = getValidatorFilePath(copiedExample);
+        File source = new File(originalValidatorFilePath);
+        File dest = new File(copiedValidatorFilePath);
+
+        FileUtils.copyDirectory(source, dest);
+
+        copiedExample.setValidator(originalExample.getValidator());
+        exampleRepository.save(copiedExample);
+
+    }
+
     public byte [] getValidatorSkeleton() throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);

@@ -68,7 +68,7 @@ public class CourseController {
     }
 
     @PostMapping(value = "/course/copy")
-    public ResponseEntity<?> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest)  throws ServiceValidationException {
+    public ResponseEntity<?> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest) throws ServiceValidationException, IOException {
 
         CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
         return ResponseEntity.ok(responseObject);

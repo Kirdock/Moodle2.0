@@ -15,6 +15,7 @@ import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelCourseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -199,8 +200,8 @@ public class CourseService extends AbstractService {
         return finishesExampleResponses;
     }
 
-    @Transactional
-    public CourseResponseObject copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public CourseResponseObject copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException, IOException {
 
         Semester semester = readSemester(copyCourseRequest.getSemesterId());
         Course originalCourse = readCourse(copyCourseRequest.getCourseId());
@@ -235,6 +236,8 @@ public class CourseService extends AbstractService {
                 Example copiedExample = example.copy();
                 copiedExample.setExerciseSheet(copiedExerciseSheet);
                 exampleRepository.save(copiedExample);
+                exampleService.copyValidator(example,copiedExample);
+
 
                 if (example.getSubExamples() != null) {
                     for (Example subExample : example.getSubExamples()) {
@@ -242,6 +245,7 @@ public class CourseService extends AbstractService {
                         copiedSubExample.setExerciseSheet(copiedExerciseSheet);
                         copiedSubExample.setParentExample(copiedExample);
                         exampleRepository.save(copiedSubExample);
+                        exampleService.copyValidator(subExample,copiedSubExample);
                         if (subExample.getSupportFileTypes() != null) {
                             copySupportFileType(subExample.getSupportFileTypes(), copiedSubExample);
                         }
