@@ -8,30 +8,30 @@
     "test:e2e": "vue-cli-service test:e2e"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.12.1",
+    "@fortawesome/fontawesome-free": "^5.14.0",
     "axios": "^0.19.2",
-    "bootstrap": "^4.4.1",
-    "bootstrap-vue": "^2.14.0",
+    "bootstrap": "^4.5.2",
+    "bootstrap-vue": "^2.16.0",
     "core-js": "^3.6.4",
     "jquery": "^3.5.0",
     "portal-vue": "^2.1.7",
     "sortablejs": "^1.10.2",
     "summernote": "^0.8.18",
     "vue": "^2.6.11",
-    "vue-i18n": "^8.17.4",
+    "vue-i18n": "^8.21.0",
     "vue-multiselect": "^2.1.6",
-    "vue-router": "^3.1.5",
-    "vuex": "^3.1.2"
+    "vue-router": "^3.4.3",
+    "vuex": "^3.5.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.2.0",
-    "@vue/cli-plugin-e2e-nightwatch": "^4.4.6",
-    "@vue/cli-plugin-router": "^4.2.0",
-    "@vue/cli-plugin-vuex": "^4.2.3",
-    "@vue/cli-service": "^4.2.0",
+    "@vue/cli-plugin-babel": "^4.5.3",
+    "@vue/cli-plugin-e2e-nightwatch": "^4.5.3",
+    "@vue/cli-plugin-router": "^4.5.3",
+    "@vue/cli-plugin-vuex": "^4.5.3",
+    "@vue/cli-service": "^4.5.3",
     "@vue/test-utils": "1.0.0-beta.31",
     "chromedriver": "^84.0.1",
-    "geckodriver": "^1.19.1",
+    "geckodriver": "^1.20.0",
     "vue-template-compiler": "^2.6.11"
   }
 }
