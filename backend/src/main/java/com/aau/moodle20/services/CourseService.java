@@ -37,7 +37,7 @@ public class CourseService extends AbstractService {
     public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceValidationException {
 
         Semester semester = readSemester(createCourseRequest.getSemesterId());
-        if(courseRepository.existsByNameAndNumberAndSemester_Id(createCourseRequest.getName(),createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
+        if(courseRepository.existsByNumberAndSemester_Id(createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
             throw new ServiceValidationException("Course in Semester already exists", ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
         Course course = new Course();
@@ -62,6 +62,13 @@ public class CourseService extends AbstractService {
 
         if (!userDetails.getAdmin() && !isOwner(course))
             throw new ServiceValidationException("Error: User is not owner of this course and thus cannot update this course!", HttpStatus.UNAUTHORIZED);
+
+        // if number  updated check if no course with given number im semester exists
+        if(!updateCourseRequest.getNumber().equals(course.getNumber()))
+        {
+            if(courseRepository.existsByNumberAndSemester_Id(updateCourseRequest.getNumber(),course.getSemester().getId()))
+                throw new ServiceValidationException("Error: A Course with this number already exists");
+        }
 
         course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
         course.setMinPoints(updateCourseRequest.getMinPoints());
