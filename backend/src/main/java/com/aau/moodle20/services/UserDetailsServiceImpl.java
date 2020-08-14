@@ -234,7 +234,10 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
     }
 
     public List<UserResponseObject> getAllUsers() throws UserException {
-        return userRepository.findAll().stream().map(User::createUserResponseObject).collect(Collectors.toList());
+        return userRepository.findAll().stream()
+                .sorted(Comparator.comparing(User::getMatriculationNumber))
+                .map(User::createUserResponseObject)
+                .collect(Collectors.toList());
     }
 
     public void changePassword(ChangePasswordRequest changePasswordRequest) throws ServiceValidationException {
