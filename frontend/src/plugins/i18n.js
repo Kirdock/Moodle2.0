@@ -244,6 +244,9 @@ const messages = {
                 save: 'Benutzer konnte nicht gespeichert werden',
                 usernameExists: 'Der Benutzername ist bereits vergeben'
             },
+            warning: {
+                create: 'Folgende Zeilen konnten aufgrund fehlerhafter Daten nicht angelegt werden:'
+            },
             question: {
                 delete: 'Wollen Sie den Benutzer wirklich löschen?'
             },
@@ -520,6 +523,9 @@ const messages = {
                 matriculationNumberExists: 'Matriculation number is already taken',
                 save: 'User could not be saved',
                 usernameExists: 'Username is already taken'
+            },
+            warning: {
+                create: 'The following lines could not be created due to incorrect data:'
             },
             question: {
                 delete: 'Do you really want to delete this user?',

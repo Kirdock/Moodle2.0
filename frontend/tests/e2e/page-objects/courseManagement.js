@@ -85,9 +85,8 @@ const assignedUsersCommands = {
                                 throw new Error('Dropdown not found')
                             }
                         })
-                    }).perform(function (done2){
+                    }).perform(function (){
                         self.logSuccess('User \033[33m ['+matriculationNumber+']\033[0m assigned right')
-                        done2();
                         done();
                     })
                 }

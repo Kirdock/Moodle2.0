@@ -473,7 +473,7 @@ export default {
         }
         if(this.$route.query.courseId){
             this.selectedCourseId = this.$route.query.courseId;
-            this.getCourse(this.selectedCourseId);
+            this.getCourse(this.selectedCourseId, true);
         }
         else{
             this.getSemesters();
@@ -917,7 +917,7 @@ export default {
                 this.loading.copyCourse = false;
             }
         },
-        async getCourse(courseId){
+        async getCourse(courseId, revertOnError){
             this.getCourseUsers(courseId);
             try{
                 const response = await this.$store.dispatch('getCourse',{courseId});
@@ -933,6 +933,11 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
+
+                if(revertOnError && this.semesters.length === 0){
+                    this.getSemesters();
+                    this.setCourseQuery();
+                }
             }
         },
         async getCourses(id){

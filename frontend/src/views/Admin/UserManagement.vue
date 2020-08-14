@@ -141,16 +141,29 @@ export default {
             this.$refs.file.value = '';
             try{
                 const response = await this.$store.dispatch('createUsers', formData);
-                this.$bvToast.toast(this.$t('user.created'), {
-                    title: this.$t('success'),
-                    variant: 'success',
-                    appendToast: true
-                });
-                this.users.push(...response.data);
-                this.users.sort((a,b) => a.matriculationNumber.localeCompare(b.matriculationNumber));
+                
+                if(response.data.failedUsers.length !== 0){
+                    this.$bvToast.toast(this.$t('user.warning.create') + '\n' + response.data.failedUsers.join(', '), {
+                        title: this.$t('warning'),
+                        variant: 'warning',
+                        appendToast: true,
+                        autoHideDelay: 15000
+                    });    
+                }
+                if(response.data.registeredUsers.length !== 0){
+                    if(response.data.failedUsers.length === 0){
+                        this.$bvToast.toast(this.$t('user.created'), {
+                            title: this.$t('success'),
+                            variant: 'success',
+                            appendToast: true
+                        });
+                    }
+                    this.users.push(...response.data.registeredUsers);
+                    this.users.sort((a,b) => a.matriculationNumber.localeCompare(b.matriculationNumber));
+                }
             }
             catch{
-                this.$bvToast.toast(this.$t('user.create.error'), {
+                this.$bvToast.toast(this.$t('user.error.create'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
