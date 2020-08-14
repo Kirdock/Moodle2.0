@@ -115,14 +115,9 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
 
             lineNumber++;
         }
-
-        if(!registerMultipleUserResponse.getFailedUsers().isEmpty())
-        {
-            registerMultipleUserResponse.setMessage("The users in following line numbers could not be registered");
-        }else
-            registerMultipleUserResponse.setMessage("All users could be registered");
-
         userRepository.saveAll(usersToBeSaves);
+        List<UserResponseObject> registeredUsers = usersToBeSaves.stream().map(User::createUserResponseObject).collect(Collectors.toList());
+        registerMultipleUserResponse.getRegisteredUsers().addAll(registeredUsers);
 
         return registerMultipleUserResponse;
     }
