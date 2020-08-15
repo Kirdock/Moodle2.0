@@ -16,9 +16,12 @@ const userCommands = {
         this.section.creation.click('@newButton');
         return this.section.modal_new.waitForElementVisible('@submitButton', 1000);
     },
-    showModalDelete: function(){
-        this.click('@rowDeleteButton');
+    showModalDelete: function(matriculationNumber){
+        this.click('xpath', `//table//tr[td[1][contains(text(),"${matriculationNumber}")]]/td[5]/a[2]`);
         return this.section.modal_delete.waitForElementVisible('@submitButton',1000);
+    },
+    showModalEdit: function(matriculationNumber){
+        return this.click('xpath', `//table//tr[td[1][contains(text(),"${matriculationNumber}")]]/td[5]/a[1]`);
     },
     isUserModalPresent: function(){
         return this.expect.section('@modal_new').to.be.visible;
@@ -31,6 +34,27 @@ const userCommands = {
     },
     deleteModalNotPresent: function(){
         return this.expect.section('@modal_delete').to.not.be.present;
+    },
+    userExists: function(browser, matriculationNumber, callback){
+        browser.element('xpath', `//table//tr[td[1][contains(text(),"${matriculationNumber}")]]`, callback)
+    },
+    userNotPresent: function(matriculationNumber){
+        return this.assert.not.elementPresent( {
+            selector: `//table//tr[td[1][contains(text(),"${matriculationNumber}")]]`,
+            locateStrategy: 'xpath'
+        });
+    },
+    userPresent: function(matriculationNumber){
+        return this.assert.elementPresent({
+            selector: `//table//tr[td[1][contains(text(),"${matriculationNumber}")]]`,
+            locateStrategy: 'xpath'
+        });
+    },
+    userPresentStrict: function(user){
+        return this.assert.elementPresent({
+            selector: `//table//tr[td[1][contains(text(),"${user.matriculationNumber}")] and td[2][contains(text(),"${user.surname}")] and td[3][contains(text(),"${user.forename}")] and td[4][contains(text(),"${user.isAdmin ? 'Ja' : 'Nein'}")]]`,
+            locateStrategy: 'xpath'
+        });
     }
 };
 

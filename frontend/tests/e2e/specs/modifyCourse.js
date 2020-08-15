@@ -10,7 +10,18 @@ const testCourse = {
     minPoints: '30',
     description: 'Meine Kursbeschreibung'
 }
+const testExerciseSheet = {
+    name: 'TestExerciseSheet',
+    issueDate: '31-08-2021T23:55',
+    submissionDate: '30-09-2021T23:50',
+    submissionDateFormat: '30.9.2021, 23:50:00',
+    description: 'My first exercise sheet',
+    minKreuzel: '50',
+    minPoints: '40',
+    kreuzelType: 0
+}
 const testUsers = require('./../testUsers.js');
+const userTest = require('./modifyUsers.js');
 
 function deSelectAssignedUser(browser){
     const assignedUsers = browser.page.courseManagement().section.assignedUsers;
@@ -29,6 +40,30 @@ function deSelectAssignedUser(browser){
             assignedUsers.closeToast();
             done();
         });
+    })
+}
+
+function ownerExists(browser, name, done){
+    const page = browser.page.courseManagement();
+    page.showNewModal()
+    page.pause(1000);
+    browser.perform(function(){ //done not possible because timeout reaches 10s
+        page.ownerExists(browser, name, function(result){
+            if(result.value && result.value.ELEMENT){
+                browser.log('Owner is present');
+                page.section.modal_new.cancel().pause(1000, done)
+            }
+            else{
+                browser.log('Owner is not present. Owner will now be created');
+                browser.page.userManagement().navigate().pause(2000);
+
+                userTest['upload CSV file'](browser);
+                
+                page.navigate().pause(1000, ()=>{
+                    done();
+                });
+            }
+        })
     })
 }
 
@@ -53,6 +88,35 @@ function courseExists(self, browser, courseText, create){
                 done();
             }
         });
+    })
+}
+
+function exerciseSheetExists(self, browser, courseText, name, create){
+    const page = browser.page.courseManagement();
+    courseExists(self, browser, courseText, true)
+
+    browser.perform(function (done){
+        page.selectCourse(courseText);
+        page.selectTab(2);
+        const exerciseSheet = page.section.exerciseSheets;
+        exerciseSheet.exerciseSheetPresent(browser, name, function(result){
+            // if (result.value && result.value.length !== 0) {
+            //     // Elements are present
+            //     if(!create){
+            //         browser.log('Course already available. Course will now be deleted')
+            //         self['delete course'](browser, courseText);
+            //     }
+            //     done();
+            // } else {
+            //     if(create){
+            //         browser.log('Course does not exist. Course will now be created')
+            //         self['create course'](browser);
+            //     }
+            //     done();
+            // }
+            done();
+        });
+        // done();
     })
 }
 
@@ -153,32 +217,35 @@ module.exports = {
         const page = browser.page.courseManagement();
 
         courseExists(this,browser, testCourse.number, false)
+        ownerExists(browser,testCourse.owner.value, next)
         
-        const modal_new = page.section.modal_new;
-        const courseInfo = page.section.courseInfo;
-        page.showNewModal();
-        page.pause(1000);
-        const courses = [testCourse]
-
-        for(const course of courses){
-            modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
-            modal_new
-                .setValue('@number', course.number)
-                .setValue('@name', course.name)
-                .setValue('@minKreuzel', course.minKreuzel)
-                .setValue('@minPoints', course.minPoints)
-                .setValue('@description', course.description)
-                .submit();
-            page.assert.successPresent();
-            page.closeToast();
+        function next(){
+            const modal_new = page.section.modal_new;
+            const courseInfo = page.section.courseInfo;
+            page.showNewModal();
             page.pause(1000);
-            page.assert.urlContains('?courseId=');
-            courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
-                .assert.value('@number', course.number)
-                .assert.value('@name', course.name)
-                .assert.containsText('@description', course.description)
-                .assert.value('@minKreuzel', course.minKreuzel)
-                .assert.value('@minPoints', course.minPoints)
+            const courses = [testCourse]
+
+            for(const course of courses){
+                modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
+                modal_new
+                    .setValue('@number', course.number)
+                    .setValue('@name', course.name)
+                    .setValue('@minKreuzel', course.minKreuzel)
+                    .setValue('@minPoints', course.minPoints)
+                    .setValue('@description', course.description)
+                    .submit();
+                page.assert.successPresent();
+                page.closeToast();
+                page.pause(1000);
+                page.assert.urlContains('?courseId=');
+                courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
+                    .assert.value('@number', course.number)
+                    .assert.value('@name', course.name)
+                    .assert.containsText('@description', course.description)
+                    .assert.value('@minKreuzel', course.minKreuzel)
+                    .assert.value('@minPoints', course.minPoints)
+            }
         }
     },
     'modify course invalid': function(browser, number){
@@ -376,7 +443,44 @@ module.exports = {
         assignedUsers.isUserAssigned(browser, testUsers[1].matriculationNumber, 't');
         assignedUsers.selectUserByMatriculationNumber(browser, testUsers[2].matriculationNumber);
         assignedUsers.isUserAssigned(browser, testUsers[2].matriculationNumber, 's');
+        assignedUsers.setUserRoleByMatriculationNumber(browser, testUsers[3].matriculationNumber, 2);
+        assignedUsers.isUserAssigned(browser, testUsers[3].matriculationNumber, 's');
         assignedUsers.submit();
+    },
+    'create exerciseSheet':  function(browser){
+        const courseText = testCourse.number;
+        const page = browser.page.courseManagement();
+        const exerciseSheetSection = page.section.exerciseSheets;
+        const self = this;
+
+        exerciseSheetExists(self, browser, courseText, testExerciseSheet.name, false)
+
+        page.selectCourse(courseText);
+        page.selectTab(2);
+        const newModal = page.section.exerciseSheetsNewModal;
+
+        const exerciseSheets = [testExerciseSheet];
+        for(const exerciseSheet of exerciseSheets){
+            exerciseSheetSection.showNewModal();
+            newModal.setValue('@name', exerciseSheet.name)
+                .setValue('@issueDate', exerciseSheet.issueDate.replace('T', browser.Keys.RIGHT_ARROW))
+                .setValue('@submissionDate', exerciseSheet.submissionDate.replace('T', browser.Keys.RIGHT_ARROW))
+                .setValue('@description', exerciseSheet.description)
+                .setValue('@minKreuzel', exerciseSheet.minKreuzel)
+                .setValue('@minPoints', exerciseSheet.minPoints)
+            if(exerciseSheet.kreuzelType === 0){
+                newModal.click('@kreuzelType1')
+            }
+            else{
+                newModal.click('@kreuzelType2')
+            }
+            newModal.submit();
+            page.assert.successPresent()
+            page.closeToast();
+            page.modalNewExerciseSheetNotPresent();
+            exerciseSheetSection.exerciseSheetPresentStrict(exerciseSheet);
+        }
+
     },
     after: browser =>{
         browser.end();

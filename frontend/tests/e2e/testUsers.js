@@ -1,5 +1,17 @@
 module.exports = [
     {
+        username: 'TestOwner',
+        matriculationNumber: '00000001',
+        surname: 'TestOwnerN',
+        forename: 'TestOwnerV'
+    },
+    {
+        username: 'TestTutor',
+        matriculationNumber: '00000002',
+        surname: 'TestTutorN',
+        forename: 'TestTutorV'
+    },
+    {
         username: 'klstriessnig',
         matriculationNumber: '88888888',
         surname: 'Strießnig',
@@ -10,11 +22,5 @@ module.exports = [
         matriculationNumber: '87596328',
         surname: 'Pipp',
         forename: 'Peter'
-    },
-    {
-        username: 'TestOwner',
-        matriculationNumber: '00000001',
-        surname: 'TestOwnerN',
-        forename: 'TestOwnerV'
     }
 ]

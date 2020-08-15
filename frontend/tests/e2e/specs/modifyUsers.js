@@ -16,13 +16,8 @@ function userExists(self, browser, matriculationNumber, create){
     //create === true: create it
     //create === false: delete it
     const page = browser.page.userManagement();
-    page
-        .clearValue2('@searchBar')
-        .setValue('@searchBar',matriculationNumber)
-        .pause(1000) //wait for search
     browser.perform(function (done){
-        browser.element('css selector', page.elements.firstTableCell.selector, function(result){
-            page.clearValue2('@searchBar')
+        page.userExists(browser, matriculationNumber, function(result){
     
             if (result.value && result.value.ELEMENT) {
                 // Element is present
@@ -47,16 +42,9 @@ function userRightCreated(browser, user){
         const page = browser.page.userManagement();
         const modalNew = page.section.modal_new;
         browser.log('Checking if user was created right')
-        page
-            .clearValue2('@searchBar')
-            .setValue('@searchBar',user.matriculationNumber)
-            .assert.elementCount('@tableEntries',1);
-        const {email, username, ...tableColumns} = user;
-        for(const data in tableColumns){ //table check
-            page.assert.containsText(`@tableCell${data}`, user[data] === true ? 'Ja' : user[data] === false ? 'Nein' : user[data])
-        }
+        page.userPresentStrict(user)
 
-        page.click('@rowEditButton')
+        page.showModalEdit(user.matriculationNumber)
             .isUserModalPresent()
 
         for(const data in user){ //edit modal check
@@ -72,7 +60,6 @@ function userRightCreated(browser, user){
         }
         
         modalNew.cancel();
-        page.clearValue2('@searchBar');
         done();
     })
 }
@@ -183,7 +170,7 @@ module.exports = {
             .assert.not.errorPresent();
             page.isUserModalPresent()
         }
-        // browser.end();
+        modalNew.cancel();
     },
     'Create: reopen': browser => {
         const page = browser.page.userManagement();
@@ -212,6 +199,7 @@ module.exports = {
             modalNew.assert.value(`@${data}`,'');
         }
         modalNew.expect.element(`@isAdmin`).to.not.be.selected;
+        modalNew.cancel();
     },
     'create user': function(browser) {
         const page = browser.page.userManagement();
@@ -242,8 +230,11 @@ module.exports = {
     },
     'modal_delete close test': browser =>{
         const page = browser.page.userManagement();
+        const matriculationNumber = testUser.matriculationNumber;
         browser.pause(2000) //wait till table is loaded
-        
+
+        userExists(this, browser, matriculationNumber, true)
+
         browser.execute(function(selector){
             return document.querySelectorAll(selector).length;
         },[page.elements.tableEntries.selector],function(result){
@@ -253,7 +244,7 @@ module.exports = {
             const deleteModal = page.section.modal_delete;
             const modalCloseVariants = ['cancel', 'cancelX', 'cancelClick'];
             for(const variant of modalCloseVariants){
-                page.showModalDelete();
+                page.showModalDelete(matriculationNumber);
                 deleteModal.pause(1000)[variant]();
                 page.deleteModalNotPresent();
                 page.assert.not.toastPresent()
@@ -293,12 +284,7 @@ module.exports = {
 
         userExists(this, browser, matriculationNumber, true)
 
-        page
-            .clearValue2('@searchBar')
-            .setValue('@searchBar',matriculationNumber)
-            .assert.elementCount('@tableEntries',1)
-            .assert.containsText('@firstTableCell', matriculationNumber)
-            .showModalDelete()
+        page.showModalDelete(matriculationNumber)
 
         deleteModal.pause(1000).submit() //without pause, button click is not triggered
 
@@ -307,19 +293,13 @@ module.exports = {
         page
             .assert.successPresent()
             .closeToast()
-            .assert.not.elementPresent('@tableEntries')
-            .clearValue2('@searchBar')
+            .userNotPresent(matriculationNumber)
     },
     'delete admin': function(browser, matr) {
         const page = browser.page.userManagement();
         const deleteModal = page.section.modal_delete;
         const matriculationNumber = admin.matriculationNumber;
-        page
-            .clearValue2('@searchBar')
-            .setValue('@searchBar',matriculationNumber)
-            .assert.elementCount('@tableEntries',1)
-            .assert.containsText('@firstTableCell', matriculationNumber)
-            .showModalDelete()
+        page.showModalDelete(matriculationNumber)
 
         deleteModal.pause(1000).submit() //without pause, button click is not triggered
 
@@ -328,8 +308,6 @@ module.exports = {
         page
             .assert.errorPresent()
             .closeToast()
-            .assert.elementCount('@tableEntries',1)
-            .clearValue2('@searchBar')
     },
     'upload CSV file wrong': browser => {
         const creation = browser.page.userManagement().section.creation;
@@ -342,13 +320,13 @@ module.exports = {
             .closeToast();
         }
     },
-    'upload CSV file right': function(browser, isAdmin = false) {
+    'upload CSV file': function(browser, isAdmin = false) {
         const page = browser.page.userManagement();
         const creation = page.section.creation;
         const files = ['usersRight'];
         const self = this;
-        const users = testUsers;
-        for(const user of testUsers){
+        const [...users] = testUsers;
+        for(const user of users){
             user.isAdmin = isAdmin;
         }
         creation.setCheckbox('@isAdmin', isAdmin);
@@ -360,22 +338,22 @@ module.exports = {
         for(const fileName of files){
             creation
             .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
-            .assert.successPresent();
+            .assert.successPresent()
+            .closeToast()
         }
         
         for(const user of users){
             userRightCreated(browser, user)
         }
     },
-    'upload CSV file right admin': function(browser) {
-        this["upload CSV file right"](browser, true);
+    'upload CSV file admin': function(browser) {
+        this["upload CSV file"](browser, true);
     },
     'Edit: invalid input': function(browser) {
         const page = browser.page.userManagement();
         userExists(this, browser, testUser.matriculationNumber, true)
         
-        page.setValue('@searchBar',testUser.matriculationNumber)
-            .click('@rowEditButton')
+        page.showModalEdit(testUser.matriculationNumber)
             .isUserModalPresent()
 
         const modalUser = page.section.modal_new;

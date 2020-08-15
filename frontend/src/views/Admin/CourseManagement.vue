@@ -11,7 +11,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="courseSemester_edit" class="control-label">{{ $t('semester.name') }}</label>
-                    <select class="form-control" v-model="selectedSemester_edit" id="courseSemester_edit" @change="getCourses(selectedSemester_edit); selectedCourse = selectedCourseId = undefined">
+                    <select class="form-control" v-model="selectedSemester_edit" id="courseSemester_edit" @change="getCourses(selectedSemester_edit); selectedCourse = {}; selectedCourseId = undefined;">
                         <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
                             {{semester.year}} {{semester.type === 'w' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
                         </option>
@@ -813,18 +813,24 @@ export default {
             else{
                 this.courseInfo_create.semesterId = this.selectedSemester_edit;
                 this.loading.createCourse = true;
+                const {semesterId} = this.courseInfo_create;
+                const {...temp} = this.courseInfo_create; //create a copy in order to have consistent data after api call (during creation the form could be called again)
                 try{
-                    const response = await this.$store.dispatch('createCourse',this.courseInfo_create);
+                    const response = await this.$store.dispatch('createCourse',temp);
                     this.$bvToast.toast(this.$t('course.created'), {
                         title: this.$t('success'),
                         variant: 'success',
                         appendToast: true
                     });
-                    const {semesterId} = this.courseInfo_create;
                     this.courseInfo_create = {semesterId};
 
                     if(semesterId === this.selectedSemester_edit){
-                        this.getCourses(this.selectedSemester_edit);
+                        this.courses.push({
+                            id: response.data.id,
+                            name: temp.name,
+                            number: temp.number
+                        })
+                        this.courses.sort((a,b) => a.number.localeCompare(b.number));
                         this.selectedCourseId = response.data.id;
                         this.getCourse(response.data.id);
                     }

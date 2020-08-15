@@ -23,7 +23,16 @@ const createCommands = {
     },
     modalDeleteNotPresent: function(){
         return this.expect.section('@modal_delete').to.not.be.present;
-    }
+    },
+    ownerExists: function(browser, owner, callback){
+        browser.element('xpath', `//li[@class="multiselect__element"]/span/span[contains(text(),"${owner}")]`, callback)
+    },
+    modalNewExerciseSheetNotPresent: function(){
+        return this.expect.section('@exerciseSheetsNewModal').to.not.be.present;
+    },
+    modalNewExerciseSheetPresent: function(){
+        return this.expect.section('@exerciseSheetsNewModal').to.be.visible;
+    },
 }
 const assignedUsersCommands = {
     selectRole: function(index){
@@ -212,6 +221,65 @@ module.exports = {
                     selector: '#assignedUsers button',
                     index: 3
                 }
+            }
+        },
+        exerciseSheets: {
+            selector: '#exerciseSheets',
+            commands: [{
+                showNewModal: function(){
+                    this.click('@newButton');
+                    return this.api.waitForElementVisible(this.elements.submitButton.selector).pause(1000);
+                },
+                exerciseSheetPresent: function(browser, name, callback){
+                    browser.elements('xpath', `//div[@id="exerciseSheets"]//table//tr[td[1][contains(text(),"${name}")]]`, callback)
+                },
+                exerciseSheetPresentStrict: function(exerciseSheet){
+                    return this.assert.elementPresent({
+                        selector: `//table//tr[td[1][contains(text(),"${exerciseSheet.name}")] and td[2][contains(text(),"${exerciseSheet.submissionDateFormat}")]]`,
+                        locateStrategy: 'xpath'
+                    })
+                }
+            }],
+            elements: {
+                tableEntriesX: '//div[@id="exerciseSheets"]//table//tr',
+                newButton: '#exerciseSheets button',
+                submitButton: '#modal-new-exerciseSheet .modal-footer button.btn.btn-primary'
+            }
+        },
+        exerciseSheetsNewModal: {
+            selector: '#modal-new-exerciseSheet',
+            commands: [modalCommands],
+            elements: {
+                name: {
+                    selector: '#modal-new-exerciseSheet input',
+                    index: 0
+                },
+                issueDate: {
+                    selector: '#modal-new-exerciseSheet input[type=datetime-local]',
+                    index: 0
+                },
+                submissionDate: {
+                    selector: '#modal-new-exerciseSheet input[type=datetime-local]',
+                    index: 1
+                },
+                description: '#modal-new-exerciseSheet .note-editable',
+                minKreuzel: {
+                    selector: '#modal-new-exerciseSheet input[type=number]',
+                    index: 0
+                },
+                minPoints: {
+                    selector: '#modal-new-exerciseSheet input[type=number]',
+                    index: 1
+                },
+                kreuzelType1: {
+                    selector: '#modal-new-exerciseSheet input[type=radio]',
+                    index: 0
+                },
+                kreuzelType2: {
+                    selector: '#modal-new-exerciseSheet input[type=radio]',
+                    index: 1
+                },
+                submitButton: '#modal-new-exerciseSheet .modal-footer button.btn.btn-primary'
             }
         }
     }
