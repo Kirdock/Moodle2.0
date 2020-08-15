@@ -206,6 +206,9 @@ public class CourseService extends AbstractService {
         Semester semester = readSemester(copyCourseRequest.getSemesterId());
         Course originalCourse = readCourse(copyCourseRequest.getCourseId());
 
+        if(courseRepository.existsByNumberAndSemester_Id(originalCourse.getNumber(),semester.getId()))
+            throw new ServiceValidationException("Error: A course with this number already exists in given semester!"); 
+
         // first copy course
         Course copiedCourse = originalCourse.copy();
         copiedCourse.setSemester(semester);
