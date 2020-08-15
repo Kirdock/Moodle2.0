@@ -43,11 +43,13 @@ function deSelectAssignedUser(browser){
     })
 }
 
-function ownerExists(browser, name, done){
+function ownerExists(browser, name){
     const page = browser.page.courseManagement();
     page.showNewModal()
     page.pause(1000);
-    browser.perform(function(){ //done not possible because timeout reaches 10s
+    const defaultTimeoutBefore = browser.options.globals.asyncHookTimeout;
+    browser.options.globals.asyncHookTimeout = 60000; //adjust default timeout; creation of users takes more time than 10s
+    browser.perform(function(done){
         page.ownerExists(browser, name, function(result){
             if(result.value && result.value.ELEMENT){
                 browser.log('Owner is present');
@@ -60,6 +62,7 @@ function ownerExists(browser, name, done){
                 userTest['upload CSV file'](browser);
                 
                 page.navigate().pause(1000, ()=>{
+                    browser.options.globals.asyncHookTimeout = defaultTimeoutBefore;
                     done();
                 });
             }
@@ -217,35 +220,33 @@ module.exports = {
         const page = browser.page.courseManagement();
 
         courseExists(this,browser, testCourse.number, false)
-        ownerExists(browser,testCourse.owner.value, next)
+        ownerExists(browser, testCourse.owner.value)
         
-        function next(){
-            const modal_new = page.section.modal_new;
-            const courseInfo = page.section.courseInfo;
-            page.showNewModal();
-            page.pause(1000);
-            const courses = [testCourse]
+        const modal_new = page.section.modal_new;
+        const courseInfo = page.section.courseInfo;
+        page.showNewModal();
+        page.pause(1000);
+        const courses = [testCourse]
 
-            for(const course of courses){
-                modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
-                modal_new
-                    .setValue('@number', course.number)
-                    .setValue('@name', course.name)
-                    .setValue('@minKreuzel', course.minKreuzel)
-                    .setValue('@minPoints', course.minPoints)
-                    .setValue('@description', course.description)
-                    .submit();
-                page.assert.successPresent();
-                page.closeToast();
-                page.pause(1000);
-                page.assert.urlContains('?courseId=');
-                courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
-                    .assert.value('@number', course.number)
-                    .assert.value('@name', course.name)
-                    .assert.containsText('@description', course.description)
-                    .assert.value('@minKreuzel', course.minKreuzel)
-                    .assert.value('@minPoints', course.minPoints)
-            }
+        for(const course of courses){
+            modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
+            modal_new
+                .setValue('@number', course.number)
+                .setValue('@name', course.name)
+                .setValue('@minKreuzel', course.minKreuzel)
+                .setValue('@minPoints', course.minPoints)
+                .setValue('@description', course.description)
+                .submit();
+            page.assert.successPresent();
+            page.closeToast();
+            page.pause(1000);
+            page.assert.urlContains('?courseId=');
+            courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
+                .assert.value('@number', course.number)
+                .assert.value('@name', course.name)
+                .assert.containsText('@description', course.description)
+                .assert.value('@minKreuzel', course.minKreuzel)
+                .assert.value('@minPoints', course.minPoints)
         }
     },
     'modify course invalid': function(browser, number){

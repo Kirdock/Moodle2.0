@@ -963,16 +963,25 @@ export default {
             this.loading.deleteCourse = true;
             try{
                 await this.$store.dispatch('deleteCourse',{id});
-                if(id === this.selectedCourseId){
+                if(id == this.selectedCourseId){ //check if user did not select another course during delete
                     this.selectedCourse = {};
                     this.setCourseQuery();
                 }
+                let index = -1;
+                this.courses.forEach((course, $index) => {
+                    if(course.id === id){
+                        index = $index;
+                    }
+                });
+                if(index !== -1){
+                    this.courses.splice(index, 1);
+                }
+
                 this.$bvToast.toast(this.$t('course.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-                this.getCourses(this.selectedSemester_edit);
             }
             catch{
                 this.$bvToast.toast(this.$t('course.error.delete'), {
