@@ -38,8 +38,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(ex.getMessage()));
     }
 
-    @ExceptionHandler(ServiceValidationException.class)
-    protected ResponseEntity<Object> handleServiceValidationException(ServiceValidationException ex) {
+    @ExceptionHandler(ServiceException.class)
+    protected ResponseEntity<Object> handleServiceValidationException(ServiceException ex) {
         HttpStatus status = ex.getHttpStatus()!=null?ex.getHttpStatus():HttpStatus.BAD_REQUEST;
 
         ApiError apiError =

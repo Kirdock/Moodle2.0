@@ -4,7 +4,7 @@ import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
 import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
@@ -39,7 +39,7 @@ import java.util.zip.ZipFile;
 public class FinishesExampleService extends AbstractService{
 
     @Transactional
-    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceValidationException {
+    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         for (UserKreuzelRequest userKreuzelRequest : userKreuzelRequests) {
             updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription(), false);
@@ -47,7 +47,7 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public void setKreuzelUserMulti(List<UserKreuzeMultilRequest> userKreuzeMultilRequests) throws ServiceValidationException
+    public void setKreuzelUserMulti(List<UserKreuzeMultilRequest> userKreuzeMultilRequests) throws ServiceException
     {
         for(UserKreuzeMultilRequest userKreuzeMultilRequest: userKreuzeMultilRequests)
         {
@@ -55,12 +55,12 @@ public class FinishesExampleService extends AbstractService{
         }
     }
 
-    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) throws ServiceValidationException {
+    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) throws ServiceException {
         FinishesExample finishesExample = null;
         Example example = readExample(exampleId);
         User user = readUser(matriculationNumber);
         if (!example.getSubExamples().isEmpty())
-            throw new ServiceValidationException("Error: Example has sub-examples and can therefore not be kreuzelt");
+            throw new ServiceException("Error: Example has sub-examples and can therefore not be kreuzelt");
 
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
                 .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
@@ -87,9 +87,9 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public List<ViolationResponse> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException, ClassNotFoundException {
+    public List<ViolationResponse> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
         if (file.isEmpty())
-            throw new ServiceValidationException("Error: given file is empty");
+            throw new ServiceException("Error: given file is empty");
 
         List<? extends Violation> violations;
         UserDetailsImpl userDetails = getUserDetails();
@@ -109,7 +109,7 @@ public class FinishesExampleService extends AbstractService{
 
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
         if (finishesExample.getRemainingUploadCount() == 0 && finishesExample.getExample().getUploadCount() != 0)
-            throw new ServiceValidationException("Error: max upload counts reached!");
+            throw new ServiceException("Error: max upload counts reached!");
 
         saveFileToDisk(file, example);
         String fileName = file.getOriginalFilename();
@@ -176,12 +176,12 @@ public class FinishesExampleService extends AbstractService{
 //        deleteMavenProject(destDir);
     }
 
-    protected void installMavenProject(String destDir) throws ServiceValidationException
+    protected void installMavenProject(String destDir) throws ServiceException
     {
         MavenCli cli = new MavenCli();
         int result = cli.doMain(new String[]{"clean", "install"}, destDir, System.out, System.out);
         if(result !=0)
-            throw new ServiceValidationException("Error: maven project could not be build!");
+            throw new ServiceException("Error: maven project could not be build!");
 
 //        InvocationRequest request = new DefaultInvocationRequest();
 //        request.setPomFile( new File( "/path/to/pom.xml" ) );
@@ -196,7 +196,7 @@ public class FinishesExampleService extends AbstractService{
         MavenCli cli = new MavenCli();
         int result = cli.doMain(new String[]{"test"}, destDir, System.out, System.out);
         if(result !=0)
-            throw new ServiceValidationException("Error: maven project could not be tested!");
+            throw new ServiceException("Error: maven project could not be tested!");
 
     }
 
@@ -256,20 +256,20 @@ public class FinishesExampleService extends AbstractService{
         return FileConstants.attachmentsDir + createExampleAttachmentDir(example) + userDir;
     }
 
-    public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceValidationException {
+    public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
         try {
             finishesExample.setAttachmentContent(readFileFromDisk(finishesExample));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new ServiceValidationException(e.getMessage());
+            throw new ServiceException(e.getMessage());
         }
 
         return finishesExample;
     }
 
-    public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceValidationException {
+    public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceException {
         readExample(userExamplePresented.getExampleId()); // checks if example exits
         readUser(userExamplePresented.getMatriculationNumber()); // checks if user exists
         FinishesExample finishesExample = readFinishesExample(userExamplePresented.getExampleId(), userExamplePresented.getMatriculationNumber());
@@ -277,11 +277,11 @@ public class FinishesExampleService extends AbstractService{
         finishesExampleRepository.save(finishesExample);
     }
 
-    protected FinishesExample readFinishesExample(Long exampleId, String matriculationNumber) throws ServiceValidationException {
+    protected FinishesExample readFinishesExample(Long exampleId, String matriculationNumber) throws ServiceException {
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
                 .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
         if (!optionalFinishesExample.isPresent())
-            throw new ServiceValidationException("Error: user did not check this example");
+            throw new ServiceException("Error: user did not check this example");
 
         return optionalFinishesExample.get();
     }
@@ -291,9 +291,9 @@ public class FinishesExampleService extends AbstractService{
      * @param matriculationNumber
      * @param courseId
      * @return list of example id and name
-     * @throws ServiceValidationException
+     * @throws ServiceException
      */
-    public List<KreuzelResponse> getKreuzelUserCourse(String matriculationNumber, Long courseId) throws ServiceValidationException {
+    public List<KreuzelResponse> getKreuzelUserCourse(String matriculationNumber, Long courseId) throws ServiceException {
         List<KreuzelResponse> responseObjects = new ArrayList<>();
 
         User user = readUser(matriculationNumber);
@@ -301,7 +301,7 @@ public class FinishesExampleService extends AbstractService{
 
         // check permission
         if (!isAdmin() && !isOwner(course))
-            throw new ServiceValidationException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
 
         Comparator<ExerciseSheet> exerciseSheetComparator = Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName);
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);

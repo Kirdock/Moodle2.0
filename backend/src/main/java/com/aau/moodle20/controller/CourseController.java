@@ -1,7 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.SemesterException;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CopyCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.UpdateCoursePresets;
@@ -68,7 +68,7 @@ public class CourseController {
     }
 
     @PostMapping(value = "/course/copy")
-    public ResponseEntity<?> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest) throws ServiceValidationException, IOException {
+    public ResponseEntity<?> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest) throws ServiceException, IOException {
 
         CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
         return ResponseEntity.ok(responseObject);

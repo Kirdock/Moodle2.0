@@ -2,19 +2,23 @@ package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
-import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
+import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.request.UpdateUserRequest;
-import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.RegisterMultipleUserResponse;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.security.jwt.JwtUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.passay.CharacterData;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +26,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,33 +34,46 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.passay.CharacterOccurrencesRule.ERROR_CODE;
+
 @Service
 public class UserDetailsServiceImpl extends AbstractService implements UserDetailsService {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
+    private AuthenticationManager authenticationManager;
+    private PasswordEncoder encoder;
+    private JwtUtils jwtUtils;
+    private EmailService emailService;
+    private ResourceBundleMessageSource resourceBundleMessageSource;
 
     @Value("${adminMatriculationNumber}")
     private String adminMatriculationNumber;
 
+    @Value("${developerMode}")
+    private Boolean developerMode;
+
     @Value("${studentEmailPostfix}")
     private String studentEmailPostFix;
 
+    @Value("${tempPasswordExpirationHours}")
+    private Long tempPasswordExpirationHours;
+
     private Pattern matriculationPattern = Pattern.compile("^[0-9]{8}$");
+
+
+    public UserDetailsServiceImpl(AuthenticationManager authenticationManager, PasswordEncoder encoder, JwtUtils jwtUtils, EmailService emailService, ResourceBundleMessageSource resourceBundleMessageSource)
+    {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.encoder = encoder;
+        this.emailService = emailService;
+        this.resourceBundleMessageSource = resourceBundleMessageSource;
+    }
 
     @Override
     @Transactional
@@ -66,17 +84,20 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         return UserDetailsImpl.build(user);
     }
 
-    public void registerUser(SignUpRequest signUpRequest) throws ServiceValidationException
+    public void registerUser(SignUpRequest signUpRequest) throws ServiceException
     {
         if (userRepository.existsByMatriculationNumber(signUpRequest.getMatriculationNumber())) {
-           throw new ServiceValidationException("Error: User with this matriculationNumber already exists!", ApiErrorResponseCodes.MATRICULACTIONNUMBER_ALREADY_EXISTS);
+           throw new ServiceException("Error: User with this matriculationNumber already exists!", ApiErrorResponseCodes.MATRICULACTIONNUMBER_ALREADY_EXISTS);
         }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new ServiceValidationException("Error: User with this username already exists!",ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
+            throw new ServiceException("Error: User with this username already exists!",ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
         }
 
-        String password = "password";//TODO should not be hardcoded
-        password = encoder.encode(password);
+        String emailSubject = getLocaleMessage("registerUser.email.subject");
+        String emailText = getLocaleMessage("registerUser.email.text");
+
+        String password =  generateRandomPassword(); //"password";//TODO should not be hardcoded
+        String encodedPassword = encoder.encode(password);
 
         //username, matrikelNumber, forename, surename, password, isAdmin
         User user = new User();
@@ -84,22 +105,38 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         user.setMatriculationNumber(signUpRequest.getMatriculationNumber());
         user.setForename(signUpRequest.getForename());
         user.setSurname(signUpRequest.getSurname());
-        user.setPassword(password);
+        user.setPassword(encodedPassword);
         user.setAdmin(signUpRequest.getIsAdmin()!=null?signUpRequest.getIsAdmin():Boolean.FALSE);
         user.setEmail(signUpRequest.getEmail());
-         userRepository.save(user);
+        user.setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
+        userRepository.save(user);
+        emailService.sendEmail(user.getEmail(), emailSubject,emailText.replace("{password}",password));
     }
 
-
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RegisterMultipleUserResponse registerUsers(MultipartFile file, Boolean isAdmin) throws UserException {
         List<User> users = getUserObjectsFromFile(file);
         List<User> usersToBeSaves = new ArrayList<>();
         RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
-        String password = encoder.encode("password");//TODO should not be hardcoded
+        String standardPassword = encoder.encode("password");
+        Map<String,String> passwords = new HashMap<>();
+
+        String emailSubject = getLocaleMessage("registerUser.email.subject");
+        String emailText = getLocaleMessage("registerUser.email.text");
+
 
         Integer lineNumber = 1;
         for (User user : users) {
-            user.setPassword(password);
+            if (developerMode)
+                user.setPassword(standardPassword);
+            else {
+                String password = generateRandomPassword();
+                String encodedPassword = encoder.encode(password);
+                user.setPassword(encodedPassword);
+                user.setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
+                passwords.put(user.getMatriculationNumber(),password);
+            }
+
             if (isAdmin != null)
                 user.setAdmin(isAdmin);
 
@@ -116,6 +153,11 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
             lineNumber++;
         }
         userRepository.saveAll(usersToBeSaves);
+        if (!developerMode) {
+            for (User user : usersToBeSaves) {
+                emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace("{password}", passwords.get(user.getMatriculationNumber())));
+            }
+        }
         List<UserResponseObject> registeredUsers = usersToBeSaves.stream().map(User::createUserResponseObject).collect(Collectors.toList());
         registerMultipleUserResponse.getRegisteredUsers().addAll(registeredUsers);
 
@@ -164,9 +206,9 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
      * also join with finishe example and returns all presented examples
      * @param courseId
      * @return
-     * @throws ServiceValidationException
+     * @throws ServiceException
      */
-    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws ServiceValidationException {
+    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws ServiceException {
         List<UserResponseObject> userResponseObjectList = new ArrayList<>();
 
         readCourse(courseId);
@@ -237,29 +279,29 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
                 .collect(Collectors.toList());
     }
 
-    public void changePassword(ChangePasswordRequest changePasswordRequest) throws ServiceValidationException {
+    public void changePassword(ChangePasswordRequest changePasswordRequest) throws ServiceException {
         User currentUser = getCurrentUser();
         if (!encoder.matches(changePasswordRequest.getOldPassword(), currentUser.getPassword()))
-            throw new ServiceValidationException("Password for User not correct!");
+            throw new ServiceException("Password for User not correct!");
         currentUser.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(currentUser);
     }
 
-    public void updateUser(UpdateUserRequest updateUserRequest) throws ServiceValidationException {
+    public void updateUser(UpdateUserRequest updateUserRequest) throws ServiceException {
         String matriculationNumber = null;
         UserDetailsImpl userDetails = getUserDetails();
         if (updateUserRequest.getMatriculationNumber() != null && updateUserRequest.getMatriculationNumber().length() > 0) {
             matriculationNumber = updateUserRequest.getMatriculationNumber();
             if (!userRepository.existsByMatriculationNumber(matriculationNumber))
-                throw new ServiceValidationException("Error: user with matriculationNumber:" + matriculationNumber + " does not exists", HttpStatus.NOT_FOUND);
+                throw new ServiceException("Error: user with matriculationNumber:" + matriculationNumber + " does not exists", HttpStatus.NOT_FOUND);
         } else {
             matriculationNumber = userDetails.getMatriculationNumber();
         }
         if(!userDetails.getAdmin() && !userDetails.getMatriculationNumber().equals(matriculationNumber))
-            throw new ServiceValidationException("Error: User is not admin and therefore not allowed to edit other users than himself ", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: User is not admin and therefore not allowed to edit other users than himself ", HttpStatus.UNAUTHORIZED);
 
         if(adminMatriculationNumber.equals(matriculationNumber))
-            throw new ServiceValidationException("Error: Root admin cannot be updated!");
+            throw new ServiceException("Error: Root admin cannot be updated!");
 
         User user = readUser(matriculationNumber);
         user.setEmail(updateUserRequest.getEmail());
@@ -271,10 +313,10 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         userRepository.save(user);
     }
 
-    public void deleteUser(String matriculationNumber) throws ServiceValidationException {
+    public void deleteUser(String matriculationNumber) throws ServiceException {
         User user = readUser(matriculationNumber);
         if (user.getMatriculationNumber().equals(adminMatriculationNumber))
-            throw new ServiceValidationException("Super Admin user cannot be deleted!");
+            throw new ServiceException("Super Admin user cannot be deleted!");
 
         userRepository.delete(user);
     }
@@ -288,5 +330,69 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         return readUser(matriculationNumber).createUserResponseObject();
     }
 
+    protected String generateRandomPassword() {
+        PasswordGenerator gen = new PasswordGenerator();
+        CharacterData lowerCaseChars = EnglishCharacterData.LowerCase;
+        CharacterRule lowerCaseRule = new CharacterRule(lowerCaseChars);
+        lowerCaseRule.setNumberOfCharacters(2);
 
+        CharacterData upperCaseChars = EnglishCharacterData.UpperCase;
+        CharacterRule upperCaseRule = new CharacterRule(upperCaseChars);
+        upperCaseRule.setNumberOfCharacters(2);
+
+        CharacterData digitChars = EnglishCharacterData.Digit;
+        CharacterRule digitRule = new CharacterRule(digitChars);
+        digitRule.setNumberOfCharacters(2);
+
+        CharacterData specialChars = new CharacterData() {
+            public String getErrorCode() {
+                return ERROR_CODE;
+            }
+
+            public String getCharacters() {
+                return "!@#$%^&*()_+";
+            }
+        };
+        CharacterRule splCharRule = new CharacterRule(specialChars);
+        splCharRule.setNumberOfCharacters(2);
+
+        String password = gen.generatePassword(10, splCharRule, lowerCaseRule,
+                upperCaseRule, digitRule);
+        return password;
+    }
+
+
+    public void checkForTemporaryPassword(LoginRequest loginRequest) throws ServiceException
+    {
+        Optional<User> optionalUser= userRepository.findByUsername(loginRequest.getUsername());
+        if(optionalUser.isPresent()){
+            if(optionalUser.get().getPasswordExpireDate()!=null)
+            {
+                LocalDateTime now = LocalDateTime.now();
+                if(now.isAfter(optionalUser.get().getPasswordExpireDate()))
+                {
+                    String password = generateRandomPassword();
+                    String encodedPassword = encoder.encode(password);
+                    optionalUser.get().setPassword(encodedPassword);
+                    optionalUser.get().setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
+                    userRepository.save(optionalUser.get());
+                    String emailSubject = getLocaleMessage("registerUser.email.subject");
+                    String emailText = getLocaleMessage("registerUser.email.text");
+
+                    emailService.sendEmail(optionalUser.get().getEmail(), emailSubject, emailText.replace("{password}",password));
+
+                    throw new ServiceException("Error: temporary password is expired",ApiErrorResponseCodes.TEMPORARY_PASSWORD_EXPIRED);
+                }else
+                {
+                    optionalUser.get().setPasswordExpireDate(null);
+                    userRepository.save(optionalUser.get());
+                }
+
+            }
+        }
+    }
+
+    private String getLocaleMessage(String code) {
+        return resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+    }
 }

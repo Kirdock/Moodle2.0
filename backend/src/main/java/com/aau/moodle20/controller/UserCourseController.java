@@ -1,7 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.SemesterException;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
@@ -61,7 +61,7 @@ public class UserCourseController {
     }
 
     @PostMapping(value = "/course/assignFile")
-    public ResponseEntity<?> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  throws ServiceValidationException {
+    public ResponseEntity<?> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  throws ServiceException {
         userCourseService.assignFile(file,courseId);
         return ResponseEntity.ok("Users successfully assigned to course");
     }

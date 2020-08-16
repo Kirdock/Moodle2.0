@@ -5,31 +5,36 @@ import org.springframework.http.HttpStatus;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServiceValidationException extends RuntimeException{
+public class ServiceException extends RuntimeException{
 
     private Integer errorResponseCode;
     private List<String> errors = new ArrayList<>();
     private HttpStatus httpStatus = null;
-    public ServiceValidationException()
+    public ServiceException()
     {
     }
 
-    public ServiceValidationException(String message)
+    public ServiceException(String message, Throwable throwable)
+    {
+        super(message,throwable);
+    }
+
+    public ServiceException(String message)
     {
         super(message);
     }
 
-    public ServiceValidationException(String message,Integer errorResponseCode)
+    public ServiceException(String message, Integer errorResponseCode)
     {
         super(message);
         this.errorResponseCode = errorResponseCode;
     }
-    public ServiceValidationException(String message,HttpStatus status)
+    public ServiceException(String message, HttpStatus status)
     {
         super(message);
         this.httpStatus = status;
     }
-    public ServiceValidationException(String message,Integer errorResponseCode,HttpStatus status)
+    public ServiceException(String message, Integer errorResponseCode, HttpStatus status)
     {
         super(message);
         this.errorResponseCode = errorResponseCode;

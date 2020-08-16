@@ -6,7 +6,7 @@ import com.aau.moodle20.entity.User;
 import com.aau.moodle20.entity.UserInCourse;
 import com.aau.moodle20.entity.embeddable.UserCourseKey;
 import com.aau.moodle20.exception.SemesterException;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import org.slf4j.Logger;
@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,12 +31,12 @@ public class UserCourseService extends AbstractService {
 
     private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
 
-    public CourseResponseObject getCourseAssigned(Long courseId) throws ServiceValidationException {
+    public CourseResponseObject getCourseAssigned(Long courseId) throws ServiceException {
         Course course = readCourse(courseId);
         User currentUser = getCurrentUser();
         Boolean isCourseAssigned = currentUser.getCourses().stream().anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
         if (!isCourseAssigned)
-            throw new ServiceValidationException("Error: User is not assigned to this course!", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: User is not assigned to this course!", HttpStatus.UNAUTHORIZED);
 
         return course.createCourseResponseObject_GetAssignedCourse(currentUser.getMatriculationNumber());
     }
@@ -75,7 +73,7 @@ public class UserCourseService extends AbstractService {
     }
 
     @Transactional
-    public void assignFile(MultipartFile file, Long courseId) throws ServiceValidationException {
+    public void assignFile(MultipartFile file, Long courseId) throws ServiceException {
         Course course = readCourse(courseId);
         List<User> allGivenUsers = userDetailsService.registerMissingUsersFromFile(file);
         List<UserInCourse> userInCourses = new ArrayList<>();

@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS USER
     forename        VARCHAR(50),
     is_Admin            CHAR(5),
     email           VARCHAR(200),
-    surname         VARCHAR(50)
+    surname         VARCHAR(50),
+    password_Expire_Date datetime
 );
 
 CREATE TABLE IF NOT EXISTS SEMESTER

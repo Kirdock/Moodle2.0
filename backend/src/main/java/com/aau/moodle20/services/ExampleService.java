@@ -3,22 +3,18 @@ package com.aau.moodle20.services;
 import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -27,8 +23,9 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class ExampleService extends AbstractService{
 
+
     @Transactional
-    public ExampleResponseObject createExample (ExampleRequest createExampleRequest) throws ServiceValidationException, IOException {
+    public ExampleResponseObject createExample (ExampleRequest createExampleRequest) throws ServiceException, IOException {
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
         Example parentExample = null;
@@ -36,7 +33,7 @@ public class ExampleService extends AbstractService{
         if (createExampleRequest.getSubmitFile() != null && createExampleRequest.getSubmitFile()) {
             if ((createExampleRequest.getSupportedFileTypes() == null || createExampleRequest.getSupportedFileTypes().isEmpty()) &&
                     (createExampleRequest.getCustomFileTypes() == null || createExampleRequest.getCustomFileTypes().isEmpty()))
-                throw new ServiceValidationException("Error:either supported file types or custom file types  must be specified!");
+                throw new ServiceException("Error:either supported file types or custom file types  must be specified!");
         }
 
         // if this is an subExample remove all finishesExample entries of parentExample
@@ -96,12 +93,12 @@ public class ExampleService extends AbstractService{
     }
 
     @Transactional
-    public void updateExample(ExampleRequest updateExampleRequest) throws ServiceValidationException, IOException {
+    public void updateExample(ExampleRequest updateExampleRequest) throws ServiceException, IOException {
         List<SupportFileType> supportFileTypes;
         if (updateExampleRequest.getSubmitFile() != null && updateExampleRequest.getSubmitFile()) {
             if ((updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty()) &&
                     (updateExampleRequest.getCustomFileTypes() == null || updateExampleRequest.getCustomFileTypes().isEmpty()))
-                throw new ServiceValidationException("Error:either supported file types or custom file types  must be specified!");
+                throw new ServiceException("Error:either supported file types or custom file types  must be specified!");
         }
         Example example = readExample(updateExampleRequest.getId());
         if(!updateExampleRequest.getSubmitFile() && (example.getValidator()!=null && !example.getValidator().isEmpty()) )
@@ -115,7 +112,7 @@ public class ExampleService extends AbstractService{
     }
 
     @Transactional
-    public void deleteExample(Long exampleId) throws ServiceValidationException, IOException {
+    public void deleteExample(Long exampleId) throws ServiceException, IOException {
         Example example = readExample(exampleId);
         ExerciseSheet exerciseSheet = example.getExerciseSheet();
         Example parentExample = example.getParentExample();
@@ -145,12 +142,12 @@ public class ExampleService extends AbstractService{
         return fileTypeRepository.findAll().stream().map(FileType::createFileTypeResponseObject).collect(Collectors.toList());
     }
 
-    public ExampleResponseObject getExample(Long id) throws ServiceValidationException {
+    public ExampleResponseObject getExample(Long id) throws ServiceException {
         Example example = readExample(id);
         return example.createExampleResponseObject(null);
     }
 
-    public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) throws ServiceValidationException {
+    public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) throws ServiceException {
         for (ExampleOrderRequest exampleOrderRequest : exampleOrderRequests) {
             Example example = readExample(exampleOrderRequest.getId());
             example.setOrder(exampleOrderRequest.getOrder());
@@ -158,13 +155,13 @@ public class ExampleService extends AbstractService{
         }
     }
 
-    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws ServiceValidationException, IOException {
+    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws ServiceException, IOException {
         Example example = readExample(exampleId);
         String fileName = validatorFile.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
         if(fileName!=null) {
             if (!FileConstants.JarFileExtension.equals(extension))
-                throw new ServiceValidationException("Error: Not a jar File!");
+                throw new ServiceException("Error: Not a jar File!");
         }
 
         String validatorFilePath = getValidatorFilePath(example);
@@ -184,7 +181,7 @@ public class ExampleService extends AbstractService{
         }
     }
 
-    public Example getExampleValidator(Long exampleId) throws ServiceValidationException, IOException {
+    public Example getExampleValidator(Long exampleId) throws ServiceException, IOException {
         Example example = readExample(exampleId);
         String validatorFilePath = getValidatorFilePath(example);
         byte [] content = readFileFromDisk(validatorFilePath,example.getValidator());
@@ -236,14 +233,14 @@ public class ExampleService extends AbstractService{
         return byteArrayOutputStream.toByteArray();
     }
 
-    public void deleteExampleValidator(Long exampleId) throws ServiceValidationException, IOException {
+    public void deleteExampleValidator(Long exampleId) throws ServiceException, IOException {
         Example example = readExample(exampleId);
         if(example.getValidator()==null || example.getValidator().isEmpty())
             return ;
         String validatorFilePath = getValidatorFilePath(example);
         boolean result = deleteFileFromDisk(validatorFilePath,example.getValidator());
         if(!result)
-            throw new ServiceValidationException("Error: Validator could not be deleted");
+            throw new ServiceException("Error: Validator could not be deleted");
 
 
         example.setValidator(null);

@@ -5,6 +5,7 @@ import com.aau.moodle20.payload.response.UserResponseObject;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -32,6 +33,9 @@ public class User {
     private String forename;
     private String surname;
     private String email;
+
+    @Column(name = "password_Expire_Date", columnDefinition="DATETIME")
+    private LocalDateTime passwordExpireDate;
 
     @OneToMany(mappedBy = "user")
     private Set<UserInCourse> courses;
@@ -135,6 +139,14 @@ public class User {
 
     public void setFinishedExamples(Set<FinishesExample> finishedExamples) {
         this.finishedExamples = finishedExamples;
+    }
+
+    public LocalDateTime getPasswordExpireDate() {
+        return passwordExpireDate;
+    }
+
+    public void setPasswordExpireDate(LocalDateTime passwordExpireDate) {
+        this.passwordExpireDate = passwordExpireDate;
     }
 
     public UserResponseObject createUserResponseObject()
