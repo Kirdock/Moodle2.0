@@ -33,6 +33,9 @@ const createCommands = {
     modalNewExerciseSheetPresent: function(){
         return this.expect.section('@exerciseSheetsNewModal').to.be.visible;
     },
+    modalDeleteExerciseSheetNotPresent: function(){
+        return this.expect.section('@exerciseSheetDeleteModal').to.not.be.present;
+    }
 }
 const assignedUsersCommands = {
     selectRole: function(index){
@@ -230,6 +233,13 @@ module.exports = {
                     this.click('@newButton');
                     return this.api.waitForElementVisible(this.elements.submitButton.selector).pause(1000);
                 },
+                showDeleteModal: function(name){
+                    this.api.click('xpath',`//table//tr[td[1][contains(text(),"${name}")]]/td[3]/a[3]`);
+                    return this.api.waitForElementVisible(this.elements.submitButton.selector).pause(1000);
+                },
+                edit: function(name){
+                    return this.api.click('xpath',`//table//tr[td[1][contains(text(),"${name}")]]/td[3]/a[1]`);
+                },
                 exerciseSheetPresent: function(browser, name, callback){
                     browser.elements('xpath', `//div[@id="exerciseSheets"]//table//tr[td[1][contains(text(),"${name}")]]`, callback)
                 },
@@ -238,12 +248,19 @@ module.exports = {
                         selector: `//table//tr[td[1][contains(text(),"${exerciseSheet.name}")] and td[2][contains(text(),"${exerciseSheet.submissionDateFormat}")]]`,
                         locateStrategy: 'xpath'
                     })
+                },
+                count: function(callback){
+                    this.api.execute(function(selector){
+                        return document.querySelectorAll(selector).length;
+                    }, [this.elements.tableEntries.selector], function(result){
+                        callback(result.value);
+                    })
                 }
             }],
             elements: {
-                tableEntriesX: '//div[@id="exerciseSheets"]//table//tr',
+                tableEntries: '#exerciseSheets table tr',
                 newButton: '#exerciseSheets button',
-                submitButton: '#modal-new-exerciseSheet .modal-footer button.btn.btn-primary'
+                submitButton: '.modal-footer button.btn.btn-primary'
             }
         },
         exerciseSheetsNewModal: {
@@ -280,6 +297,13 @@ module.exports = {
                     index: 1
                 },
                 submitButton: '#modal-new-exerciseSheet .modal-footer button.btn.btn-primary'
+            }
+        },
+        exerciseSheetDeleteModal: {
+            selector: '#modal-delete-exerciseSheet',
+            commands: [modalCommands],
+            elements: {
+                submitButton: '.modal-footer button.btn.btn-primary'
             }
         }
     }

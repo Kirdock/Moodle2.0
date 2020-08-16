@@ -103,23 +103,21 @@ function exerciseSheetExists(self, browser, courseText, name, create){
         page.selectTab(2);
         const exerciseSheet = page.section.exerciseSheets;
         exerciseSheet.exerciseSheetPresent(browser, name, function(result){
-            // if (result.value && result.value.length !== 0) {
-            //     // Elements are present
-            //     if(!create){
-            //         browser.log('Course already available. Course will now be deleted')
-            //         self['delete course'](browser, courseText);
-            //     }
-            //     done();
-            // } else {
-            //     if(create){
-            //         browser.log('Course does not exist. Course will now be created')
-            //         self['create course'](browser);
-            //     }
-            //     done();
-            // }
-            done();
+            if (result.value && result.value.length !== 0) {
+                // Elements are present
+                if(!create){
+                    // browser.log('ExerciseSheet already available. ExerciseSheet will now be deleted')
+                    // self['delete exerciseSheet'](browser, courseText);
+                }
+                done();
+            } else {
+                if(create){
+                    browser.log('ExerciseSheet does not exist. ExerciseSheet will now be created')
+                    self['create exerciseSheet'](browser);
+                }
+                done();
+            }
         });
-        // done();
     })
 }
 
@@ -256,6 +254,7 @@ module.exports = {
         const page = browser.page.courseManagement();
         const courseInfo = page.section.courseInfo;
         page.selectCourse(number);
+        page.selectTab(0);
 
         const courseData = [
             {
@@ -339,12 +338,14 @@ module.exports = {
             }
         ]
         courseExists(self, browser, courseText, true);
-        courseExists(self, browser, `${courseData[0].number.value} ${courseData[0].name.value}`, false);
+        for(const course of courseData){
+            courseExists(self, browser, `${course.number.value} ${course.name.value}`, false);
+        }
         
         const page = browser.page.courseManagement();
         const courseInfo = page.section.courseInfo;
         page.selectCourse(courseText);
-        
+        page.selectTab(0);
         
         for(const course of courseData){
             const {owner, description, ...data} = course;
@@ -482,6 +483,53 @@ module.exports = {
             exerciseSheetSection.exerciseSheetPresentStrict(exerciseSheet);
         }
 
+    },
+    'delete exerciseSheet': function(browser){
+        const courseText = testCourse.number;
+        const page = browser.page.courseManagement();
+        const exerciseSheetSection = page.section.exerciseSheets;
+        const self = this;
+        const exerciseSheets = [testExerciseSheet];
+        const deleteModal = page.section.exerciseSheetDeleteModal;
+        exerciseSheetExists(self, browser, courseText, testExerciseSheet.name, true);
+        
+        page.selectCourse(courseText);
+        page.selectTab(2);
+        for(const exerciseSheet of exerciseSheets){
+            browser.perform(done =>{
+                exerciseSheetSection.count(function(countBefore){
+                    exerciseSheetSection.showDeleteModal(exerciseSheet.name)
+                    deleteModal.submit();
+                    page.assert.successPresent();
+                    page.closeToast();
+                    page.modalDeleteExerciseSheetNotPresent();
+
+                    exerciseSheetSection.count(function(countAfter){
+                        if(countAfter + 1 === countBefore){
+                            done();
+                        }
+                        else{
+                            throw new Error('Delete exerciseSheet did not work');
+                        }
+                    });
+                })
+            })
+        }
+
+        
+    },
+    'select exerciseSheet': function(browser){
+        const courseText = testCourse.number;
+        const exerciseSheetName = testExerciseSheet.name;
+        const page = browser.page.courseManagement();
+        exerciseSheetExists(this, browser, courseText, exerciseSheetName, true);
+        page.selectCourse(courseText);
+        page.selectTab(2);
+
+        const exerciseSheetSection = page.section.exerciseSheets;
+        exerciseSheetSection.edit(exerciseSheetName);
+        page.pause(1000)
+        page.expect.url().to.match(/\/Admin\/Course\/([0-9]+)\/SheetManagement\/([0-9]+)$/)
     },
     after: browser =>{
         browser.end();
