@@ -67,7 +67,7 @@ public class CourseService extends AbstractService {
         if(!updateCourseRequest.getNumber().equals(course.getNumber()))
         {
             if(courseRepository.existsByNumberAndSemester_Id(updateCourseRequest.getNumber(),course.getSemester().getId()))
-                throw new ServiceException("Error: A Course with this number already exists");
+                throw new ServiceException("Error: A Course with this number already exists",ApiErrorResponseCodes.CHANGED_COURSE_NUMBER_ALREADY_EXISTS);
         }
 
         course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
@@ -206,7 +206,7 @@ public class CourseService extends AbstractService {
         Course originalCourse = readCourse(copyCourseRequest.getCourseId());
 
         if(courseRepository.existsByNumberAndSemester_Id(originalCourse.getNumber(),semester.getId()))
-            throw new ServiceException("Error: A course with this number already exists in given semester!");
+            throw new ServiceException("Error: A course with this number already exists in given semester!",ApiErrorResponseCodes.COPIED_COURSE_NUMBER_ALREADY_EXISTS);
 
         // first copy course
         Course copiedCourse = originalCourse.copy();
