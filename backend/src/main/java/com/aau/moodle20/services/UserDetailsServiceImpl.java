@@ -286,9 +286,11 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         if (!encoder.matches(changePasswordRequest.getOldPassword(), currentUser.getPassword()))
             throw new ServiceException("Password for User not correct!");
         currentUser.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
+        currentUser.setPasswordExpireDate(null);
         userRepository.save(currentUser);
     }
 
+    @Transactional
     public void updateUser(UpdateUserRequest updateUserRequest) throws ServiceException {
         String matriculationNumber = null;
         UserDetailsImpl userDetails = getUserDetails();
@@ -306,14 +308,18 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
             throw new ServiceException("Error: Root admin cannot be updated!");
 
         User user = readUser(matriculationNumber);
+        boolean hasEmailChanged = !updateUserRequest.equals(user.getEmail());
         user.setEmail(updateUserRequest.getEmail());
         user.setSurname(updateUserRequest.getSurname());
         user.setForename(updateUserRequest.getForename());
         if(userDetails.getAdmin() && updateUserRequest.getIsAdmin()!=null)
             user.setAdmin(updateUserRequest.getIsAdmin());
 
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
+        if(hasEmailChanged && user.getPasswordExpireDate()!=null)
+            generateNewTemporaryPassword(user);
     }
+
 
     public void deleteUser(String matriculationNumber) throws ServiceException {
         User user = readUser(matriculationNumber);
@@ -372,19 +378,7 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
             {
                 LocalDateTime now = LocalDateTime.now();
                 if(now.isAfter(optionalUser.get().getPasswordExpireDate())) {
-                    String password = developerMode ? "password" : generateRandomPassword();
-                    String encodedPassword = encoder.encode(password);
-                    optionalUser.get().setPassword(encodedPassword);
-                    if (!developerMode)
-                        optionalUser.get().setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
-                    userRepository.save(optionalUser.get());
-
-                    if(!developerMode) {
-                        String emailSubject = getLocaleMessage("registerUser.email.subject");
-                        String emailText = getLocaleMessage("registerUser.email.text");
-
-                        emailService.sendEmail(optionalUser.get().getEmail(), emailSubject, emailText.replace("{password}", password));
-                    }
+                    generateNewTemporaryPassword(optionalUser.get());
                     throw new ServiceException("Error: temporary password is expired", ApiErrorResponseCodes.TEMPORARY_PASSWORD_EXPIRED);
                 }else
                 {
@@ -393,6 +387,23 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
                 }
 
             }
+        }
+    }
+
+    protected void generateNewTemporaryPassword(User user)
+    {
+        String password = developerMode ? "password" : generateRandomPassword();
+        String encodedPassword = encoder.encode(password);
+        user.setPassword(encodedPassword);
+        if (!developerMode)
+            user.setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
+        userRepository.save(user);
+
+        if(!developerMode) {
+            String emailSubject = getLocaleMessage("registerUser.email.subject");
+            String emailText = getLocaleMessage("registerUser.email.text");
+
+            emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace("{password}", password));
         }
     }
 
