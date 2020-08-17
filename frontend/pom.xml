@@ -27,7 +27,7 @@
                 <version>${frontend-maven-plugin.version}</version>
                 <executions>
                     <!-- Install our node and npm version to run npm/node scripts-->
-                    <execution>
+                    <!-- <execution>
                         <id>install node and npm</id>
                         <goals>
                             <goal>install-node-and-npm</goal>
@@ -35,31 +35,31 @@
                         <configuration>
                             <nodeVersion>v10.10.0</nodeVersion>
                         </configuration>
-                    </execution>
+                    </execution> -->
                     <!-- Install all project dependencies -->
-                    <execution>
+                    <!-- <execution>
                         <id>npm install</id>
                         <goals>
                             <goal>npm</goal>
-                        </goals>
+                        </goals> -->
                         <!-- optional: default phase is "generate-resources" -->
-                        <phase>generate-resources</phase>
+                        <!-- <phase>generate-resources</phase> -->
                         <!-- Optional configuration which provides for running any npm command -->
-                        <configuration>
+                        <!-- <configuration>
                             <arguments>install</arguments>
                         </configuration>
-                    </execution>
+                    </execution> -->
                     <!-- Build and minify static files -->
-                    <execution>
+                    <!-- <execution>
                         <id>npm run build</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
                         <configuration>
                             <arguments>run build</arguments>
-            </configuration>
+                        </configuration>
                     </execution>
-                </executions>
+                </executions> -->
             </plugin>
         </plugins>
     </build>

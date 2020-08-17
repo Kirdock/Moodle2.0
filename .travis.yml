@@ -8,11 +8,13 @@ addons:
       - google-chrome-stable
 jdk:
   - openjdk8
-
+before_install: npm i -g npm@^3
+install:
+  - ./frontend npm install
+  - ./frontend npm run build
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - npm i -g npm@^3
   - sleep 3
 
 script: mvn clean install
