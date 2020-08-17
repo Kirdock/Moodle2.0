@@ -9,9 +9,10 @@ addons:
 jdk:
   - openjdk8
 node_js:
-  - 12.13.0
+  - 12.x
 before_install: npm i -g npm@^6
 install:
+  - node -v
   - cd ./frontend
   - npm install
   - npm run build
