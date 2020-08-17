@@ -10,15 +10,11 @@ jdk:
   - openjdk8
 node_js:
   - 12.x
-before_install: npm i -g npm@^6
-install:
-  - node -v
-  - cd ./frontend
-  - npm install
-  - npm run build
+
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+  - npm i -g npm@^6
   - sleep 3
 
 script: mvn clean install
