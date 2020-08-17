@@ -49,18 +49,6 @@
                             <arguments>install</arguments>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>npm -v</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <!-- optional: default phase is "generate-resources" -->
-                        <!-- <phase>generate-resources</phase> -->
-                        <!-- Optional configuration which provides for running any npm command -->
-                        <configuration>
-                            <arguments>-v</arguments>
-                        </configuration>
-                    </execution>
                     <!-- Build and minify static files -->
                     <execution>
                         <id>npm run build</id>

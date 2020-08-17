@@ -1,19 +1,15 @@
 sudo: required
 language: java
 addons:
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
+  chrome: stable
 jdk:
   - openjdk8
-node_js:
-  - 12.x
+
+services:
+  - xvfb
 
 before_script:
   - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
   - npm i -g npm@^6
   - sleep 3
 
