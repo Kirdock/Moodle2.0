@@ -864,12 +864,21 @@ export default {
                     appendToast: true
                 });
             }
-            catch{
-                this.$bvToast.toast(this.$t('course.error.save'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
+            catch(error){
+                if(error.response.data.errorResponseCode === 474){
+                    this.$bvToast.toast(this.$t('course.error.duplicate'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
+                else{
+                    this.$bvToast.toast(this.$t('course.error.save'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
             }
             finally{
                 this.loading.updateCourse = false;
@@ -912,12 +921,21 @@ export default {
                     appendToast: true
                 });
             }
-            catch{
-                this.$bvToast.toast(this.$t('course.error.copy'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
+            catch(error){
+                if(error.response.data.errorResponseCode === 475){
+                    this.$bvToast.toast(this.$t('course.error.duplicate'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
+                else{
+                    this.$bvToast.toast(this.$t('course.error.copy'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
             }
             finally{
                 this.loading.copyCourse = false;
