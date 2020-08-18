@@ -1,5 +1,35 @@
+const Path = require('path');
 const courseTest = require('./modifyCourse.js');
 const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid.js');
+const testExamplesRight = require('./testFiles/testExamplesRight.js');
+
+
+function exampleExists(self, browser, name, create){
+    const page = browser.page.exerciseSheetManagement();
+
+    browser.perform(function(done){
+        page.getExample(browser, name, function(result){
+            if(result.value && result.value.ELEMENT){
+                if(!create){
+                    browser.log('Example exist. Example will now be deleted')
+                    self['delete example'](browser, name);
+                }
+                done();
+            }
+            else{
+                if(create){
+                    browser.log('Example does not exist. Example will now be created')
+                    self['create example'](browser, name)
+                }
+                done();
+            }
+        })
+    });
+}
+
+function getExample(name){
+    return testExamplesRight.find(example => example.name === name);
+}
 
 module.exports = {
     before: browser => {
@@ -12,9 +42,8 @@ module.exports = {
         const page = browser.page.exerciseSheetManagement();
         const information = page.section.information;
         // information.clearValue('@issueDate');
-        information.clearDate('@issueDate');
-        information.setValue('@name', 'asdlfkj');
-        page.pause(10000)
+        // information.clearDate('@issueDate');
+        // information.setValue('@name', 'asdlfkj');
     },
     'modify information invalid': browser =>{
         const page = browser.page.exerciseSheetManagement();
@@ -50,6 +79,97 @@ module.exports = {
             information
                 .submit()
                 .assert.not.toastPresent();
+        }
+    },
+    'create example': function(browser, name){
+        const page = browser.page.exerciseSheetManagement();
+        const self = this;
+        const examples = name ? [getExample(name)] : testExamplesRight;
+        const exampleSection = page.section.example;
+
+        for(const example of examples){
+            exampleExists(self, browser, example.name, false);
+
+            browser.perform(function(done){
+                page.newExample(browser, next)
+
+                function next(index){
+                    page
+                        .clearValue2(exampleSection.name(index))
+                        .clearValue(exampleSection.description(index)) // clear part 1
+                        .setValue(exampleSection.description(index), ` ${browser.Keys.BACK_SPACE}`) //clear part 2
+                        .clearValue2(exampleSection.weighting(index))
+                        .clearValue2(exampleSection.points(index))
+
+                        .setValue(exampleSection.name(index), example.name)
+                        .setValue(exampleSection.description(index), example.description)
+                    if(example.subExamples.length === 0){
+                        page.setValue(exampleSection.weighting(index), example.weighting)
+                            .setValue(exampleSection.points(index), example.points)
+                            .setCheckbox(exampleSection.submitFile(index), example.submitFile)
+                            .setCheckbox(exampleSection.mandatory(index), example.mandatory)
+                        if(example.validator){
+                            exampleSection.validatorUpload(index, Path.resolve(`${__dirname}/testFiles/${'validatorRight'}.jar`));
+                            page.assert.successPresent();
+                            page.closeToast();
+                            page.assert.containsText(exampleSection.validatorName(index),'validatorRight.jar')
+                            for(const fileType of example.fileTypes){
+                                page.setMultiSelect(exampleSection.fileTypes(index), undefined, fileType)
+                            }
+                        }
+                    }
+                    else{
+                        exampleSection.newSubExample(index);
+                    }
+                    
+                    exampleSection.save(index);
+                    page.assert.successPresent();
+                    page.closeToast();
+                    for(let i = 0; i < example.subExamples.length; i++){
+                        if(i === 0){
+                            exampleSection.selectLastSubExample(index);
+                        }
+                        else {
+                            exampleSection.newSubExampleAndSelect(index);
+                        }
+                        page
+                            .clearValue2(exampleSection.name(index))
+                            .clearValue(exampleSection.description(index)) // clear part 1
+                            .setValue(exampleSection.description(index), ` ${browser.Keys.BACK_SPACE}`) //clear part 2
+                            .clearValue2(exampleSection.weighting(index))
+                            .clearValue2(exampleSection.points(index))
+
+                            .setValue(exampleSection.name(index), example.subExamples[i].name)
+                            .setValue(exampleSection.description(index), example.subExamples[i].description)
+                            .setValue(exampleSection.weighting(index), example.subExamples[i].weighting)
+                            .setValue(exampleSection.points(index), example.subExamples[i].points)
+                            .setCheckbox(exampleSection.submitFile(index), example.subExamples[i].submitFile)
+                            .setCheckbox(exampleSection.mandatory(index), example.subExamples[i].mandatory)
+                        exampleSection.save(index);
+                        page.assert.successPresent();
+                        page.closeToast();
+                        exampleSection.selectParent(index);
+                    }
+                    done();
+                }
+            })
+        }
+    },
+    'delete example': function(browser, name){
+        const page = browser.page.exerciseSheetManagement();
+        const exampleSection = page.section.example;
+        const deleteModal = page.section.deleteModal;
+        const self = this;
+        name = name || testExamplesRight[0].name;
+        
+        exampleExists(self, browser, name, true);
+        page.selectExample(browser, name, next);
+
+        function next(index){
+            exampleSection.showDeleteModal(index);
+            deleteModal.submit();
+            page.assert.successPresent();
+            page.closeToast();
         }
     }
 }

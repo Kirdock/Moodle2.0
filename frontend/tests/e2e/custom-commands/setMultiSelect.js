@@ -19,6 +19,9 @@ module.exports = class {
                         self.api.click(`${selector} .multiselect__element:nth-child(${index+1})>span`)
                     }
                 }
+                self.api.moveTo(res.value.ELEMENT, -1, -1, function() { //close multiselect
+                    self.api.mouseButtonClick(0);
+                });
             })
         });
     }

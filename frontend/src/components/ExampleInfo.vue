@@ -10,21 +10,21 @@
                     <label :for="`eInfoDescription${_uid}`" class="control-label" :class="value.subExamples.length === 0 ? 'required' : ''">{{ $t('description') }}</label>
                     <editor :id="`eInfoDescription${_uid}`" :ref="`editor${_uid}`" v-model="value.description" :required="value.subExamples.length === 0" ></editor>
                 </div>
-                <div v-if="value.subExamples.length === 0">
+                <template v-if="value.subExamples.length === 0">
                     <div class="form-group">
                         <label :for="`eInfoWeighting${_uid}`" class="control-label required">{{ $t('weighting') }}</label>
                         <div class="col-md-4" style="padding-left: 0px">
-                            <i-input :id="`eInfoWeighting${_uid}`" min="1" class="form-control"  v-model="value.weighting" required> </i-input>
+                            <i-input :id="`eInfoWeighting${_uid}`" min="1" class="eInfoWeighting form-control"  v-model="value.weighting" required> </i-input>
                         </div>
                     </div>
                     <div class="form-group">
                         <label :for="`eInfoPoints${_uid}`" class="control-label required">{{ $t('points') }}</label>
                         <div class="col-md-4" style="padding-left: 0px">
-                            <i-input :id="`eInfoPoints${_uid}`" class="form-control" min="0"  v-model="value.points" required> </i-input>
+                            <i-input :id="`eInfoPoints${_uid}`" class="eInfoPoints form-control" min="0"  v-model="value.points" required> </i-input>
                         </div>
                     </div>
                     <div class="form-check" style="margin-top: 20px">
-                        <input :id="`eInfoSubmitFile${_uid}`" type="checkbox" class="form-check-input" v-model="value.submitFile" @change="submitFile_changed()">
+                        <input :id="`eInfoSubmitFile${_uid}`" type="checkbox" class="eInfoSubmitFile form-check-input" v-model="value.submitFile" @change="submitFile_changed()">
                         <label :for="`eInfoSubmitFile${_uid}`" class="form-check-label" style="margin-right:15px">
                             {{$t('submitFile')}}
                         </label>
@@ -38,11 +38,11 @@
                                 <i-input class="form-control" :id="`uploadCount${_uid}`" v-model="value.uploadCount" min="0" required></i-input>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group validatorGroup">
                             <label class="control-label" :for="`validatorGroup${_uid}`">
                                 {{$t('validator.name')}}: {{value.validator}}
                             </label>
-                            <div class="form-inline validatorGroup" :id="`validatorGroup${_uid}`">
+                            <div class="form-inline" :id="`validatorGroup${_uid}`">
                                 <label class="btn btn-primary">
                                     <span class="fa fa-sync fa-spin" v-if="loading.validatorUpload"></span>
                                     <span class="fas fa-upload" v-else></span>
@@ -93,12 +93,12 @@
                         </div>
                     </template>
                     <div class="form-check" style="margin-top: 20px">
-                        <input :id="`eInfoMandatory${_uid}`" type="checkbox" class="form-check-input" v-model="value.mandatory">
+                        <input :id="`eInfoMandatory${_uid}`" type="checkbox" class="eInfoMandatory form-check-input" v-model="value.mandatory">
                         <label :for="`eInfoMandatory${_uid}`"   class="form-check-label" style="margin-right:15px">
                             {{$t('mandatory')}}
                         </label>
                     </div>
-                </div>
+                </template>
             </div>
             <div class="form-horizontal offset-md-2 col-md-5 subExamples" v-if="!isSubExample">
                 <h1 :id="`eInfoHeader${_uid}`">{{$t('subExamples.name')}}</h1>
@@ -257,7 +257,11 @@ export default {
                 this.value.supportedFileTypes = [];
                 this.setFileTypes();
             }
-            const example = this.buildExample(this.$t('subExample.name'), this.value.subExamples.length);
+            let count = this.value.subExamples.length || 1;
+            while(this.value.subExamples.some(example => example.name === `${this.$t('subExample.name')} ${count}`)){
+                count++;
+            }
+            const example = this.buildExample(this.$t('subExample.name'), count);
             try{
                 const response = await this.$store.dispatch('createExample', example);
                 example.id = response.data.id;

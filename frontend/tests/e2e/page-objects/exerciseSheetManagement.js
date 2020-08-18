@@ -1,6 +1,34 @@
+const modalCommands = require("../modalCommands")
 
 module.exports = {
-    commands: [],
+    commands: [{
+        getExample: function(browser, name, callback){
+            browser.element('xpath', `//ul[@class="nav nav-tabs"]/li[a[text()="${name}"]]`, callback)
+        },
+        newExample: function(browser, callback){
+            this.click('ul.nav.nav-tabs li:last-child').pause(1000, function(){
+                browser.elements('css selector', 'ul.nav.nav-tabs li', result => callback(result.value.length - 2))
+            })
+        },
+        selectExample: function(browser, name, done){
+            browser.perform(function(){
+                browser.elements('css selector', `ul.nav.nav-tabs li a`, function(result){
+                    for(let i = 1; i < result.value.length - 1; i++){
+                        browser.perform(function(done2){
+                            browser.elementIdText(result.value[i].ELEMENT,function(res){
+                                if(res.value === name){
+                                    browser.elementIdClick(result.value[i].ELEMENT,()=> browser.pause(1000, ()=>done(i)))
+                                    done2();
+                                }
+                                done2();
+                            })
+                        })
+                        
+                    }
+                })
+            })
+        }
+    }],
     elements: {
         newExampleButton: '#exerciseSheetTab .nav.nav-tabs li:last-child'
     },
@@ -46,23 +74,64 @@ module.exports = {
             selector: '#exerciseSheetTab .tab-content>div',
             commands: [{
                 tabContent: function(sortIndex){
-                    return `#exerciseSheetTab .tab-content>div:nth-child(${sortIndex + 2})`;
+                    return `#exerciseSheetTab .tab-content>div:nth-child(${sortIndex+1})`;
+                },
+                selectParent: function(sortIndex){
+                    return this.api.click(`${this.tabContent(sortIndex)}>div a`).pause(1000);
                 },
                 newSubExample: function(sortIndex){
-                    return this.click(`${this.tabContent(sortIndex)} .subExamples button`)
+                    return this.api.click(`${this.tabContent(sortIndex)} .subExamples button`)
+                        .pause(1000);
+                },
+                selectLastSubExample: function(sortIndex){
+                    return this.api.click(`${this.tabContent(sortIndex)} .subExamples tr:last-child a:nth-child(1)`);
+                },
+                newSubExampleAndSelect: function(sortIndex){
+                    return this.api.click(`${this.tabContent(sortIndex)} .subExamples button`)
+                        .pause(1000)
+                        .click(`${this.tabContent(sortIndex)} .subExamples tr:last-child a:nth-child(1)`)
+                        .pause(1000)
                 },
                 save: function(sortIndex){
-                    return this.click(`${this.tabContent(sortIndex)} button[type=submit]`)
+                    return this.api.click(`${this.tabContent(sortIndex)} button[type=submit]`)
                 },
-                delete: function(sortIndex){
-                    return this.click(`${this.tabContent(sortIndex)} button.btn.btn-danger`)
+                showDeleteModal: function(sortIndex){
+                    return this.api.click(`${this.tabContent(sortIndex)} button.btn.btn-danger`).pause(1000)
                 },
                 validatorUpload: function(sortIndex, path){
-                    return this.setValue(`${this.tabContent(sortIndex)} .validatorGroup input[type=file]`, path)
+                    return this.api.setValue(`${this.tabContent(sortIndex)} .validatorGroup input[type=file]`, path)
+                },
+                validatorName: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} .validatorGroup label:first-child`
+                },
+                name: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} input[type=text]`
+                },
+                description: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} .note-editable`
+                },
+                weighting: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} input.eInfoWeighting`
+                },
+                points: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} input.eInfoPoints`
+                },
+                submitFile: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} input.eInfoSubmitFile`
+                },
+                fileTypes: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} .multiselect`
+                },
+                mandatory: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} input.eInfoMandatory`
                 }
             }],
             elements: {
             }
+        },
+        deleteModal: {
+            selector: '#modal-delete-example',
+            commands: [modalCommands]
         }
     }
 }

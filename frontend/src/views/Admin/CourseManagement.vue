@@ -991,12 +991,8 @@ export default {
                     this.selectedCourse = {};
                     this.setCourseQuery();
                 }
-                let index = -1;
-                this.courses.forEach((course, $index) => {
-                    if(course.id === id){
-                        index = $index;
-                    }
-                });
+                const index = this.courses.findIndex(course => course.id === id);
+                
                 if(index !== -1){
                     this.courses.splice(index, 1);
                 }

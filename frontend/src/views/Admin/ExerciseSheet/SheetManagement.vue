@@ -222,7 +222,12 @@ export default {
         },
         async createExample(){
             this.loading.createExample = true;
-            const example = this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length, true);
+            let count = this.sheetInfo.examples.length || 1;
+            
+            while(this.sheetInfo.examples.some(example => example.name === `${this.$t('example.name')} ${count}`)){
+                count++;
+            }
+            const example = this.buildExample(this.$t('example.name'), count, true);
             try{
                 const response = await this.$store.dispatch('createExample', example);
                 example.id = response.data.id;
@@ -242,7 +247,7 @@ export default {
         },
         buildExample(name, order, isParent){
             return {
-                name: `${name} ${order+1}`,
+                name: `${name} ${order}`,
                 description: '',
                 parentId: isParent ? undefined : this.sheetInfo.examples[this.activeTab -1].id,
                 exerciseSheetId: this.sheetId,
@@ -251,7 +256,8 @@ export default {
                 subExamples: [],
                 order,
                 supportedFileTypes: [],
-                customFileTypes: []
+                customFileTypes: [],
+                submitFile: false
             }
         },
         async deleteExample(id, index){

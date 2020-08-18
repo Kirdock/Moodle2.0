@@ -65,14 +65,8 @@ export default {
             }
             catch(error){
                 const status = error.response.data.errorResponseCode;
-                let message;
-                if(status === 472){
-                    message = this.$t('semester.error.alreadyExists');
-                }
-                else{
-                    message = this.$t('semester.error.create');
-                }
-                this.$bvToast.toast(message, {
+                
+                this.$bvToast.toast(status === 472 ? this.$t('semester.error.alreadyExists') : this.$t('semester.error.create'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
