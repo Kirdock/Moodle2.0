@@ -1,8 +1,6 @@
 <template>
     <div>
-        <textarea :id="`summernote_${_uid}`">
-            {{value}}
-        </textarea>
+        <textarea :id="`summernote_${_uid}`" :value="value"></textarea>
     </div>
 </template>
 
@@ -49,7 +47,7 @@
             },
             forceUpdate(value){ //called from parent, if v-model changes
                 this.triggerByForceUpdate = true;
-                $(`#summernote_${this._uid}`).summernote('code', value);
+                $(`#summernote_${this._uid}`).summernote('code', value || '');
             }
         },
         watch:{

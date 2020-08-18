@@ -258,7 +258,7 @@
                         <div class="form-group col-md-6">
                             <label class="control-label" for="defaultDescription">{{$t('descriptionExerciseSheets')}}</label>
                             <div class="document-editor__editable-container">
-                                <editor :id="`defaultDescription`" v-model="selectedCourseTemplate"></editor>
+                                <editor ref="defaultDescription" :id="`defaultDescription`" v-model="selectedCourseTemplate"></editor>
                             </div>
                         </div>
                         <div class="form-group">
@@ -950,6 +950,9 @@ export default {
                     this.getSemesters(this.selectedCourse.semesterId);
                 }
                 this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
+                this.$nextTick(()=>{
+                    this.$refs.defaultDescription.forceUpdate(this.selectedCourseTemplate);
+                })
             }
             catch{
                 this.$bvToast.toast(this.$t('course.error.get'), {

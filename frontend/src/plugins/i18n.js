@@ -63,6 +63,7 @@ const messages = {
             }
         },
         create: 'Anlegen',
+        date: 'Datum',
         deadlineReached: 'Das Abgabeende wurde bereits überschritten',
         delete: 'Löschen',
         description: 'Beschreibung',
@@ -344,6 +345,7 @@ const messages = {
             }
         },
         create: 'Create',
+        date: 'Date',
         deadlineReached: 'Submission date is already reached',
         delete: 'Delete',
         description: 'Description',

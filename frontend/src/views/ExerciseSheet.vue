@@ -33,7 +33,7 @@
                     <th scope="col">{{$t('mandatory')}}</th>
                     <th scope="col">{{$t('weighting')}}</th>
                     <th scope="col">{{$t('points')}}</th>
-                    <th scope="col">{{$t('kreuzel.name')}}</th>
+                    <th scope="col" class="text-center">{{$t('kreuzel.name')}}</th>
                     <th scope="col" v-if="this.hasFileUpload">{{$t('attempts')}}</th>
                     <th scope="col">{{$t('actions')}}</th>
                 </thead>
@@ -54,7 +54,7 @@
                         <td :style="minimumRequired(sheetInfo.minPoints, points, pointsTotal)">
                             {{points}}/{{pointsTotal}}
                         </td>
-                        <td :style="minimumRequired(sheetInfo.minKreuzel, kreuzel, kreuzelTotal)">
+                        <td class="text-center" :style="minimumRequired(sheetInfo.minKreuzel, kreuzel, kreuzelTotal)">
                             {{kreuzel}}/{{kreuzelTotal}}
                         </td>
                         <td v-if="hasFileUpload"></td>
@@ -71,7 +71,7 @@
             </div>
         </form>
         <b-modal id="modal-kreuzelResult" :title="$t('kreuzel.name')" size="xl" hide-footer>
-            <kreuzel-list v-model="selectedKreuzelResult"></kreuzel-list>
+            <kreuzel-result v-model="selectedKreuzelResult"></kreuzel-result>
         </b-modal>
     </div>
 </template>
