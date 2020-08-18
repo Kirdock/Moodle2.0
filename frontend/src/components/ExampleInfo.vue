@@ -42,7 +42,7 @@
                             <label class="control-label" :for="`validatorGroup${_uid}`">
                                 {{$t('validator.name')}}: {{value.validator}}
                             </label>
-                            <div class="form-inline" :id="`validatorGroup${_uid}`">
+                            <div class="form-inline validatorGroup" :id="`validatorGroup${_uid}`">
                                 <label class="btn btn-primary">
                                     <span class="fa fa-sync fa-spin" v-if="loading.validatorUpload"></span>
                                     <span class="fas fa-upload" v-else></span>
@@ -100,7 +100,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-horizontal offset-md-2 col-md-5" v-if="!isSubExample">
+            <div class="form-horizontal offset-md-2 col-md-5 subExamples" v-if="!isSubExample">
                 <h1 :id="`eInfoHeader${_uid}`">{{$t('subExamples.name')}}</h1>
                 <button class="btn btn-primary" type="button" style="margin-top: 10px" @click="newSubExample()">
                     <span class="fa fa-sync fa-spin" v-if="loading.newSubExample"></span>

@@ -2,7 +2,7 @@ const Path = require('path');
 const admin = {
     matriculationNumber: '00000000'
 }
-const testUsers = require('./../testUsers.js');
+const testUsers = require('./testFiles/testUsers.js');
 const testUser = { //will be used for creating, deleting, editing
     username: 'TestStudent',
     surname: 'mySurname',
@@ -60,7 +60,7 @@ function userRightCreated(browser, user){
         }
         
         modalNew.cancel();
-        done();
+        modalNew.pause(1000, done)
     })
 }
 

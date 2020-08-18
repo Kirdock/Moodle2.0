@@ -288,11 +288,11 @@ module.exports = {
                     selector: '#modal-new-exerciseSheet input[type=number]',
                     index: 1
                 },
-                kreuzelType1: {
+                kreuzelType0: {
                     selector: '#modal-new-exerciseSheet input[type=radio]',
                     index: 0
                 },
-                kreuzelType2: {
+                kreuzelType1: {
                     selector: '#modal-new-exerciseSheet input[type=radio]',
                     index: 1
                 },

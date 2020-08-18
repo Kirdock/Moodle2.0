@@ -13,15 +13,21 @@ const testCourse = {
 const testExerciseSheet = {
     name: 'TestExerciseSheet',
     issueDate: '31-08-2021T23:55',
+    issueDateValue: '2021-08-31T23:55',
     submissionDate: '30-09-2021T23:50',
+    submissionDateValue: '2021-09-30T23:50',
     submissionDateFormat: '30.9.2021, 23:50:00',
     description: 'My first exercise sheet',
     minKreuzel: '50',
     minPoints: '40',
     kreuzelType: 0
 }
-const testUsers = require('./../testUsers.js');
+const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid.js');
+const testUsers = require('./testFiles/testUsers.js');
 const userTest = require('./modifyUsers.js');
+const exerciseSheetsTab = 2;
+const assignUsersTab = 1;
+const informationTab = 0;
 
 function deSelectAssignedUser(browser){
     const assignedUsers = browser.page.courseManagement().section.assignedUsers;
@@ -100,14 +106,14 @@ function exerciseSheetExists(self, browser, courseText, name, create){
 
     browser.perform(function (done){
         page.selectCourse(courseText);
-        page.selectTab(2);
+        page.selectTab(exerciseSheetsTab);
         const exerciseSheet = page.section.exerciseSheets;
         exerciseSheet.exerciseSheetPresent(browser, name, function(result){
             if (result.value && result.value.length !== 0) {
                 // Elements are present
                 if(!create){
-                    // browser.log('ExerciseSheet already available. ExerciseSheet will now be deleted')
-                    // self['delete exerciseSheet'](browser, courseText);
+                    browser.log('ExerciseSheet already available. ExerciseSheet will now be deleted')
+                    self['delete exerciseSheet'](browser, name);
                 }
                 done();
             } else {
@@ -190,16 +196,19 @@ module.exports = {
         ]
         for(const course of courses){
             page.showNewModal(); //have to open the modal again, because owner is not resetable (it can't be empty)
-            const {owner, ...keys} = course;
+            const {owner, description, ...keys} = course;
+
+            modal_new.clearValue('@description')
+                .setValue('@description', ` ${browser.Keys.BACK_SPACE}`)
+                .setValue('@description', description.value);
             for(const data in keys){
                 modal_new
                 .setValue(`@${data}`, course[data].value);
                 if(course[data].expected !== undefined){
                     modal_new.assert.value(`@${data}`,course[data].expected)
                 }
-                if(course[data].valid !== undefined){
-                    modal_new.assert.isValidInput(`@${data}`, 'valid', course[data].valid)
-                }
+                
+                modal_new.assert.isValidInput(`@${data}`, 'valid', course[data].valid)
             }
             if(owner.value !== undefined){
                 modal_new.setMultiSelect('@owner',0,owner.value)
@@ -254,7 +263,7 @@ module.exports = {
         const page = browser.page.courseManagement();
         const courseInfo = page.section.courseInfo;
         page.selectCourse(number);
-        page.selectTab(0);
+        page.selectTab(informationTab);
 
         const courseData = [
             {
@@ -288,9 +297,11 @@ module.exports = {
         for(const course of courseData){
             const {owner, description, ...data} = course;
 
-            courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value);
-            courseInfo.assert.isValidInput(`@ownerInput`, 'valid', owner.valid);
-            courseInfo.clearValue('@description')
+            courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value)
+                .assert.isValidInput(`@ownerInput`, 'valid', owner.valid)
+                .clearValue('@description')
+                .setValue('@description', ` ${browser.Keys.BACK_SPACE}`)
+                .setValue('@description', description.value);
             for(const key in data){
                 courseInfo.clearValue2(`@${key}`)
                     .setValue(`@${key}`, course[key].value)
@@ -345,15 +356,16 @@ module.exports = {
         const page = browser.page.courseManagement();
         const courseInfo = page.section.courseInfo;
         page.selectCourse(courseText);
-        page.selectTab(0);
+        page.selectTab(informationTab);
         
         for(const course of courseData){
             const {owner, description, ...data} = course;
 
-            courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value);
-            courseInfo.assert.isValidInput(`@ownerInput`, 'valid', owner.valid);
-            courseInfo.clearValue('@description')
-            courseInfo.setValue('@description', description.value)
+            courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value)
+                .assert.isValidInput(`@ownerInput`, 'valid', owner.valid)
+                .clearValue('@description')
+                .setValue('@description', ` ${browser.Keys.BACK_SPACE}`)
+                .setValue('@description', description.value);
             for(const key in data){
                 courseInfo.clearValue2(`@${key}`)
                     .setValue(`@${key}`, course[key].value)
@@ -413,7 +425,7 @@ module.exports = {
         courseExists(self, browser, courseText, true);
 
         page.selectCourse(courseText);
-        page.selectTab(1);
+        page.selectTab(assignUsersTab);
         deSelectAssignedUser(browser)
 
         page.expect.section('@assignedUsers').to.be.visible;
@@ -433,7 +445,7 @@ module.exports = {
 
         courseExists(self, browser, courseText, true);
         page.selectCourse(courseText);
-        page.selectTab(1);
+        page.selectTab(assignUsersTab);
         this['assign users csv'](browser);
         page.expect.section('@assignedUsers').to.be.visible;
         deSelectAssignedUser(browser);
@@ -458,8 +470,9 @@ module.exports = {
         exerciseSheetExists(self, browser, courseText, testExerciseSheet.name, false)
 
         page.selectCourse(courseText);
-        page.selectTab(2);
+        page.selectTab(exerciseSheetsTab);
         const newModal = page.section.exerciseSheetsNewModal;
+        const exerciseSheetPage = browser.page.exerciseSheetManagement().section.information;
 
         const exerciseSheets = [testExerciseSheet];
         for(const exerciseSheet of exerciseSheets){
@@ -470,61 +483,117 @@ module.exports = {
                 .setValue('@description', exerciseSheet.description)
                 .setValue('@minKreuzel', exerciseSheet.minKreuzel)
                 .setValue('@minPoints', exerciseSheet.minPoints)
-            if(exerciseSheet.kreuzelType === 0){
-                newModal.click('@kreuzelType1')
-            }
-            else{
-                newModal.click('@kreuzelType2')
-            }
-            newModal.submit();
+                .click(`@kreuzelType${exerciseSheet.kreuzelType}`)
+                .submit();
             page.assert.successPresent()
             page.closeToast();
             page.modalNewExerciseSheetNotPresent();
             exerciseSheetSection.exerciseSheetPresentStrict(exerciseSheet);
+            this['select exerciseSheet'](browser, exerciseSheet.name);
+            
+            exerciseSheetPage.assert.value('@name', exerciseSheet.name)
+                .assert.value('@issueDate', exerciseSheet.issueDateValue)
+                .assert.value('@submissionDate', exerciseSheet.submissionDateValue)
+                .assert.containsText('@description', exerciseSheet.description)
+                .assert.value('@minKreuzel', exerciseSheet.minKreuzel)
+                .assert.value('@minPoints', exerciseSheet.minPoints)
+                
+            if(exerciseSheet.kreuzelType === 0){
+                exerciseSheetPage.expect.element('@kreuzelType0').to.be.selected;
+                exerciseSheetPage.expect.element('@kreuzelType1').to.not.be.selected;
+            }
+            else{
+                exerciseSheetPage.expect.element('@kreuzelType1').to.be.selected;
+                exerciseSheetPage.expect.element('@kreuzelType0').to.not.be.selected;
+            }
+
+            page.navigate().pause(1000);
+            page.selectCourse(courseText);
+            page.selectTab(exerciseSheetsTab);
         }
 
     },
-    'delete exerciseSheet': function(browser){
+    'create exerciseSheet invalid': function(browser){
         const courseText = testCourse.number;
         const page = browser.page.courseManagement();
         const exerciseSheetSection = page.section.exerciseSheets;
         const self = this;
-        const exerciseSheets = [testExerciseSheet];
+        courseExists(self,browser, courseText, true);
+
+        page.selectCourse(courseText);
+        page.selectTab(exerciseSheetsTab);
+        const newModal = page.section.exerciseSheetsNewModal;
+
+        exerciseSheetSection.showNewModal();
+        for(const exerciseSheet of testExerciseSheetsInvalid){
+            newModal
+                .clearValue2('@name')
+                .clearDate('@issueDate')
+                .clearDate('@submissionDate')
+                .clearValue('@description') // clear part 1
+                .setValue('@description', ` ${browser.Keys.BACK_SPACE}`) //clear part 2 (custom clear for editor)
+                .clearValue2('@minKreuzel')
+                .clearValue2('@minPoints')
+                .setValue('@name', exerciseSheet.name.value)
+                .setValue('@issueDate', exerciseSheet.issueDate.value.replace('T', browser.Keys.RIGHT_ARROW))
+                .setValue('@submissionDate', exerciseSheet.submissionDate.value.replace('T', browser.Keys.RIGHT_ARROW))
+                .setValue('@description', exerciseSheet.description.value)
+                .setValue('@minKreuzel', exerciseSheet.minKreuzel.value)
+                .setValue('@minPoints', exerciseSheet.minPoints.value)
+                .click(`@kreuzelType${exerciseSheet.kreuzelType}`)
+
+            const {description, kreuzelType, ...keys} = exerciseSheet;
+            for(const key in keys){
+                newModal.assert.isValidInput(`@${key}`, 'valid', exerciseSheet[key].valid)
+            }
+            if(exerciseSheet.minKreuzel.expected !== undefined){
+                newModal.assert.value('@minKreuzel', exerciseSheet.minKreuzel.expected)
+            }
+            if(exerciseSheet.minPoints.expected !== undefined){
+                newModal.assert.value('@minPoints', exerciseSheet.minPoints.expected)
+            }
+            newModal
+                .submit()
+                .assert.not.toastPresent();
+        }
+    },
+    'delete exerciseSheet': function(browser, name){
+        const courseText = testCourse.number;
+        const page = browser.page.courseManagement();
+        const exerciseSheetSection = page.section.exerciseSheets;
+        const self = this;
+        name = name || testExerciseSheet.name;
         const deleteModal = page.section.exerciseSheetDeleteModal;
         exerciseSheetExists(self, browser, courseText, testExerciseSheet.name, true);
         
         page.selectCourse(courseText);
-        page.selectTab(2);
-        for(const exerciseSheet of exerciseSheets){
-            browser.perform(done =>{
-                exerciseSheetSection.count(function(countBefore){
-                    exerciseSheetSection.showDeleteModal(exerciseSheet.name)
-                    deleteModal.submit();
-                    page.assert.successPresent();
-                    page.closeToast();
-                    page.modalDeleteExerciseSheetNotPresent();
+        page.selectTab(exerciseSheetsTab);
+        browser.perform(done =>{
+            exerciseSheetSection.count(function(countBefore){
+                exerciseSheetSection.showDeleteModal(name)
+                deleteModal.submit();
+                page.assert.successPresent();
+                page.closeToast();
+                page.modalDeleteExerciseSheetNotPresent();
 
-                    exerciseSheetSection.count(function(countAfter){
-                        if(countAfter + 1 === countBefore){
-                            done();
-                        }
-                        else{
-                            throw new Error('Delete exerciseSheet did not work');
-                        }
-                    });
-                })
+                exerciseSheetSection.count(function(countAfter){
+                    if(countAfter + 1 === countBefore){
+                        done();
+                    }
+                    else{
+                        throw new Error('Delete exerciseSheet did not work');
+                    }
+                });
             })
-        }
-
-        
+        })
     },
-    'select exerciseSheet': function(browser){
+    'select exerciseSheet': function(browser, name){
         const courseText = testCourse.number;
-        const exerciseSheetName = testExerciseSheet.name;
+        const exerciseSheetName = name || testExerciseSheet.name;
         const page = browser.page.courseManagement();
         exerciseSheetExists(this, browser, courseText, exerciseSheetName, true);
         page.selectCourse(courseText);
-        page.selectTab(2);
+        page.selectTab(exerciseSheetsTab);
 
         const exerciseSheetSection = page.section.exerciseSheets;
         exerciseSheetSection.edit(exerciseSheetName);

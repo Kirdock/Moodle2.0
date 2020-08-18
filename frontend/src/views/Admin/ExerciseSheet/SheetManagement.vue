@@ -25,7 +25,7 @@
             <b-tabs class="mt-3" v-model="activeTab" id="exerciseSheetTab">
                 <b-tab :title="$t('information')" :class="'fixed'">
                     
-                    <div class="form-horizontal col-md-5 fixed">
+                    <div class="form-horizontal col-md-5 fixed" v-if="sheetInfo.includeThird !== undefined">
                         <form ref="exerciseSheet" @submit.prevent="updateInfo()">
                             <es-info v-model="sheetInfo"></es-info>
                             <div class="form-inline" style="margin-top: 10px">

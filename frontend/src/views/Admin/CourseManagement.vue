@@ -202,7 +202,7 @@
             <b-tab :title="$t('exerciseSheets.name')" id="exerciseSheets">
                 <div class="form-horizontal">
                     <div class="form-group col-md-6">
-                        <button class="btn btn-primary" v-b-modal="'modal-new-exerciseSheet'">
+                        <button class="btn btn-primary" @click="setNewExerciseSheet()">
                             <span class="fa fa-sync fa-spin"  v-if="loading.createExerciseSheet"></span>
                             <span class="fa fa-plus" v-else></span>
                             {{$t('new')}}
@@ -451,7 +451,7 @@ export default {
                 attendanceList: false,
                 presentations: false
             },
-            selectedCourseTemplate: undefined,
+            selectedCourseTemplate: '',
             selectedDeleteExerciseSheet: undefined,
             presentedUser: undefined,
             presentedExample: {},
@@ -467,13 +467,12 @@ export default {
     },
     async created(){
         this.showExerciseSheet = this.$t('all');
-        this.resetExerciseSheet();
         if(this.$store.getters.userInfo.isAdmin){
             await this.getUsers();
         }
         if(this.$route.query.courseId){
             this.selectedCourseId = this.$route.query.courseId;
-            this.getCourse(this.selectedCourseId, true);
+            await this.getCourse(this.selectedCourseId, true);
         }
         else{
             this.getSemesters();
@@ -533,6 +532,10 @@ export default {
         }
     },
     methods:{
+        setNewExerciseSheet(){
+            this.resetExerciseSheet();
+            this.$bvModal.show('modal-new-exerciseSheet')
+        },
         setNewCourse(){
             for(const key in this.courseInfo_create){ //this.courseInfo_create = {} kills reference
                 this.courseInfo_create[key] = undefined;
@@ -698,7 +701,8 @@ export default {
             this.exerciseSheet_create = {
                 submissionDate: dateManagement.midnightDateTime(),
                 issueDate: dateManagement.currentDateTime(),
-                includeThird: false
+                description: this.selectedCourse.descriptionTemplate,
+                includeThird: false,
             }
         },
         async createExerciseSheet(modal){
@@ -709,14 +713,13 @@ export default {
             else{
                 this.loading.createExerciseSheet = true;
                 this.exerciseSheet_create.courseId = this.selectedCourseId;
-                this.exerciseSheet_create.description = this.selectedCourse.descriptionTemplate;
+                
                 try{
                     await this.$store.dispatch('createExerciseSheet', this.exerciseSheet_create);
                     this.$bvModal.hide('modal-new-exerciseSheet');
                     if(this.exerciseSheet_create.courseId === this.selectedCourseId){
                         this.getExerciseSheets(this.selectedCourseId);
                     }
-                    this.resetExerciseSheet();
                     this.$bvToast.toast(this.$t('exerciseSheet.created'), {
                         title: this.$t('success'),
                         variant: 'success',
@@ -949,7 +952,7 @@ export default {
                 if(this.semesters.length === 0){
                     this.getSemesters(this.selectedCourse.semesterId);
                 }
-                this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
+                this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate || ''; //no reference; update on save
                 this.$nextTick(()=>{
                     this.$refs.defaultDescription.forceUpdate(this.selectedCourseTemplate);
                 })
