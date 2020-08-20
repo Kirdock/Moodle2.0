@@ -10,6 +10,7 @@ import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
+import com.aau.moodle20.payload.response.ViolationHistoryResponse;
 import com.aau.moodle20.payload.response.ViolationResponse;
 import com.aau.moodle20.validation.ValidatorLoader;
 import com.aau.moodle20.entity.ViolationEntity;
@@ -87,7 +88,7 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public List<ViolationResponse> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
+    public ViolationHistoryResponse setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
         if (file.isEmpty())
             throw new ServiceException("Error: given file is empty");
 
@@ -135,7 +136,7 @@ public class FinishesExampleService extends AbstractService{
 
         violationHistoryRepository.save(violationHistory);
 
-        return violations.stream().map(this::createViolationResponse).collect(Collectors.toList());
+        return violationHistory.createViolationHistoryResponse();
     }
 
 
