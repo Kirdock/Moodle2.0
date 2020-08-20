@@ -9,6 +9,7 @@ import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
+import com.aau.moodle20.payload.response.RegisterMultipleUserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,9 +74,10 @@ public class UserCourseService extends AbstractService {
     }
 
     @Transactional
-    public void assignFile(MultipartFile file, Long courseId) throws ServiceException {
+    public RegisterMultipleUserResponse assignFile(MultipartFile file, Long courseId) throws ServiceException {
         Course course = readCourse(courseId);
-        List<User> allGivenUsers = userDetailsService.registerMissingUsersFromFile(file);
+        RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
+        List<User> allGivenUsers = userDetailsService.registerMissingUsersFromFile(file,registerMultipleUserResponse);
         List<UserInCourse> userInCourses = new ArrayList<>();
 
         for (User user : allGivenUsers) {
@@ -93,5 +95,7 @@ public class UserCourseService extends AbstractService {
             userInCourses.add(userInCourse);
         }
         userInCourseRepository.saveAll(userInCourses);
+
+        return registerMultipleUserResponse;
     }
 }

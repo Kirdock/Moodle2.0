@@ -9,6 +9,7 @@ import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
 import com.aau.moodle20.payload.request.UpdateUserRequest;
+import com.aau.moodle20.payload.response.FailedUserResponse;
 import com.aau.moodle20.payload.response.RegisterMultipleUserResponse;
 import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.security.jwt.JwtUtils;
@@ -136,22 +137,12 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
                 String encodedPassword = encoder.encode(password);
                 user.setPassword(encodedPassword);
                 user.setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
-                passwords.put(user.getMatriculationNumber(),password);
+                passwords.put(user.getMatriculationNumber(), password);
             }
 
             if (isAdmin != null)
                 user.setAdmin(isAdmin);
-
-            Matcher matcher = matriculationPattern.matcher(user.getMatriculationNumber());
-
-            boolean isValid = matcher.matches() &&
-                    (!userRepository.existsByMatriculationNumber(user.getMatriculationNumber()) &&
-                            !userRepository.existsByUsername(user.getUsername()));
-            if (!isValid) {
-                registerMultipleUserResponse.getFailedUsers().add(lineNumber);
-            } else
-                usersToBeSaves.add(user);
-
+            validateUserEntry(user,registerMultipleUserResponse,usersToBeSaves,lineNumber);
             lineNumber++;
         }
         userRepository.saveAll(usersToBeSaves);
@@ -164,6 +155,39 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         registerMultipleUserResponse.getRegisteredUsers().addAll(registeredUsers);
 
         return registerMultipleUserResponse;
+    }
+
+    protected void validateUserEntry(User user, RegisterMultipleUserResponse registerMultipleUserResponse, List<User> userToBeSaved, Integer lineNumber) {
+        Matcher matcher = matriculationPattern.matcher(user.getMatriculationNumber());
+
+        boolean alreadyExists = userRepository.existsByMatriculationNumber(user.getMatriculationNumber()) &&
+                userRepository.existsByUsername(user.getUsername());
+        boolean userNameAlreadyExists = !userRepository.existsByMatriculationNumber(user.getMatriculationNumber()) &&
+                userRepository.existsByUsername(user.getUsername());
+        boolean matriculationNumberAlreadyExists = userRepository.existsByMatriculationNumber(user.getMatriculationNumber()) &&
+                !userRepository.existsByUsername(user.getUsername());
+
+        if (!matcher.matches()) {
+            FailedUserResponse failedUserResponse = new FailedUserResponse();
+            failedUserResponse.setMessage("Error: Wrong format for matriculationNumber");
+            failedUserResponse.setLineNumber(lineNumber);
+            failedUserResponse.setStatusCode(ApiErrorResponseCodes.REGISTER_USERS_WRONG_MATRICULATION_NUMBER_FORMAT);
+            registerMultipleUserResponse.getFailedUsers().add(failedUserResponse);
+
+        } else if (userNameAlreadyExists) {
+            FailedUserResponse failedUserResponse = new FailedUserResponse();
+            failedUserResponse.setMessage("Error: Username already exists");
+            failedUserResponse.setLineNumber(lineNumber);
+            failedUserResponse.setStatusCode(ApiErrorResponseCodes.REGISTER_USERS_USERNAME_ALREADY_EXISTS);
+            registerMultipleUserResponse.getFailedUsers().add(failedUserResponse);
+        } else if (matriculationNumberAlreadyExists) {
+            FailedUserResponse failedUserResponse = new FailedUserResponse();
+            failedUserResponse.setMessage("Error: Matriculation number already exists");
+            failedUserResponse.setLineNumber(lineNumber);
+            failedUserResponse.setStatusCode(ApiErrorResponseCodes.REGISTER_USERS_MATRICULATION_ALREADY_EXISTS);
+            registerMultipleUserResponse.getFailedUsers().add(failedUserResponse);
+        } else if(!alreadyExists)
+            userToBeSaved.add(user);
     }
 
     protected List<User> getUserObjectsFromFile(MultipartFile file) {
@@ -186,9 +210,11 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
         return users;
     }
 
-    public List<User> registerMissingUsersFromFile(MultipartFile file)
+    public List<User> registerMissingUsersFromFile(MultipartFile file, RegisterMultipleUserResponse registerMultipleUserResponse)
     {
-        registerUsers(file,Boolean.FALSE);
+        RegisterMultipleUserResponse registerMultipleUserResponse2 = registerUsers(file,Boolean.FALSE);
+        registerMultipleUserResponse.setFailedUsers(registerMultipleUserResponse2.getFailedUsers());
+        registerMultipleUserResponse.setRegisteredUsers(registerMultipleUserResponse2.getRegisteredUsers());
 
         userRepository.flush();
         List<User> users = getUserObjectsFromFile(file);

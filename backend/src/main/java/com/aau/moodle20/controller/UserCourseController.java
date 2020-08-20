@@ -5,6 +5,7 @@ import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
+import com.aau.moodle20.payload.response.RegisterMultipleUserResponse;
 import com.aau.moodle20.services.PdfService;
 import com.aau.moodle20.services.UserCourseService;
 import org.springframework.core.io.InputStreamResource;
@@ -61,8 +62,7 @@ public class UserCourseController {
     }
 
     @PostMapping(value = "/course/assignFile")
-    public ResponseEntity<?> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  throws ServiceException {
-        userCourseService.assignFile(file,courseId);
-        return ResponseEntity.ok("Users successfully assigned to course");
+    public ResponseEntity<RegisterMultipleUserResponse> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  throws ServiceException {
+        return ResponseEntity.ok(userCourseService.assignFile(file,courseId));
     }
 }

@@ -8,14 +8,14 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RegisterMultipleUserResponse {
 
-    List<Integer> failedUsers  = new ArrayList<>();
+    List<FailedUserResponse> failedUsers  = new ArrayList<>();
     List<UserResponseObject> registeredUsers = new ArrayList<>();
 
-    public List<Integer> getFailedUsers() {
+    public List<FailedUserResponse> getFailedUsers() {
         return failedUsers;
     }
 
-    public void setFailedUsers(List<Integer> failedUsers) {
+    public void setFailedUsers(List<FailedUserResponse> failedUsers) {
         this.failedUsers = failedUsers;
     }
 
