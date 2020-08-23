@@ -1,5 +1,5 @@
 const modalCommands = require("../modalCommands")
-
+//div[@id="exerciseSheetTab"]/div[@class="tab-content"]/div[count(//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="Beispiel 1"]]/preceding-sibling::*)+1]
 module.exports = {
     commands: [{
         getExample: function(browser, name, callback){

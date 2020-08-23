@@ -67,7 +67,7 @@
             </button>
         </template>
         <b-modal id="modal-kreuzelResult" :title="$t('kreuzel.name')" size="xl" hide-footer>
-            <kreuzel-list v-model="selectedKreuzelResult"></kreuzel-list>
+            <kreuzel-result v-model="selectedKreuzelResult"></kreuzel-result>
         </b-modal>
     </div>
 </template>

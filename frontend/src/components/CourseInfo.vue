@@ -28,16 +28,19 @@
             <label :for="`cInfoName${_uid}`" class="control-label required">{{ $t('name') }}</label>
             <input :id="`cInfoName${_uid}`" type="text" class="form-control" v-model="value.name" :disabled="!$store.getters.userInfo.isAdmin" required>
         </div>
-        <div class="form-group">
-            <label :for="`cInfoMinKreuzel${_uid}`" class="control-label">{{$t('minRequireKreuzel')}}</label>
-            <div class="col-md-6" style="padding-left: 0px">
-                <i-input :id="`cInfoMinKreuzel${_uid}`" class="form-control" min="0" max="100" v-model="value.minKreuzel"> </i-input>
+        <label :for="`cInfoMinKreuzel${_uid}`" class="control-label">{{$t('minRequireKreuzel')}}</label>
+        <div class="col-md-4 input-group mb-3" style="padding-left: 0px">
+            <i-input :id="`cInfoMinKreuzel${_uid}`" class="form-control" min="0" max="100" v-model="value.minKreuzel"> </i-input>
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
             </div>
         </div>
-        <div class="form-group" >
-            <label :for="`cInfoMinPoints${_uid}`" class="control-label">{{$t('minRequirePoints')}}</label>
-            <div class="col-md-6" style="padding-left: 0px">
-                <i-input :id="`cInfoMinPoints${_uid}`" class="form-control" min="0" max="100" v-model="value.minPoints"> </i-input>
+        
+        <label :for="`cInfoMinPoints${_uid}`" class="control-label">{{$t('minRequirePoints')}}</label>    
+        <div class="col-md-4 input-group mb-3" style="padding-left: 0px">
+            <i-input :id="`cInfoMinPoints${_uid}`" class="form-control" min="0" max="100" v-model="value.minPoints"> </i-input>
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
             </div>
         </div>
         <div class="form-group">
