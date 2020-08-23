@@ -126,6 +126,10 @@ export const userManagement = {
                 message = i18n.t('user.error.matriculationNumberExists');
                 break;
 
+            case 481:
+                message = i18n.t('user.error.matriculationNumberWrongFormat');
+                break;
+
             case 482:
                 message = i18n.t('user.error.matriculationNumberExistsUsernameAvaliable');
                 break;

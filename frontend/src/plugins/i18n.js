@@ -246,6 +246,7 @@ const messages = {
                 get: 'Benutzer konnte nicht geladen werden',
                 matriculationNumberExists: 'Die Matrikelnummer ist bereits vergeben',
                 matriculationNumberExistsUsernameAvaliable: 'Benutzername ist frei, aber die Matrikelnummer ist bereits vergeben',
+                matriculationNumberWrongFormat: 'Ungültiges Format der Matrikelnummer. Bitte vergewissern Sie sich, dass es sich um eine achtstellige Nummer handelt',
                 save: 'Benutzer konnte nicht gespeichert werden',
                 usernameExists: 'Der Benutzername ist bereits vergeben',
                 usernameExistsMatAvailable: 'Die Matrikelnummer ist frei, aber der Benutzername ist bereits vergeben'
@@ -529,6 +530,7 @@ const messages = {
                 get: 'User could not be loaded',
                 matriculationNumberExists: 'Matriculation number is already taken',
                 matriculationNumberExistsUsernameAvaliable: 'Username is available but matriculation number is already taken',
+                matriculationNumberWrongFormat: 'Invalid matriculation number format. Please  Please make sure it is an eight-digit number',
                 save: 'User could not be saved',
                 usernameExists: 'Username is already taken',
                 usernameExistsMatAvailable: 'Matriculation number is available but username is already taken'
