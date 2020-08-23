@@ -114,6 +114,31 @@ export const userManagement = {
                                         || user.forename.indexOf(searchText) !== -1);
         }
         return result;
+    },
+    modifyMessage(status){
+        let message;
+        switch(status){
+            case 470:
+                message = i18n.t('user.error.usernameExists');
+                break;
+
+            case 471:
+                message = i18n.t('user.error.matriculationNumberExists');
+                break;
+
+            case 482:
+                message = i18n.t('user.error.matriculationNumberExistsUsernameAvaliable');
+                break;
+
+            case 483:
+                message = i18n.t('user.error.usernameExistsMatAvailable');
+                break;
+
+            default:
+                message = i18n.t('user.error.create');
+                break;
+        }
+        return message;
     }
 }
 

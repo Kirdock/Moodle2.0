@@ -407,6 +407,9 @@
         <b-modal id="modal-kreuzelList" :title="$t('kreuzel.name')" size="xl" hide-footer>
             <kreuzel-list :exerciseSheets="selectedCourse.exerciseSheets"></kreuzel-list>
         </b-modal>
+        <b-modal id="modal-user-creation-error" :title="$t('error')" hide-footer>
+            <user-creation-error v-model="failedUsers"></user-creation-error>
+        </b-modal>
     </div>
 </template>
 
@@ -418,12 +421,14 @@ import {userManagement, dateManagement, fileManagement} from '@/plugins/global';
 import Editor from '@/components/Editor.vue';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
+import UserCreationError from '@/components/UserCreationError.vue'
 
 export default {
     components: {
         'course-info': CourseInfo,
         'es-info': ExerciseSheetInfo,
         'kreuzel-list': KreuzelList,
+        'user-creation-error': UserCreationError,
         Editor,
         Multiselect
     },
@@ -462,7 +467,8 @@ export default {
             sortOrder:{
                 index: 0,
                 type: 0 //0 => DESC, 1 => ASC
-            }
+            },
+            failedUsers: []
         }
     },
     async created(){
@@ -678,13 +684,20 @@ export default {
             formData.append('id', this.selectedCourseId)
             this.$refs.file.value = '';
             try{
-                await this.$store.dispatch('assignCourseUsers', formData);
+                const response = await this.$store.dispatch('assignCourseUsers', formData);
+                this.failedUsers = response.data.failedUsers;
+                
                 this.getCourseUsers(this.selectedCourseId);
-                this.$bvToast.toast(this.$t('course.usersSaved'), {
-                    title: this.$t('success'),
-                    variant: 'success',
-                    appendToast: true
-                });
+                if(response.data.failedUsers.length === 0){
+                    this.$bvToast.toast(this.$t('course.usersSaved'), {
+                        title: this.$t('success'),
+                        variant: 'success',
+                        appendToast: true
+                    });
+                }
+                else{
+                    this.$bvModal.show('modal-user-creation-error');
+                }
             }
             catch{
                 this.$bvToast.toast(this.$t('course.error.usersSave'), {

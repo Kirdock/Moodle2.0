@@ -195,6 +195,7 @@ const messages = {
         requirements: 'Anforderungen',
         result: 'Ergebnis',
         role: 'Rolle',
+        row: 'Zeile',
         save: 'Speichern',
         search: 'Suche',
         searchOrAddFileType: 'Suchen oder Dateityp hinzufügen',
@@ -244,11 +245,10 @@ const messages = {
                 delete: 'Benutzer konnte nicht gelöscht werden',
                 get: 'Benutzer konnte nicht geladen werden',
                 matriculationNumberExists: 'Die Matrikelnummer ist bereits vergeben',
+                matriculationNumberExistsUsernameAvaliable: 'Benutzername ist frei, aber die Matrikelnummer ist bereits vergeben',
                 save: 'Benutzer konnte nicht gespeichert werden',
-                usernameExists: 'Der Benutzername ist bereits vergeben'
-            },
-            warning: {
-                create: 'Folgende Zeilen konnten aufgrund fehlerhafter Daten nicht angelegt werden:'
+                usernameExists: 'Der Benutzername ist bereits vergeben',
+                usernameExistsMatAvailable: 'Die Matrikelnummer ist frei, aber der Benutzername ist bereits vergeben'
             },
             question: {
                 delete: 'Wollen Sie den Benutzer wirklich löschen?'
@@ -478,6 +478,7 @@ const messages = {
         requirements: 'Requirements',
         result: 'Result',
         role: 'Role',
+        row: 'Row',
         save: 'Save',
         search: 'Search',
         searchOrAddFileType: 'Search or add a file type',
@@ -527,11 +528,10 @@ const messages = {
                 delete: 'User could not be deleted',
                 get: 'User could not be loaded',
                 matriculationNumberExists: 'Matriculation number is already taken',
+                matriculationNumberExistsUsernameAvaliable: 'Username is available but matriculation number is already taken',
                 save: 'User could not be saved',
-                usernameExists: 'Username is already taken'
-            },
-            warning: {
-                create: 'The following lines could not be created due to incorrect data:'
+                usernameExists: 'Username is already taken',
+                usernameExistsMatAvailable: 'Matriculation number is available but username is already taken'
             },
             question: {
                 delete: 'Do you really want to delete this user?',
