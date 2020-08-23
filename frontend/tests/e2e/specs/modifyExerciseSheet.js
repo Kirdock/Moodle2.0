@@ -4,6 +4,19 @@ const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid
 const testExamplesRight = require('./testFiles/testExamplesRight.js');
 const testExamplesInvalid = require('./testFiles/testExamplesInvalid.js');
 
+const testExerciseSheet = {
+    name: 'TestExerciseSheet',
+    issueDate: '31-08-2021T23:55',
+    issueDateValue: '2021-08-31T23:55',
+    submissionDate: '30-09-2021T23:50',
+    submissionDateValue: '2021-09-30T23:50',
+    submissionDateFormat: '30.9.2021, 23:50:00',
+    description: 'My first exercise sheet',
+    minKreuzel: '50',
+    minPoints: '40',
+    kreuzelType: 0
+}
+
 
 function exampleExists(self, browser, example, create){
     const page = browser.page.exerciseSheetManagement();
@@ -110,9 +123,43 @@ module.exports = {
     'modify information': browser => {
         const page = browser.page.exerciseSheetManagement();
         const information = page.section.information;
-        // information.clearValue('@issueDate');
-        // information.clearDate('@issueDate');
-        // information.setValue('@name', 'asdlfkj');
+        const exerciseSheets = [
+            {
+                name: 'Modified Exercise Sheet',
+                issueDate: '30-06-2022T23:55',
+                issueDateValue: '2022-06-30T23:55',
+                submissionDate: '30-11-2022T23:51',
+                submissionDateValue: '2022-11-30T23:51',
+                submissionDateFormat: '30.11.2022, 23:51:00',
+                description: 'My modified exercise sheet',
+                minKreuzel: '100',
+                minPoints: '30',
+                kreuzelType: 1
+            },
+            testExerciseSheet //to maintain the right exercisesheet name, just set and save it after modification
+        ]
+        for(const exerciseSheet of exerciseSheets){
+            information
+                .clearValue2('@name')
+                .clearDate('@issueDate')
+                .clearDate('@submissionDate')
+                .clearValue('@description') // clear part 1
+                .setValue('@description', ` ${browser.Keys.BACK_SPACE}`) //clear part 2 (custom clear for editor)
+                .clearValue2('@minKreuzel')
+                .clearValue2('@minPoints')
+
+                .setValue('@name', exerciseSheet.name)
+                .setValue('@issueDate', exerciseSheet.issueDate.replace('T', browser.Keys.RIGHT_ARROW))
+                .setValue('@submissionDate', exerciseSheet.submissionDate.replace('T', browser.Keys.RIGHT_ARROW))
+                .setValue('@description', exerciseSheet.description)
+                .setValue('@minKreuzel', exerciseSheet.minKreuzel)
+                .setValue('@minPoints', exerciseSheet.minPoints)
+                .click(`@kreuzelType${exerciseSheet.kreuzelType}`)
+
+                .submit()
+                .assert.successPresent()
+                .closeToast();
+        }
     },
     'modify information invalid': browser =>{
         const page = browser.page.exerciseSheetManagement();

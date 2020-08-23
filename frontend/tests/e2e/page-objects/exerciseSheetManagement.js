@@ -41,31 +41,31 @@ module.exports = {
                 }
             }],
             elements: {
-                submitButton: '#exerciseSheetTab .tab-content div:first-child button.btn.btn-primary',
-                name: '#exerciseSheetTab .tab-content div:first-child input[type=text]',
+                submitButton: '#exerciseSheetTab .tab-content>div:first-child button.btn.btn-primary',
+                name: '#exerciseSheetTab .tab-content>div:first-child input[type=text]',
                 issueDate: {
-                    selector: '#exerciseSheetTab .tab-content div:first-child input[type=datetime-local]',
+                    selector: '#exerciseSheetTab .tab-content>div:first-child input[type=datetime-local]',
                     index: 0
                 },
                 submissionDate: {
-                    selector: '#exerciseSheetTab .tab-content div:first-child input[type=datetime-local]',
+                    selector: '#exerciseSheetTab .tab-content>div:first-child input[type=datetime-local]',
                     index: 1
                 },
-                description: '#exerciseSheetTab .tab-content div:first-child .note-editable',
+                description: '#exerciseSheetTab .tab-content>div:first-child .note-editable',
                 minKreuzel: {
-                    selector: '#exerciseSheetTab .tab-content div:first-child input[type=number]',
+                    selector: '#exerciseSheetTab .tab-content>div:first-child input[type=number]',
                     index: 0
                 },
                 minPoints: {
-                    selector: '#exerciseSheetTab .tab-content div:first-child input[type=number]',
+                    selector: '#exerciseSheetTab .tab-content>div:first-child input[type=number]',
                     index: 1
                 },
                 kreuzelType0: {
-                    selector: '#exerciseSheetTab .tab-content div:first-child input[type=radio]',
+                    selector: '#exerciseSheetTab .tab-content>div:first-child input[type=radio]',
                     index: 0
                 },
                 kreuzelType1: {
-                    selector: '#exerciseSheetTab .tab-content div:first-child input[type=radio]',
+                    selector: '#exerciseSheetTab .tab-content>div:first-child input[type=radio]',
                     index: 1
                 }
             }
