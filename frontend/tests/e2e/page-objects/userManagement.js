@@ -82,7 +82,11 @@ module.exports = {
     sections: {
         creation: {
             selector: '.form-horizontal .form-inline',
-        
+            commands: [{
+                closeUserErrorModal: function(){
+                    return this.click('#modal-user-creation-error .modal-header button.close').pause(1000)
+                }
+            }],
             elements: {
                 newButton: {
                     selector: 'button',
@@ -90,6 +94,7 @@ module.exports = {
                 },
                 uploadButton: 'input[type="file"]',
                 isAdmin: 'input[type="checkbox"]',
+                userErrorModal: '#modal-user-creation-error'
             },
         },
         modal_delete: {

@@ -13,6 +13,13 @@ module.exports = [
     {
         name: 'My Example Nr. 2',
         description: 'My Example 2 description',
+        forceEnterInformation: true,
+        weighting: 0,
+        points: '',
+        submitFile: true,
+        fileTypes: [],
+        validator: true,
+        mandatory: false,
         subExamples: [
             {
                 name: 'My SubExample Nr. 1',

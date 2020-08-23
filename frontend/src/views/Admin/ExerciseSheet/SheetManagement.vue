@@ -222,7 +222,7 @@ export default {
         },
         async createExample(){
             this.loading.createExample = true;
-            let count = this.sheetInfo.examples.length || 1;
+            let count = this.sheetInfo.examples.length + 1;
             
             while(this.sheetInfo.examples.some(example => example.name === `${this.$t('example.name')} ${count}`)){
                 count++;
@@ -233,6 +233,9 @@ export default {
                 example.id = response.data.id;
                 this.sheetInfo.examples.push(example);
                 this.setActiveTab(this.sheetInfo.examples.length);
+                this.$nextTick(()=>{
+                    this.setSelectedExample(undefined, {example, index: this.sheetInfo.examples.length - 1})
+                })
             }
             catch{
                 this.$bvToast.toast(this.$t('example.error.create'), {

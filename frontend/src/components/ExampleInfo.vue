@@ -29,7 +29,7 @@
                             {{$t('submitFile')}}
                         </label>
                     </div>
-                    <template v-if="value.submitFile">
+                    <div v-if="value.submitFile" class="validatorContainer">
                         <div class="form-group">
                             <label class="control-label required" :for="`uploadCount${_uid}`">
                                 {{$t('uploadLimit')}}
@@ -91,7 +91,7 @@
                                         >
                             </multiselect>
                         </div>
-                    </template>
+                    </div>
                     <div class="form-check" style="margin-top: 20px">
                         <input :id="`eInfoMandatory${_uid}`" type="checkbox" class="eInfoMandatory form-check-input" v-model="value.mandatory">
                         <label :for="`eInfoMandatory${_uid}`"   class="form-check-label" style="margin-right:15px">
@@ -257,7 +257,7 @@ export default {
                 this.value.supportedFileTypes = [];
                 this.setFileTypes();
             }
-            let count = this.value.subExamples.length || 1;
+            let count = this.value.subExamples.length + 1;
             while(this.value.subExamples.some(example => example.name === `${this.$t('subExample.name')} ${count}`)){
                 count++;
             }

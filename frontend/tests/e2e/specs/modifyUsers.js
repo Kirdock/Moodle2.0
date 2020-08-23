@@ -309,9 +309,19 @@ module.exports = {
             .assert.errorPresent()
             .closeToast()
     },
+    'upload CSV file invalid': browser =>{
+        const creation = browser.page.userManagement().section.creation;
+        const files = ['usersInvalid'];
+        for(const fileName of files){
+            creation
+            .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
+            .assert.elementPresent('@userErrorModal')
+            .closeUserErrorModal();
+        }
+    },
     'upload CSV file wrong': browser => {
         const creation = browser.page.userManagement().section.creation;
-        const files = ['usersWrong', 'usersWrong2'];
+        const files = ['usersWrong'];
         for(const fileName of files){
             creation
             .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
