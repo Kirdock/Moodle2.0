@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS COURSE
     description_Template CLOB,
     upload_Count NUMBER(10),
     CONSTRAINT FOREIGN_KEY_SEMESTER FOREIGN KEY (semester_id) references SEMESTER on delete cascade ,
-    CONSTRAINT FOREIGN_KEY_OWNER FOREIGN KEY (owner) references USER on delete cascade
+    CONSTRAINT FOREIGN_KEY_OWNER FOREIGN KEY (owner) references USER
 );
 
 

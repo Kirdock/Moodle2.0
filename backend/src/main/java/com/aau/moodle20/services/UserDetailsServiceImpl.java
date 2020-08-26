@@ -347,11 +347,21 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
     }
 
 
+    @Transactional
     public void deleteUser(String matriculationNumber) throws ServiceException {
         User user = readUser(matriculationNumber);
+
         if (user.getMatriculationNumber().equals(adminMatriculationNumber))
             throw new ServiceException("Super Admin user cannot be deleted!");
 
+        User adminUser = readUser(adminMatriculationNumber);
+        List<Course> courses = courseRepository.findByOwner_MatriculationNumber(matriculationNumber);
+        for(Course course : courses)
+        {
+            course.setOwner(adminUser);
+        }
+
+        courseRepository.saveAll(courses);
         userRepository.delete(user);
     }
 
