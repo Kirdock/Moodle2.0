@@ -229,6 +229,7 @@ public class CourseService extends AbstractService {
             if (exerciseSheet.getExamples() == null)
                 continue;
 
+            // copy examples
             for (Example example : exerciseSheet.getExamples()) {
 
                 // if true example is subExample and this is handled below
