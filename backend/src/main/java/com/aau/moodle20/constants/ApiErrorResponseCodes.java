@@ -24,6 +24,10 @@ public class ApiErrorResponseCodes {
     public final static Integer REGISTER_USERS_USERNAME_ALREADY_EXISTS = 483;
     public final static Integer EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS = 484;
 
+    public final static Integer EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS = 485;
+    public final static Integer SUB_EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS = 486;
+
+
 
 
 

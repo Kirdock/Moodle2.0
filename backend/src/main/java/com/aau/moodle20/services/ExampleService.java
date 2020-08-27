@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
@@ -35,12 +36,16 @@ public class ExampleService extends AbstractService{
                     (createExampleRequest.getCustomFileTypes() == null || createExampleRequest.getCustomFileTypes().isEmpty()))
                 throw new ServiceException("Error:either supported file types or custom file types  must be specified!");
         }
+        if(createExampleRequest.getParentId()!=null)
+            parentExample = readExample(createExampleRequest.getParentId());
+
+        ExerciseSheet exerciseSheet = readExerciseSheet(createExampleRequest.getExerciseSheetId());
+        checkIfExampleNameAlreadyUsed(exerciseSheet,createExampleRequest.getName(),null,parentExample);
 
         // if this is an subExample remove all finishesExample entries of parentExample
         // and set points to 0
         if(createExampleRequest.getParentId()!=null)
         {
-            parentExample = readExample(createExampleRequest.getParentId());
             List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_Id(createExampleRequest.getParentId());
             finishesExampleRepository.deleteAll(finishesExamples);
             parentExample.setPoints(0);
@@ -67,6 +72,26 @@ public class ExampleService extends AbstractService{
         responseObject.setSubExamples(null);
 
         return responseObject;
+    }
+
+    protected void checkIfExampleNameAlreadyUsed(ExerciseSheet exerciseSheet,String exampleName,Long exampleId, Example parentExample) throws ServiceException
+    {
+        if(parentExample==null)
+        {
+            List<Example> examples = exerciseSheet.getExamples().stream()
+                    .filter(example -> example.getParentExample()==null)
+                    .filter(example -> !example.getId().equals(exampleId)).collect(Collectors.toList());
+            boolean alreadyExists = examples.stream().anyMatch(example -> example.getName().equals(exampleName));
+            if(alreadyExists)
+                throw new ServiceException("Error: example with this name already exists in exerciseSheet", ApiErrorResponseCodes.EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS);
+        }else
+        {
+            boolean alreadyExists = parentExample.getSubExamples().stream()
+                    .filter(example -> !example.getId().equals(exampleId))
+                    .anyMatch(example -> example.getName().equals(exampleName));
+            if(alreadyExists)
+                throw new ServiceException("Error: sub example with this name already exists in exerciseSheet", ApiErrorResponseCodes.SUB_EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS);
+        }
     }
 
 
@@ -100,6 +125,10 @@ public class ExampleService extends AbstractService{
                     (updateExampleRequest.getCustomFileTypes() == null || updateExampleRequest.getCustomFileTypes().isEmpty()))
                 throw new ServiceException("Error:either supported file types or custom file types  must be specified!");
         }
+        ExerciseSheet exerciseSheet = readExerciseSheet(updateExampleRequest.getExerciseSheetId());
+        Example parentExample = updateExampleRequest.getParentId()!=null?readExample(updateExampleRequest.getParentId()):null;
+        checkIfExampleNameAlreadyUsed(exerciseSheet,updateExampleRequest.getName(),updateExampleRequest.getId(),parentExample);
+
         Example example = readExample(updateExampleRequest.getId());
         if(!updateExampleRequest.getSubmitFile() && (example.getValidator()!=null && !example.getValidator().isEmpty()) )
             deleteExampleValidator(example.getId());
