@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
@@ -33,6 +34,8 @@ public class ExerciseSheetService extends AbstractService{
     public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceException {
         Course course = readCourse(createExerciseSheetRequest.getCourseId());
 
+        checkExerciseSheetName(course,createExerciseSheetRequest.getName());
+
         ExerciseSheet exerciseSheet = new ExerciseSheet();
         exerciseSheet.setCourse(course);
         exerciseSheet.setMinKreuzel(createExerciseSheetRequest.getMinKreuzel());
@@ -46,10 +49,18 @@ public class ExerciseSheetService extends AbstractService{
         exerciseSheetRepository.save(exerciseSheet);
     }
 
+    protected void checkExerciseSheetName(Course course, String name) throws ServiceException
+    {
+        boolean exists = course.getExerciseSheets().stream().anyMatch(exerciseSheet -> exerciseSheet.getName().equals(name));
+        if(exists)
+            throw new ServiceException("Error Exercise Sheet with this name already exists in given course", ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS);
+    }
+
+
     public void updateExerciseSheet(UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceException {
         ExerciseSheet exerciseSheet = readExerciseSheet(updateExerciseSheetRequest.getId());
-        List<ExerciseSheet> courseExerciseSheets = exerciseSheetRepository.findByCourse_Id(exerciseSheet.getCourse().getId());
-        courseExerciseSheets.removeIf(sheet -> sheet.getId().equals(updateExerciseSheetRequest.getId()));
+
+        checkExerciseSheetName(exerciseSheet.getCourse(),updateExerciseSheetRequest.getName());
 
         exerciseSheet.setMinKreuzel(updateExerciseSheetRequest.getMinKreuzel());
         exerciseSheet.setMinPoints(updateExerciseSheetRequest.getMinPoints());

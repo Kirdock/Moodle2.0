@@ -22,6 +22,7 @@ public class ApiErrorResponseCodes {
     public final static Integer REGISTER_USERS_WRONG_MATRICULATION_NUMBER_FORMAT = 481;
     public final static Integer REGISTER_USERS_MATRICULATION_ALREADY_EXISTS = 482;
     public final static Integer REGISTER_USERS_USERNAME_ALREADY_EXISTS = 483;
+    public final static Integer EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS = 484;
 
 
 
