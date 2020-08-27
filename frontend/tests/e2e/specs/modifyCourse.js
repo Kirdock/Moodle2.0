@@ -1,27 +1,7 @@
 const Path = require('path');
-const testCourse = {
-    owner: {
-        index: undefined,
-        value: 'Owner'
-    },
-    number: '000.001',
-    name: 'Mein erster Kurs',
-    minKreuzel: '20',
-    minPoints: '30',
-    description: 'Meine Kursbeschreibung'
-}
-const testExerciseSheet = {
-    name: 'TestExerciseSheet',
-    issueDate: '31-08-2021T23:55',
-    issueDateValue: '2021-08-31T23:55',
-    submissionDate: '30-09-2021T23:50',
-    submissionDateValue: '2021-09-30T23:50',
-    submissionDateFormat: '30.9.2021, 23:50:00',
-    description: 'My first exercise sheet',
-    minKreuzel: '50',
-    minPoints: '40',
-    kreuzelType: 0
-}
+const testCourses = require('./testFiles/testCourses.js');
+const testCourse = testCourses[0];
+const testExerciseSheet = require('./testFiles/testExerciseSheets.js')[0];
 const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid.js');
 const testUsers = require('./testFiles/testUsers.js');
 const userTest = require('./modifyUsers.js');
@@ -225,17 +205,14 @@ module.exports = {
     },
     'create course': function (browser) {
         const page = browser.page.courseManagement();
-
-        courseExists(this,browser, testCourse.number, false)
-        ownerExists(browser, testCourse.owner.value)
-        
         const modal_new = page.section.modal_new;
         const courseInfo = page.section.courseInfo;
-        page.showNewModal();
-        page.pause(1000);
-        const courses = [testCourse]
 
-        for(const course of courses){
+        for(const course of testCourses){
+            courseExists(this,browser, course.number, false)
+            ownerExists(browser, course.owner.value)
+            page.showNewModal().pause(1000);
+
             modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
             modal_new
                 .setValue('@number', course.number)

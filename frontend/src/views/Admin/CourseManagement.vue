@@ -719,8 +719,10 @@ export default {
             }
         },
         async createExerciseSheet(modal){
-            if(modal && !this.$refs.exerciseSheet.checkValidity()){
+            if(modal){
                 modal.preventDefault();
+            }
+            if(!this.$refs.exerciseSheet.checkValidity()){
                 this.$refs.exerciseSheet.reportValidity();
             }
             else{
@@ -740,8 +742,8 @@ export default {
                     });
                     
                 }
-                catch{
-                    this.$bvToast.toast(this.$t('exerciseSheet.error.create'), {
+                catch(error){
+                    this.$bvToast.toast(error.response.data.errorResponseCode === 484 ? this.$t('exerciseSheet.error.duplicate') : this.$t('exerciseSheet.error.create'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true

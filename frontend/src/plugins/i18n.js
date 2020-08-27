@@ -81,6 +81,7 @@ const messages = {
             saved: 'Beispiel wurde gespeichert',
             error: {
                 create: 'Beispiel konnte nicht angelegt werden',
+                duplicate: 'Der Name des Beispiels ist bereits vergeben',
                 delete: 'Beispiel konnte nicht gelöscht werden',
                 save: 'Beispiel konnte nicht gespeichert werden'
             },
@@ -93,7 +94,10 @@ const messages = {
         reason: 'Begründung',
         subExample: {
             name: 'Unterbeispiel',
-            new: 'Neues Unterbeispiel'
+            new: 'Neues Unterbeispiel',
+            error: {
+                duplicate: 'Der Name des Unterbeispiels ist bereits vergeben',
+            }
         },
         subExamples: {
             name: 'Unterbeispiele',
@@ -105,6 +109,7 @@ const messages = {
             deleted: 'Übungsblatt wurde gelöscht',
             error: {
                 create: 'Übungsblatt konnte nicht angelegt werden',
+                duplicate: 'Der Name des Übungsblattes ist bereits vergeben',
                 get: 'Übungsblatt konnte nicht geladen werden',
                 save: 'Übungsblatt konnte nicht gespeichert werden',
                 delete: 'Übungsblatt konnte nicht gelöscht werden'
@@ -365,6 +370,7 @@ const messages = {
             saved: 'Example saved',
             error: {
                 create: 'Example could not be created',
+                duplicate: 'Example name is already taken',
                 delete: 'Example could not be deleted',
                 save: 'Example could not be saved'
             },
@@ -377,7 +383,10 @@ const messages = {
         reason: 'Reason',
         subExample: {
             name: 'Sub example',
-            new: 'New sub example'
+            new: 'New sub example',
+            error: {
+                duplicate: 'Sub example name is already taken',
+            }
         },
         subExamples: {
             name: 'Sub examples',
@@ -389,6 +398,7 @@ const messages = {
             delete: 'Exercise sheet deleted',
             error: {
                 create: 'Exercise sheet could not be created',
+                duplicate: 'Exercise sheet name is already taken',
                 get: 'Exercise sheet could not be loaded',
                 save: 'Exercise sheet could lnto be saved',
                 delete: 'Exercise sheet could not be deleted'

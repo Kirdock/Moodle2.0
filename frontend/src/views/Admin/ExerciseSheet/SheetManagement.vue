@@ -47,7 +47,7 @@
                         <span class="fas fa-chevron-right"></span>
                         <span>{{selectedExample.name}}</span>
                     </div>
-                    <form @submit.prevent="updateExample(selectedExample || example)" :ref="`formExample${index}`">
+                    <form @submit.prevent="updateExample(selectedExample || example, index)" :ref="`formExample${index}`">
                         <example-info :ref="`eInfo${index}`" :uploadCount="sheetInfo.uploadCount" :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example"></example-info>
                         <div class="form-inline" style="margin-left: 10px; margin-top: 10px" v-if="!isSubExample">
                             <button class="btn btn-primary" type="submit">
@@ -198,19 +198,32 @@ export default {
             this.selectedDeleteExample.index = index;
             this.selectedDeleteExample.array = array;
         },
-        async updateExample(example){
+        async updateExample(example, index){
+            let changedData;
+            if(example.parentId !== undefined){
+                //fetch real data. selectedExample is not changed only a copy of it
+                let child = this.$refs[`eInfo${index}`];
+                if(Array.isArray(child)){
+                    child = child[0];
+                }
+                changedData = child.exampleData; 
+            }
+            
             example.loading = true;
-            const {loading, subExamples, ...data} = example;
+            const {loading, subExamples, ...data} = (changedData || example);
             try{
                 await this.$store.dispatch('updateExample', data);
+                if(example.parentId !== undefined){
+                    Object.assign(example, changedData);
+                }
                 this.$bvToast.toast(this.$t('example.saved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
             }
-            catch{
-                this.$bvToast.toast(this.$t('example.error.save'), {
+            catch(error){
+                this.$bvToast.toast(error.response.data.errorResponseCode === 485 ? this.$t('example.error.duplicate') : error.response.data.errorResponseCode === 486 ? this.$t('subExample.error.duplicate') : this.$t('example.error.save'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
@@ -237,8 +250,8 @@ export default {
                     this.setSelectedExample(undefined, {example, index: this.sheetInfo.examples.length - 1})
                 })
             }
-            catch{
-                this.$bvToast.toast(this.$t('example.error.create'), {
+            catch(error){
+                this.$bvToast.toast(error.response.data.errorResponseCode === 485 ? this.$t('example.error.duplicate') : this.$t('example.error.create'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true

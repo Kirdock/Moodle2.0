@@ -20,7 +20,7 @@
         </div>
 
         <label :for="`esInfoMinKreuzel${_uid}`" class="control-label">{{ $t('minRequireKreuzel') }}</label>
-        <div class="col-md-2 input-group mb-3" style="padding-left: 0px">
+        <div class="col-md-4 input-group mb-3" style="padding-left: 0px">
             <i-input :id="`esInfoMinKreuzel${_uid}`" class="form-control" min="0" max="100" v-model="value.minKreuzel"></i-input>
             <div class="input-group-append">
                 <span class="input-group-text">%</span>
@@ -28,7 +28,7 @@
         </div>
 
         <label :for="`esInfoMinPoints${_uid}`" class="control-label">{{ $t('minRequirePoints') }}</label>
-        <div class="col-md-2 input-group mb-3" style="padding-left: 0px">
+        <div class="col-md-4 input-group mb-3" style="padding-left: 0px">
             <i-input :id="`esInfoMinPoints${_uid}`"  class="form-control" min="0" max="100" v-model="value.minPoints"></i-input>
             <div class="input-group-append">
                 <span class="input-group-text">%</span>

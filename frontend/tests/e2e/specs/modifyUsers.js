@@ -325,8 +325,7 @@ module.exports = {
         for(const fileName of files){
             creation
             .setValue('@uploadButton', Path.resolve(`${__dirname}/testFiles/${fileName}.csv`))
-            .assert.toastPresent()
-            .assert.not.successPresent()
+            .assert.errorPresent()
             .closeToast();
         }
     },
