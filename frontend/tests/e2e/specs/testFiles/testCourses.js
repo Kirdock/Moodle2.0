@@ -13,7 +13,7 @@ module.exports = [
     {
         owner: {
             index: undefined,
-            value: 'Admin'
+            value: 'admin'
         },
         number: '000.002',
         name: 'Mein zweiter Kurs',

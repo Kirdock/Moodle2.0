@@ -45,7 +45,7 @@
         </div>
         <div class="form-group">
             <label class="control-label" :for="`description${_uid}`">{{$t('description')}}</label>
-            <editor :id="`description${_uid}`" v-model="value.description"></editor>
+            <editor :id="`description${_uid}`" v-model="value.description" :ref="`editor${_uid}`"></editor>
         </div>
     </div>
 </template>
@@ -89,6 +89,9 @@ export default {
                     }
                 })
             }
+        },
+        forceUpdate(value){
+            this.$refs[`editor${this._uid}`].forceUpdate(value);
         }
     },
     watch:{

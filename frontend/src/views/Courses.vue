@@ -10,17 +10,19 @@
             </select>
         </div>
         <div class="form-group col-md-12">
-            <h1 id="courses">{{$t('courses.name')}}</h1>
+            <h1>{{$t('courses.name')}}</h1>
         </div>
-        <div class="form-group col-md-6" v-for="course in courses" :key="course.id">
-            <router-link :to="{
-                                name: 'Course',
-                                params: {
-                                    id: course.id,
-                                }
-                            }">
-                {{ `${course.number} ${course.name}` }}
-            </router-link>
+        <div id="courseList">
+            <div class="form-group col-md-6" v-for="course in courses" :key="course.id">
+                <router-link :to="{
+                                    name: 'Course',
+                                    params: {
+                                        id: course.id,
+                                    }
+                                }">
+                    {{ `${course.number} ${course.name}` }}
+                </router-link>
+            </div>
         </div>
     </div>
   </div>

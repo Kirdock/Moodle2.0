@@ -207,31 +207,37 @@ module.exports = {
         const page = browser.page.courseManagement();
         const modal_new = page.section.modal_new;
         const courseInfo = page.section.courseInfo;
-
+        const defaultTimeoutBefore = browser.options.globals.asyncHookTimeout;
+        const self = this;
+        browser.options.globals.asyncHookTimeout = 60000;
         for(const course of testCourses){
-            courseExists(this,browser, course.number, false)
-            ownerExists(browser, course.owner.value)
-            page.showNewModal().pause(1000);
+            browser.perform(function(done){
+                courseExists(self,browser, course.number, false)
+                ownerExists(browser, course.owner.value)
+                page.showNewModal().pause(1000);
 
-            modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
-            modal_new
-                .setValue('@number', course.number)
-                .setValue('@name', course.name)
-                .setValue('@minKreuzel', course.minKreuzel)
-                .setValue('@minPoints', course.minPoints)
-                .setValue('@description', course.description)
-                .submit();
-            page.assert.successPresent();
-            page.closeToast();
-            page.pause(1000);
-            page.assert.urlContains('?courseId=');
-            courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
-                .assert.value('@number', course.number)
-                .assert.value('@name', course.name)
-                .assert.containsText('@description', course.description)
-                .assert.value('@minKreuzel', course.minKreuzel)
-                .assert.value('@minPoints', course.minPoints)
+                modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
+                modal_new
+                    .setValue('@number', course.number)
+                    .setValue('@name', course.name)
+                    .setValue('@minKreuzel', course.minKreuzel)
+                    .setValue('@minPoints', course.minPoints)
+                    .setValue('@description', course.description)
+                    .submit();
+                page.assert.successPresent();
+                page.closeToast();
+                page.pause(1000);
+                page.assert.urlContains('?courseId=');
+                courseInfo.assert.containsText('@ownerText',`${course.owner.value}`)
+                    .assert.value('@number', course.number)
+                    .assert.value('@name', course.name)
+                    .assert.containsText('@description', course.description)
+                    .assert.value('@minKreuzel', course.minKreuzel)
+                    .assert.value('@minPoints', course.minPoints)
+                done();
+            })
         }
+        browser.options.globals.asyncHookTimeout = defaultTimeoutBefore;
     },
     'modify course invalid': function(browser, number){
         number = number || testCourse.number;

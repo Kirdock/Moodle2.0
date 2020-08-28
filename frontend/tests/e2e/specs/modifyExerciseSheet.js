@@ -191,9 +191,8 @@ module.exports = {
         const exampleSection = page.section.example;
 
         for(const example of examples){
-            exampleExists(self, browser, example, false);
-
             browser.perform(function(done){
+                exampleExists(self, browser, example, false);
                 page.newExample(browser, next)
 
                 function next(index){
@@ -249,7 +248,7 @@ module.exports = {
                         else {
                             exampleSection.newSubExampleAndSelect(index);
                         }
-                        page.assert.not.present(exampleSection.deleteButton(index));
+                        page.assert.not.elementPresent(exampleSection.deleteButton(index));
                         page
                             .clearValue2(exampleSection.name(index))
                             .clearValue(exampleSection.description(index)) // clear part 1
@@ -265,7 +264,7 @@ module.exports = {
                             .setCheckbox(exampleSection.mandatory(index), example.subExamples[i].mandatory)
 
                         if(example.subExamples[i].submitFile){
-                            page.assert.not.present(exampleSection.validatorContainer(index));
+                            page.assert.not.elementPresent(exampleSection.validatorContainer(index));
                             for(const fileType of example.subExamples[i].fileTypes){
                                 page.setMultiSelect(exampleSection.fileTypes(index), undefined, fileType)
                             }
@@ -350,7 +349,7 @@ module.exports = {
         exampleExists(self, browser, testExample, true);
         page.selectExample(browser, testExample.name, function(index){
             exampleSection.selectLastSubExample(index);
-            page.assert.not.present(exampleSection.deleteButton(index));
+            page.assert.not.elementPresent(exampleSection.deleteButton(index));
             for(const example of testSubExamplesInvalid){
                 enterInvalidExample(browser, example, index);
             }

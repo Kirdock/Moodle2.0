@@ -69,7 +69,7 @@
                 <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
                 <div class="form-horizontal col-md-4">
                     <form @submit.prevent="updateCourse()">
-                        <course-info v-model="selectedCourse" :users="users"></course-info>
+                        <course-info ref="courseInfo" v-model="selectedCourse" :users="users"></course-info>
                         
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">
@@ -970,6 +970,7 @@ export default {
                 this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate || ''; //no reference; update on save
                 this.$nextTick(()=>{
                     this.$refs.defaultDescription.forceUpdate(this.selectedCourseTemplate);
+                    this.$refs.courseInfo.forceUpdate(this.selectedCourse.description)
                 })
             }
             catch{

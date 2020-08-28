@@ -25,7 +25,7 @@ module.exports = [
                 name: 'My SubExample Nr. 1',
                 description: 'My SubExample 1 description',
                 weighting: 1,
-                points: 10,
+                points: 15,
                 submitFile: false,
                 mandatory: false,
             }
