@@ -9,6 +9,7 @@ import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
+import com.aau.moodle20.validation.ValidatorLoader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
@@ -184,7 +185,7 @@ public class ExampleService extends AbstractService{
         }
     }
 
-    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws ServiceException, IOException {
+    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
         Example example = readExample(exampleId);
         String fileName = validatorFile.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -192,6 +193,8 @@ public class ExampleService extends AbstractService{
             if (!FileConstants.JarFileExtension.equals(extension))
                 throw new ServiceException("Error: Not a jar File!");
         }
+        ValidatorLoader loader = new ValidatorLoader();
+        loader.checkValidatorFile(validatorFile);
 
         String validatorFilePath = getValidatorFilePath(example);
         clearDirectory(validatorFilePath);
@@ -233,33 +236,6 @@ public class ExampleService extends AbstractService{
         copiedExample.setValidator(originalExample.getValidator());
         exampleRepository.save(copiedExample);
 
-    }
-
-    public byte [] getValidatorSkeleton() throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-        ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-
-        //simple file list, just for tests
-        ArrayList<File> files = new ArrayList<>(2);
-        files.add(new File(FileConstants.VALIDATOR_INTERFACE_PATH));
-        files.add(new File(FileConstants.VIOLATION_PATH));
-
-        for (File file : files) {
-            zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
-            FileInputStream fileInputStream = new FileInputStream(file);
-
-            IOUtils.copy(fileInputStream, zipOutputStream);
-
-            fileInputStream.close();
-            zipOutputStream.closeEntry();
-        }
-
-        if (zipOutputStream != null) {
-            zipOutputStream.finish();
-            zipOutputStream.flush();
-        }
-        return byteArrayOutputStream.toByteArray();
     }
 
     public void deleteExampleValidator(Long exampleId) throws ServiceException, IOException {

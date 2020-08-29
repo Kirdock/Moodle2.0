@@ -54,18 +54,6 @@ public class ExampleController {
                 .body(new InputStreamResource(inputStream));
     }
 
-    @GetMapping(value = "/validator/skeleton" ,produces="application/zip")
-    public ResponseEntity<byte []> getValidatorSkeleton() throws ServiceException, IOException {
-        byte [] skeletonContent = exampleService.getValidatorSkeleton();
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(skeletonContent);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename=validatorSkeleton.zip");
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(skeletonContent);
-    }
 
     @PutMapping(value = "/example")
     public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody ExampleRequest createExampleRequest) throws ServiceException, IOException {
@@ -86,7 +74,7 @@ public class ExampleController {
     }
 
     @PostMapping(value = "/example/validator")
-    public ResponseEntity<?> setExampleValidator(@RequestParam(value = "file",required = true) MultipartFile validator, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws ServiceException, IOException {
+    public ResponseEntity<?> setExampleValidator(@RequestParam(value = "file",required = true) MultipartFile validator, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
         exampleService.setExampleValidator(validator,exampleId);
         return ResponseEntity.ok("Validator was successfully set");
     }

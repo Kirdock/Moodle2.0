@@ -26,6 +26,8 @@ public class ApiErrorResponseCodes {
 
     public final static Integer EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS = 485;
     public final static Integer SUB_EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS = 486;
+    public final static Integer NO_VALID_VALIDATOR_FOUND_IN_JAR = 487;
+
 
 
 

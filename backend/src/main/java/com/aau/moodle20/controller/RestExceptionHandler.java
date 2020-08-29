@@ -55,6 +55,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return  ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
+    @ExceptionHandler(ClassNotFoundException.class)
+    protected ResponseEntity<Object> handleClassNotFoundException(ClassNotFoundException ex) {
+        List<String> errors = new ArrayList<String>();
+        errors.add("ClassNotFoundException");
+        ApiError apiError =
+                new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
+        return  ResponseEntity.status(apiError.getStatus()).body(apiError);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         List<String> errors = new ArrayList<String>();

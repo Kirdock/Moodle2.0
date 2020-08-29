@@ -11,7 +11,6 @@ import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
-import com.aau.moodle20.payload.response.ViolationResponse;
 import com.aau.moodle20.validation.ValidatorLoader;
 import com.aau.moodle20.entity.ViolationEntity;
 import org.apache.maven.cli.MavenCli;
@@ -23,9 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import validation.IValidator;
 import validation.Violation;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,8 +30,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 @Service
 public class FinishesExampleService extends AbstractService{
@@ -117,7 +112,7 @@ public class FinishesExampleService extends AbstractService{
 //        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 
         String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
-        violations =  excectueValidator(filePath, example);
+        violations =  executeValidator(filePath, example);
 
 
 
@@ -140,13 +135,6 @@ public class FinishesExampleService extends AbstractService{
     }
 
 
-    protected ViolationResponse createViolationResponse(Violation violation)
-    {
-        ViolationResponse response = new ViolationResponse();
-        response.setResult(violation.getResult());
-        return response;
-    }
-
     protected  Set<ViolationEntity> createViolationEntities(List<? extends Violation> violations)
     {
         Set<ViolationEntity> violationEntities = new HashSet<>();
@@ -159,7 +147,7 @@ public class FinishesExampleService extends AbstractService{
         return violationEntities;
     }
 
-    protected List<? extends Violation> excectueValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
+    protected List<? extends Violation> executeValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
         List<? extends Violation> violations = new ArrayList<>();
         String validatorDir = FileConstants.validatorDir + createExampleAttachmentDir(example);
         validatorDir = validatorDir + "/"+ example.getValidator();
@@ -192,48 +180,48 @@ public class FinishesExampleService extends AbstractService{
 //        invoker.execute( request );
     }
 
-    protected void executeValidator(String destDir)
-    {
-        MavenCli cli = new MavenCli();
-        int result = cli.doMain(new String[]{"test"}, destDir, System.out, System.out);
-        if(result !=0)
-            throw new ServiceException("Error: maven project could not be tested!");
-
-    }
-
-    protected void deleteMavenProject(String destDir) throws IOException {
-        File directory = new File(destDir);
-        if(directory.exists())
-            FileUtils.deleteDirectory(directory);
-    }
-
-    protected void unzipMavenProject(String zipFilePath, File destDir) throws IOException {
-        ZipFile zipFile = new ZipFile(zipFilePath);
-        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-        while (zipEntries.hasMoreElements()) {
-            ZipEntry zipEntry = zipEntries.nextElement();
-            if (zipEntry.isDirectory()) {
-                String subDir = destDir + "\\" + zipEntry.getName();
-                File as = new File(subDir);
-                as.mkdirs();
-            } else {
-                // Create new  file
-                File newFile = new File(destDir, zipEntry.getName());
-                String extractedDirectoryPath = destDir.getCanonicalPath();
-                String extractedFilePath = newFile.getCanonicalPath();
-                if (!extractedFilePath.startsWith(extractedDirectoryPath + File.separator))
-                    throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-
-                BufferedInputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry));
-                try (FileOutputStream outputStream = new FileOutputStream(newFile)) {
-                    while (inputStream.available() > 0) {
-                        outputStream.write(inputStream.read());
-                    }
-                }
-            }
-        }
-        zipFile.close();
-    }
+//    protected void executeValidator(String destDir)
+//    {
+//        MavenCli cli = new MavenCli();
+//        int result = cli.doMain(new String[]{"test"}, destDir, System.out, System.out);
+//        if(result !=0)
+//            throw new ServiceException("Error: maven project could not be tested!");
+//
+//    }
+//
+//    protected void deleteMavenProject(String destDir) throws IOException {
+//        File directory = new File(destDir);
+//        if(directory.exists())
+//            FileUtils.deleteDirectory(directory);
+//    }
+//
+//    protected void unzipMavenProject(String zipFilePath, File destDir) throws IOException {
+//        ZipFile zipFile = new ZipFile(zipFilePath);
+//        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+//        while (zipEntries.hasMoreElements()) {
+//            ZipEntry zipEntry = zipEntries.nextElement();
+//            if (zipEntry.isDirectory()) {
+//                String subDir = destDir + "\\" + zipEntry.getName();
+//                File as = new File(subDir);
+//                as.mkdirs();
+//            } else {
+//                // Create new  file
+//                File newFile = new File(destDir, zipEntry.getName());
+//                String extractedDirectoryPath = destDir.getCanonicalPath();
+//                String extractedFilePath = newFile.getCanonicalPath();
+//                if (!extractedFilePath.startsWith(extractedDirectoryPath + File.separator))
+//                    throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+//
+//                BufferedInputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry));
+//                try (FileOutputStream outputStream = new FileOutputStream(newFile)) {
+//                    while (inputStream.available() > 0) {
+//                        outputStream.write(inputStream.read());
+//                    }
+//                }
+//            }
+//        }
+//        zipFile.close();
+//    }
 
     protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
         String filePath = createUserExampleAttachmentDir(example);
