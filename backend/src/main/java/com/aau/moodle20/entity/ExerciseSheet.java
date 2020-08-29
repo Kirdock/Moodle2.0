@@ -208,6 +208,7 @@ public class ExerciseSheet {
         exerciseSheet.setIssueDate(getIssueDate());
         exerciseSheet.setMinKreuzel(getMinKreuzel());
         exerciseSheet.setMinPoints(getMinPoints());
+        exerciseSheet.setIncludeThird(getIncludeThird());
         exerciseSheet.setSubmissionDate(getSubmissionDate());
         exerciseSheet.setName(getName());
 
