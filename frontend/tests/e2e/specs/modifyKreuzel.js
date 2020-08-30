@@ -12,10 +12,18 @@ module.exports = {
         courseTest.before(browser, function (){
             courseTest['create course'](browser); //create two courses, one where the user is in and one where he isn't
             courseTest['assign users'](browser);
-            exerciseSheetTest.before(browser, function (){
-                exerciseSheetTest['create example'](browser)
+            for(const sheet of testExerciseSheets){
+                browser.perform(done=>{
+                    exerciseSheetTest.before(browser, function (){
+                        exerciseSheetTest['create example'](browser);
+                        done();
+                    }, sheet.name);
+                })
+            }
+            browser.perform(done =>{
                 browser.loginAsStudent();
-            });
+                done();
+            })
         });
     },
     'check courses': function(browser){
@@ -56,13 +64,13 @@ module.exports = {
         
         for(const example of testExamplesRight){
             if(example.subExamples.length === 0){
-                browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][text()=" ${example.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${example.weighting} "] and td[5][text()=" ${example.points} "] and td[6][${example.includeThird ? 'input[@type="radio"][3]' : 'input[@type="checkbox"]'}]`)
+                browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][text()=" ${example.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${example.weighting} "] and td[5][text()=" ${example.points} "] and td[6][${example.includeThird ? `count(.//input[@type="radio"${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]) = 3` : `input[@type="checkbox" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]`}]`)
             }
             else{
                 browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][boolean(text()) = true] and td[4][boolean(text()) = true] and td[5][boolean(text()) = true]]`)
             }
             for(const subExample of example.subExamples){
-                browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][boolean(text()) = true] and td[2][text()=" ${subExample.name} "] and td[3][text()=" ${subExample.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${subExample.weighting} "] and td[5][text()=" ${subExample.points} "] and td[6][${subExample.includeThird ? 'input[@type="radio"][3]' : 'input[@type="checkbox"]'}]`)
+                browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][boolean(text()) = true] and td[2][text()=" ${subExample.name} "] and td[3][text()=" ${subExample.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${subExample.weighting} "] and td[5][text()=" ${subExample.points} "] and td[6][${subExample.includeThird ? `count(.//input[@type="radio" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]) = 3` : `input[@type="checkbox" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]`}]`)
             }
         }
     }

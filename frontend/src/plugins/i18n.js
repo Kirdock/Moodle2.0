@@ -280,7 +280,8 @@ const messages = {
                 delete: 'Validator konnte nicht gelöscht werden',
                 get: 'Validator konnte nicht geladen werden',
                 save: 'Validator konnte nicht gespeichert werden',
-                skeletonDownload: 'Validator-Skelett konnte nicht heruntergeladen werden'
+                skeletonDownload: 'Validator-Skelett konnte nicht heruntergeladen werden',
+                valid: 'Kein gültiger Validator'
             }
         },
         view: 'Ansehen',
@@ -564,7 +565,8 @@ const messages = {
                 delete: 'Validator could not be deleted',
                 get: 'Validator could not be loaded',
                 save: 'Validator could not be saved',
-                skeletonDownload: 'Validator skeleton could not be downloaded'
+                skeletonDownload: 'Validator skeleton could not be downloaded',
+                valid: 'Validator is invalid'
             }
         },
         view: 'View',

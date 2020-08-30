@@ -102,9 +102,10 @@ function enterInvalidExample(browser, example, index){
 }
 
 module.exports = {
-    before: browser => {
+    before: (browser, done, exerciseSheetName) => {
         courseTest.before(browser, function (){
-            courseTest['select exerciseSheet'](browser);
+            courseTest['select exerciseSheet'](browser, exerciseSheetName);
+            done();
         });
     },
     'modify information': browser => {

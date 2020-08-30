@@ -1,7 +1,8 @@
 const Path = require('path');
 const testCourses = require('./testFiles/testCourses.js');
 const testCourse = testCourses[0];
-const testExerciseSheet = require('./testFiles/testExerciseSheets.js')[0];
+const testExerciseSheets = require('./testFiles/testExerciseSheets.js');
+const testExerciseSheet = testExerciseSheets[0];
 const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid.js');
 const testUsers = require('./testFiles/testUsers.js');
 const userTest = require('./modifyUsers.js');
@@ -99,7 +100,7 @@ function exerciseSheetExists(self, browser, courseText, name, create){
             } else {
                 if(create){
                     browser.log('ExerciseSheet does not exist. ExerciseSheet will now be created')
-                    self['create exerciseSheet'](browser);
+                    self['create exerciseSheet'](browser, name);
                 }
                 done();
             }
@@ -444,55 +445,66 @@ module.exports = {
         assignedUsers.isUserAssigned(browser, testUsers[3].matriculationNumber, 's');
         assignedUsers.submit();
     },
-    'create exerciseSheet':  function(browser){
+    'create exerciseSheet':  function(browser, name){
         const courseText = testCourse.number;
         const page = browser.page.courseManagement();
         const exerciseSheetSection = page.section.exerciseSheets;
         const self = this;
-
-        exerciseSheetExists(self, browser, courseText, testExerciseSheet.name, false)
-
-        page.selectCourse(courseText);
-        page.selectTab(exerciseSheetsTab);
         const newModal = page.section.exerciseSheetsNewModal;
         const exerciseSheetPage = browser.page.exerciseSheetManagement().section.information;
+        const exerciseSheets = [];
+        if(name === undefined){
+            exerciseSheets.push(testExerciseSheet[0]);
+        }
+        else if(name instanceof Array){
+            for(const sheetName of name){
+                exerciseSheets.push(testExerciseSheets.find(sheet => sheet.name === sheetName))
+            }
+        }
+        else{
+            exerciseSheets.push(testExerciseSheets.find(sheet => sheet.name === name));
+        }
 
-        const exerciseSheets = [testExerciseSheet];
         for(const exerciseSheet of exerciseSheets){
-            exerciseSheetSection.showNewModal();
-            newModal.setValue('@name', exerciseSheet.name)
-                .setValue('@issueDate', exerciseSheet.issueDate.replace('T', browser.Keys.RIGHT_ARROW))
-                .setValue('@submissionDate', exerciseSheet.submissionDate.replace('T', browser.Keys.RIGHT_ARROW))
-                .setValue('@description', exerciseSheet.description)
-                .setValue('@minKreuzel', exerciseSheet.minKreuzel)
-                .setValue('@minPoints', exerciseSheet.minPoints)
-                .click(`@kreuzelType${exerciseSheet.kreuzelType}`)
-                .submit();
-            page.assert.successPresent()
-            page.closeToast();
-            page.modalNewExerciseSheetNotPresent();
-            exerciseSheetSection.exerciseSheetPresentStrict(exerciseSheet);
-            this['select exerciseSheet'](browser, exerciseSheet.name);
-            
-            exerciseSheetPage.assert.value('@name', exerciseSheet.name)
-                .assert.value('@issueDate', exerciseSheet.issueDateValue)
-                .assert.value('@submissionDate', exerciseSheet.submissionDateValue)
-                .assert.containsText('@description', exerciseSheet.description)
-                .assert.value('@minKreuzel', exerciseSheet.minKreuzel)
-                .assert.value('@minPoints', exerciseSheet.minPoints)
-                
-            if(exerciseSheet.kreuzelType === 0){
-                exerciseSheetPage.expect.element('@kreuzelType0').to.be.selected;
-                exerciseSheetPage.expect.element('@kreuzelType1').to.not.be.selected;
-            }
-            else{
-                exerciseSheetPage.expect.element('@kreuzelType1').to.be.selected;
-                exerciseSheetPage.expect.element('@kreuzelType0').to.not.be.selected;
-            }
+            browser.perform(done =>{
+                exerciseSheetExists(self, browser, courseText, exerciseSheet.name, false)
+                page.selectCourse(courseText);
+                page.selectTab(exerciseSheetsTab);
 
-            page.navigate().pause(1000);
-            page.selectCourse(courseText);
-            page.selectTab(exerciseSheetsTab);
+                exerciseSheetSection.showNewModal();
+                newModal.setValue('@name', exerciseSheet.name)
+                    .setValue('@issueDate', exerciseSheet.issueDate.replace('T', browser.Keys.RIGHT_ARROW))
+                    .setValue('@submissionDate', exerciseSheet.submissionDate.replace('T', browser.Keys.RIGHT_ARROW))
+                    .setValue('@description', exerciseSheet.description)
+                    .setValue('@minKreuzel', exerciseSheet.minKreuzel)
+                    .setValue('@minPoints', exerciseSheet.minPoints)
+                    .click(`@kreuzelType${exerciseSheet.kreuzelType}`)
+                    .submit();
+                page.assert.successPresent()
+                page.closeToast();
+                page.modalNewExerciseSheetNotPresent();
+                exerciseSheetSection.exerciseSheetPresentStrict(exerciseSheet);
+                self['select exerciseSheet'](browser, exerciseSheet.name);
+                
+                exerciseSheetPage.assert.value('@name', exerciseSheet.name)
+                    .assert.value('@issueDate', exerciseSheet.issueDateValue)
+                    .assert.value('@submissionDate', exerciseSheet.submissionDateValue)
+                    .assert.containsText('@description', exerciseSheet.description)
+                    .assert.value('@minKreuzel', exerciseSheet.minKreuzel)
+                    .assert.value('@minPoints', exerciseSheet.minPoints)
+                    
+                if(exerciseSheet.kreuzelType === 0){
+                    exerciseSheetPage.expect.element('@kreuzelType0').to.be.selected;
+                    exerciseSheetPage.expect.element('@kreuzelType1').to.not.be.selected;
+                }
+                else{
+                    exerciseSheetPage.expect.element('@kreuzelType1').to.be.selected;
+                    exerciseSheetPage.expect.element('@kreuzelType0').to.not.be.selected;
+                }
+
+                page.navigate().pause(1000);
+                done();
+            })
         }
 
     },

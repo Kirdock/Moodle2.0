@@ -306,8 +306,8 @@ export default {
                         appendToast: true
                     });
                 }
-                catch{
-                    this.$bvToast.toast(this.$t('validator.error.save'), {
+                catch (error){
+                    this.$bvToast.toast(error.response.data.errorResponseCode === 487 ? this.$t('validator.error.valid') : this.$t('validator.error.save'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true

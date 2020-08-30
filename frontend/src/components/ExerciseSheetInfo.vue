@@ -10,7 +10,7 @@
         </div>
         <div class="form-group">
             <label :for="`esInfoSubmissionDate${_uid}`" class="control-label required">{{ $t('submissionDate') }}</label>
-            <input :id="`esInfoSubmissionDate${_uid}`" type="datetime-local" class="form-control" :min="minDate" v-model="value.submissionDate" required>
+            <input :id="`esInfoSubmissionDate${_uid}`" type="datetime-local" class="form-control" v-model="value.submissionDate" required>
         </div>
         <div class="form-group">
             <label :for="`esInfoDescription${_uid}`" class="control-label">{{ $t('description') }}</label>
@@ -63,11 +63,6 @@ export default {
     props: ['value'],
     components:{
         Editor
-    },
-    data(){
-        return {
-            minDate: dateManagement.currentDateTime()
-        }
     }
 }
 </script>
