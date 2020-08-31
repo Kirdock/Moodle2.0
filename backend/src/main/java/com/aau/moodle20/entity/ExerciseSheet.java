@@ -168,11 +168,12 @@ public class ExerciseSheet {
             responseObject.setExampleCount(Math.toIntExact(exampleCount));
 
             for (Example example : getExamples()) {
-                totalPoints = totalPoints + (example.getPoints() * example.getWeighting());
+                if (example.getPoints() != null && example.getWeighting() != null)
+                    totalPoints = totalPoints + (example.getPoints() * example.getWeighting());
                 Boolean hasFinishedExample = example.getExamplesFinishedByUser().stream()
                         .anyMatch(finishesExample -> finishesExample.getId().getMatriculationNumber().equals(matriculationNumber)
-                                && (EFinishesExampleState.YES.equals(finishesExample.getState()) ||  EFinishesExampleState.MAYBE.equals(finishesExample.getState()) ));
-                if(hasFinishedExample) {
+                                && (EFinishesExampleState.YES.equals(finishesExample.getState()) || EFinishesExampleState.MAYBE.equals(finishesExample.getState())));
+                if (hasFinishedExample) {
                     kreuzel++;
                     points = points + (example.getPoints() * example.getWeighting());
                 }
@@ -208,6 +209,7 @@ public class ExerciseSheet {
         exerciseSheet.setIssueDate(getIssueDate());
         exerciseSheet.setMinKreuzel(getMinKreuzel());
         exerciseSheet.setMinPoints(getMinPoints());
+        exerciseSheet.setIncludeThird(getIncludeThird());
         exerciseSheet.setSubmissionDate(getSubmissionDate());
         exerciseSheet.setName(getName());
 

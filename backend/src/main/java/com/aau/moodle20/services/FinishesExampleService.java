@@ -4,14 +4,14 @@ import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
 import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
-import com.aau.moodle20.payload.response.ViolationResponse;
-import com.aau.moodle20.validation.ValidatorLoader;
+import com.aau.moodle20.payload.response.ViolationHistoryResponse;
+import com.aau.moodle20.validation.ValidatorHandler;
 import com.aau.moodle20.entity.ViolationEntity;
 import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -22,9 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import validation.IValidator;
 import validation.Violation;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,14 +30,12 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 @Service
 public class FinishesExampleService extends AbstractService{
 
     @Transactional
-    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceValidationException {
+    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         for (UserKreuzelRequest userKreuzelRequest : userKreuzelRequests) {
             updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription(), false);
@@ -47,7 +43,7 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public void setKreuzelUserMulti(List<UserKreuzeMultilRequest> userKreuzeMultilRequests) throws ServiceValidationException
+    public void setKreuzelUserMulti(List<UserKreuzeMultilRequest> userKreuzeMultilRequests) throws ServiceException
     {
         for(UserKreuzeMultilRequest userKreuzeMultilRequest: userKreuzeMultilRequests)
         {
@@ -55,12 +51,12 @@ public class FinishesExampleService extends AbstractService{
         }
     }
 
-    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) throws ServiceValidationException {
+    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) throws ServiceException {
         FinishesExample finishesExample = null;
         Example example = readExample(exampleId);
         User user = readUser(matriculationNumber);
         if (!example.getSubExamples().isEmpty())
-            throw new ServiceValidationException("Error: Example has sub-examples and can therefore not be kreuzelt");
+            throw new ServiceException("Error: Example has sub-examples and can therefore not be kreuzelt");
 
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
                 .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
@@ -87,9 +83,9 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public List<ViolationResponse> setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceValidationException, IOException, ClassNotFoundException {
+    public ViolationHistoryResponse setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
         if (file.isEmpty())
-            throw new ServiceValidationException("Error: given file is empty");
+            throw new ServiceException("Error: given file is empty");
 
         List<? extends Violation> violations;
         UserDetailsImpl userDetails = getUserDetails();
@@ -109,14 +105,14 @@ public class FinishesExampleService extends AbstractService{
 
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
         if (finishesExample.getRemainingUploadCount() == 0 && finishesExample.getExample().getUploadCount() != 0)
-            throw new ServiceValidationException("Error: max upload counts reached!");
+            throw new ServiceException("Error: max upload counts reached!");
 
         saveFileToDisk(file, example);
         String fileName = file.getOriginalFilename();
 //        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 
         String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
-        violations =  excectueValidator(filePath, example);
+        violations =  executeValidator(filePath, example);
 
 
 
@@ -135,16 +131,9 @@ public class FinishesExampleService extends AbstractService{
 
         violationHistoryRepository.save(violationHistory);
 
-        return violations.stream().map(this::createViolationResponse).collect(Collectors.toList());
+        return violationHistory.createViolationHistoryResponse();
     }
 
-
-    protected ViolationResponse createViolationResponse(Violation violation)
-    {
-        ViolationResponse response = new ViolationResponse();
-        response.setResult(violation.getResult());
-        return response;
-    }
 
     protected  Set<ViolationEntity> createViolationEntities(List<? extends Violation> violations)
     {
@@ -158,12 +147,12 @@ public class FinishesExampleService extends AbstractService{
         return violationEntities;
     }
 
-    protected List<? extends Violation> excectueValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
+    protected List<? extends Violation> executeValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
         List<? extends Violation> violations = new ArrayList<>();
         String validatorDir = FileConstants.validatorDir + createExampleAttachmentDir(example);
         validatorDir = validatorDir + "/"+ example.getValidator();
 
-        ValidatorLoader validationLoader = new ValidatorLoader();
+        ValidatorHandler validationLoader = new ValidatorHandler();
         IValidator validator = validationLoader.loadValidator(validatorDir);
         if(validator!=null)
             violations = validator.validate(filePath);
@@ -176,12 +165,12 @@ public class FinishesExampleService extends AbstractService{
 //        deleteMavenProject(destDir);
     }
 
-    protected void installMavenProject(String destDir) throws ServiceValidationException
+    protected void installMavenProject(String destDir) throws ServiceException
     {
         MavenCli cli = new MavenCli();
         int result = cli.doMain(new String[]{"clean", "install"}, destDir, System.out, System.out);
         if(result !=0)
-            throw new ServiceValidationException("Error: maven project could not be build!");
+            throw new ServiceException("Error: maven project could not be build!");
 
 //        InvocationRequest request = new DefaultInvocationRequest();
 //        request.setPomFile( new File( "/path/to/pom.xml" ) );
@@ -191,48 +180,48 @@ public class FinishesExampleService extends AbstractService{
 //        invoker.execute( request );
     }
 
-    protected void executeValidator(String destDir)
-    {
-        MavenCli cli = new MavenCli();
-        int result = cli.doMain(new String[]{"test"}, destDir, System.out, System.out);
-        if(result !=0)
-            throw new ServiceValidationException("Error: maven project could not be tested!");
-
-    }
-
-    protected void deleteMavenProject(String destDir) throws IOException {
-        File directory = new File(destDir);
-        if(directory.exists())
-            FileUtils.deleteDirectory(directory);
-    }
-
-    protected void unzipMavenProject(String zipFilePath, File destDir) throws IOException {
-        ZipFile zipFile = new ZipFile(zipFilePath);
-        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-        while (zipEntries.hasMoreElements()) {
-            ZipEntry zipEntry = zipEntries.nextElement();
-            if (zipEntry.isDirectory()) {
-                String subDir = destDir + "\\" + zipEntry.getName();
-                File as = new File(subDir);
-                as.mkdirs();
-            } else {
-                // Create new  file
-                File newFile = new File(destDir, zipEntry.getName());
-                String extractedDirectoryPath = destDir.getCanonicalPath();
-                String extractedFilePath = newFile.getCanonicalPath();
-                if (!extractedFilePath.startsWith(extractedDirectoryPath + File.separator))
-                    throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-
-                BufferedInputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry));
-                try (FileOutputStream outputStream = new FileOutputStream(newFile)) {
-                    while (inputStream.available() > 0) {
-                        outputStream.write(inputStream.read());
-                    }
-                }
-            }
-        }
-        zipFile.close();
-    }
+//    protected void executeValidator(String destDir)
+//    {
+//        MavenCli cli = new MavenCli();
+//        int result = cli.doMain(new String[]{"test"}, destDir, System.out, System.out);
+//        if(result !=0)
+//            throw new ServiceException("Error: maven project could not be tested!");
+//
+//    }
+//
+//    protected void deleteMavenProject(String destDir) throws IOException {
+//        File directory = new File(destDir);
+//        if(directory.exists())
+//            FileUtils.deleteDirectory(directory);
+//    }
+//
+//    protected void unzipMavenProject(String zipFilePath, File destDir) throws IOException {
+//        ZipFile zipFile = new ZipFile(zipFilePath);
+//        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+//        while (zipEntries.hasMoreElements()) {
+//            ZipEntry zipEntry = zipEntries.nextElement();
+//            if (zipEntry.isDirectory()) {
+//                String subDir = destDir + "\\" + zipEntry.getName();
+//                File as = new File(subDir);
+//                as.mkdirs();
+//            } else {
+//                // Create new  file
+//                File newFile = new File(destDir, zipEntry.getName());
+//                String extractedDirectoryPath = destDir.getCanonicalPath();
+//                String extractedFilePath = newFile.getCanonicalPath();
+//                if (!extractedFilePath.startsWith(extractedDirectoryPath + File.separator))
+//                    throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+//
+//                BufferedInputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry));
+//                try (FileOutputStream outputStream = new FileOutputStream(newFile)) {
+//                    while (inputStream.available() > 0) {
+//                        outputStream.write(inputStream.read());
+//                    }
+//                }
+//            }
+//        }
+//        zipFile.close();
+//    }
 
     protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
         String filePath = createUserExampleAttachmentDir(example);
@@ -256,20 +245,20 @@ public class FinishesExampleService extends AbstractService{
         return FileConstants.attachmentsDir + createExampleAttachmentDir(example) + userDir;
     }
 
-    public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceValidationException {
+    public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
         try {
             finishesExample.setAttachmentContent(readFileFromDisk(finishesExample));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new ServiceValidationException(e.getMessage());
+            throw new ServiceException(e.getMessage());
         }
 
         return finishesExample;
     }
 
-    public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceValidationException {
+    public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceException {
         readExample(userExamplePresented.getExampleId()); // checks if example exits
         readUser(userExamplePresented.getMatriculationNumber()); // checks if user exists
         FinishesExample finishesExample = readFinishesExample(userExamplePresented.getExampleId(), userExamplePresented.getMatriculationNumber());
@@ -277,11 +266,11 @@ public class FinishesExampleService extends AbstractService{
         finishesExampleRepository.save(finishesExample);
     }
 
-    protected FinishesExample readFinishesExample(Long exampleId, String matriculationNumber) throws ServiceValidationException {
+    protected FinishesExample readFinishesExample(Long exampleId, String matriculationNumber) throws ServiceException {
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
                 .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
         if (!optionalFinishesExample.isPresent())
-            throw new ServiceValidationException("Error: user did not check this example");
+            throw new ServiceException("Error: user did not check this example");
 
         return optionalFinishesExample.get();
     }
@@ -291,9 +280,9 @@ public class FinishesExampleService extends AbstractService{
      * @param matriculationNumber
      * @param courseId
      * @return list of example id and name
-     * @throws ServiceValidationException
+     * @throws ServiceException
      */
-    public List<KreuzelResponse> getKreuzelUserCourse(String matriculationNumber, Long courseId) throws ServiceValidationException {
+    public List<KreuzelResponse> getKreuzelUserCourse(String matriculationNumber, Long courseId) throws ServiceException {
         List<KreuzelResponse> responseObjects = new ArrayList<>();
 
         User user = readUser(matriculationNumber);
@@ -301,7 +290,7 @@ public class FinishesExampleService extends AbstractService{
 
         // check permission
         if (!isAdmin() && !isOwner(course))
-            throw new ServiceValidationException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
 
         Comparator<ExerciseSheet> exerciseSheetComparator = Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName);
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);

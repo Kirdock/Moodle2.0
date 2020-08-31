@@ -3,7 +3,7 @@ package com.aau.moodle20.services;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
@@ -18,15 +18,11 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.UniqueConstraint;
-import javax.print.Doc;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
@@ -366,17 +362,17 @@ public class PdfService extends AbstractService {
         return resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
     }
 
-    public ByteArrayInputStream generateKreuzelList(Long exerciseSheetId) throws ServiceValidationException, IOException {
+    public ByteArrayInputStream generateKreuzelList(Long exerciseSheetId) throws ServiceException, IOException {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         return new ByteArrayInputStream(createKreuzelList(exerciseSheet));
     }
 
-    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceValidationException, IOException {
+    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceException, IOException {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         return new ByteArrayInputStream(createExerciseSheet(exerciseSheet));
     }
 
-    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceValidationException, IOException {
+    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceException, IOException {
         Course course = readCourse(courseId);
         return new ByteArrayInputStream(createAttendanceList(course));
     }

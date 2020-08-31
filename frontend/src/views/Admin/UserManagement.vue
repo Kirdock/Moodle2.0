@@ -63,10 +63,10 @@
                             {{user.isAdmin ? $t('yes') : $t('no')}}
                         </td>
                         <td>
-                            <a href="#" v-b-modal="'modal-edit-user'" :title="$t('edit')" @click.prevent="userInfo = {...user}; selectedUser = user" >
+                            <a href="#" :title="$t('edit')" @click.prevent="setEdit(user)" >
                                 <span class="fa fa-edit fa-2x"></span>
                             </a>
-                            <a href="#" v-b-modal="'modal-delete-user'" :title="$t('delete')" @click.prevent="selectedUser = user">
+                            <a href="#" :title="$t('delete')" @click.prevent="setDelete(user)">
                                 <span class="fa fa-trash fa-2x"></span>
                             </a>
                         </td>
@@ -82,16 +82,21 @@
         <b-modal id="modal-delete-user" :title="$t('title.delete')" :ok-title="$t('yes')" :cancel-title="$t('no')" @ok="deleteUser()">
             {{$t('user.question.delete')}}
         </b-modal>
+        <b-modal id="modal-user-creation-error" :title="$t('error')" hide-footer>
+            <user-creation-error v-model="failedUsers"></user-creation-error>
+        </b-modal>
     </div>
 </template>
 
 <script>
 import UserInfo from '@/components/UserInfo.vue';
 import {userManagement} from '@/plugins/global';
+import UserCreationError from '@/components/UserCreationError.vue'
 
 export default {
     components:{
-        'user-info': UserInfo
+        'user-info': UserInfo,
+        'user-creation-error': UserCreationError
     },
     data(){
         return {
@@ -103,7 +108,8 @@ export default {
                 fileUpload: false,
             },
             searchText: undefined,
-            isAdmin: false
+            isAdmin: false,
+            failedUsers: []
         }
     },
     created(){
@@ -124,6 +130,15 @@ export default {
         resetUserInfo(){
             this.userInfo = {};
         },
+        setEdit(user){
+            this.userInfo = {...user};
+            this.selectedUser = user;
+            this.$bvModal.show('modal-edit-user');
+        },
+        setDelete(user){
+            this.selectedUser = user;
+            this.$bvModal.show('modal-delete-user');
+        },
         async submitUsers(){
             this.loading.fileUpload = true;
             const formData = new FormData();
@@ -131,15 +146,26 @@ export default {
             formData.append('isAdmin', this.isAdmin)
             this.$refs.file.value = '';
             try{
-                await this.$store.dispatch('createUsers', formData);
-                this.$bvToast.toast(this.$t('user.created'), {
-                    title: this.$t('success'),
-                    variant: 'success',
-                    appendToast: true
-                });
+                const response = await this.$store.dispatch('createUsers', formData);
+                this.failedUsers = response.data.failedUsers;
+                if(response.data.failedUsers.length === 0){
+                    this.$bvToast.toast(this.$t('user.created'), {
+                        title: this.$t('success'),
+                        variant: 'success',
+                        appendToast: true
+                    });
+                }
+                else{
+                    this.$bvModal.show('modal-user-creation-error');
+                }
+                
+                if(response.data.registeredUsers.length !== 0){
+                    this.users.push(...response.data.registeredUsers);
+                    this.users.sort((a,b) => a.matriculationNumber.localeCompare(b.matriculationNumber));
+                }
             }
             catch{
-                this.$bvToast.toast(this.$t('user.create.error'), {
+                this.$bvToast.toast(this.$t('user.error.create'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
@@ -166,21 +192,11 @@ export default {
                         variant: 'success',
                         appendToast: true
                     });
-                    this.getUsers();
+                    this.users.push(this.userInfo);
+                    this.users.sort((a,b) => a.matriculationNumber.localeCompare(b.matriculationNumber));
                 }
                 catch(error){
-                    const status = error.response.data.errorResponseCode;
-                    let message;
-                    if(status === 470){
-                        message = this.$t('user.error.usernameExists');
-                    }
-                    else if(status === 471){
-                        message = this.$t('user.error.matriculationNumberExists');
-                    }
-                    else{
-                        message = this.$t('user.error.create');
-                    }
-                    this.$bvToast.toast(message, {
+                    this.$bvToast.toast(userManagement.modifyMessage(error.response.data.errorResponseCode), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true

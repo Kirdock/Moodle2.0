@@ -26,10 +26,10 @@
             <td></td>
             <td></td>
         </template>
-        <td>
+        <td class="text-center">
             <template v-if="value.subExamples.length === 0">
                 <template v-if="includeThird">
-                    <div class="form-inline">
+                    <div class="form-inline justify-content-center">
                         <div class="form-check">
                             <input :id="`kInfoYes${_uid}`" type="radio" value="y" class="form-check-input"  v-model="value.state" :disabled="deadlineReached">
                             <label :id="`kInfoYes${_uid}`" class="form-check-label">
@@ -56,14 +56,19 @@
                         </div>
                     </div>
                 </template>
-                <template v-else style="margin-right: 20px">
+                <template v-else>
                     <input :true-value="'y'" :false-value="'n'" type="checkbox" class="form-check-input" v-model="value.state" :disabled="deadlineReached">
                 </template>
             </template>
         </td>
-        <td v-if="hasFileUpload">
+        <td v-if="hasFileUpload" class="text-center">
             <template v-if="value.submitFile">
-                {{value.remainingUploadCount}}/{{value.uploadCount}}
+                <template v-if="uploadCount === 0">
+                    <span class="fa fa-infinity"></span>
+                </template>
+                <template v-else>
+                    {{value.remainingUploadCount}}/{{uploadCount}}
+                </template>
             </template>
         </td>
         <td>
@@ -74,14 +79,14 @@
                     {{$t('submitFile')}}
                     <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached"/>
                 </label>
-                <a href.prevent="#" style="color: red; font-size: 25px" v-b-tooltip.hover :title="$t('noFileUploaded')">
+                <a href.prevent="#" style="color: red !important; font-size: 25px" v-b-tooltip.hover :title="$t('noFileUploaded')">
                     <span class="fas fa-exclamation-circle" v-show="value.state !== 'n' && !value.hasAttachment"></span>
                 </a>
                 <a href="#" @click.prevent="downloadFile(value.id)" :title="$t('download')" v-if="value.hasAttachment">
                     <span class="fa fa-sync fa-spin fa-2x" v-if="loading.fileDownload"></span>
                     <span class="fa fa-download fa-2x" v-else></span>
                 </a>
-                <a href="#" @click.prevent="setSelectedKreuzelResult(value.result)" :title="$t('result')" v-if="value.result.length !== 0">
+                <a href="#" @click.prevent="setSelectedKreuzelResult(value.result)" :title="$t('result')" v-if="value.result && value.result.length !== 0">
                     <span class="fa fa-list fa-2x"></span>
                 </a>
             </template>
@@ -97,7 +102,7 @@ export default {
     components:{
         KreuzelResult
     },
-    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload', 'setSelectedKreuzelResult'],
+    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload', 'setSelectedKreuzelResult', 'uploadCount'],
     data(){
         return {
             loading: {
@@ -134,11 +139,15 @@ export default {
                 formData.append('id', this.value.id);
                 this.$refs[`file${this._uid}`].value = '';
                 try{
-                    await this.$store.dispatch('addExampleAttachment', formData);
+                    const response = await this.$store.dispatch('addExampleAttachment', formData);
                     if(this.value.remainingUploadCount > 0){
                         this.value.remainingUploadCount--;
                     }
                     this.value.hasAttachment = true;
+                    if(!this.value.result){
+                        this.value.result = []
+                    }
+                    this.value.result.push(response.data);
                     this.$bvToast.toast(this.$t('attachment.saved'), {
                         title: this.$t('success'),
                         variant: 'success',

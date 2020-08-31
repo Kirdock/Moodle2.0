@@ -4,8 +4,7 @@ import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
-import com.aau.moodle20.exception.EntityNotFoundException;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CopyCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.UpdateCoursePresets;
@@ -15,8 +14,10 @@ import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelCourseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,11 +28,17 @@ import java.util.stream.Collectors;
 public class CourseService extends AbstractService {
 
 
-    public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceValidationException {
+    private ExampleService exampleService;
+
+    public CourseService( ExampleService exampleService) {
+        this.exampleService = exampleService;
+    }
+
+    public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceException {
 
         Semester semester = readSemester(createCourseRequest.getSemesterId());
-        if(courseRepository.existsByNameAndNumberAndSemester_Id(createCourseRequest.getName(),createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
-            throw new ServiceValidationException("Course in Semester already exists", ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
+        if(courseRepository.existsByNumberAndSemester_Id(createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
+            throw new ServiceException("Course in Semester already exists", ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
         Course course = new Course();
         course.setMinKreuzel(createCourseRequest.getMinKreuzel());
@@ -47,14 +54,21 @@ public class CourseService extends AbstractService {
         return new CourseResponseObject(course.getId());
     }
 
-    public void updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceValidationException {
+    public void updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(updateCourseRequest.getId());
         if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
-            throw new ServiceValidationException("Error: Owner cannot be updated because the given matriculationNumber those not exists!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Owner cannot be updated because the given matriculationNumber those not exists!", HttpStatus.NOT_FOUND);
 
         if (!userDetails.getAdmin() && !isOwner(course))
-            throw new ServiceValidationException("Error: User is not owner of this course and thus cannot update this course!", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: User is not owner of this course and thus cannot update this course!", HttpStatus.UNAUTHORIZED);
+
+        // if number  updated check if no course with given number im semester exists
+        if(!updateCourseRequest.getNumber().equals(course.getNumber()))
+        {
+            if(courseRepository.existsByNumberAndSemester_Id(updateCourseRequest.getNumber(),course.getSemester().getId()))
+                throw new ServiceException("Error: A Course with this number already exists",ApiErrorResponseCodes.CHANGED_COURSE_NUMBER_ALREADY_EXISTS);
+        }
 
         course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
         course.setMinPoints(updateCourseRequest.getMinPoints());
@@ -67,29 +81,37 @@ public class CourseService extends AbstractService {
         courseRepository.save(course);
     }
 
-    public void updateCoursePresets(UpdateCoursePresets updateCoursePresets) throws ServiceValidationException
+    public void updateCoursePresets(UpdateCoursePresets updateCoursePresets) throws ServiceException
     {
         Course course = readCourse(updateCoursePresets.getId());
         UserDetailsImpl userDetails = getUserDetails();
         if(!userDetails.getAdmin() && !isOwner(course))
-            throw new ServiceValidationException("Error: not authorized to update course",HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: not authorized to update course",HttpStatus.UNAUTHORIZED);
 
         course.setDescriptionTemplate(updateCoursePresets.getDescription());
         course.setUploadCount(updateCoursePresets.getUploadCount());
         courseRepository.save(course);
     }
 
-    public void deleteCourse(Long courseId) throws EntityNotFoundException {
+    @Transactional
+    public void deleteCourse(Long courseId) throws  IOException {
         Course course = readCourse(courseId);
+        Set<ExerciseSheet> exerciseSheets = course.getExerciseSheets();
+        for(ExerciseSheet exerciseSheet: exerciseSheets)
+        {
+            for(Example example: exerciseSheet.getExamples())
+                exampleService.deleteExampleValidator(example.getId());
+        }
+
         courseRepository.delete(course);
     }
 
-    public CourseResponseObject getCourse(long courseId) throws ServiceValidationException {
+    public CourseResponseObject getCourse(long courseId) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
 
         Course course = readCourse(courseId);
         if (!userDetails.getAdmin() && !isOwner(course))
-            throw new ServiceValidationException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);
 
         CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
         responseObject.setPresented(createCoursePresentedList(course));
@@ -100,7 +122,7 @@ public class CourseService extends AbstractService {
         return responseObject;
     }
 
-    public List<FinishesExampleResponse> getCoursePresented(Long courseId) throws ServiceValidationException {
+    public List<FinishesExampleResponse> getCoursePresented(Long courseId) throws ServiceException {
         Course course = readCourse(courseId);
         return createCoursePresentedList(course);
     }
@@ -177,11 +199,14 @@ public class CourseService extends AbstractService {
         return finishesExampleResponses;
     }
 
-    @Transactional
-    public CourseResponseObject copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceValidationException {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public CourseResponseObject copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceException, IOException {
 
         Semester semester = readSemester(copyCourseRequest.getSemesterId());
         Course originalCourse = readCourse(copyCourseRequest.getCourseId());
+
+        if(courseRepository.existsByNumberAndSemester_Id(originalCourse.getNumber(),semester.getId()))
+            throw new ServiceException("Error: A course with this number already exists in given semester!",ApiErrorResponseCodes.COPIED_COURSE_NUMBER_ALREADY_EXISTS);
 
         // first copy course
         Course copiedCourse = originalCourse.copy();
@@ -204,6 +229,7 @@ public class CourseService extends AbstractService {
             if (exerciseSheet.getExamples() == null)
                 continue;
 
+            // copy examples
             for (Example example : exerciseSheet.getExamples()) {
 
                 // if true example is subExample and this is handled below
@@ -213,6 +239,8 @@ public class CourseService extends AbstractService {
                 Example copiedExample = example.copy();
                 copiedExample.setExerciseSheet(copiedExerciseSheet);
                 exampleRepository.save(copiedExample);
+                exampleService.copyValidator(example,copiedExample);
+
 
                 if (example.getSubExamples() != null) {
                     for (Example subExample : example.getSubExamples()) {
@@ -220,6 +248,7 @@ public class CourseService extends AbstractService {
                         copiedSubExample.setExerciseSheet(copiedExerciseSheet);
                         copiedSubExample.setParentExample(copiedExample);
                         exampleRepository.save(copiedSubExample);
+                        exampleService.copyValidator(subExample,copiedSubExample);
                         if (subExample.getSupportFileTypes() != null) {
                             copySupportFileType(subExample.getSupportFileTypes(), copiedSubExample);
                         }

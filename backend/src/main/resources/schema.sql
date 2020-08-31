@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS USER
     forename        VARCHAR(50),
     is_Admin            CHAR(5),
     email           VARCHAR(200),
-    surname         VARCHAR(50)
+    surname         VARCHAR(50),
+    password_Expire_Date datetime
 );
 
 CREATE TABLE IF NOT EXISTS SEMESTER
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS COURSE
     description_Template CLOB,
     upload_Count NUMBER(10),
     CONSTRAINT FOREIGN_KEY_SEMESTER FOREIGN KEY (semester_id) references SEMESTER on delete cascade ,
-    CONSTRAINT FOREIGN_KEY_OWNER FOREIGN KEY (owner) references USER on delete cascade
+    CONSTRAINT FOREIGN_KEY_OWNER FOREIGN KEY (owner) references USER
 );
 
 

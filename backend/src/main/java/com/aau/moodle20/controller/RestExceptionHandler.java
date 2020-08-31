@@ -19,6 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(ex.getMessage()));
     }
 
-    @ExceptionHandler(ServiceValidationException.class)
-    protected ResponseEntity<Object> handleServiceValidationException(ServiceValidationException ex) {
+    @ExceptionHandler(ServiceException.class)
+    protected ResponseEntity<Object> handleServiceValidationException(ServiceException ex) {
         HttpStatus status = ex.getHttpStatus()!=null?ex.getHttpStatus():HttpStatus.BAD_REQUEST;
 
         ApiError apiError =
@@ -52,6 +53,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errors = new ArrayList<String>();
         ApiError apiError =
                 new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors, ApiErrorResponseCodes.USER_ALREADY_EXISTS);
+        return  ResponseEntity.status(apiError.getStatus()).body(apiError);
+    }
+
+    @ExceptionHandler(ClassNotFoundException.class)
+    protected ResponseEntity<Object> handleClassNotFoundException(ClassNotFoundException ex) {
+        List<String> errors = new ArrayList<String>();
+        errors.add("ClassNotFoundException");
+        ApiError apiError =
+                new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
+        return  ResponseEntity.status(apiError.getStatus()).body(apiError);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    protected ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {
+        List<String> errors = new ArrayList<String>();
+        ApiError apiError =
+                new ApiError(HttpStatus.BAD_REQUEST, "NullPointerException occured", errors);
         return  ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 

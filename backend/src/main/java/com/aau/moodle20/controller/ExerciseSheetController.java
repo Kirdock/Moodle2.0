@@ -1,7 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.EntityNotFoundException;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.ExerciseSheetKreuzelResponse;
@@ -34,7 +34,7 @@ public class ExerciseSheetController {
     }
 
     @PutMapping(value = "/exerciseSheet")
-    public ResponseEntity<?> createExerciseSheet(@Valid @RequestBody CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceValidationException {
+    public ResponseEntity<?> createExerciseSheet(@Valid @RequestBody CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceException {
         exerciseSheetService.createExerciseSheet(createExerciseSheetRequest);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was sucessfully created!"));
     }
@@ -55,7 +55,7 @@ public class ExerciseSheetController {
     }
 
     @PostMapping(value = "/exerciseSheet")
-    public ResponseEntity<?> updateExerciseSheet(@Valid @RequestBody UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceValidationException, EntityNotFoundException {
+    public ResponseEntity<?> updateExerciseSheet(@Valid @RequestBody UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceException, EntityNotFoundException {
         exerciseSheetService.updateExerciseSheet(updateExerciseSheetRequest);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was sucessfully updated!"));
     }
@@ -93,9 +93,8 @@ public class ExerciseSheetController {
     }
 
     @DeleteMapping(value = "/exerciseSheet/{id}")
-    public ResponseEntity<?> deleteExerciseSheet(@PathVariable("id") long id) {
+    public ResponseEntity<?> deleteExerciseSheet(@PathVariable("id") long id) throws IOException {
         exerciseSheetService.deleteExerciseSheet(id);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was successfully deleted!"));
-
     }
 }

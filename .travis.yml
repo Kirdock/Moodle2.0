@@ -1,5 +1,16 @@
+sudo: required
 language: java
+addons:
+  chrome: stable
 jdk:
   - openjdk8
+
+services:
+  - xvfb
+
+before_script:
+  - export DISPLAY=:99.0
+  - npm i -g npm@^6
+  - sleep 3
 
 script: mvn clean install

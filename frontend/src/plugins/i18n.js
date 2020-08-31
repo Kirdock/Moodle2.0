@@ -42,6 +42,7 @@ const messages = {
                 copy: 'Die Lehrveranstaltung konnte nicht kopiert werden',
                 create: 'Lehrveranstaltung konnte nicht angelegt werden',
                 delete: 'Lehrveranstaltung konnte nicht gelöscht werden',
+                duplicate: 'In diesem Semester existiert bereits eine Lehrveranstaltung mit dieser Nummer',
                 get: 'Lehrveranstaltung konnte nicht geladen werden',
                 save: 'Lehrveranstaltung konnte nicht gespeichert werden',
                 presetsUpdate: 'Voreinstellungen konnten nicht gespeichert werden',
@@ -62,6 +63,7 @@ const messages = {
             }
         },
         create: 'Anlegen',
+        date: 'Datum',
         deadlineReached: 'Das Abgabeende wurde bereits überschritten',
         delete: 'Löschen',
         description: 'Beschreibung',
@@ -79,6 +81,7 @@ const messages = {
             saved: 'Beispiel wurde gespeichert',
             error: {
                 create: 'Beispiel konnte nicht angelegt werden',
+                duplicate: 'Der Name des Beispiels ist bereits vergeben',
                 delete: 'Beispiel konnte nicht gelöscht werden',
                 save: 'Beispiel konnte nicht gespeichert werden'
             },
@@ -91,7 +94,10 @@ const messages = {
         reason: 'Begründung',
         subExample: {
             name: 'Unterbeispiel',
-            new: 'Neues Unterbeispiel'
+            new: 'Neues Unterbeispiel',
+            error: {
+                duplicate: 'Der Name des Unterbeispiels ist bereits vergeben',
+            }
         },
         subExamples: {
             name: 'Unterbeispiele',
@@ -103,6 +109,7 @@ const messages = {
             deleted: 'Übungsblatt wurde gelöscht',
             error: {
                 create: 'Übungsblatt konnte nicht angelegt werden',
+                duplicate: 'Der Name des Übungsblattes ist bereits vergeben',
                 get: 'Übungsblatt konnte nicht geladen werden',
                 save: 'Übungsblatt konnte nicht gespeichert werden',
                 delete: 'Übungsblatt konnte nicht gelöscht werden'
@@ -155,8 +162,8 @@ const messages = {
         maxAttemptsReached: 'Die maximale Anzahl der Versuche wurde bereits erreicht',
         minKreuzel: 'Mindestanforderung Kreuzel',
         minPoints: 'Mindestanforderung Punkte',
-        minRequireKreuzel: 'Mindestanforderung Kreuzel (in %)',
-        minRequirePoints: 'Mindestanforderung Punkte (in %)',
+        minRequireKreuzel: 'Mindestanforderung Kreuzel',
+        minRequirePoints: 'Mindestanforderung Punkte',
         name: 'Name',
         new: 'Neu',
         no: 'Nein',
@@ -168,6 +175,7 @@ const messages = {
         owner: 'Besitzer',
         password: 'Passwort',
         passwordDontMatch: 'Passwörter stimmen nicht überein',
+        passwordExpired: 'Das Passwort ist abgelaufen\nEin neues Passwort wird soeben zugeschickt',
         passwordNew: 'Neues Passwort',
         passwordNewConfirm: 'Neues Passwort bestätigen',
         passwordOld: 'Altes Passwort',
@@ -192,6 +200,7 @@ const messages = {
         requirements: 'Anforderungen',
         result: 'Ergebnis',
         role: 'Rolle',
+        row: 'Zeile',
         save: 'Speichern',
         search: 'Suche',
         searchOrAddFileType: 'Suchen oder Dateityp hinzufügen',
@@ -241,15 +250,18 @@ const messages = {
                 delete: 'Benutzer konnte nicht gelöscht werden',
                 get: 'Benutzer konnte nicht geladen werden',
                 matriculationNumberExists: 'Die Matrikelnummer ist bereits vergeben',
+                matriculationNumberExistsUsernameAvaliable: 'Benutzername ist frei, aber die Matrikelnummer ist bereits vergeben',
+                matriculationNumberWrongFormat: 'Ungültiges Format der Matrikelnummer. Bitte vergewissern Sie sich, dass es sich um eine achtstellige Nummer handelt',
                 save: 'Benutzer konnte nicht gespeichert werden',
-                usernameExists: 'Der Benutzername ist bereits vergeben'
+                usernameExists: 'Der Benutzername ist bereits vergeben',
+                usernameExistsMatAvailable: 'Die Matrikelnummer ist frei, aber der Benutzername ist bereits vergeben'
             },
             question: {
                 delete: 'Wollen Sie den Benutzer wirklich löschen?'
             },
             title: {
                 new: 'Neuen Benutzer anlegen',
-                edit: 'Edit user'
+                edit: 'Benutzer bearbeiten'
             }
         },
         users: {
@@ -268,7 +280,8 @@ const messages = {
                 delete: 'Validator konnte nicht gelöscht werden',
                 get: 'Validator konnte nicht geladen werden',
                 save: 'Validator konnte nicht gespeichert werden',
-                skeletonDownload: 'Validator-Skelett konnte nicht heruntergeladen werden'
+                skeletonDownload: 'Validator-Skelett konnte nicht heruntergeladen werden',
+                valid: 'Kein gültiger Validator'
             }
         },
         view: 'Ansehen',
@@ -302,7 +315,7 @@ const messages = {
                 get: 'Could not get attendance list'
             }
         },
-        cancel: 'cancel',
+        cancel: 'Cancel',
         change: 'Change',
         changeLanguageError: 'Language could not be changed',
         confirm: 'Confirm',
@@ -323,6 +336,7 @@ const messages = {
                 copy: 'Course could not be copied',
                 create: 'Course could not be created',
                 delete: 'Course could not be deleted',
+                duplicate: 'A course with this number already exists this semester',
                 get: 'Course could not be loaded',
                 save: 'Course could not be saved',
                 presetsUpdate: 'Presets could not be saved',
@@ -339,6 +353,7 @@ const messages = {
             }
         },
         create: 'Create',
+        date: 'Date',
         deadlineReached: 'Submission date is already reached',
         delete: 'Delete',
         description: 'Description',
@@ -356,6 +371,7 @@ const messages = {
             saved: 'Example saved',
             error: {
                 create: 'Example could not be created',
+                duplicate: 'Example name is already taken',
                 delete: 'Example could not be deleted',
                 save: 'Example could not be saved'
             },
@@ -368,7 +384,10 @@ const messages = {
         reason: 'Reason',
         subExample: {
             name: 'Sub example',
-            new: 'New sub example'
+            new: 'New sub example',
+            error: {
+                duplicate: 'Sub example name is already taken',
+            }
         },
         subExamples: {
             name: 'Sub examples',
@@ -380,6 +399,7 @@ const messages = {
             delete: 'Exercise sheet deleted',
             error: {
                 create: 'Exercise sheet could not be created',
+                duplicate: 'Exercise sheet name is already taken',
                 get: 'Exercise sheet could not be loaded',
                 save: 'Exercise sheet could lnto be saved',
                 delete: 'Exercise sheet could not be deleted'
@@ -432,8 +452,8 @@ const messages = {
         maxAttemptsReached: 'The maximum number of attempts has already been reached',
         minKreuzel: 'Minimum requirement of kreuzel',
         minPoints: 'Minimum requirement of points',
-        minRequireKreuzel: 'Minimum requirement of kreuzel (in %)',
-        minRequirePoints: 'Minimum requirement of points (in %)',
+        minRequireKreuzel: 'Minimum requirement of kreuzel',
+        minRequirePoints: 'Minimum requirement of points',
         name: 'Name',
         new: 'New',
         no: 'No',
@@ -445,6 +465,7 @@ const messages = {
         owner: 'Owner',
         password: 'Password',
         passwordDontMatch: 'Passwords do not match',
+        passwordExpired: 'The password has expired.\nA new password has just been sent',
         passwordNew: 'New password',
         passwordNewConfirm: 'Confirm new password',
         passwordOld: 'Old Password',
@@ -469,6 +490,7 @@ const messages = {
         requirements: 'Requirements',
         result: 'Result',
         role: 'Role',
+        row: 'Row',
         save: 'Save',
         search: 'Search',
         searchOrAddFileType: 'Search or add a file type',
@@ -518,8 +540,11 @@ const messages = {
                 delete: 'User could not be deleted',
                 get: 'User could not be loaded',
                 matriculationNumberExists: 'Matriculation number is already taken',
+                matriculationNumberExistsUsernameAvaliable: 'Username is available but matriculation number is already taken',
+                matriculationNumberWrongFormat: 'Invalid matriculation number format. Please  Please make sure it is an eight-digit number',
                 save: 'User could not be saved',
-                usernameExists: 'Username is already taken'
+                usernameExists: 'Username is already taken',
+                usernameExistsMatAvailable: 'Matriculation number is available but username is already taken'
             },
             question: {
                 delete: 'Do you really want to delete this user?',
@@ -540,7 +565,8 @@ const messages = {
                 delete: 'Validator could not be deleted',
                 get: 'Validator could not be loaded',
                 save: 'Validator could not be saved',
-                skeletonDownload: 'Validator skeleton could not be downloaded'
+                skeletonDownload: 'Validator skeleton could not be downloaded',
+                valid: 'Validator is invalid'
             }
         },
         view: 'View',

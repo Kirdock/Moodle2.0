@@ -169,6 +169,7 @@ public class Course {
         course.setOwner(getOwner());
         course.setDescriptionTemplate(getDescriptionTemplate());
         course.setDescription(getDescription());
+        course.setUploadCount(getUploadCount());
         return course;
     }
 

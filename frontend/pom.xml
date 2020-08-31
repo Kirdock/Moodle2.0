@@ -33,7 +33,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v10.10.0</nodeVersion>
+                            <nodeVersion>v12.13.0</nodeVersion>
                         </configuration>
                     </execution>
                     <!-- Install all project dependencies -->
@@ -43,7 +43,7 @@
                             <goal>npm</goal>
                         </goals>
                         <!-- optional: default phase is "generate-resources" -->
-                        <phase>generate-resources</phase>
+                        <!-- <phase>generate-resources</phase> -->
                         <!-- Optional configuration which provides for running any npm command -->
                         <configuration>
                             <arguments>install</arguments>
@@ -57,7 +57,7 @@
                         </goals>
                         <configuration>
                             <arguments>run build</arguments>
-            </configuration>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

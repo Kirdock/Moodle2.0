@@ -4,7 +4,7 @@ import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.entity.UserInCourse;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import org.springframework.stereotype.Service;
@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 public class SemesterService extends AbstractService{
 
 
-    public void createSemester(CreateSemesterRequest createSemesterRequest) throws ServiceValidationException {
+    public void createSemester(CreateSemesterRequest createSemesterRequest) throws ServiceException {
         if (semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear()))
-            throw new ServiceValidationException("Error: Semester with this year and type already exists!", ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS);
+            throw new ServiceException("Error: Semester with this year and type already exists!", ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS);
         Semester semester = new Semester();
         semester.setType(createSemesterRequest.getType());
         semester.setYear(createSemesterRequest.getYear());

@@ -26,7 +26,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 
 export default {
   data() {
@@ -43,12 +42,21 @@ export default {
         await this.$store.dispatch('login', { user: this.user, password: this.password});
         this.$router.push('Courses');
       }
-      catch{
-        this.$bvToast.toast(this.$t('userPwdInvalid'), {
-          title: this.$t('error'),
-          appendToast: true,
-          variant: 'danger'
-        });
+      catch(error){
+        if(error.response.data.errorResponseCode === 480){
+          this.$bvToast.toast(this.$t('passwordExpired'), {
+            title: this.$t('warning'),
+            appendToast: true,
+            variant: 'warning'
+          });
+        }
+        else{
+          this.$bvToast.toast(this.$t('userPwdInvalid'), {
+            title: this.$t('error'),
+            appendToast: true,
+            variant: 'danger'
+          });
+        }
       }
       finally{
         this.loading = false;

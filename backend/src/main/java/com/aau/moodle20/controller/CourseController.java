@@ -1,7 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.SemesterException;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CopyCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.UpdateCoursePresets;
@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController()
@@ -60,14 +61,14 @@ public class CourseController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @DeleteMapping(value = "/course/{courseId}")
-    public ResponseEntity<?> deleteCourse(@PathVariable("courseId") long courseId)  throws SemesterException {
+    public ResponseEntity<?> deleteCourse(@PathVariable("courseId") long courseId) throws IOException {
 
         courseService.deleteCourse(courseId);
         return ResponseEntity.ok(new MessageResponse("Course was successfully deleted!"));
     }
 
     @PostMapping(value = "/course/copy")
-    public ResponseEntity<?> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest)  throws ServiceValidationException {
+    public ResponseEntity<?> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest) throws ServiceException, IOException {
 
         CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
         return ResponseEntity.ok(responseObject);

@@ -1,8 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.Example;
-import com.aau.moodle20.entity.FinishesExample;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
@@ -38,12 +37,12 @@ public class ExampleController {
     }
 
     @GetMapping(value = "/example/{id}")
-    public ExampleResponseObject getExample(@PathVariable("id") long id) throws ServiceValidationException {
+    public ExampleResponseObject getExample(@PathVariable("id") long id) throws ServiceException {
         return exampleService.getExample(id);
     }
 
     @GetMapping(value = "/example/{id}/validator")
-    public ResponseEntity<InputStreamResource> getExampleValidator(@PathVariable("id") long id) throws ServiceValidationException, IOException {
+    public ResponseEntity<InputStreamResource> getExampleValidator(@PathVariable("id") long id) throws ServiceException, IOException {
         Example example = exampleService.getExampleValidator(id);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(example.getValidatorContent());
         HttpHeaders headers = new HttpHeaders();
@@ -55,52 +54,40 @@ public class ExampleController {
                 .body(new InputStreamResource(inputStream));
     }
 
-    @GetMapping(value = "/validator/skeleton" ,produces="application/zip")
-    public ResponseEntity<byte []> getValidatorSkeleton() throws ServiceValidationException, IOException {
-        byte [] skeletonContent = exampleService.getValidatorSkeleton();
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(skeletonContent);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename=validatorSkeleton.zip");
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(skeletonContent);
-    }
 
     @PutMapping(value = "/example")
-    public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody ExampleRequest createExampleRequest) throws ServiceValidationException, IOException {
+    public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody ExampleRequest createExampleRequest) throws ServiceException, IOException {
         ExampleResponseObject exampleResponseObject = exampleService.createExample(createExampleRequest);
         return ResponseEntity.ok(exampleResponseObject);
     }
 
     @PostMapping(value = "/example")
-    public ResponseEntity<?> updateExample(@Valid @RequestBody ExampleRequest updateExampleRequest) throws ServiceValidationException, IOException {
+    public ResponseEntity<?> updateExample(@Valid @RequestBody ExampleRequest updateExampleRequest) throws ServiceException, IOException {
         exampleService.updateExample(updateExampleRequest);
         return ResponseEntity.ok("Example successfully updated");
     }
 
     @PostMapping(value = "/examples/order")
-    public ResponseEntity<?> updateExampleOrder(@Valid @RequestBody List<ExampleOrderRequest> exampleOrderRequests) throws ServiceValidationException {
+    public ResponseEntity<?> updateExampleOrder(@Valid @RequestBody List<ExampleOrderRequest> exampleOrderRequests) throws ServiceException {
         exampleService.updateExampleOrder(exampleOrderRequests);
         return ResponseEntity.ok("Example order updated successfully");
     }
 
     @PostMapping(value = "/example/validator")
-    public ResponseEntity<?> setExampleValidator(@RequestParam(value = "file",required = true) MultipartFile validator, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws ServiceValidationException, IOException {
+    public ResponseEntity<?> setExampleValidator(@RequestParam(value = "file",required = true) MultipartFile validator, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
         exampleService.setExampleValidator(validator,exampleId);
         return ResponseEntity.ok("Validator was successfully set");
     }
 
 
     @DeleteMapping(value = "/example/{id}")
-    public ResponseEntity<?> deleteExample(@PathVariable("id") long id) throws ServiceValidationException {
+    public ResponseEntity<?> deleteExample(@PathVariable("id") long id) throws ServiceException, IOException {
         exampleService.deleteExample(id);
         return ResponseEntity.ok(new MessageResponse("Example was successfully deleted!"));
 
     }
     @DeleteMapping(value = "/example/{id}/validator")
-    public ResponseEntity<?> setExampleValidator(@PathVariable("id") long id) throws ServiceValidationException, IOException {
+    public ResponseEntity<?> setExampleValidator(@PathVariable("id") long id) throws ServiceException, IOException {
         exampleService.deleteExampleValidator(id);
         return ResponseEntity.ok("Validator was successfully deleted");
     }

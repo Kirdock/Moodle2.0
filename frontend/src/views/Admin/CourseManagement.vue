@@ -11,7 +11,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="courseSemester_edit" class="control-label">{{ $t('semester.name') }}</label>
-                    <select class="form-control" v-model="selectedSemester_edit" id="courseSemester_edit" @change="getCourses(selectedSemester_edit); selectedCourse = selectedCourseId = undefined">
+                    <select class="form-control" v-model="selectedSemester_edit" id="courseSemester_edit" @change="getCourses(selectedSemester_edit); selectedCourse = {}; selectedCourseId = undefined;">
                         <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
                             {{semester.year}} {{semester.type === 'w' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
                         </option>
@@ -28,8 +28,8 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-4" style="margin-top: 31px">
-                <button class="btn btn-primary" v-b-modal="'modal-new-course'" style="margin-right: 10px" v-show="selectedSemester_edit !== undefined">
+            <div class="col-md-4" style="margin-top: 31px" v-if="$store.getters.userInfo.isAdmin">
+                <button class="btn btn-primary" @click="setNewCourse()" style="margin-right: 10px" v-if="selectedSemester_edit !== undefined">
                     <span class="fa fa-sync fa-spin"  v-if="loading.createCourse"></span>
                     <span class="fa fa-plus" v-else></span>
                     {{ $t('new') }}
@@ -40,7 +40,7 @@
                         <course-info v-model="courseInfo_create" :users="users"></course-info>
                     </form>
                 </b-modal>
-                <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-show="selectedCourseId" @click="courseCopyId = semestersWithoutSelected[0].id">
+                <button class="btn btn-primary" v-b-modal="'modal-copy-course'" style="margin-right: 10px" v-if="selectedCourseId" @click="courseCopyId = semestersWithoutSelected[0].id">
                     <span class="fa fa-sync fa-spin"  v-if="loading.copyCourse"></span>
                     <span class="fa fa-copy" v-else></span>
                     {{ $t('copy') }}
@@ -54,7 +54,7 @@
                     </select>
                 </b-modal>
 
-                <button class="btn btn-danger" v-b-modal="'modal-delete-course'" v-show="selectedCourseId">
+                <button class="btn btn-danger" v-b-modal="'modal-delete-course'" v-if="selectedCourseId">
                     <span class="fa fa-sync fa-spin" v-if="loading.deleteCourse"></span>
                     <span class="fa fa-trash" v-else></span>
                     {{ $t('delete') }}
@@ -65,11 +65,11 @@
             </div>
         </div>
         <b-tabs content-class="mt-3" v-if="selectedCourse.id">
-            <b-tab :title="$t('information')" active>
+            <b-tab :title="$t('information')" id="courseInfo" active>
                 <label class="control-label requiredField" style="margin-left: 10px">{{ $t('requiredField') }}</label>
                 <div class="form-horizontal col-md-4">
                     <form @submit.prevent="updateCourse()">
-                        <course-info v-model="selectedCourse" :users="users"></course-info>
+                        <course-info ref="courseInfo" v-model="selectedCourse" :users="users"></course-info>
                         
                         <div class="form-inline">
                             <button class="btn btn-primary" type="submit">
@@ -202,7 +202,7 @@
             <b-tab :title="$t('exerciseSheets.name')" id="exerciseSheets">
                 <div class="form-horizontal">
                     <div class="form-group col-md-6">
-                        <button class="btn btn-primary" v-b-modal="'modal-new-exerciseSheet'">
+                        <button class="btn btn-primary" @click="setNewExerciseSheet()">
                             <span class="fa fa-sync fa-spin"  v-if="loading.createExerciseSheet"></span>
                             <span class="fa fa-plus" v-else></span>
                             {{$t('new')}}
@@ -258,7 +258,7 @@
                         <div class="form-group col-md-6">
                             <label class="control-label" for="defaultDescription">{{$t('descriptionExerciseSheets')}}</label>
                             <div class="document-editor__editable-container">
-                                <editor :id="`defaultDescription`" v-model="selectedCourseTemplate"></editor>
+                                <editor ref="defaultDescription" :id="`defaultDescription`" v-model="selectedCourseTemplate"></editor>
                             </div>
                         </div>
                         <div class="form-group">
@@ -304,6 +304,7 @@
                                     deselect-label=""
                                     :show-no-results="false"
                                     >
+                                    <span slot="noOptions">{{$t('listEmpty')}}</span>
                         </multiselect>
                     </div>
                     <div class="form-group">
@@ -406,6 +407,9 @@
         <b-modal id="modal-kreuzelList" :title="$t('kreuzel.name')" size="xl" hide-footer>
             <kreuzel-list :exerciseSheets="selectedCourse.exerciseSheets"></kreuzel-list>
         </b-modal>
+        <b-modal id="modal-user-creation-error" :title="$t('error')" hide-footer>
+            <user-creation-error v-model="failedUsers"></user-creation-error>
+        </b-modal>
     </div>
 </template>
 
@@ -417,12 +421,14 @@ import {userManagement, dateManagement, fileManagement} from '@/plugins/global';
 import Editor from '@/components/Editor.vue';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
+import UserCreationError from '@/components/UserCreationError.vue'
 
 export default {
     components: {
         'course-info': CourseInfo,
         'es-info': ExerciseSheetInfo,
         'kreuzel-list': KreuzelList,
+        'user-creation-error': UserCreationError,
         Editor,
         Multiselect
     },
@@ -450,7 +456,7 @@ export default {
                 attendanceList: false,
                 presentations: false
             },
-            selectedCourseTemplate: undefined,
+            selectedCourseTemplate: '',
             selectedDeleteExerciseSheet: undefined,
             presentedUser: undefined,
             presentedExample: {},
@@ -461,22 +467,23 @@ export default {
             sortOrder:{
                 index: 0,
                 type: 0 //0 => DESC, 1 => ASC
-            }
+            },
+            failedUsers: []
         }
     },
-    created(){
+    async created(){
         this.showExerciseSheet = this.$t('all');
-        this.resetExerciseSheet();
+        if(this.$store.getters.userInfo.isAdmin){
+            await this.getUsers();
+        }
         if(this.$route.query.courseId){
             this.selectedCourseId = this.$route.query.courseId;
-            this.getCourse(this.selectedCourseId);
+            await this.getCourse(this.selectedCourseId, true);
         }
         else{
             this.getSemesters();
         }
-        if(this.$store.getters.userInfo.isAdmin){
-            this.getUsers();
-        }
+        
     },
     computed: {
         roles(){
@@ -531,6 +538,16 @@ export default {
         }
     },
     methods:{
+        setNewExerciseSheet(){
+            this.resetExerciseSheet();
+            this.$bvModal.show('modal-new-exerciseSheet')
+        },
+        setNewCourse(){
+            for(const key in this.courseInfo_create){ //this.courseInfo_create = {} kills reference
+                this.courseInfo_create[key] = undefined;
+            }
+            this.$bvModal.show('modal-new-course');
+        },
         setSortOrder(index){
             if(this.sortOrder.index !== index){
                 this.sortOrder = {
@@ -667,13 +684,20 @@ export default {
             formData.append('id', this.selectedCourseId)
             this.$refs.file.value = '';
             try{
-                await this.$store.dispatch('assignCourseUsers', formData);
+                const response = await this.$store.dispatch('assignCourseUsers', formData);
+                this.failedUsers = response.data.failedUsers;
+                
                 this.getCourseUsers(this.selectedCourseId);
-                this.$bvToast.toast(this.$t('course.usersSaved'), {
-                    title: this.$t('success'),
-                    variant: 'success',
-                    appendToast: true
-                });
+                if(response.data.failedUsers.length === 0){
+                    this.$bvToast.toast(this.$t('course.usersSaved'), {
+                        title: this.$t('success'),
+                        variant: 'success',
+                        appendToast: true
+                    });
+                }
+                else{
+                    this.$bvModal.show('modal-user-creation-error');
+                }
             }
             catch{
                 this.$bvToast.toast(this.$t('course.error.usersSave'), {
@@ -690,25 +714,27 @@ export default {
             this.exerciseSheet_create = {
                 submissionDate: dateManagement.midnightDateTime(),
                 issueDate: dateManagement.currentDateTime(),
-                includeThird: false
+                description: this.selectedCourse.descriptionTemplate,
+                includeThird: false,
             }
         },
         async createExerciseSheet(modal){
-            if(modal && !this.$refs.exerciseSheet.checkValidity()){
+            if(modal){
                 modal.preventDefault();
+            }
+            if(!this.$refs.exerciseSheet.checkValidity()){
                 this.$refs.exerciseSheet.reportValidity();
             }
             else{
                 this.loading.createExerciseSheet = true;
                 this.exerciseSheet_create.courseId = this.selectedCourseId;
-                this.exerciseSheet_create.description = this.selectedCourse.descriptionTemplate;
+                
                 try{
                     await this.$store.dispatch('createExerciseSheet', this.exerciseSheet_create);
                     this.$bvModal.hide('modal-new-exerciseSheet');
                     if(this.exerciseSheet_create.courseId === this.selectedCourseId){
                         this.getExerciseSheets(this.selectedCourseId);
                     }
-                    this.resetExerciseSheet();
                     this.$bvToast.toast(this.$t('exerciseSheet.created'), {
                         title: this.$t('success'),
                         variant: 'success',
@@ -716,8 +742,8 @@ export default {
                     });
                     
                 }
-                catch{
-                    this.$bvToast.toast(this.$t('exerciseSheet.error.create'), {
+                catch(error){
+                    this.$bvToast.toast(error.response.data.errorResponseCode === 484 ? this.$t('exerciseSheet.error.duplicate') : this.$t('exerciseSheet.error.create'), {
                         title: this.$t('error'),
                         variant: 'danger',
                         appendToast: true
@@ -805,18 +831,24 @@ export default {
             else{
                 this.courseInfo_create.semesterId = this.selectedSemester_edit;
                 this.loading.createCourse = true;
+                const {semesterId} = this.courseInfo_create;
+                const {...temp} = this.courseInfo_create; //create a copy in order to have consistent data after api call (during creation the form could be called again)
                 try{
-                    const response = await this.$store.dispatch('createCourse',this.courseInfo_create);
+                    const response = await this.$store.dispatch('createCourse',temp);
                     this.$bvToast.toast(this.$t('course.created'), {
                         title: this.$t('success'),
                         variant: 'success',
                         appendToast: true
                     });
-                    const {semesterId} = this.courseInfo_create;
                     this.courseInfo_create = {semesterId};
 
                     if(semesterId === this.selectedSemester_edit){
-                        this.getCourses(this.selectedSemester_edit);
+                        this.courses.push({
+                            id: response.data.id,
+                            name: temp.name,
+                            number: temp.number
+                        })
+                        this.courses.sort((a,b) => a.number.localeCompare(b.number));
                         this.selectedCourseId = response.data.id;
                         this.getCourse(response.data.id);
                     }
@@ -838,18 +870,33 @@ export default {
             const {exerciseSheets, ...data} = this.selectedCourse;
             try{
                 await this.$store.dispatch('updateCourse', data);
+                for(const course of this.courses){
+                    if(course.id === data.id){
+                        course.name = data.name;
+                        course.number = data.number;
+                    }
+                }
                 this.$bvToast.toast(this.$t('course.saved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
             }
-            catch{
-                this.$bvToast.toast(this.$t('course.error.save'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
+            catch(error){
+                if(error.response.data.errorResponseCode === 474){
+                    this.$bvToast.toast(this.$t('course.error.duplicate'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
+                else{
+                    this.$bvToast.toast(this.$t('course.error.save'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
             }
             finally{
                 this.loading.updateCourse = false;
@@ -892,18 +939,27 @@ export default {
                     appendToast: true
                 });
             }
-            catch{
-                this.$bvToast.toast(this.$t('course.error.copy'), {
-                    title: this.$t('error'),
-                    variant: 'danger',
-                    appendToast: true
-                });
+            catch(error){
+                if(error.response.data.errorResponseCode === 475){
+                    this.$bvToast.toast(this.$t('course.error.duplicate'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
+                else{
+                    this.$bvToast.toast(this.$t('course.error.copy'), {
+                        title: this.$t('error'),
+                        variant: 'danger',
+                        appendToast: true
+                    });
+                }
             }
             finally{
                 this.loading.copyCourse = false;
             }
         },
-        async getCourse(courseId){
+        async getCourse(courseId, revertOnError){
             this.getCourseUsers(courseId);
             try{
                 const response = await this.$store.dispatch('getCourse',{courseId});
@@ -911,7 +967,11 @@ export default {
                 if(this.semesters.length === 0){
                     this.getSemesters(this.selectedCourse.semesterId);
                 }
-                this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate; //no reference; update on save
+                this.selectedCourseTemplate = this.selectedCourse.descriptionTemplate || ''; //no reference; update on save
+                this.$nextTick(()=>{
+                    this.$refs.defaultDescription.forceUpdate(this.selectedCourseTemplate);
+                    this.$refs.courseInfo.forceUpdate(this.selectedCourse.description)
+                })
             }
             catch{
                 this.$bvToast.toast(this.$t('course.error.get'), {
@@ -919,6 +979,11 @@ export default {
                     variant: 'danger',
                     appendToast: true
                 });
+
+                if(revertOnError && this.semesters.length === 0){
+                    this.getSemesters();
+                    this.setCourseQuery();
+                }
             }
         },
         async getCourses(id){
@@ -938,15 +1003,21 @@ export default {
             this.loading.deleteCourse = true;
             try{
                 await this.$store.dispatch('deleteCourse',{id});
-                if(id === this.selectedCourseId){
-                    this.selectedCourse = undefined;
+                if(id == this.selectedCourseId){ //check if user did not select another course during delete
+                    this.selectedCourse = {};
+                    this.setCourseQuery();
                 }
+                const index = this.courses.findIndex(course => course.id === id);
+                
+                if(index !== -1){
+                    this.courses.splice(index, 1);
+                }
+
                 this.$bvToast.toast(this.$t('course.deleted'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
-                this.getCourses(this.selectedSemester_edit);
             }
             catch{
                 this.$bvToast.toast(this.$t('course.error.delete'), {
@@ -1011,7 +1082,9 @@ export default {
         '$route.query.courseId': function(newValue, oldValue){
             if(newValue !== this.selectedCourseId){
                 this.selectedCourseId = newValue;
-                this.getCourse(this.selectedCourseId)
+                if(newValue !== undefined){
+                    this.getCourse(this.selectedCourseId)
+                }
             }
         }
     }

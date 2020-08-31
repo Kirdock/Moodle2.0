@@ -1,5 +1,5 @@
 <template>
-    <div class="form-horizontal">
+    <div class="form-horizontal user_info">
         <div class="form-check" v-if="$store.getters.userInfo.isAdmin">
             <label :for="`uInfoIsAdmin${_uid}`"   class="form-check-label">
                 <input :id="`uInfoIsAdmin${_uid}`" type="checkbox" class="form-check-input" v-model="value.isAdmin">

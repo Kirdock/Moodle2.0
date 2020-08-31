@@ -1,8 +1,7 @@
 package com.aau.moodle20.services;
 
-import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,38 +51,38 @@ public class AbstractService {
     ViolationRepository violationRepository;
 
 
-    protected Semester readSemester(Long semesterId) throws ServiceValidationException {
+    protected Semester readSemester(Long semesterId) throws ServiceException {
         Optional<Semester> optionalSemester = semesterRepository.findById(semesterId);
         if (!optionalSemester.isPresent())
-            throw new ServiceValidationException("Error: Semester not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Semester not found!", HttpStatus.NOT_FOUND);
         return optionalSemester.get();
     }
 
-    protected Course readCourse(Long courseId) throws ServiceValidationException {
+    protected Course readCourse(Long courseId) throws ServiceException {
         Optional<Course> optionalCourse = courseRepository.findById(courseId);
         if (!optionalCourse.isPresent())
-            throw new ServiceValidationException("Error: Course not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Course not found!", HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 
-    protected User readUser(String matriculationNumber) throws ServiceValidationException {
+    protected User readUser(String matriculationNumber) throws ServiceException {
         Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
         if (!optionalUser.isPresent())
-            throw new ServiceValidationException("Error: User not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: User not found!", HttpStatus.NOT_FOUND);
         return optionalUser.get();
     }
 
-    protected ExerciseSheet readExerciseSheet(Long exerciseSheetId) throws ServiceValidationException {
+    protected ExerciseSheet readExerciseSheet(Long exerciseSheetId) throws ServiceException {
         Optional<ExerciseSheet> optionalExerciseSheet = exerciseSheetRepository.findById(exerciseSheetId);
         if (!optionalExerciseSheet.isPresent())
-            throw new ServiceValidationException("Error: ExerciseSheet not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: ExerciseSheet not found!", HttpStatus.NOT_FOUND);
         return optionalExerciseSheet.get();
     }
 
-    protected Example readExample(Long exampleId) throws ServiceValidationException {
+    protected Example readExample(Long exampleId) throws ServiceException {
         Optional<Example> optionalExample = exampleRepository.findById(exampleId);
         if (!optionalExample.isPresent())
-            throw new ServiceValidationException("Error: Example not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Example not found!", HttpStatus.NOT_FOUND);
         return optionalExample.get();
     }
 
@@ -125,7 +124,7 @@ public class AbstractService {
         return Files.readAllBytes(path);
     }
 
-    protected boolean deleteFileFromDisk(String filePath, String fileName) throws IOException,ServiceValidationException {
+    protected boolean deleteFileFromDisk(String filePath, String fileName) throws IOException, ServiceException {
         Path path = Paths.get(filePath+"/"+fileName);
         return Files.deleteIfExists(path);
     }

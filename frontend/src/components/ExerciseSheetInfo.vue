@@ -10,7 +10,7 @@
         </div>
         <div class="form-group">
             <label :for="`esInfoSubmissionDate${_uid}`" class="control-label required">{{ $t('submissionDate') }}</label>
-            <input :id="`esInfoSubmissionDate${_uid}`" type="datetime-local" class="form-control" :min="minDate" v-model="value.submissionDate" required>
+            <input :id="`esInfoSubmissionDate${_uid}`" type="datetime-local" class="form-control" v-model="value.submissionDate" required>
         </div>
         <div class="form-group">
             <label :for="`esInfoDescription${_uid}`" class="control-label">{{ $t('description') }}</label>
@@ -18,16 +18,20 @@
                 <editor :id="`esInfoDescription${_uid}`" v-model="value.description"></editor>
             </div>
         </div>
-        <div class="form-group">
-            <label :for="`esInfoMinKreuzel${_uid}`" class="control-label">{{ $t('minRequireKreuzel') }}</label>
-            <div class="col-md-4" style="padding-left: 0px">
-                <i-input :id="`esInfoMinKreuzel${_uid}`" class="form-control" v-model="value.minKreuzel"></i-input>
+
+        <label :for="`esInfoMinKreuzel${_uid}`" class="control-label">{{ $t('minRequireKreuzel') }}</label>
+        <div class="col-md-4 input-group mb-3" style="padding-left: 0px">
+            <i-input :id="`esInfoMinKreuzel${_uid}`" class="form-control" min="0" max="100" v-model="value.minKreuzel"></i-input>
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
             </div>
         </div>
-        <div class="form-group">
-            <label :for="`esInfoMinPoints${_uid}`" class="control-label">{{ $t('minRequirePoints') }}</label>
-            <div class="col-md-4" style="padding-left: 0px">
-                <i-input :id="`esInfoMinPoints${_uid}`" class="form-control" v-model="value.minPoints"></i-input>
+
+        <label :for="`esInfoMinPoints${_uid}`" class="control-label">{{ $t('minRequirePoints') }}</label>
+        <div class="col-md-4 input-group mb-3" style="padding-left: 0px">
+            <i-input :id="`esInfoMinPoints${_uid}`"  class="form-control" min="0" max="100" v-model="value.minPoints"></i-input>
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
             </div>
         </div>
         <div class="form-group">
@@ -51,7 +55,6 @@
 </template>
 
 <script>
-import {dateManagement} from '@/plugins/global';
 import Editor from '@/components/Editor.vue';
 
 export default {
@@ -59,11 +62,6 @@ export default {
     props: ['value'],
     components:{
         Editor
-    },
-    data(){
-        return {
-            minDate: dateManagement.currentDateTime()
-        }
     }
 }
 </script>

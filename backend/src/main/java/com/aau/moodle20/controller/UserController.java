@@ -1,12 +1,10 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.FinishesExample;
+import com.aau.moodle20.entity.User;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.*;
-import com.aau.moodle20.payload.response.ExampleResponseObject;
-import com.aau.moodle20.payload.response.JwtResponse;
-import com.aau.moodle20.payload.response.MessageResponse;
-import com.aau.moodle20.payload.response.UserResponseObject;
+import com.aau.moodle20.payload.response.*;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import com.aau.moodle20.services.FinishesExampleService;
 import com.aau.moodle20.services.UserDetailsServiceImpl;
@@ -26,6 +24,7 @@ import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController()
 @RequestMapping("/api")
@@ -66,10 +65,10 @@ public class UserController {
     // post api----------------------------------------------------------------
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
+        userDetailsService.checkForTemporaryPassword(loginRequest);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
@@ -100,10 +99,8 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
-    public ResponseEntity<?> registerUsers(@Valid  @RequestParam("file") MultipartFile file) throws UserException {
-
-        userDetailsService.registerUsers(file);
-        return ResponseEntity.ok(new MessageResponse("Users registered successfully!"));
+    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "isAdmin",required = false) Boolean isAdmin) throws UserException {
+        return ResponseEntity.ok(userDetailsService.registerUsers(file, isAdmin));
     }
 
     // delete api -------------------------------------------------------------------------

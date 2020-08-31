@@ -64,9 +64,9 @@ export default new Vuex.Store({
         this.dispatch('getIsOwner').then(isOwner =>{
           commit('initialiseStore', isOwner);
           resolve(isOwner);
-        }).catch((error)=>{
+        }).catch(()=>{
           commit('initialiseStore', false);
-          reject(error);
+          resolve(false);
         });
       })
       

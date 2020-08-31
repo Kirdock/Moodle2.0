@@ -74,14 +74,19 @@ export default {
         return axios.get(`/user/${store.getters.userInfo.matriculationNumber}`);
     },
     createUser(userData){
-        return axios.put('/user',userData);
+        return axios.put('/user',userData, {
+            headers:{
+                'Accept-Language': i18n.locale
+            }
+        });
     },
     createUsers(formData){
         return axios.put('/users',
             formData,
             {
                 headers: {
-                    'Content-Type': undefined
+                    'Content-Type': undefined,
+                    'Accept-Language': i18n.locale
                 }
             }
         );
@@ -91,7 +96,8 @@ export default {
             formData,
             {
                 headers: {
-                    'Content-Type': undefined
+                    'Content-Type': undefined,
+                    'Accept-Language': i18n.locale
                 }
             }
         )
@@ -100,7 +106,11 @@ export default {
         return axios.post('/user/password', data);
     },
     updateUser(userData){
-        return axios.post('/user', userData);
+        return axios.post('/user', userData, {
+            headers:{
+                'Accept-Language': i18n.locale
+            }
+        });
     },
     deleteUser(matriculationNumber){
         return axios.delete(`/user/${matriculationNumber}`);

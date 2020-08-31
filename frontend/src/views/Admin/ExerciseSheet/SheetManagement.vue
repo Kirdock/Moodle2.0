@@ -25,7 +25,7 @@
             <b-tabs class="mt-3" v-model="activeTab" id="exerciseSheetTab">
                 <b-tab :title="$t('information')" :class="'fixed'">
                     
-                    <div class="form-horizontal col-md-5 fixed">
+                    <div class="form-horizontal col-md-5 fixed" v-if="sheetInfo.includeThird !== undefined">
                         <form ref="exerciseSheet" @submit.prevent="updateInfo()">
                             <es-info v-model="sheetInfo"></es-info>
                             <div class="form-inline" style="margin-top: 10px">
@@ -47,7 +47,7 @@
                         <span class="fas fa-chevron-right"></span>
                         <span>{{selectedExample.name}}</span>
                     </div>
-                    <form @submit.prevent="updateExample(selectedExample || example)" :ref="`formExample${index}`">
+                    <form @submit.prevent="updateExample(selectedExample || example, index)" :ref="`formExample${index}`">
                         <example-info :ref="`eInfo${index}`" :uploadCount="sheetInfo.uploadCount" :selectedDeleteExample="selectedDeleteExample" :isSubExample="isSubExample" :buildExample="buildExample" :setSelectedExample="setSelectedExample" :setDeleteExample="setDeleteExample" :value="selectedExample || example"></example-info>
                         <div class="form-inline" style="margin-left: 10px; margin-top: 10px" v-if="!isSubExample">
                             <button class="btn btn-primary" type="submit">
@@ -198,19 +198,41 @@ export default {
             this.selectedDeleteExample.index = index;
             this.selectedDeleteExample.array = array;
         },
-        async updateExample(example){
+        async updateExample(example, index){
+            let changedData;
+            if(example.parentId !== undefined){
+                //fetch real data. selectedExample is not changed only a copy of it
+                let child = this.$refs[`eInfo${index}`];
+                if(Array.isArray(child)){
+                    child = child[0];
+                }
+                changedData = child.exampleData; 
+            }
+            else if(example.subExamples.length !== 0){
+                changedData = {//only send needed data. weighting, points, etc. are not needed
+                    exerciseSheetId: this.sheetInfo.id,
+                    id: example.id,
+                    name: example.name,
+                    description: example.description,
+                    order: example.order
+                }
+            }
+            
             example.loading = true;
-            const {loading, subExamples, ...data} = example;
+            const {loading, subExamples, ...data} = (changedData || example);
             try{
                 await this.$store.dispatch('updateExample', data);
+                if(example.parentId !== undefined){
+                    Object.assign(example, changedData);
+                }
                 this.$bvToast.toast(this.$t('example.saved'), {
                     title: this.$t('success'),
                     variant: 'success',
                     appendToast: true
                 });
             }
-            catch{
-                this.$bvToast.toast(this.$t('example.error.save'), {
+            catch(error){
+                this.$bvToast.toast(error.response.data.errorResponseCode === 485 ? this.$t('example.error.duplicate') : error.response.data.errorResponseCode === 486 ? this.$t('subExample.error.duplicate') : this.$t('example.error.save'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
@@ -222,15 +244,23 @@ export default {
         },
         async createExample(){
             this.loading.createExample = true;
-            const example = this.buildExample(this.$t('example.name'), this.sheetInfo.examples.length, true);
+            let count = this.sheetInfo.examples.length + 1;
+            
+            while(this.sheetInfo.examples.some(example => example.name === `${this.$t('example.name')} ${count}`)){
+                count++;
+            }
+            const example = this.buildExample(this.$t('example.name'), count, true);
             try{
                 const response = await this.$store.dispatch('createExample', example);
                 example.id = response.data.id;
                 this.sheetInfo.examples.push(example);
                 this.setActiveTab(this.sheetInfo.examples.length);
+                this.$nextTick(()=>{
+                    this.setSelectedExample(undefined, {example, index: this.sheetInfo.examples.length - 1})
+                })
             }
-            catch{
-                this.$bvToast.toast(this.$t('example.error.create'), {
+            catch(error){
+                this.$bvToast.toast(error.response.data.errorResponseCode === 485 ? this.$t('example.error.duplicate') : this.$t('example.error.create'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
@@ -242,7 +272,7 @@ export default {
         },
         buildExample(name, order, isParent){
             return {
-                name: `${name} ${order+1}`,
+                name: `${name} ${order}`,
                 description: '',
                 parentId: isParent ? undefined : this.sheetInfo.examples[this.activeTab -1].id,
                 exerciseSheetId: this.sheetId,
@@ -251,7 +281,8 @@ export default {
                 subExamples: [],
                 order,
                 supportedFileTypes: [],
-                customFileTypes: []
+                customFileTypes: [],
+                submitFile: false
             }
         },
         async deleteExample(id, index){

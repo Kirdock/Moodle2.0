@@ -1,17 +1,18 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.exception.EntityNotFoundException;
-import com.aau.moodle20.exception.ServiceValidationException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,14 +24,17 @@ import java.util.stream.Collectors;
 public class ExerciseSheetService extends AbstractService{
 
     private PdfService pdfService;
+    private ExampleService exampleService;
 
-    public ExerciseSheetService(PdfService pdfService)
-    {
+    public ExerciseSheetService(PdfService pdfService, ExampleService exampleService) {
         this.pdfService = pdfService;
+        this.exampleService = exampleService;
     }
 
-    public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceValidationException {
+    public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceException {
         Course course = readCourse(createExerciseSheetRequest.getCourseId());
+
+        checkExerciseSheetName(course,createExerciseSheetRequest.getName(),null);
 
         ExerciseSheet exerciseSheet = new ExerciseSheet();
         exerciseSheet.setCourse(course);
@@ -45,10 +49,27 @@ public class ExerciseSheetService extends AbstractService{
         exerciseSheetRepository.save(exerciseSheet);
     }
 
-    public void updateExerciseSheet(UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceValidationException {
+    protected void checkExerciseSheetName(Course course, String name, ExerciseSheet exerciseSheet) throws ServiceException
+    {
+        boolean exists;
+        if(exerciseSheet!=null)
+        {
+            exists = course.getExerciseSheets().stream()
+                    .filter(exerciseSheet1 -> !exerciseSheet.getName().equals(exerciseSheet1.getName()))
+                    .anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
+        }else
+        {
+            exists = course.getExerciseSheets().stream().anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
+        }
+        if(exists)
+            throw new ServiceException("Error Exercise Sheet with this name already exists in given course", ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS);
+    }
+
+
+    public void updateExerciseSheet(UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceException {
         ExerciseSheet exerciseSheet = readExerciseSheet(updateExerciseSheetRequest.getId());
-        List<ExerciseSheet> courseExerciseSheets = exerciseSheetRepository.findByCourse_Id(exerciseSheet.getCourse().getId());
-        courseExerciseSheets.removeIf(sheet -> sheet.getId().equals(updateExerciseSheetRequest.getId()));
+
+        checkExerciseSheetName(exerciseSheet.getCourse(),updateExerciseSheetRequest.getName(),exerciseSheet);
 
         exerciseSheet.setMinKreuzel(updateExerciseSheetRequest.getMinKreuzel());
         exerciseSheet.setMinPoints(updateExerciseSheetRequest.getMinPoints());
@@ -61,15 +82,15 @@ public class ExerciseSheetService extends AbstractService{
         exerciseSheetRepository.save(exerciseSheet);
     }
 
-    public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceValidationException {
+    public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceException {
         ExerciseSheet exerciseSheet = readExerciseSheet(id);
         if(!isAdmin() && !isOwner(exerciseSheet.getCourse()))
-            throw new ServiceValidationException("Error: Not an Admin or Owner",HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: Not an Admin or Owner",HttpStatus.UNAUTHORIZED);
 
         return exerciseSheet.getResponseObject(null);
     }
 
-    public ExerciseSheetKreuzelResponse getExerciseSheetKreuzel(Long exerciseSheetId) throws ServiceValidationException {
+    public ExerciseSheetKreuzelResponse getExerciseSheetKreuzel(Long exerciseSheetId) throws ServiceException {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         ExerciseSheetKreuzelResponse response = new ExerciseSheetKreuzelResponse();
         response.setIncludeThird(exerciseSheet.getIncludeThird());
@@ -157,7 +178,7 @@ public class ExerciseSheetService extends AbstractService{
         return sortedExampleList;
     }
 
-    public ExerciseSheetResponseObject getExerciseSheetAssigned(Long exerciseSheetId) throws ServiceValidationException {
+    public ExerciseSheetResponseObject getExerciseSheetAssigned(Long exerciseSheetId) throws ServiceException {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         UserDetailsImpl userDetails = getUserDetails();
         Boolean isAssignedUser = exerciseSheet.getCourse().getStudents().stream()
@@ -170,12 +191,18 @@ public class ExerciseSheetService extends AbstractService{
         return responseObject;
     }
 
-    public void deleteExerciseSheet(Long id) throws EntityNotFoundException {
+    @Transactional
+    public void deleteExerciseSheet(Long id) throws EntityNotFoundException, IOException {
         ExerciseSheet exerciseSheet = readExerciseSheet(id);
+        for(Example example: exerciseSheet.getExamples())
+        {
+            exampleService.deleteExampleValidator(example.getId());
+        }
+        exampleRepository.flush();
         exerciseSheetRepository.delete(exerciseSheet);
     }
 
-    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) throws ServiceValidationException {
+    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(courseId);
         if (!userDetails.getAdmin()) {
@@ -183,7 +210,7 @@ public class ExerciseSheetService extends AbstractService{
             boolean isStudentInCourse = course.getStudents().stream()
                     .anyMatch(userInCourse -> userInCourse.getRole().equals(ECourseRole.Student) && userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
             if (!isOwner && !isStudentInCourse)
-                throw new ServiceValidationException("Error: not authorized to access exerciseSheets", HttpStatus.UNAUTHORIZED);
+                throw new ServiceException("Error: not authorized to access exerciseSheets", HttpStatus.UNAUTHORIZED);
         }
 
         List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);

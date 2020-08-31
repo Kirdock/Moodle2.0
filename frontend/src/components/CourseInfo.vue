@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="course_info">
         <div class="form-group" v-if="$store.getters.userInfo.isAdmin">
             <label :for="`cInfoOwner${_uid}`" class="control-label required">{{ $t('owner') }}</label>
             <multiselect v-model="owner" :id="`cInfoOwner${_uid}`" open-direction="bottom" @input="ownerChanged"
@@ -17,7 +17,6 @@
                         :max-height="600"
                         deselect-label=""
                         :show-no-results="false"
-                        required
                         >
             </multiselect>
         </div>
@@ -29,21 +28,24 @@
             <label :for="`cInfoName${_uid}`" class="control-label required">{{ $t('name') }}</label>
             <input :id="`cInfoName${_uid}`" type="text" class="form-control" v-model="value.name" :disabled="!$store.getters.userInfo.isAdmin" required>
         </div>
-        <div class="form-group">
-            <label :for="`cInfoMinKreuzel${_uid}`" class="control-label">{{$t('minRequireKreuzel')}}</label>
-            <div class="col-md-6" style="padding-left: 0px">
-                <i-input :id="`cInfoMinKreuzel${_uid}`" class="form-control" min="0" max="100" v-model="value.minKreuzel"> </i-input>
+        <label :for="`cInfoMinKreuzel${_uid}`" class="control-label">{{$t('minRequireKreuzel')}}</label>
+        <div class="col-md-4 input-group mb-3" style="padding-left: 0px">
+            <i-input :id="`cInfoMinKreuzel${_uid}`" class="form-control" min="0" max="100" v-model="value.minKreuzel"> </i-input>
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
             </div>
         </div>
-        <div class="form-group" >
-            <label :for="`cInfoMinPoints${_uid}`" class="control-label">{{$t('minRequirePoints')}}</label>
-            <div class="col-md-6" style="padding-left: 0px">
-                <i-input :id="`cInfoMinPoints${_uid}`" class="form-control" min="0" max="100" v-model="value.minPoints"> </i-input>
+        
+        <label :for="`cInfoMinPoints${_uid}`" class="control-label">{{$t('minRequirePoints')}}</label>    
+        <div class="col-md-4 input-group mb-3" style="padding-left: 0px">
+            <i-input :id="`cInfoMinPoints${_uid}`" class="form-control" min="0" max="100" v-model="value.minPoints"> </i-input>
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
             </div>
         </div>
         <div class="form-group">
             <label class="control-label" :for="`description${_uid}`">{{$t('description')}}</label>
-            <editor :id="`description${_uid}`" v-model="value.description"></editor>
+            <editor :id="`description${_uid}`" v-model="value.description" :ref="`editor${_uid}`"></editor>
         </div>
     </div>
 </template>
@@ -72,9 +74,24 @@ export default {
         },
         ownerChanged(ownerUser){
             this.value.owner = ownerUser.matriculationNumber;
+            const multiselect = document.getElementById(`cInfoOwner${this._uid}`);
+            if(multiselect){
+                multiselect.removeAttribute('required');
+            }
         },
         setOwner(){
             this.owner = this.users.find(user => user.matriculationNumber == this.value.owner);
+            if(!this.owner){
+                this.$nextTick(()=>{
+                    const multiselect = document.getElementById(`cInfoOwner${this._uid}`);
+                    if(multiselect){
+                        multiselect.setAttribute('required', true);
+                    }
+                })
+            }
+        },
+        forceUpdate(value){
+            this.$refs[`editor${this._uid}`].forceUpdate(value);
         }
     },
     watch:{
