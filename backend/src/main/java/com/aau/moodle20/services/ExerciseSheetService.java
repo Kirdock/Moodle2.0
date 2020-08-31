@@ -34,7 +34,7 @@ public class ExerciseSheetService extends AbstractService{
     public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceException {
         Course course = readCourse(createExerciseSheetRequest.getCourseId());
 
-        checkExerciseSheetName(course,createExerciseSheetRequest.getName());
+        checkExerciseSheetName(course,createExerciseSheetRequest.getName(),null);
 
         ExerciseSheet exerciseSheet = new ExerciseSheet();
         exerciseSheet.setCourse(course);
@@ -49,9 +49,18 @@ public class ExerciseSheetService extends AbstractService{
         exerciseSheetRepository.save(exerciseSheet);
     }
 
-    protected void checkExerciseSheetName(Course course, String name) throws ServiceException
+    protected void checkExerciseSheetName(Course course, String name, ExerciseSheet exerciseSheet) throws ServiceException
     {
-        boolean exists = course.getExerciseSheets().stream().anyMatch(exerciseSheet -> exerciseSheet.getName().equals(name));
+        boolean exists;
+        if(exerciseSheet!=null)
+        {
+            exists = course.getExerciseSheets().stream()
+                    .filter(exerciseSheet1 -> !exerciseSheet.getName().equals(exerciseSheet1.getName()))
+                    .anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
+        }else
+        {
+            exists = course.getExerciseSheets().stream().anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
+        }
         if(exists)
             throw new ServiceException("Error Exercise Sheet with this name already exists in given course", ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS);
     }
@@ -60,7 +69,7 @@ public class ExerciseSheetService extends AbstractService{
     public void updateExerciseSheet(UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceException {
         ExerciseSheet exerciseSheet = readExerciseSheet(updateExerciseSheetRequest.getId());
 
-        checkExerciseSheetName(exerciseSheet.getCourse(),updateExerciseSheetRequest.getName());
+        checkExerciseSheetName(exerciseSheet.getCourse(),updateExerciseSheetRequest.getName(),exerciseSheet);
 
         exerciseSheet.setMinKreuzel(updateExerciseSheetRequest.getMinKreuzel());
         exerciseSheet.setMinPoints(updateExerciseSheetRequest.getMinPoints());
