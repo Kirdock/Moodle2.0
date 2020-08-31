@@ -128,7 +128,7 @@ public class ExampleService extends AbstractService{
         checkIfExampleNameAlreadyUsed(exerciseSheet,updateExampleRequest.getName(),updateExampleRequest.getId(),parentExample);
 
         Example example = readExample(updateExampleRequest.getId());
-        if(!updateExampleRequest.getSubmitFile() && (example.getValidator()!=null && !example.getValidator().isEmpty()) )
+        if((updateExampleRequest.getSubmitFile()!=null && !updateExampleRequest.getSubmitFile()) && (example.getValidator()!=null && !example.getValidator().isEmpty()) )
             deleteExampleValidator(example.getId());
 
         example.fillValuesFromRequestObject(updateExampleRequest);
