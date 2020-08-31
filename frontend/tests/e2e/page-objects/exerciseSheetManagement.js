@@ -74,13 +74,22 @@ module.exports = {
             selector: '#exerciseSheetTab .tab-content>div',
             commands: [{
                 examplePresent: function(name){
-                    return this.api.assert.elementPresent('xpath',`//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="${name}"]]`);
+                    return this.api.assert.elementPresent({
+                        selector: `//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="${name}"]]`,
+                        locateStrategy: 'xpath'
+                    });
                 },
                 exampleNotPresent: function(name){
-                    return this.api.assert.not.elementPresent('xpath',`//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="${name}"]]`);
+                    return this.api.assert.not.elementPresent({
+                        selector: `//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="${name}"]]`,
+                        locateStrategy: 'xpath'
+                    });
                 },
                 subExampleNotPresent: function(exampleName, subExampleName){
-                    return this.api.assert.not.elementPresent('xpath',`//div[@id="exerciseSheetTab"]/div[@class="tab-content"]/div[count(//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="${exampleName}"]]/preceding-sibling::*)+1]]//div[contains(@class, 'subExamples')]//tr/td[1][contains(text(),"${subExampleName}")]`);
+                    return this.api.assert.not.elementPresent({
+                        selector: `//div[@id="exerciseSheetTab"]/div[@class="tab-content"]/div[count(//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="${exampleName}"]]/preceding-sibling::*)+1]]//div[contains(@class, 'subExamples')]//tr/td[1][contains(text(),"${subExampleName}")]`,
+                        locateStrategy: 'xpath'
+                    });
                 },
                 tabContent: function(sortIndex){
                     return `#exerciseSheetTab .tab-content>div:nth-child(${sortIndex+1})`;

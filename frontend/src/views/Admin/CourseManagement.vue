@@ -28,7 +28,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-4" style="margin-top: 31px">
+            <div class="col-md-4" style="margin-top: 31px" v-if="$store.getters.userInfo.isAdmin">
                 <button class="btn btn-primary" @click="setNewCourse()" style="margin-right: 10px" v-if="selectedSemester_edit !== undefined">
                     <span class="fa fa-sync fa-spin"  v-if="loading.createCourse"></span>
                     <span class="fa fa-plus" v-else></span>

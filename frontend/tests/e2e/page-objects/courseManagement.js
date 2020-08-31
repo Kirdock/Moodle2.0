@@ -124,14 +124,14 @@ module.exports = {
     commands: [createCommands],
     elements: {
         newButton: {
-            selector: 'button.btn-primary',
+            selector: '.courseManagement>div:nth-of-type(1) button.btn-primary',
             index: 0
         },
         copyButton: {
-            selector: 'button.btn-primary',
+            selector: '.courseManagement>div:nth-of-type(1) button.btn-primary',
             index: 1
         },
-        deleteButton: 'button.btn-danger',
+        deleteButton: '.courseManagement>div:nth-of-type(1) button.btn-danger',
         selectSemester: '#courseSemester_edit',
         selectSemesterOption: '#courseSemester_edit option',
         selectCourse: '#selectedCourse',
@@ -192,12 +192,12 @@ module.exports = {
                     index: 0
                 },
                 number: {
-                    selector: '#courseInfo input[type="text"]',
-                    index: 1
+                    selector: '#courseInfo input[type="text"].form-control', //.form-control to differentiate between ownerInput and to be more persistent when ownerInput is not present
+                    index: 0
                 },
                 name: {
-                    selector: '#courseInfo input[type="text"]',
-                    index: 2
+                    selector: '#courseInfo input[type="text"].form-control',
+                    index: 1
                 },
                 minKreuzel: {
                     selector: '#courseInfo input[type="number"]',

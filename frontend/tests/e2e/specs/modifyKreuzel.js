@@ -28,10 +28,16 @@ module.exports = {
     },
     'check courses': function(browser){
         for(const visibleCourse of visibileCourses){
-            browser.assert.elementPresent('xpath', `//div[@id="courseList"]/div/a[text()="${visibleCourse.number} ${visibleCourse.name}"]`);
+            browser.assert.elementPresent({
+                selector: `//div[@id="courseList"]/div/a[text()="${visibleCourse.number} ${visibleCourse.name}"]`,
+                locateStrategy: 'xpath'
+            });
         }
         for(const hiddenCourse of hiddenCourses){
-            browser.assert.not.elementPresent('xpath', `//div[@id="courseList"]/div/a[text()="${hiddenCourse.number} ${hiddenCourse.name}"]`);
+            browser.assert.not.elementPresent({
+                selector: `//div[@id="courseList"]/div/a[text()="${hiddenCourse.number} ${hiddenCourse.name}"]`,
+                locateStrategy: 'xpath'
+            });
         }
     },
     'select course': function(browser, course){
@@ -41,13 +47,19 @@ module.exports = {
             locateStrategy: 'xpath'
         }).pause(1000)
           .expect.url().to.match(/\/Course\/([0-9]+)$/);
-        browser.assert.elementPresent('xpath', `//div[@class="course"]/div[1][text()="${course.description}"]`);
+        browser.assert.elementPresent({
+            selector: `//div[@class="course"]/div[1][text()="${course.description}"]`,
+            locateStrategy: 'xpath'
+        });
     },
     'check exerciseSheet': function(browser, course){
         this['select course'](browser, course);
 
         for(const exercisSheet of testExerciseSheets){
-            browser.assert.elementPresent('xpath', `//div[@class="course"]/table/tbody/tr[td[1][text() = " ${exercisSheet.name} "] and td[2][contains(text(), "/${2}")] and td[3][text(), " ${exercisSheet.submissionDateFormat} ")] and td[4][text() = " ${exercisSheet.minKreuzel} "] and td[5][contains(text(), "/${15}")] and td[6][text(), " ${exercisSheet.minPoints} "]]`);
+            browser.assert.elementPresent({
+                selector: `//div[@class="course"]/table/tbody/tr[td[1][text() = " ${exercisSheet.name} "] and td[2][contains(text(), "/${2}")] and td[3][text(), " ${exercisSheet.submissionDateFormat} ")] and td[4][text() = " ${exercisSheet.minKreuzel} "] and td[5][contains(text(), "/${15}")] and td[6][text(), " ${exercisSheet.minPoints} "]]`,
+                locateStrategy: 'xpath'
+            });
         }
     },
     'select exerciseSheet': function(browser, course, exerciseSheet){
@@ -58,19 +70,35 @@ module.exports = {
             locateStrategy: 'xpath'
         }).pause(1000)
           .expect.url().to.match(/\/Course\/([0-9]+)\/ExerciseSheet\/([0-9]+)$/);
-        browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]/h2[contains(text(),"${exerciseSheet.submissionDateFormat}")]`)
-            .assert.elementPresent('xpath', `//div[@class="exerciseSheet"]/div[1]/label/strong[text()="${exerciseSheet.minKreuzel}%"]`)
-            .assert.elementPresent('xpath', `//div[@class="exerciseSheet"]/div[2]/label/strong[text()="${exerciseSheet.minPoints}%")]`)
+        browser.assert.elementPresent({
+            selector: `//div[@class="exerciseSheet"]/h2[contains(text(),"${exerciseSheet.submissionDateFormat}")]`,
+            locateStrategy: 'xpath'
+        }).assert.elementPresent({
+            selector: `//div[@class="exerciseSheet"]/div[1]/label/strong[text()="${exerciseSheet.minKreuzel}%"]`,
+            locateStrategy: 'xpath'
+        }).assert.elementPresent({
+            selector: `//div[@class="exerciseSheet"]/div[2]/label/strong[text()="${exerciseSheet.minPoints}%")]`,
+            locateStrategy: 'xpath'
+        })
         
         for(const example of testExamplesRight){
             if(example.subExamples.length === 0){
-                browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][text()=" ${example.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${example.weighting} "] and td[5][text()=" ${example.points} "] and td[6][${example.includeThird ? `count(.//input[@type="radio"${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]) = 3` : `input[@type="checkbox" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]`}]`)
+                browser.assert.elementPresent({
+                    selector: `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][text()=" ${example.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${example.weighting} "] and td[5][text()=" ${example.points} "] and td[6][${example.includeThird ? `count(.//input[@type="radio"${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]) = 3` : `input[@type="checkbox" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]`}]`,
+                    locateStrategy: 'xpath'
+                })
             }
             else{
-                browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][boolean(text()) = true] and td[4][boolean(text()) = true] and td[5][boolean(text()) = true]]`)
+                browser.assert.elementPresent({
+                    selector: `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][boolean(text()) = true] and td[4][boolean(text()) = true] and td[5][boolean(text()) = true]]`,
+                    locateStrategy: 'xpath'
+                })
             }
             for(const subExample of example.subExamples){
-                browser.assert.elementPresent('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][boolean(text()) = true] and td[2][text()=" ${subExample.name} "] and td[3][text()=" ${subExample.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${subExample.weighting} "] and td[5][text()=" ${subExample.points} "] and td[6][${subExample.includeThird ? `count(.//input[@type="radio" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]) = 3` : `input[@type="checkbox" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]`}]`)
+                browser.assert.elementPresent({
+                    selector: `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][boolean(text()) = true] and td[2][text()=" ${subExample.name} "] and td[3][text()=" ${subExample.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${subExample.weighting} "] and td[5][text()=" ${subExample.points} "] and td[6][${subExample.includeThird ? `count(.//input[@type="radio" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]) = 3` : `input[@type="checkbox" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]`}]`,
+                    locateStrategy: 'xpath'
+                })
             }
         }
     }
