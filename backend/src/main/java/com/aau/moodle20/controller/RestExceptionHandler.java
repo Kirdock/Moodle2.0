@@ -19,6 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +62,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         errors.add("ClassNotFoundException");
         ApiError apiError =
                 new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
+        return  ResponseEntity.status(apiError.getStatus()).body(apiError);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    protected ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {
+        List<String> errors = new ArrayList<String>();
+        ApiError apiError =
+                new ApiError(HttpStatus.BAD_REQUEST, "NullPointerException occured", errors);
         return  ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
