@@ -10,7 +10,6 @@ module.exports = {
             browser.logout();
             browser.loginAsOwner();
         })
-        browser.loginAsOwner();
     },
     'check courses': function(browser){
         browser.assert.elementPresent({
