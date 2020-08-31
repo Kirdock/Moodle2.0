@@ -11,7 +11,7 @@ import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
-import com.aau.moodle20.validation.ValidatorLoader;
+import com.aau.moodle20.validation.ValidatorHandler;
 import com.aau.moodle20.entity.ViolationEntity;
 import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -152,7 +152,7 @@ public class FinishesExampleService extends AbstractService{
         String validatorDir = FileConstants.validatorDir + createExampleAttachmentDir(example);
         validatorDir = validatorDir + "/"+ example.getValidator();
 
-        ValidatorLoader validationLoader = new ValidatorLoader();
+        ValidatorHandler validationLoader = new ValidatorHandler();
         IValidator validator = validationLoader.loadValidator(validatorDir);
         if(validator!=null)
             violations = validator.validate(filePath);

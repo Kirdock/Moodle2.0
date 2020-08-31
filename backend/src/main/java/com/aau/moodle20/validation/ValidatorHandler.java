@@ -4,11 +4,11 @@ package com.aau.moodle20.validation;
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.exception.ServiceException;
+import org.apache.commons.io.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 import validation.IValidator;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -18,7 +18,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class ValidatorLoader {
+public class ValidatorHandler {
 
     public IValidator loadValidator(String directory) throws ClassNotFoundException, IOException {
 
@@ -53,27 +53,35 @@ public class ValidatorLoader {
     }
 
 
-    public void checkValidatorFile(MultipartFile file) throws IOException, ClassNotFoundException {
+    public void checkValidatorFile(MultipartFile file,Long exampleId) throws IOException, ClassNotFoundException {
 
-        String filePath = FileConstants.validatorTestDir + "/" + file.getOriginalFilename();
-        Files.deleteIfExists(Paths.get(filePath));
-        saveFile(FileConstants.validatorTestDir, file);
-        IValidator validator = loadValidator(filePath);
-        if (validator == null)
-            throw new ServiceException("Error: no validator found in Jar File", ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR);
+        String filePath = FileConstants.validatorTestDir +"/"+file.getOriginalFilename() ;
+        File fileValidatorTest = new File(filePath);
+        if(fileValidatorTest.exists())
+            fileValidatorTest.delete();
+        try {
+            saveFile(filePath,file);
+            IValidator validator = loadValidator(filePath);
+            if (validator == null) {
+                throw new ServiceException("Error: no validator found in Jar File", ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR);
+            }
 
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new ServiceException("Error: classNotFoundException",e, ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR);
+        }
     }
 
     protected void saveFile(String filePath, MultipartFile file) throws IOException
     {
-        File fileToBeSaved= new File(filePath);
-        // if path does not exists create it
-        if(!fileToBeSaved.exists()) {
-            fileToBeSaved.mkdirs();
-        }
-
-        Path path = Paths.get(filePath + "/"+file.getOriginalFilename());
-        Files.write(path,file.getBytes());
+        InputStream initialStream = file.getInputStream();
+        byte[] buffer = new byte[initialStream.available()];
+        initialStream.read(buffer);
+        File targetFile= new File(filePath);
+        OutputStream outStream = new FileOutputStream(targetFile);
+        outStream.write(buffer);
+        outStream.close();
     }
 
 }

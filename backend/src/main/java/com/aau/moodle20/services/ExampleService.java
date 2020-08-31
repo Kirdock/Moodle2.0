@@ -9,9 +9,8 @@ import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.ExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
-import com.aau.moodle20.validation.ValidatorLoader;
+import com.aau.moodle20.validation.ValidatorHandler;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @Service
 public class ExampleService extends AbstractService{
@@ -193,8 +190,8 @@ public class ExampleService extends AbstractService{
             if (!FileConstants.JarFileExtension.equals(extension))
                 throw new ServiceException("Error: Not a jar File!");
         }
-        ValidatorLoader loader = new ValidatorLoader();
-        loader.checkValidatorFile(validatorFile);
+        ValidatorHandler loader = new ValidatorHandler();
+        loader.checkValidatorFile(validatorFile,example.getId());
 
         String validatorFilePath = getValidatorFilePath(example);
         clearDirectory(validatorFilePath);

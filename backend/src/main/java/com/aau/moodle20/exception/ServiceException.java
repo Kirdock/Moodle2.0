@@ -29,6 +29,11 @@ public class ServiceException extends RuntimeException{
         super(message);
         this.errorResponseCode = errorResponseCode;
     }
+    public ServiceException(String message, Throwable throwable,Integer errorResponseCode)
+    {
+        super(message,throwable);
+        this.errorResponseCode = errorResponseCode;
+    }
     public ServiceException(String message, HttpStatus status)
     {
         super(message);
