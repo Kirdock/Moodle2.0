@@ -48,7 +48,20 @@
                     const response = await this.$store.dispatch("getSemestersAssigned");
                     this.semesters = response.data;
                     if(this.semesters.length > 0){
-                        this.selectedSemester = this.semesters[this.semesters.length - 1].id; //this.$store.selectedSemester
+                        let id = this.semesters[this.semesters.length - 1].id;
+                        if(this.$store.state.settings.selectedSemester !== undefined){
+                            const semester = this.semesters.find(semester => semester.id === this.$store.state.settings.selectedSemester);
+                            if(semester !== undefined){
+                                id = this.$store.state.settings.selectedSemester;
+                            }
+                            else{
+                                this.$store.commit('updateSettings', {selectedSemester: id});
+                            }
+                        }
+                        else{
+                            this.$store.commit('updateSettings', {selectedSemester: id});
+                        }
+                        this.selectedSemester =  id;
                         this.getCourses(this.selectedSemester);
                     }
                 }
@@ -62,6 +75,7 @@
             },
             async getCourses(id){
                 try{
+                    this.$store.commit('updateSettings', {selectedSemester: id});
                     const response = await this.$store.dispatch("getCoursesAssigned", {id});
                     this.courses = response.data;
                 }
