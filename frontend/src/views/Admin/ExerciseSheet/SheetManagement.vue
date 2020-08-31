@@ -208,6 +208,15 @@ export default {
                 }
                 changedData = child.exampleData; 
             }
+            else if(example.subExamples.length !== 0){
+                changedData = {//only send needed data. weighting, points, etc. are not needed
+                    exerciseSheetId: this.sheetInfo.id,
+                    id: example.id,
+                    name: example.name,
+                    description: example.description,
+                    order: example.order
+                }
+            }
             
             example.loading = true;
             const {loading, subExamples, ...data} = (changedData || example);
