@@ -63,11 +63,11 @@
         </td>
         <td v-if="hasFileUpload" class="text-center">
             <template v-if="value.submitFile">
-                <template v-if="uploadCount === 0">
+                <template v-if="value.uploadCount === 0">
                     <span class="fa fa-infinity"></span>
                 </template>
                 <template v-else>
-                    {{value.remainingUploadCount}}/{{uploadCount}}
+                    {{value.remainingUploadCount}}/{{value.uploadCount}}
                 </template>
             </template>
         </td>
@@ -102,7 +102,7 @@ export default {
     components:{
         KreuzelResult
     },
-    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload', 'setSelectedKreuzelResult', 'uploadCount'],
+    props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload', 'setSelectedKreuzelResult'],
     data(){
         return {
             loading: {

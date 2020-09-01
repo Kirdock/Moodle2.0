@@ -128,6 +128,9 @@ module.exports = {
                 validatorUpload: function(sortIndex, path){
                     return this.api.setValue(`${this.tabContent(sortIndex)} .validatorGroup input[type=file]`, path);
                 },
+                uploadCount: function(sortIndex){
+                    return `${this.tabContent(sortIndex)} .validatorContainer input[type=number]`;
+                },
                 validatorName: function(sortIndex){
                     return `${this.tabContent(sortIndex)} .validatorGroup label:first-child`;
                 },

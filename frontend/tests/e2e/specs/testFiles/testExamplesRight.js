@@ -4,6 +4,7 @@ module.exports = [
         description: 'My Example 1 description',
         weighting: 1,
         points: 10,
+        uploadCount: 0,
         submitFile: true,
         fileTypes: ['Word', 'zip'],
         validator: true,
@@ -17,6 +18,7 @@ module.exports = [
         weighting: 0,
         points: '',
         submitFile: true,
+        uploadCount: 10,
         fileTypes: [],
         validator: true,
         mandatory: false,
@@ -30,5 +32,17 @@ module.exports = [
                 mandatory: true,
             }
         ]
+    },
+    {
+        name: 'My Example Nr. 3',
+        description: 'My Example 3 description',
+        weighting: 1,
+        points: 0,
+        uploadCount: 1,
+        submitFile: true,
+        fileTypes: ['Word', 'zip'],
+        validator: true,
+        mandatory: false,
+        subExamples: []
     }
 ]

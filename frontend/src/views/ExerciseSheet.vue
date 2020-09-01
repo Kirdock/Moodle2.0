@@ -39,8 +39,8 @@
                 </thead>
                 <tbody>
                     <template v-for="example in sheetInfo.examples">
-                        <kreuzel-info :setSelectedKreuzelResult="setSelectedKreuzelResult" :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" :key="example.id" :isParent="true" :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached" :uploadCount="sheetInfo.uploadCount"> </kreuzel-info>
-                        <kreuzel-info :setSelectedKreuzelResult="setSelectedKreuzelResult" :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" v-for="subExample in example.subExamples" :key="subExample.id" :isParent="false" :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached" :uploadCount="sheetInfo.uploadCount"> </kreuzel-info>
+                        <kreuzel-info :setSelectedKreuzelResult="setSelectedKreuzelResult" :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" :key="example.id" :isParent="true" :value="example" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
+                        <kreuzel-info :setSelectedKreuzelResult="setSelectedKreuzelResult" :hasFileUpload="hasFileUpload" :hasSubExamples="hasSubExamples" v-for="subExample in example.subExamples" :key="subExample.id" :isParent="false" :value="subExample" :supportedFileTypes="supportedFileTypes" :includeThird="sheetInfo.includeThird" :deadlineReached="deadlineReached" :isDeadlineReached="isDeadlineReached"> </kreuzel-info>
                     </template>
                     <tr style="font-weight: bold">
                         <td>

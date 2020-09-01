@@ -183,8 +183,8 @@ export default {
                     appendToast: true
                 });
             }
-            catch{
-                this.$bvToast.toast(this.$t('exerciseSheet.error.save'), {
+            catch(error){
+                this.$bvToast.toast(error.response.data.errorResponseCode === 484 ? this.$t('exerciseSheet.error.duplicate') : this.$t('exerciseSheet.error.save'), {
                     title: this.$t('error'),
                     variant: 'danger',
                     appendToast: true
