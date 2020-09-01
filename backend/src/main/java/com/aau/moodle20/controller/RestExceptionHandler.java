@@ -73,6 +73,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return  ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
+        List<String> errors = new ArrayList<String>();
+        ApiError apiError = new ApiError(
+                HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), "error occurred");
+        return  ResponseEntity.status(apiError.getStatus()).body(apiError);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         List<String> errors = new ArrayList<String>();
@@ -117,18 +125,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-
-    @ExceptionHandler({ Exception.class })
+    @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         ApiError apiError = null;
-       if(ex instanceof AccessDeniedException)//TODO make own method for accessdenied execption
-       {
-           apiError = new ApiError(
-                   HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), "error occurred");
-       }else {
-           apiError = new ApiError(
-                   HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
-       }
+
+        apiError = new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
+
         return new ResponseEntity<Object>(
                 apiError, new HttpHeaders(), apiError.getStatus());
     }

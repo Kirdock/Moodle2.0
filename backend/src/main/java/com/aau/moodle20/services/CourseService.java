@@ -37,6 +37,7 @@ public class CourseService extends AbstractService {
     public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceException {
 
         Semester semester = readSemester(createCourseRequest.getSemesterId());
+        User owner = readUser(createCourseRequest.getOwner());
         if(courseRepository.existsByNumberAndSemester_Id(createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
             throw new ServiceException("Course in Semester already exists", ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
