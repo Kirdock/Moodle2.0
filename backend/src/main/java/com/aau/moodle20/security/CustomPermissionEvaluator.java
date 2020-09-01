@@ -29,18 +29,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         }
         boolean hasPermission = false;
         String permission = (String)o;
-        if("Example".equals(s))
+        if("Course".equals(s))
             hasPermission = handleCoursePermission(authentication,serializable, permission);
-
-//        ConfidentialDocument confidentialDocument =
-//                confidentialDocumentsRepository.findOne((Integer) targetId);
-//        String documentOwner = confidentialDocument.getOwner();
-//        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-//        String principalLogin = userDetails.getUsername();
-//        // if current user is owner of document permission is granted
-//        if (Objects.equals(documentOwner, principalLogin)) {
-//            return true;
-//        }
         return hasPermission;
     }
 
@@ -55,11 +45,13 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     protected boolean handleCoursePermission(Authentication authentication, Serializable targetId, String permission)
     {
         boolean hasPermission = false;
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
         if ("update".equals(permission) && targetId instanceof UpdateCourseRequest) {
             UpdateCourseRequest updateCourseRequest = (UpdateCourseRequest) targetId;
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             hasPermission = isAdminOrOwner(updateCourseRequest.getId(),userDetails);
-        }
+        }else if("get".equals(permission) && targetId instanceof String)
+            hasPermission = isAdminOrOwner(Long.getLong((String) targetId),userDetails);
         return hasPermission;
     }
 

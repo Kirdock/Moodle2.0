@@ -106,11 +106,7 @@ public class CourseService extends AbstractService {
 
     public CourseResponseObject getCourse(long courseId) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
-
         Course course = readCourse(courseId);
-        if (!userDetails.getAdmin() && !isOwner(course))
-            throw new ServiceException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);
-
         CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
         responseObject.setPresented(createCoursePresentedList(course));
 
