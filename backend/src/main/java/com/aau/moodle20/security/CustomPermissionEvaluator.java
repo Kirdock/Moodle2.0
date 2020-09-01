@@ -49,6 +49,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             hasPermission = handleCoursePermission(authentication,serializable, permission);
         else if("Example".equals(s))
             hasPermission = handleExamplePermission(authentication,serializable,permission);
+        else if("User".equals(s))
+            hasPermission = handleUserPermission(authentication,serializable,permission);
         return hasPermission;
     }
 
@@ -110,6 +112,26 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return hasPermission;
     }
 
+    protected boolean handleUserPermission(Authentication authentication, Serializable targetId, String permission)
+    {
+        boolean hasPermission = false;
+        String matriculationNumber = null;
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        if ("update".equals(permission)) {
+            if (targetId instanceof String)
+                matriculationNumber = (String) targetId;
+            else
+                matriculationNumber = userDetails.getMatriculationNumber();
+        } else if ("get".equals(permission) && targetId instanceof String)
+            matriculationNumber = (String) targetId;
+
+        if (matriculationNumber != null)
+            hasPermission = matriculationNumber.equals(userDetails.getMatriculationNumber());
+
+        return hasPermission;
+    }
+
 
     protected boolean handleExampleOrderRequests(List<ExampleOrderRequest> exampleOrderRequests, UserDetailsImpl userDetails)
     {
@@ -123,8 +145,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return true;
     }
 
-    protected boolean isOwnerOfCourse(Long courseId, UserDetailsImpl userDetails)
-    {
+    protected boolean isOwnerOfCourse(Long courseId, UserDetailsImpl userDetails) {
         Course course = readCourse(courseId);
         return course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber());
     }

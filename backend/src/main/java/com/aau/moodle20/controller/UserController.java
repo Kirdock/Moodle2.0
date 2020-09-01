@@ -22,34 +22,36 @@ import java.util.List;
 public class UserController {
     AuthenticationManager authenticationManager;
     JwtUtils jwtUtils;
-    private UserService userDetailsService;
+    private UserService userService;
 
-    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserService userDetailsService)
+    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserService userService)
     {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-        this.userDetailsService = userDetailsService;
+        this.userService = userService;
     }
 
     // get api--------------------------------------------------------------------
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping(path = "/users")
     public List<UserResponseObject> getUsers() {
-        return userDetailsService.getAllUsers();
+        return userService.getAllUsers();
     }
 
+    @PreAuthorize("hasPermission(#courseId, 'Course', 'get')")
     @GetMapping(path = "/users/course/{courseId}")
     public List<UserResponseObject> getUsersWithCourseRoles(@PathVariable("courseId") long courseId) {
-        return userDetailsService.getUsersWithCourseRoles(courseId);
+        return userService.getUsersWithCourseRoles(courseId);
     }
     @GetMapping(path = "/user/isOwner")
     public Boolean isOwner() {
-        return userDetailsService.isOwner();
+        return userService.isOwner();
     }
 
+    @PreAuthorize("hasPermission(#matriculationNumber, 'User', 'get')")
     @GetMapping(path = "/user/{matriculationNumber}")
     public UserResponseObject getUser(@PathVariable String matriculationNumber) {
-        return userDetailsService.getUser(matriculationNumber);
+        return userService.getUser(matriculationNumber);
     }
 
 
@@ -59,22 +61,23 @@ public class UserController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        userDetailsService.checkForTemporaryPassword(loginRequest);
+        userService.checkForTemporaryPassword(loginRequest);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
+    @PreAuthorize("hasPermission(null, 'User', 'update')")
     @PostMapping(path = "/user/password")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
-        userDetailsService.changePassword(changePasswordRequest);
+        userService.changePassword(changePasswordRequest);
         return ResponseEntity.ok(new MessageResponse("User password changed!"));
     }
-
+    @PreAuthorize("hasPermission(#updateUserRequest.matriculationNumber, 'User', 'update')")
     @PostMapping(path = "/user")
     public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
-        userDetailsService.updateUser(updateUserRequest);
+        userService.updateUser(updateUserRequest);
         return ResponseEntity.ok(new MessageResponse("User was successfully updated!"));
     }
 
@@ -83,22 +86,21 @@ public class UserController {
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/user")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-
-        userDetailsService.registerUser(signUpRequest);
+        userService.registerUser(signUpRequest);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
     public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "isAdmin",required = false) Boolean isAdmin) throws UserException {
-        return ResponseEntity.ok(userDetailsService.registerUsers(file, isAdmin));
+        return ResponseEntity.ok(userService.registerUsers(file, isAdmin));
     }
 
     // delete api -------------------------------------------------------------------------
     @PreAuthorize("hasAuthority('Admin')")
     @DeleteMapping(path = "/user/{matriculationNumber}")
     public ResponseEntity<?> deleteUser(@PathVariable String matriculationNumber) {
-        userDetailsService.deleteUser(matriculationNumber);
+        userService.deleteUser(matriculationNumber);
         return ResponseEntity.ok(new MessageResponse("User was deleted!"));
     }
 }

@@ -305,6 +305,8 @@ public class UserService  extends AbstractService{
         User currentUser = getCurrentUser();
         if (!encoder.matches(changePasswordRequest.getOldPassword(), currentUser.getPassword()))
             throw new ServiceException("Password for User not correct!");
+        if(adminMatriculationNumber.equals(currentUser.getMatriculationNumber()))
+            throw new ServiceException("Password for Root Admin cannot be changed");
         currentUser.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
         currentUser.setPasswordExpireDate(null);
         userRepository.save(currentUser);
@@ -321,8 +323,6 @@ public class UserService  extends AbstractService{
         } else {
             matriculationNumber = userDetails.getMatriculationNumber();
         }
-        if(!userDetails.getAdmin() && !userDetails.getMatriculationNumber().equals(matriculationNumber))
-            throw new ServiceException("Error: User is not admin and therefore not allowed to edit other users than himself ", HttpStatus.UNAUTHORIZED);
 
         if(adminMatriculationNumber.equals(matriculationNumber))
             throw new ServiceException("Error: Root admin cannot be updated!");
@@ -365,6 +365,7 @@ public class UserService  extends AbstractService{
     }
 
     public UserResponseObject getUser(String matriculationNumber) {
+
         return readUser(matriculationNumber).createUserResponseObject();
     }
 
