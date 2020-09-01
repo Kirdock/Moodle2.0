@@ -1,16 +1,10 @@
 package com.aau.moodle20.controller;
 
-import com.aau.moodle20.entity.FinishesExample;
-import com.aau.moodle20.entity.User;
 import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.*;
 import com.aau.moodle20.payload.response.*;
 import com.aau.moodle20.security.jwt.JwtUtils;
-import com.aau.moodle20.services.FinishesExampleService;
-import com.aau.moodle20.services.UserDetailsServiceImpl;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import com.aau.moodle20.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,19 +15,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController()
 @RequestMapping("/api")
 public class UserController {
     AuthenticationManager authenticationManager;
     JwtUtils jwtUtils;
-    private UserDetailsServiceImpl userDetailsService;
+    private UserService userDetailsService;
 
-    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserDetailsServiceImpl userDetailsService)
+    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserService userDetailsService)
     {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;

@@ -45,9 +45,9 @@ public class CourseController {
         return ResponseEntity.ok(courseService.createCourse(createCourseRequest));
     }
 
+    @PreAuthorize("hasPermission(#updateCourseRequest, 'Example', 'update')")
     @PostMapping(value = "/course")
     public ResponseEntity<?> updateCourse(@Valid  @RequestBody UpdateCourseRequest updateCourseRequest)  throws SemesterException {
-
         courseService.updateCourse(updateCourseRequest);
         return ResponseEntity.ok(new MessageResponse("Course was successfully updated!"));
     }

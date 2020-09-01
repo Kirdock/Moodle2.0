@@ -61,9 +61,6 @@ public class CourseService extends AbstractService {
         if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
             throw new ServiceException("Error: Owner cannot be updated because the given matriculationNumber those not exists!", HttpStatus.NOT_FOUND);
 
-        if (!userDetails.getAdmin() && !isOwner(course))
-            throw new ServiceException("Error: User is not owner of this course and thus cannot update this course!", HttpStatus.UNAUTHORIZED);
-
         // if number is updated check if given number already exists in semester
         if(!updateCourseRequest.getNumber().equals(course.getNumber()))
         {

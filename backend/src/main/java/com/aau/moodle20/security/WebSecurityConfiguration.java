@@ -4,38 +4,34 @@ package com.aau.moodle20.security;
 import com.aau.moodle20.security.jwt.AuthEntryPointJwt;
 import com.aau.moodle20.security.jwt.AuthTokenFilter;
 import com.aau.moodle20.services.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.aau.moodle20.services.UserService;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import java.util.Locale;
 
-@Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-       // securedEnabled = true,
-        prePostEnabled = true
+public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    @Autowired
     private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+    private CustomPermissionEvaluator customPermissionEvaluator;
+
+    public WebSecurityConfiguration(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler, CustomPermissionEvaluator customPermissionEvaluator)
+    {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.customPermissionEvaluator = customPermissionEvaluator;
+    }
 
 
     @Bean
@@ -82,5 +78,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     }
 
-
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
+        handler.setPermissionEvaluator(customPermissionEvaluator);
+        web.expressionHandler(handler);
+    }
 }

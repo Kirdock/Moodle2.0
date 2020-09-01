@@ -28,7 +28,7 @@ public class UserCourseService extends AbstractService {
     PdfService pdfService;
 
     @Autowired
-    UserDetailsServiceImpl userDetailsService;
+    UserService userService;
 
     private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
 
@@ -77,7 +77,7 @@ public class UserCourseService extends AbstractService {
     public RegisterMultipleUserResponse assignFile(MultipartFile file, Long courseId) throws ServiceException {
         Course course = readCourse(courseId);
         RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
-        List<User> allGivenUsers = userDetailsService.registerMissingUsersFromFile(file,registerMultipleUserResponse);
+        List<User> allGivenUsers = userService.registerMissingUsersFromFile(file,registerMultipleUserResponse);
         List<UserInCourse> userInCourses = new ArrayList<>();
 
         for (User user : allGivenUsers) {
