@@ -17,7 +17,7 @@ public class Example {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_Sheet_id", referencedColumnName = "id")
     private ExerciseSheet exerciseSheet;
 
