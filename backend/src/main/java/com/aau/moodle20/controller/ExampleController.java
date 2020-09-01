@@ -2,8 +2,9 @@ package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.Example;
 import com.aau.moodle20.exception.ServiceException;
+import com.aau.moodle20.payload.request.CreateExampleRequest;
 import com.aau.moodle20.payload.request.ExampleOrderRequest;
-import com.aau.moodle20.payload.request.ExampleRequest;
+import com.aau.moodle20.payload.request.UpdateExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
@@ -56,15 +57,15 @@ public class ExampleController {
                 .body(new InputStreamResource(inputStream));
     }
 
-    @PreAuthorize("hasPermission(#createExampleRequest.id, 'Example', 'create')")
+    @PreAuthorize("hasPermission(#createExampleRequest.exerciseSheetId, 'Example', 'create')")
     @PutMapping(value = "/example")
-    public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody ExampleRequest createExampleRequest) throws ServiceException, IOException {
+    public ResponseEntity<ExampleResponseObject> createExample(@Valid @RequestBody CreateExampleRequest createExampleRequest) throws ServiceException, IOException {
         ExampleResponseObject exampleResponseObject = exampleService.createExample(createExampleRequest);
         return ResponseEntity.ok(exampleResponseObject);
     }
     @PreAuthorize("hasPermission(#updateExampleRequest.id, 'Example', 'update')")
     @PostMapping(value = "/example")
-    public ResponseEntity<?> updateExample(@Valid @RequestBody ExampleRequest updateExampleRequest) throws ServiceException, IOException {
+    public ResponseEntity<?> updateExample(@Valid @RequestBody UpdateExampleRequest updateExampleRequest) throws ServiceException, IOException {
         exampleService.updateExample(updateExampleRequest);
         return ResponseEntity.ok("Example successfully updated");
     }
@@ -81,7 +82,7 @@ public class ExampleController {
         return ResponseEntity.ok("Validator was successfully set");
     }
 
-    @PreAuthorize("hasPermission(#id, 'Example', 'get')")
+    @PreAuthorize("hasPermission(#id, 'Example', 'delete')")
     @DeleteMapping(value = "/example/{id}")
     public ResponseEntity<?> deleteExample(@PathVariable("id") long id) throws ServiceException, IOException {
         exampleService.deleteExample(id);
@@ -90,7 +91,7 @@ public class ExampleController {
     }
     @PreAuthorize("hasPermission(#id, 'Example', 'delete')")
     @DeleteMapping(value = "/example/{id}/validator")
-    public ResponseEntity<?> setExampleValidator(@PathVariable("id") long id) throws ServiceException, IOException {
+    public ResponseEntity<?> deleteExampleValidator(@PathVariable("id") long id) throws ServiceException, IOException {
         exampleService.deleteExampleValidator(id);
         return ResponseEntity.ok("Validator was successfully deleted");
     }

@@ -1,7 +1,8 @@
 package com.aau.moodle20.entity;
 
 import com.aau.moodle20.constants.EFinishesExampleState;
-import com.aau.moodle20.payload.request.ExampleRequest;
+import com.aau.moodle20.payload.request.CreateExampleRequest;
+import com.aau.moodle20.payload.request.UpdateExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
 
@@ -209,7 +210,25 @@ public class Example {
         }
     }
 
-    public void fillValuesFromRequestObject(ExampleRequest exampleRequest) {
+    public void fillValuesFromRequestObject(CreateExampleRequest exampleRequest) {
+        setName(exampleRequest.getName());
+        setDescription(exampleRequest.getDescription());
+        setOrder(exampleRequest.getOrder());
+        setPoints(exampleRequest.getPoints());
+        setWeighting(exampleRequest.getWeighting());
+        setUploadCount(exampleRequest.getUploadCount());
+
+        setSubmitFile(exampleRequest.getSubmitFile() != null ? exampleRequest.getSubmitFile() : Boolean.FALSE);
+        setMandatory(exampleRequest.getMandatory() != null ? exampleRequest.getMandatory() : Boolean.FALSE);
+
+        setCustomFileTypesList(exampleRequest.getCustomFileTypes());
+        if (exampleRequest.getParentId() != null)
+            setParentExample(new Example(exampleRequest.getParentId()));
+        if (exampleRequest.getExerciseSheetId() != null)
+            setExerciseSheet(new ExerciseSheet(exampleRequest.getExerciseSheetId()));
+    }
+// TODO refactor later
+    public void fillValuesFromRequestObject(UpdateExampleRequest exampleRequest) {
         setName(exampleRequest.getName());
         setDescription(exampleRequest.getDescription());
         setOrder(exampleRequest.getOrder());

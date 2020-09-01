@@ -5,8 +5,9 @@ import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import com.aau.moodle20.exception.ServiceException;
+import com.aau.moodle20.payload.request.CreateExampleRequest;
 import com.aau.moodle20.payload.request.ExampleOrderRequest;
-import com.aau.moodle20.payload.request.ExampleRequest;
+import com.aau.moodle20.payload.request.UpdateExampleRequest;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import com.aau.moodle20.validation.ValidatorHandler;
@@ -24,7 +25,7 @@ public class ExampleService extends AbstractService{
 
 
     @Transactional
-    public ExampleResponseObject createExample (ExampleRequest createExampleRequest) throws ServiceException, IOException {
+    public ExampleResponseObject createExample (CreateExampleRequest createExampleRequest) throws ServiceException, IOException {
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
         Example parentExample = null;
@@ -62,7 +63,7 @@ public class ExampleService extends AbstractService{
 
         example.fillValuesFromRequestObject(createExampleRequest);
         exampleRepository.save(example);
-        supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest);
+        supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest.getSupportedFileTypes());
         supportFileTypeRepository.saveAll(supportFileTypes);
 
         ExampleResponseObject responseObject = new ExampleResponseObject();
@@ -93,12 +94,12 @@ public class ExampleService extends AbstractService{
     }
 
 
-    protected List<SupportFileType> createSupportedFileTypesEntries(Example example, ExampleRequest abstractExampleRequest) {
+    protected List<SupportFileType> createSupportedFileTypesEntries(Example example, List<Long> supportedFileTypes) {
         List<SupportFileType> supportFileTypes = new ArrayList<>();
-        if(abstractExampleRequest.getSupportedFileTypes()==null)
+        if(supportedFileTypes==null)
             return supportFileTypes;
 
-        for (Long fileTypeId : abstractExampleRequest.getSupportedFileTypes()) {
+        for (Long fileTypeId : supportedFileTypes) {
             Optional<FileType> optionalFileType = fileTypeRepository.findById(fileTypeId);
             if (optionalFileType.isPresent()) {
                 SupportFileTypeKey supportFileTypeKey = new SupportFileTypeKey();
@@ -116,7 +117,7 @@ public class ExampleService extends AbstractService{
     }
 
     @Transactional
-    public void updateExample(ExampleRequest updateExampleRequest) throws ServiceException, IOException {
+    public void updateExample(UpdateExampleRequest updateExampleRequest) throws ServiceException, IOException {
         List<SupportFileType> supportFileTypes;
         if (updateExampleRequest.getSubmitFile() != null && updateExampleRequest.getSubmitFile()) {
             if ((updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty()) &&
@@ -132,7 +133,7 @@ public class ExampleService extends AbstractService{
             deleteExampleValidator(example.getId());
 
         example.fillValuesFromRequestObject(updateExampleRequest);
-        supportFileTypes = createSupportedFileTypesEntries(example, updateExampleRequest);
+        supportFileTypes = createSupportedFileTypesEntries(example, updateExampleRequest.getSupportedFileTypes());
         supportFileTypeRepository.saveAll(supportFileTypes);
         example.setSupportFileTypes(new HashSet<>(supportFileTypes));
         exampleRepository.saveAndFlush(example);
