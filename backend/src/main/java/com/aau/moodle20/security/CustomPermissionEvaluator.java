@@ -50,8 +50,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         if ("update".equals(permission) && targetId instanceof UpdateCourseRequest) {
             UpdateCourseRequest updateCourseRequest = (UpdateCourseRequest) targetId;
             hasPermission = isAdminOrOwner(updateCourseRequest.getId(),userDetails);
-        }else if("get".equals(permission) && targetId instanceof String)
-            hasPermission = isAdminOrOwner(Long.getLong((String) targetId),userDetails);
+        }else if("get".equals(permission) && targetId instanceof Long)
+            hasPermission = isAdminOrOwner((Long) targetId,userDetails);
         return hasPermission;
     }
 
