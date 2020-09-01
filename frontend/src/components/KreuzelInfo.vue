@@ -112,6 +112,9 @@ export default {
         }
     },
     created(){
+        if(this.value.submitFile && this.value.remainingUploadCount === undefined){
+            this.value.remainingUploadCount = this.value.uploadCount;
+        }
         const allTypes = this.supportedFileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType === fileType.id)).map(filetype => filetype.value).concat(this.value.customFileTypes);
         this.supportedTypes = allTypes.join(',');
     },

@@ -6,26 +6,26 @@ const testExerciseSheets = require('./testFiles/testExerciseSheets.js');
 const testExamplesRight = require('./testFiles/testExamplesRight.js');
 const visibileCourses = [testCourses[0]];
 const hiddenCourses = [testCourses[1]];
+const kreuzelDescription = 'My kreuzel description';
 
 module.exports = {
     before: browser => {
-        // courseTest.before(browser, function (){
-        //     courseTest['create course'](browser); //create two courses, one where the user is in and one where he isn't
-        //     courseTest['assign users'](browser);
-        //     for(const sheet of testExerciseSheets){
-        //         browser.perform(done=>{
-        //             exerciseSheetTest.before(browser, function (){
-        //                 exerciseSheetTest['create example'](browser);
-        //                 done();
-        //             }, sheet.name);
-        //         })
-        //     }
-        //     browser.perform(done =>{
-        //         browser.loginAsStudent();
-        //         done();
-        //     })
-        // });
-        browser.loginAsStudent();
+        courseTest.before(browser, function (){
+            courseTest['create course'](browser); //create two courses, one where the user is in and one where he isn't
+            courseTest['assign users'](browser);
+            for(const sheet of testExerciseSheets){
+                browser.perform(done=>{
+                    exerciseSheetTest.before(browser, function (){
+                        exerciseSheetTest['create example'](browser);
+                        done();
+                    }, sheet.name);
+                })
+            }
+            browser.perform(done =>{
+                browser.loginAsStudent();
+                done();
+            })
+        });
     },
     'check courses': function(browser){
         const page = browser.page.studentCourses();
@@ -79,5 +79,66 @@ module.exports = {
         for(const example of testExamplesRight){
             exerciseSheetPage.validateExample(example, exerciseSheet);
         }
+        if(exerciseSheet.deadlineReached){
+            exerciseSheetPage.expect.element('@submitButton').to.not.be.enabled;
+        }
+        else{
+            exerciseSheetPage.expect.element('@submitButton').to.be.enabled;
+        }
+    },
+    'modify exerciseSheet type2': function(browser, exerciseSheet){
+        const page = browser.page.studentExerciseSheet();
+        exerciseSheet = exerciseSheet || testExerciseSheets[1];
+        this['select exerciseSheet'](browser, undefined, exerciseSheet);
+        const example = testExamplesRight[0];
+        page.setKreuzel2(example.name, false, 1);
+        page.assert.not.elementPresent({
+            selector: page.description(example.name, false),
+            locateStrategy: 'xpath'
+        })
+
+        page.setKreuzel2(example.name, false, 3);
+        page.assert.elementPresent({
+            selector: page.description(example.name, false),
+            locateStrategy: 'xpath'
+        })
+        page.clearValue2(page.description(example.name, false), true);
+        page.assert.isValidInput(page.description(example.name, false), 'valid', false, true)
+        page.submit();
+        page.assert.not.toastPresent();
+
+        page.clearValue2(page.description(example.name, false), true)
+            .setValue('xpath',page.description(example.name, false), kreuzelDescription);
+
+        page.setKreuzel2(testExamplesRight[1].subExamples[0].name, true, 1);
+        page.checkMandatory(1,1);
+
+        page.submit();
+        page.assert.successPresent();
+        page.closeToast();
+        
+        browser.refresh().pause(1000);
+        page.assert.value({
+            selector: page.description(example.name, false),
+            locateStrategy: 'xpath'
+            }, kreuzelDescription);
+        page.expect.element({
+                selector: page.kreuzelOption(example.name, false, 3),
+                locateStrategy: 'xpath'
+            }).to.be.selected;
+        page.checkMandatory(1,1);
+        page.expect.element({
+                selector: page.kreuzelOption(testExamplesRight[1].subExamples[0].name, true, 1),
+                locateStrategy: 'xpath'
+            }).to.be.selected;
+    },
+    'modify exerciseSheet type1': function(browser, exerciseSheet){
+        const page = browser.page.studentExerciseSheet();
+        exerciseSheet = exerciseSheet || testExerciseSheets[0];
+        this['select exerciseSheet'](browser, undefined, exerciseSheet);
+        page.setKreuzel(testExamplesRight[0].name, false, true);
+        page.submit();
+        page.assert.successPresent();
+        page.closeToast();
     }
 }

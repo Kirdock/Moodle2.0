@@ -34,6 +34,30 @@ module.exports = {
                     this.checkExample(subExample, exerciseSheet, true);
                 }
             },
+            checkMandatory(first, second){
+                return this.api.assert.elementPresent({
+                    selector: `//tr[last()]/td[3][contains(@style,"color: ${first === second ? 'green' : 'red'};") and text()=" ${first}/${second} "]`,
+                    locateStrategy: 'xpath'
+                })
+            },
+            kreuzelOption(exampleName, isSubExample, option){
+                return `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[6]/div/div[${option}]/input`
+            },
+            setKreuzel(exampleName, isSubExample, status){
+                return this.setCheckbox(`//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[6]/input`, status, true)
+            },
+            setKreuzel2(exampleName, isSubExample, option){
+                return this.api.click('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[6]/div/div[${option}]/input`)
+            },
+            description(exampleName, isSubExample){
+                return `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[6]//textarea`;
+            },
+            submit(){
+                return this.click('@submitButton');
+            }
         }
-    ]
+    ],
+    elements: {
+        submitButton: 'button[type=submit]'
+    }
 }

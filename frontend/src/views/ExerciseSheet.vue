@@ -35,7 +35,7 @@
                     <th scope="col">{{$t('points')}}</th>
                     <th scope="col" class="text-center">{{$t('kreuzel.name')}}</th>
                     <th scope="col" v-if="this.hasFileUpload" class="text-center">{{$t('attempts')}}</th>
-                    <th scope="col">{{$t('actions')}}</th>
+                    <th scope="col" style="width: 270px">{{$t('actions')}}</th>
                 </thead>
                 <tbody>
                     <template v-for="example in sheetInfo.examples">
