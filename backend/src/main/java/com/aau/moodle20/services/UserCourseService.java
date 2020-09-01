@@ -44,14 +44,21 @@ public class UserCourseService extends AbstractService {
 
 
 
-
+    @Transactional
     public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws SemesterException
     {
-        //TODO add validation
-
         List<UserInCourse> userInCourses = new ArrayList<>();
-
         for(AssignUserToCourseRequest assignUserToCourseRequest: assignUserToCourseRequests) {
+
+            if(!userRepository.existsByMatriculationNumber(assignUserToCourseRequest.getMatriculationNumber()))
+                throw new ServiceException("Error: User with matrikulationNumber:"+assignUserToCourseRequest.getMatriculationNumber()+" does not exist");
+
+            if(!courseRepository.existsById(assignUserToCourseRequest.getCourseId()))
+                throw new ServiceException("Error: Course with id:"+assignUserToCourseRequest.getCourseId()+" does not exist");
+
+            if(!getUserDetails().getAdmin() && !isOwner(assignUserToCourseRequest.getCourseId()))
+                throw new ServiceException("Error: User is not owner of course: "+assignUserToCourseRequest.getCourseId(),HttpStatus.FORBIDDEN);
+
 
             UserCourseKey userCourseKey = new UserCourseKey();
             UserInCourse userInCourse = new UserInCourse();
@@ -68,7 +75,6 @@ public class UserCourseService extends AbstractService {
             userInCourse.setCourse(course);
             userInCourse.setId(userCourseKey);
             userInCourses.add(userInCourse);
-
         }
         userInCourseRepository.saveAll(userInCourses);
     }

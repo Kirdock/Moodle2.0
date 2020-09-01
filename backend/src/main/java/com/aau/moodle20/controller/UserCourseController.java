@@ -12,6 +12,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +39,7 @@ public class UserCourseController {
         return ResponseEntity.ok(userCourseService.getCourseAssigned(courseId));
     }
 
+    @PreAuthorize("hasPermission(#courseId, 'Course', 'get')")
     @GetMapping(value = "/course/{courseId}/attendanceList")
     public ResponseEntity<InputStreamResource> getAttendanceList(@PathVariable("courseId") long courseId) throws IOException {
 
@@ -53,14 +55,14 @@ public class UserCourseController {
     }
 
 
-
     @PostMapping(value = "/course/assign")
     public ResponseEntity<?> assignCourseToSemester(@Valid @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests)  throws SemesterException {
 
         userCourseService.assignUsers(assignUserToCourseRequests);
-        return ResponseEntity.ok(new MessageResponse("User were successfully assigned to courses!"));
+        return ResponseEntity.ok(new MessageResponse("Users were successfully assigned to courses!"));
     }
 
+    @PreAuthorize("hasPermission(#courseId, 'Course', 'update')")
     @PostMapping(value = "/course/assignFile")
     public ResponseEntity<RegisterMultipleUserResponse> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  throws ServiceException {
         return ResponseEntity.ok(userCourseService.assignFile(file,courseId));
