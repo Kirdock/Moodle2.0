@@ -64,7 +64,7 @@ public class CourseService extends AbstractService {
         if (!userDetails.getAdmin() && !isOwner(course))
             throw new ServiceException("Error: User is not owner of this course and thus cannot update this course!", HttpStatus.UNAUTHORIZED);
 
-        // if number  updated check if no course with given number im semester exists
+        // if number is updated check if given number already exists in semester
         if(!updateCourseRequest.getNumber().equals(course.getNumber()))
         {
             if(courseRepository.existsByNumberAndSemester_Id(updateCourseRequest.getNumber(),course.getSemester().getId()))
