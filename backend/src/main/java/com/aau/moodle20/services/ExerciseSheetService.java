@@ -84,9 +84,6 @@ public class ExerciseSheetService extends AbstractService{
 
     public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceException {
         ExerciseSheet exerciseSheet = readExerciseSheet(id);
-        if(!isAdmin() && !isOwner(exerciseSheet.getCourse()))
-            throw new ServiceException("Error: Not an Admin or Owner",HttpStatus.UNAUTHORIZED);
-
         return exerciseSheet.getResponseObject(null);
     }
 

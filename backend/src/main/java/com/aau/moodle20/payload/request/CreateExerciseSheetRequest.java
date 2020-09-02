@@ -2,6 +2,7 @@ package com.aau.moodle20.payload.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -17,10 +18,14 @@ public class CreateExerciseSheetRequest {
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime issueDate;
+    @NotNull
+    @Min(value = 0)
     private Integer minKreuzel;
+    @NotNull
+    @Min(value = 0)
     private Integer minPoints;
     private String description;
-    private Boolean includeThird;
+    private Boolean includeThird =  Boolean.FALSE;
 
     public Long getCourseId() {
         return courseId;
@@ -83,6 +88,7 @@ public class CreateExerciseSheetRequest {
     }
 
     public void setIncludeThird(Boolean includeThird) {
-        this.includeThird = includeThird;
+        if (includeThird != null)
+            this.includeThird = includeThird;
     }
 }
