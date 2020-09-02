@@ -10,6 +10,7 @@ import com.aau.moodle20.payload.response.CourseResponseObject;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,7 @@ public class SemesterService extends AbstractService{
             if (!semestersToBeReturned.contains(semester))
                 semestersToBeReturned.add(semester);
         }
+        semestersToBeReturned.sort(Comparator.comparing(Semester::getYear).thenComparing(Semester::getType,Comparator.reverseOrder()));
 
         return semestersToBeReturned;
     }
