@@ -67,17 +67,17 @@
                     <span class="fa fa-infinity"></span>
                 </template>
                 <template v-else>
-                    {{value.remainingUploadCount}}/{{value.uploadCount}}
+                    {{value.remainingUploadCount}}
                 </template>
             </template>
         </td>
         <td>
             <template v-if="value.submitFile">
-                <label class="btn btn-primary">
+                <label class="btn btn-primary" :class="deadlineReached || maxAttemptsReached ? 'disabled' : ''">
                     <span class="fa fa-sync fa-spin" v-if="loading.fileUpload"></span>
                     <span class="fas fa-upload" v-else></span>
                     {{$t('submitFile')}}
-                    <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached"/>
+                    <input type="file" class="d-none" :id="`file${_uid}`" :ref="`file${_uid}`" :accept="supportedTypes" @change="submitFile()" :disabled="deadlineReached || maxAttemptsReached"/>
                 </label>
                 <a href.prevent="#" style="color: red !important; font-size: 25px" v-b-tooltip.hover :title="$t('noFileUploaded')">
                     <span class="fas fa-exclamation-circle" v-show="value.state !== 'n' && !value.hasAttachment"></span>
@@ -103,6 +103,11 @@ export default {
         KreuzelResult
     },
     props: ['value','includeThird', 'supportedFileTypes', 'deadlineReached', 'isDeadlineReached', 'isParent', 'hasSubExamples', 'hasFileUpload', 'setSelectedKreuzelResult'],
+    computed: {
+        maxAttemptsReached(){
+            return this.value.submitFile && this.value.uploadCount !== 0 && this.value.remainingUploadCount === 0;
+        }
+    },
     data(){
         return {
             loading: {
@@ -113,7 +118,7 @@ export default {
     },
     created(){
         if(this.value.submitFile && this.value.remainingUploadCount === undefined){
-            this.value.remainingUploadCount = this.value.uploadCount;
+            this.$set(this.value, 'remainingUploadCount', this.value.uploadCount);
         }
         const allTypes = this.supportedFileTypes.filter(fileType => this.value.supportedFileTypes.some(sfileType => sfileType === fileType.id)).map(filetype => filetype.value).concat(this.value.customFileTypes);
         this.supportedTypes = allTypes.join(',');
@@ -128,7 +133,7 @@ export default {
                 });
                 this.deadlineReached = true;
             }
-            else if(this.value.submitFile && this.value.uploadCount !== 0 && this.value.remainingUploadCount === 0){
+            else if(this.maxAttemptsReached){
                 this.$bvToast.toast(this.$t('maxAttemptsReached'), {
                     title: this.$t('error'),
                     variant: 'danger',

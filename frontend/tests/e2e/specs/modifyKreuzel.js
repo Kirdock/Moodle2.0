@@ -26,6 +26,7 @@ module.exports = {
                 done();
             })
         });
+        // browser.loginAsStudent();
     },
     'check courses': function(browser){
         const page = browser.page.studentCourses();
@@ -91,7 +92,20 @@ module.exports = {
         exerciseSheet = exerciseSheet || testExerciseSheets[1];
         this['select exerciseSheet'](browser, undefined, exerciseSheet);
         const example = testExamplesRight[0];
+        const resultModal = page.section.resultModal;
+
+        page.checkMandatory(0,1);
+        page.checkKreuzel(0,3,exerciseSheet.minKreuzel)
+        page.checkPoints(0,18,exerciseSheet.minPoints)
+
+
         page.setKreuzel2(example.name, false, 1);
+        page.assert.not.elementPresent({
+            selector: page.description(example.name, false),
+            locateStrategy: 'xpath'
+        })
+
+        page.setKreuzel2(example.name, false, 2);
         page.assert.not.elementPresent({
             selector: page.description(example.name, false),
             locateStrategy: 'xpath'
@@ -107,38 +121,95 @@ module.exports = {
         page.submit();
         page.assert.not.toastPresent();
 
+
+
         page.clearValue2(page.description(example.name, false), true)
             .setValue('xpath',page.description(example.name, false), kreuzelDescription);
 
         page.setKreuzel2(testExamplesRight[1].subExamples[0].name, true, 1);
+
         page.checkMandatory(1,1);
+        page.checkKreuzel(2,3,exerciseSheet.minKreuzel)
+        page.checkPoints(18,18,exerciseSheet.minPoints)
+
+        page.setKreuzel2(testExamplesRight[2].name, false, 1);
+        page.setValue('xpath',page.uploadButton(testExamplesRight[2].name, false), Path.resolve(`${__dirname}/testFiles/${'testSubmission.zip'}`));
+        page.assert.successPresent();
+        page.closeToast();
+        page.checkUploadCount(testExamplesRight[2].name, false, 0);
+        page.expect.element({
+                selector: page.uploadButton(testExamplesRight[2].name, false),
+                locateStrategy: 'xpath'
+            }).to.not.be.enabled;
+        page.click('xpath',page.resultButton(testExamplesRight[2].name, false)).pause(1000);
+        
+        resultModal.containsResult();
+        resultModal.cancelX();
+        resultModal.pause(1000);
+        page.expect.section('@resultModal').to.not.be.present;
+
+        page.checkKreuzel(3,3,exerciseSheet.minKreuzel)
 
         page.submit();
         page.assert.successPresent();
         page.closeToast();
         
         browser.refresh().pause(1000);
-        page.assert.value({
-            selector: page.description(example.name, false),
-            locateStrategy: 'xpath'
-            }, kreuzelDescription);
-        page.expect.element({
-                selector: page.kreuzelOption(example.name, false, 3),
-                locateStrategy: 'xpath'
-            }).to.be.selected;
+
+        page.checkKreuzelInfo({
+            name: example.name,
+            isSubExample: false,
+            type: 3,
+            description: kreuzelDescription
+        });
+
+        page.checkKreuzelInfo({
+            name: testExamplesRight[1].subExamples[0].name,
+            isSubExample: true,
+            type: 1
+        });
         page.checkMandatory(1,1);
+        page.checkKreuzel(3,3,exerciseSheet.minKreuzel)
+        page.checkPoints(18,18,exerciseSheet.minPoints)
+        page.checkUploadCount(testExamplesRight[2].name, false, 0);
         page.expect.element({
-                selector: page.kreuzelOption(testExamplesRight[1].subExamples[0].name, true, 1),
+                selector: page.uploadButton(testExamplesRight[2].name, false),
                 locateStrategy: 'xpath'
-            }).to.be.selected;
+            }).to.not.be.enabled;
+        page.click('xpath',page.resultButton(testExamplesRight[2].name, false)).pause(1000);
+        
+        resultModal.containsResult();
+        resultModal.cancelX();
+        resultModal.pause(1000);
+        page.expect.section('@resultModal').to.not.be.present;
     },
     'modify exerciseSheet type1': function(browser, exerciseSheet){
         const page = browser.page.studentExerciseSheet();
         exerciseSheet = exerciseSheet || testExerciseSheets[0];
         this['select exerciseSheet'](browser, undefined, exerciseSheet);
+        
+        page.checkMandatory(0,1);
+        page.checkKreuzel(0,3,exerciseSheet.minKreuzel)
+        page.checkPoints(0,18,exerciseSheet.minPoints)
+
         page.setKreuzel(testExamplesRight[0].name, false, true);
+        page.setKreuzel(testExamplesRight[1].subExamples[0].name, true, true);
         page.submit();
         page.assert.successPresent();
         page.closeToast();
+        browser.refresh().pause(1000);
+        page.checkKreuzelInfo({
+            name: testExamplesRight[0].name,
+            isSubExample: false,
+            type: true,
+        })
+        page.checkKreuzelInfo({
+            name: testExamplesRight[1].subExamples[0].name,
+            isSubExample: true,
+            type: true,
+        })
+        page.checkMandatory(1,1);
+        page.checkKreuzel(2,3,exerciseSheet.minKreuzel)
+        page.checkPoints(18,18,exerciseSheet.minPoints)
     }
 }
