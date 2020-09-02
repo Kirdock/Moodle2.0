@@ -4,6 +4,8 @@ const testCourses = require('./testFiles/testCourses.js');
 const exerciseSheetTest = require('./modifyExerciseSheet.js');
 const testExerciseSheets = require('./testFiles/testExerciseSheets.js');
 const testExamplesRight = require('./testFiles/testExamplesRight.js');
+const testKreuzel2 = require('./testFiles/testKreuzel2.js');
+const testKreuzel = require('./testFiles/testKreuzel.js');
 const visibileCourses = [testCourses[0]];
 const hiddenCourses = [testCourses[1]];
 const kreuzelDescription = 'My kreuzel description';
@@ -87,31 +89,25 @@ module.exports = {
             exerciseSheetPage.expect.element('@submitButton').to.be.enabled;
         }
     },
-    'modify exerciseSheet type2': function(browser, exerciseSheet){
+    'modify exerciseSheet type2 invalid': function(browser){
         const page = browser.page.studentExerciseSheet();
         exerciseSheet = exerciseSheet || testExerciseSheets[1];
         this['select exerciseSheet'](browser, undefined, exerciseSheet);
         const example = testExamplesRight[0];
-        const resultModal = page.section.resultModal;
 
-        page.checkMandatory(0,1);
-        page.checkKreuzel(0,3,exerciseSheet.minKreuzel)
-        page.checkPoints(0,18,exerciseSheet.minPoints)
-
-
-        page.setKreuzel2(example.name, false, 1);
+        page.setKreuzel(example.name, false, 1);
         page.assert.not.elementPresent({
             selector: page.description(example.name, false),
             locateStrategy: 'xpath'
         })
 
-        page.setKreuzel2(example.name, false, 2);
+        page.setKreuzel(example.name, false, 2);
         page.assert.not.elementPresent({
             selector: page.description(example.name, false),
             locateStrategy: 'xpath'
         })
 
-        page.setKreuzel2(example.name, false, 3);
+        page.setKreuzel(example.name, false, 3);
         page.assert.elementPresent({
             selector: page.description(example.name, false),
             locateStrategy: 'xpath'
@@ -120,96 +116,53 @@ module.exports = {
         page.assert.isValidInput(page.description(example.name, false), 'valid', false, true)
         page.submit();
         page.assert.not.toastPresent();
-
-
-
-        page.clearValue2(page.description(example.name, false), true)
-            .setValue('xpath',page.description(example.name, false), kreuzelDescription);
-
-        page.setKreuzel2(testExamplesRight[1].subExamples[0].name, true, 1);
-
-        page.checkMandatory(1,1);
-        page.checkKreuzel(2,3,exerciseSheet.minKreuzel)
-        page.checkPoints(18,18,exerciseSheet.minPoints)
-
-        page.setKreuzel2(testExamplesRight[2].name, false, 1);
-        page.setValue('xpath',page.uploadButton(testExamplesRight[2].name, false), Path.resolve(`${__dirname}/testFiles/${'testSubmission.zip'}`));
-        page.assert.successPresent();
-        page.closeToast();
-        page.checkUploadCount(testExamplesRight[2].name, false, 0);
-        page.expect.element({
-                selector: page.uploadButton(testExamplesRight[2].name, false),
-                locateStrategy: 'xpath'
-            }).to.not.be.enabled;
-        page.click('xpath',page.resultButton(testExamplesRight[2].name, false)).pause(1000);
-        
-        resultModal.containsResult();
-        resultModal.cancelX();
-        resultModal.pause(1000);
-        page.expect.section('@resultModal').to.not.be.present;
-
-        page.checkKreuzel(3,3,exerciseSheet.minKreuzel)
-
-        page.submit();
-        page.assert.successPresent();
-        page.closeToast();
-        
-        browser.refresh().pause(1000);
-
-        page.checkKreuzelInfo({
-            name: example.name,
-            isSubExample: false,
-            type: 3,
-            description: kreuzelDescription
-        });
-
-        page.checkKreuzelInfo({
-            name: testExamplesRight[1].subExamples[0].name,
-            isSubExample: true,
-            type: 1
-        });
-        page.checkMandatory(1,1);
-        page.checkKreuzel(3,3,exerciseSheet.minKreuzel)
-        page.checkPoints(18,18,exerciseSheet.minPoints)
-        page.checkUploadCount(testExamplesRight[2].name, false, 0);
-        page.expect.element({
-                selector: page.uploadButton(testExamplesRight[2].name, false),
-                locateStrategy: 'xpath'
-            }).to.not.be.enabled;
-        page.click('xpath',page.resultButton(testExamplesRight[2].name, false)).pause(1000);
-        
-        resultModal.containsResult();
-        resultModal.cancelX();
-        resultModal.pause(1000);
-        page.expect.section('@resultModal').to.not.be.present;
     },
-    'modify exerciseSheet type1': function(browser, exerciseSheet){
+    'modify exerciseSheet type2': function(browser, kInfos){
         const page = browser.page.studentExerciseSheet();
-        exerciseSheet = exerciseSheet || testExerciseSheets[0];
-        this['select exerciseSheet'](browser, undefined, exerciseSheet);
-        
-        page.checkMandatory(0,1);
-        page.checkKreuzel(0,3,exerciseSheet.minKreuzel)
-        page.checkPoints(0,18,exerciseSheet.minPoints)
+        const kreuzelInfos = kInfos || testKreuzel2;
+        const self = this;
 
-        page.setKreuzel(testExamplesRight[0].name, false, true);
-        page.setKreuzel(testExamplesRight[1].subExamples[0].name, true, true);
-        page.submit();
-        page.assert.successPresent();
-        page.closeToast();
-        browser.refresh().pause(1000);
-        page.checkKreuzelInfo({
-            name: testExamplesRight[0].name,
-            isSubExample: false,
-            type: true,
-        })
-        page.checkKreuzelInfo({
-            name: testExamplesRight[1].subExamples[0].name,
-            isSubExample: true,
-            type: true,
-        })
-        page.checkMandatory(1,1);
-        page.checkKreuzel(2,3,exerciseSheet.minKreuzel)
-        page.checkPoints(18,18,exerciseSheet.minPoints)
+        for(const kreuzel of kreuzelInfos){
+            browser.perform(function(done){
+                self['select exerciseSheet'](browser, undefined, kreuzel.exerciseSheet);
+                page.checkMandatory(0, kreuzel.mandatory);
+                page.checkKreuzel(0, kreuzel.kreuzel, kreuzel.exerciseSheet.minKreuzel)
+                page.checkPoints(0, kreuzel.points, kreuzel.exerciseSheet.minPoints)
+                for(const example of kreuzel.examples){
+                    browser.perform(function(done2){
+                        page.setKreuzel(example.name, example.isSubExample, example.type);
+                        if(example.type === 3){
+                            page.clearValue2(page.description(example.name, example.isSubExample), true)
+                                .setValue('xpath',page.description(example.name, example.isSubExample), example.description);
+                        }
+                        if(example.uploadCount !== undefined){
+                            page.checkUploadCount(example.name, example.isSubExample, example.uploadCount);
+                        }
+                        if(example.submitFile){
+                            page.setValue('xpath',page.uploadButton(example.name, example.isSubExample), Path.resolve(`${__dirname}/testFiles/${'testSubmission.zip'}`));
+                            page.assert.successPresent();
+                            page.closeToast();
+                            page.checkExampleAfterUpload(example);
+                        }
+                        done2();
+                    })
+                }
+                page.checkMandatory(kreuzel.mandatoryAfter, kreuzel.mandatory);
+                page.checkKreuzel(kreuzel.kreuzelAfter, kreuzel.kreuzel, kreuzel.exerciseSheet.minKreuzel)
+                page.checkPoints(kreuzel.pointsAfter, kreuzel.points, kreuzel.exerciseSheet.minPoints)
+
+                page.submit();
+                page.assert.successPresent();
+                page.closeToast();
+                
+                browser.refresh().pause(1000);
+                page.validateKreuzelInfo(kreuzel)
+                done();
+            });
+        }
+        
+    },
+    'modify exerciseSheet type1': function(browser, kreuzelInfos){
+        this['modify exerciseSheet type2'](browser, kreuzelInfos || testKreuzel)
     }
 }

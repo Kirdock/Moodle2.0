@@ -62,6 +62,24 @@ module.exports = {
                     this.checkExample(subExample, exerciseSheet, true);
                 }
             },
+            validateKreuzelInfo(kreuzel){
+                const self = this;
+                for(const example of kreuzel.examples){
+                    self.api.perform(function(done){
+                        self.checkKreuzelInfo(example);
+                        if(example.uploadCount !== undefined){
+                            self.checkUploadCount(example.name, example.isSubExample, example.submitFile ? example.uploadCount - 1 : example.uploadCount);
+                            if(example.submitFile){
+                                self.checkExampleAfterUpload(example);
+                            }
+                        }
+                        done();
+                    })
+                }
+                self.checkMandatory(kreuzel.mandatoryAfter, kreuzel.mandatory);
+                self.checkKreuzel(kreuzel.kreuzelAfter, kreuzel.kreuzel, kreuzel.exerciseSheet.minKreuzel)
+                self.checkPoints(kreuzel.pointsAfter, kreuzel.points, kreuzel.exerciseSheet.minPoints)
+            },
             checkMandatory(first, second){
                 return this.api.assert.elementPresent({
                     selector: `//tr[last()]/td[3][contains(@style,"color: ${first === second ? 'green' : 'red'};") and text()=" ${first}/${second} "]`,
@@ -82,7 +100,7 @@ module.exports = {
             },
             checkUploadCount(exampleName, isSubExample, count){
                 return this.api.assert.elementPresent({
-                    selector: `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[7][${count === -1 ? 'span[contains(@class="fa-infinity")]' : `text() = " ${count} "`}]`,
+                    selector: `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[7][${count === -1 ? 'span[contains(@class,"fa-infinity")]' : `text() = " ${count} "`}]`,
                     locateStrategy: 'xpath'
                 });
             },
@@ -92,10 +110,18 @@ module.exports = {
             kreuzelOption(exampleName, isSubExample, option){
                 return `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[6]/div/div[${option}]/input`
             },
-            setKreuzel(exampleName, isSubExample, status){
+            setKreuzelBool(exampleName, isSubExample, status){
                 return this.setCheckbox(`//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[6]/input`, status, true)
             },
-            setKreuzel2(exampleName, isSubExample, option){
+            setKreuzel(exampleName, isSubExample, option){
+                if(typeof option === 'boolean'){
+                    return this.setKreuzelBool(exampleName, isSubExample, option);
+                }
+                else{
+                    return this.setKreuzelRadio(exampleName, isSubExample, option);
+                }
+            },
+            setKreuzelRadio(exampleName, isSubExample, option){
                 return this.api.click('xpath', `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[6]/div/div[${option}]/input`)
             },
             description(exampleName, isSubExample){
@@ -106,6 +132,21 @@ module.exports = {
             },
             resultButton(exampleName, isSubExample){
                 return `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][${isSubExample ? 'boolean(text()) = true' : `text()=" ${exampleName} "`}] and td[2][${isSubExample ? `text()=" ${exampleName} "` : 'boolean(text()) = true'}]]/td[8]/a[3]`;
+            },
+            checkExampleAfterUpload(example){
+                this.checkUploadCount(example.name, example.isSubExample, example.uploadCount - 1);
+                const resultModal = this.section.resultModal;
+                if(example.uploadCount === 1){
+                    this.expect.element({
+                            selector: this.uploadButton(example.name, example.isSubExample),
+                            locateStrategy: 'xpath'
+                        }).to.not.be.enabled;
+                }
+                this.api.click('xpath',this.resultButton(example.name, example.isSubExample)).pause(1000);
+                resultModal.containsResult();
+                resultModal.cancelX();
+                resultModal.pause(1000);
+                this.expect.section('@resultModal').to.not.be.present;
             },
             submit(){
                 return this.click('@submitButton');
