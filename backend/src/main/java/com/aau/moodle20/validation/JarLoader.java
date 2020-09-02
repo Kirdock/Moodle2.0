@@ -48,6 +48,7 @@ public class JarLoader  extends ClassLoader {
             if (newClass == null)
                 throw new ClassNotFoundException(name);
 
+            jarFile.close();
             return newClass;
         } catch (IOException ex) {
             throw new ClassNotFoundException(name, ex);

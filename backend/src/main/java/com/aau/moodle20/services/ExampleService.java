@@ -227,9 +227,7 @@ public class ExampleService extends AbstractService{
         String copiedValidatorFilePath = getValidatorFilePath(copiedExample);
         File source = new File(originalValidatorFilePath);
         File dest = new File(copiedValidatorFilePath);
-
         FileUtils.copyDirectory(source, dest);
-
         copiedExample.setValidator(originalExample.getValidator());
         exampleRepository.save(copiedExample);
 
@@ -240,10 +238,7 @@ public class ExampleService extends AbstractService{
         if(example.getValidator()==null || example.getValidator().isEmpty())
             return ;
         String validatorFilePath = getValidatorFilePath(example);
-        boolean result = deleteFileFromDisk(validatorFilePath,example.getValidator());
-        if(!result)
-            throw new ServiceException("Error: Validator could not be deleted");
-
+        deleteFileFromDisk(validatorFilePath,example.getValidator());
 
         example.setValidator(null);
         exampleRepository.save(example);

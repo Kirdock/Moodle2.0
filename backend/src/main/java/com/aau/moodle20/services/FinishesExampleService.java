@@ -114,8 +114,6 @@ public class FinishesExampleService extends AbstractService{
         String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
         violations =  executeValidator(filePath, example);
 
-
-
         finishesExample.setFileName(file.getOriginalFilename());
         if (finishesExample.getRemainingUploadCount() > 0)
             finishesExample.setRemainingUploadCount(finishesExample.getRemainingUploadCount() - 1);
@@ -157,6 +155,7 @@ public class FinishesExampleService extends AbstractService{
         if(validator!=null)
             violations = validator.validate(filePath);
 
+        validator = null;
         return violations; 
 
 //        unzipMavenProject(filePath,new File(destDir));
