@@ -8,7 +8,6 @@ const testKreuzel2 = require('./testFiles/testKreuzel2.js');
 const testKreuzel = require('./testFiles/testKreuzel.js');
 const visibileCourses = [testCourses[0]];
 const hiddenCourses = [testCourses[1]];
-const kreuzelDescription = 'My kreuzel description';
 
 module.exports = {
     before: browser => {
@@ -47,6 +46,10 @@ module.exports = {
     'select course': function(browser, course){
         const page = browser.page.studentCourses();
         page.navigate().pause(1000);
+        const dateToday = new Date();
+        const sSemesterSelected = dateToday.getMonth() > 1 && dateToday.getMonth() < 9;
+        page.selectSemester(dateToday.getFullYear(), sSemesterSelected);
+
         const coursePage = browser.page.studentCourse();
         course = course || visibileCourses[0];
         page.selectCourse(course);
@@ -164,5 +167,26 @@ module.exports = {
     },
     'modify exerciseSheet type1': function(browser, kreuzelInfos){
         this['modify exerciseSheet type2'](browser, kreuzelInfos || testKreuzel)
+    },
+    'check edit kreuzel by admin or owner': function(browser){
+        const page = browser.page.studentExerciseSheet();
+        const self = this;
+        let [...kreuzelInfo ] = testKreuzel;
+        kreuzelInfo = kreuzelInfo[0];
+        kreuzelInfo.exerciseSheet = testExerciseSheets[3];
+        
+        let [...kreuzelInfo2] = testKreuzel2;
+        kreuzelInfo2 = kreuzelInfo2[0];
+        kreuzelInfo2.exerciseSheet = testExerciseSheets[2];
+
+        courseTest['kreuzel test'](browser, true);
+
+        for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
+            browser.perform(done => {
+                self['select exerciseSheet'](browser, undefined, kreuzel.exerciseSheet);
+                page.validateKreuzelInfo(kreuzel, true);
+                done();
+            })
+        }
     }
 }

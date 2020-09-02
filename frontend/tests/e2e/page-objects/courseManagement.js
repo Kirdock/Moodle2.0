@@ -136,7 +136,7 @@ module.exports = {
         selectSemesterOption: '#courseSemester_edit option',
         selectCourse: '#selectedCourse',
         selectCourseX: '//select[@id="selectedCourse"]',
-        container: '.tabs'
+        container: '.tabs',
     },
     sections: {
         modal_new: {
@@ -213,7 +213,11 @@ module.exports = {
         },
         assignedUsers: {
             selector: '#assignedUsers',
-            commands: [assignedUsersCommands],
+            commands: [assignedUsersCommands, {
+                showKreuzelModal: function(){
+                    return this.click('@kreuzelButton')
+                }
+            }],
             elements: {
                 roleSelect: '#showRoles',
                 table: '#assignedUsers table',
@@ -223,7 +227,8 @@ module.exports = {
                 submitButton: {
                     selector: '#assignedUsers button',
                     index: 3
-                }
+                },
+                kreuzelButton: '#assignedUsers>div>div.form-inline>div:nth-of-type(1)'
             }
         },
         exerciseSheets: {
@@ -304,6 +309,56 @@ module.exports = {
             commands: [modalCommands],
             elements: {
                 submitButton: '.modal-footer button.btn.btn-primary'
+            }
+        },
+        kreuzelModal: {
+            selector: '#modal-kreuzelList',
+            commands: [{
+                selectExerciseSheet: function(exerciseSheetName){
+                    return this.api.click('xpath',`//div[@id="modal-kreuzelList"]//div[@class="form-group"][1]/select/option[text()=" ${exerciseSheetName} "]`).pause(2000);
+                },
+                validateUser: function(user, examples, withoutDescription = false){
+                    let validation = `//div[@id="modal-kreuzelList"]//tr[td[1][text() = " ${user.matriculationNumber} "] and td[2][text() = " ${user.surname} "] and td[3][text() = " ${user.forename} "]`;
+                    const offset = 4;
+                    const self = this;
+                    for(let i = 0; i < examples.length; i++){
+                        validation += ` and td[${i+offset}][text() =" ${examples[i].type === 1 || examples[i].type === true ? 'X' : examples[i].type === 3 ? 'O' : ''} " ${examples[i].type === 3 && !withoutDescription ? `and textarea[@readonly="readonly"]` : ''}]`;
+                        if(examples[i].type === 3 && !withoutDescription){
+                            this.api.perform(done => {
+                                self.api.assert.value({
+                                    selector: `//div[@id="modal-kreuzelList"]//tr[td[1][text() = " ${user.matriculationNumber} "]]/td[${i+offset}]/textarea`,
+                                    locateStrategy: 'xpath'
+                                }, examples[i].description)
+                                done();
+                            })
+                        }
+                    }
+                    return this.api.assert.elementPresent({
+                        selector: validation + ']',
+                        locateStrategy: 'xpath'
+                    })
+                },
+                setKreuzelInfo(user, examples){
+                    const offset = 4;
+                    const self = this;
+                    for(let i = 0; i < examples.length; i++){
+                        const option = examples[i].type === 1 || examples[i].type === true ? 'X' : examples[i].type === 3 ? 'O' : false;
+                        self.api.perform(done =>{
+                            self.api.click('xpath', `//div[@id="modal-kreuzelList"]//tr[td[1][text() = " ${user.matriculationNumber} "]]/td[${i+offset}]/select/option[${option === false ? 'last()' : `text()=" ${option} "`}]`)
+                            done();
+                        })
+                    }
+                },
+                enterEditMode(){
+                    return this.click('@editButton');
+                },
+                submit(){
+                    return this.click('@saveButton');
+                }
+            }],
+            elements: {
+                editButton: '#modal-kreuzelList .custom-control.custom-switch label',
+                saveButton: '.kreuzelList>button'
             }
         }
     }

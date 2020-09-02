@@ -6,6 +6,10 @@ const testExerciseSheet = testExerciseSheets[0];
 const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid.js');
 const testUsers = require('./testFiles/testUsers.js');
 const userTest = require('./modifyUsers.js');
+// const modifyExerciseSheet = require('./modifyExerciseSheet.js'); //infinity loop because of it also requires modifyCourse
+const modifyKreuzel = require('./modifyKreuzel.js');
+const testKreuzel = require('./testFiles/testKreuzel.js');
+const testKreuzel2 = require('./testFiles/testKreuzel2.js');
 const exerciseSheetsTab = 2;
 const assignUsersTab = 1;
 const informationTab = 0;
@@ -594,6 +598,82 @@ module.exports = {
         exerciseSheetSection.edit(exerciseSheetName);
         page.pause(1000)
         page.expect.url().to.match(/\/Admin\/Course\/([0-9]+)\/SheetManagement\/([0-9]+)$/)
+    },
+    'kreuzel test user': function(browser){
+        const coursePage = browser.page.courseManagement();
+        const page = coursePage.section.assignedUsers;
+
+        modifyKreuzel.before(browser)
+        modifyKreuzel['modify exerciseSheet type1'](browser)
+        modifyKreuzel['modify exerciseSheet type2'](browser)
+
+        browser.logout();
+        browser.loginAsAdmin()
+            .page.courseManagement().navigate().pause(1000)
+
+        this['select course'](browser);
+        coursePage.selectTab(assignUsersTab);
+        const kreuzelModal = coursePage.section.kreuzelModal;
+        page.showKreuzelModal();
+
+        for(const kreuzelInfo of testKreuzel.concat(testKreuzel2)){
+            browser.perform(done => {
+                kreuzelModal.selectExerciseSheet(kreuzelInfo.exerciseSheet.name)
+                kreuzelModal.validateUser(testUsers[3], kreuzelInfo.examples)
+                done();
+            })
+        }
+    },
+    'kreuzel test': function(browser, skipCreation = false){
+        const coursePage = browser.page.courseManagement();
+        const page = coursePage.section.assignedUsers;
+        let [...kreuzelInfo ] = testKreuzel;
+        kreuzelInfo = kreuzelInfo[0];
+        kreuzelInfo.exerciseSheet = testExerciseSheets[3];
+        
+        let [...kreuzelInfo2] = testKreuzel2;
+        kreuzelInfo2 = kreuzelInfo2[0];
+        kreuzelInfo2.exerciseSheet = testExerciseSheets[2];
+        
+        if(!skipCreation){
+            modifyKreuzel.before(browser);
+            browser.logout();
+            browser.loginAsAdmin()
+                .page.courseManagement().navigate().pause(1000)
+        }
+        this['select course'](browser);
+        coursePage.selectTab(assignUsersTab);
+        const kreuzelModal = coursePage.section.kreuzelModal;
+        page.showKreuzelModal();
+
+        kreuzelModal.selectExerciseSheet(kreuzelInfo.exerciseSheet.name)
+        kreuzelModal.enterEditMode().pause(1000);
+
+        for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
+            console.log(kreuzel.exerciseSheet.name)
+            browser.perform(done =>{
+                kreuzelModal.selectExerciseSheet(kreuzel.exerciseSheet.name);
+                kreuzelModal.setKreuzelInfo(testUsers[3], kreuzel.examples);
+                kreuzelModal.submit();
+                kreuzelModal.assert.successPresent();
+                kreuzelModal.closeToast();
+                done();
+            })
+        }
+        
+        
+
+        browser.refresh().pause(1000);
+        this['select course'](browser);
+        coursePage.selectTab(assignUsersTab);
+        page.showKreuzelModal();
+        for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
+            browser.perform(done =>{
+                kreuzelModal.selectExerciseSheet(kreuzel.exerciseSheet.name);
+                kreuzelModal.validateUser(testUsers[3], kreuzel.examples, true);
+                done();
+            })
+        }
     },
     after: browser =>{
         browser.end();
