@@ -51,6 +51,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             hasPermission = handleExamplePermission(authentication,serializable,permission);
         else if("User".equals(s))
             hasPermission = handleUserPermission(authentication,serializable,permission);
+        else if("ExerciseSheet".equals(s))
+            hasPermission = handleExerciseSheetPermission(authentication,serializable,permission);
+
         return hasPermission;
     }
 
@@ -89,6 +92,36 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
         if (course != null)
             hasPermission = isOwnerOfCourse(course.getId(), userDetails);
+
+        return hasPermission;
+    }
+
+
+    protected boolean handleExerciseSheetPermission(Authentication authentication, Serializable targetId, String permission)
+    {
+        boolean hasPermission = false;
+        Long exerciseSheetId = null;
+        Long courseId = null;
+        Course course =null;
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        if ("update".equals(permission) && targetId instanceof Long)
+            exerciseSheetId = (Long) targetId;
+        else if ("get".equals(permission) && targetId instanceof Long)
+            exerciseSheetId = (Long) targetId;
+        else if ("create".equals(permission) && targetId instanceof Long)
+            courseId = (Long) targetId;
+        else if ("delete".equals(permission) && targetId instanceof Long)
+            exerciseSheetId = (Long) targetId;
+
+
+        if (exerciseSheetId != null) {
+            course = getCourseFromExerciseSheet(exerciseSheetId);
+            courseId = course.getId();
+        }
+
+        if (courseId != null)
+            hasPermission = isOwnerOfCourse(courseId, userDetails);
 
         return hasPermission;
     }
