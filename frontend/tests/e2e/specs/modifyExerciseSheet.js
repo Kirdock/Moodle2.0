@@ -222,6 +222,8 @@ module.exports = {
                             page.assert.containsText(exampleSection.validatorName(index),'validatorRight.jar')
                         }
                         if(example.submitFile){
+                            page.clearValue2(exampleSection.uploadCount(index))
+                                .setValue(exampleSection.uploadCount(index), example.uploadCount)
                             page.assert.elementPresent(exampleSection.validatorContainer(index));
                             for(const fileType of example.fileTypes){
                                 page.setMultiSelect(exampleSection.fileTypes(index), undefined, fileType)
@@ -326,6 +328,7 @@ module.exports = {
             weighting: 1,
             points: 10,
             submitFile: true,
+            uploadCount: 0,
             mandatory: false,
             fileTypes: ['Word', 'zip'],
             validator: true,

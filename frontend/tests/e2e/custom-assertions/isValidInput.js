@@ -9,7 +9,7 @@
  * @param {string} stateAttr
  * @param {object} stateValue
  */
-exports.assertion = function isValidInput (selector, stateAttr, stateValue) {
+exports.assertion = function isValidInput (selector, stateAttr, stateValue, isXpath = false) {
     this.message = 'Testing if element <' + (selector.selector || selector) + '> has ValidityState ' + stateAttr + ': ' + stateValue
     this.expected = stateValue;
     
@@ -22,14 +22,21 @@ exports.assertion = function isValidInput (selector, stateAttr, stateValue) {
   
     this.command = function (cb) {
       return this.api.execute(
-        function (selector){
+        function (selector, isXpath){
           const index = selector.index || 0;
           if (typeof selector === 'object' && selector.selector) {
             selector = selector.selector
           }
-          return document.querySelectorAll(selector)[index].validity;
+          let element;
+          if(isXpath){
+            element = document.evaluate(selector, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(index);
+          }
+          else{
+            element = document.querySelectorAll(selector)[index];
+          }
+          return element.validity;
         },
-        [selector],
+        [selector, isXpath],
         cb
       )
     }

@@ -4,8 +4,11 @@ const testCourses = require('./testFiles/testCourses.js');
 const exerciseSheetTest = require('./modifyExerciseSheet.js');
 const testExerciseSheets = require('./testFiles/testExerciseSheets.js');
 const testExamplesRight = require('./testFiles/testExamplesRight.js');
+const testKreuzel2 = require('./testFiles/testKreuzel2.js');
+const testKreuzel = require('./testFiles/testKreuzel.js');
 const visibileCourses = [testCourses[0]];
 const hiddenCourses = [testCourses[1]];
+const kreuzelDescription = 'My kreuzel description';
 
 module.exports = {
     before: browser => {
@@ -25,81 +28,141 @@ module.exports = {
                 done();
             })
         });
+        // browser.loginAsStudent();
     },
     'check courses': function(browser){
+        const page = browser.page.studentCourses();
+        page.navigate();
+        const dateToday = new Date();
+        const sSemesterSelected = dateToday.getMonth() > 1 && dateToday.getMonth() < 9;
+        page.selectSemester(dateToday.getFullYear(), sSemesterSelected);
+
         for(const visibleCourse of visibileCourses){
-            browser.assert.elementPresent({
-                selector: `//div[@id="courseList"]/div/a[text()="${visibleCourse.number} ${visibleCourse.name}"]`,
-                locateStrategy: 'xpath'
-            });
+            page.coursePresent(visibleCourse);
         }
         for(const hiddenCourse of hiddenCourses){
-            browser.assert.not.elementPresent({
-                selector: `//div[@id="courseList"]/div/a[text()="${hiddenCourse.number} ${hiddenCourse.name}"]`,
-                locateStrategy: 'xpath'
-            });
+            page.courseNotPresent(hiddenCourse);
         }
     },
     'select course': function(browser, course){
+        const page = browser.page.studentCourses();
+        page.navigate().pause(1000);
+        const coursePage = browser.page.studentCourse();
         course = course || visibileCourses[0];
-        browser.click({
-            selector: `//div[@id="courseList"]/div/a[text()=" ${course.number} ${course.name} "]`,
-            locateStrategy: 'xpath'
-        }).pause(1000)
-          .expect.url().to.match(/\/Course\/([0-9]+)$/);
-        browser.assert.elementPresent({
-            selector: `//div[@class="course"]/div[1][text()="${course.description}"]`,
-            locateStrategy: 'xpath'
-        });
+        page.selectCourse(course);
+        
+        browser.expect.url().to.match(/\/Course\/([0-9]+)$/);
+        coursePage.validateCourse(course);
+        for(const exerciseSheet of testExerciseSheets){
+            coursePage.validateExerciseSheet(exerciseSheet);
+        }
     },
-    'check exerciseSheet': function(browser, course){
-        this['select course'](browser, course);
-
-        for(const exercisSheet of testExerciseSheets){
-            browser.assert.elementPresent({
-                selector: `//div[@class="course"]/table/tbody/tr[td[1][text() = " ${exercisSheet.name} "] and td[2][contains(text(), "/${2}")] and td[3][text(), " ${exercisSheet.submissionDateFormat} ")] and td[4][text() = " ${exercisSheet.minKreuzel} "] and td[5][contains(text(), "/${15}")] and td[6][text(), " ${exercisSheet.minPoints} "]]`,
-                locateStrategy: 'xpath'
-            });
+    'check exerciseSheets': function(browser, course){
+        course = course || visibileCourses[0];
+        const self = this;
+        
+        for(const exerciseSheet of testExerciseSheets){
+            browser.perform(function(done){
+                self['select course'](browser, course)
+                self['select exerciseSheet'](browser, course, exerciseSheet)
+                done();
+            })
         }
     },
     'select exerciseSheet': function(browser, course, exerciseSheet){
+        const page = browser.page.studentCourse();
+        const exerciseSheetPage = browser.page.studentExerciseSheet();
         exerciseSheet = exerciseSheet || testExerciseSheets[0];
         this['select course'](browser, course);
-        browser.click({
-            selector: `//div[@class="course"]/table/tbody/tr[td[1][text() = " ${exerciseSheet.name} "]]/td[7]/a[2]`,
-            locateStrategy: 'xpath'
-        }).pause(1000)
-          .expect.url().to.match(/\/Course\/([0-9]+)\/ExerciseSheet\/([0-9]+)$/);
-        browser.assert.elementPresent({
-            selector: `//div[@class="exerciseSheet"]/h2[contains(text(),"${exerciseSheet.submissionDateFormat}")]`,
-            locateStrategy: 'xpath'
-        }).assert.elementPresent({
-            selector: `//div[@class="exerciseSheet"]/div[1]/label/strong[text()="${exerciseSheet.minKreuzel}%"]`,
-            locateStrategy: 'xpath'
-        }).assert.elementPresent({
-            selector: `//div[@class="exerciseSheet"]/div[2]/label/strong[text()="${exerciseSheet.minPoints}%")]`,
-            locateStrategy: 'xpath'
-        })
+        page.selectExerciseSheet(exerciseSheet)
+        browser.log(`testing ExerciseSheet ${exerciseSheet.name}`)
+        browser.expect.url().to.match(/\/Course\/([0-9]+)\/ExerciseSheet\/([0-9]+)$/);
+        exerciseSheetPage.validateExerciseSheet(exerciseSheet);
         
         for(const example of testExamplesRight){
-            if(example.subExamples.length === 0){
-                browser.assert.elementPresent({
-                    selector: `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][text()=" ${example.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${example.weighting} "] and td[5][text()=" ${example.points} "] and td[6][${example.includeThird ? `count(.//input[@type="radio"${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]) = 3` : `input[@type="checkbox" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]`}]`,
-                    locateStrategy: 'xpath'
-                })
-            }
-            else{
-                browser.assert.elementPresent({
-                    selector: `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][text()=" ${example.name} "] and td[2][boolean(text()) = true] and td[3][boolean(text()) = true] and td[4][boolean(text()) = true] and td[5][boolean(text()) = true]]`,
-                    locateStrategy: 'xpath'
-                })
-            }
-            for(const subExample of example.subExamples){
-                browser.assert.elementPresent({
-                    selector: `//div[@class="exerciseSheet"]//table/tbody/tr[td[1][boolean(text()) = true] and td[2][text()=" ${subExample.name} "] and td[3][text()=" ${subExample.mandatory ? 'Ja' : 'Nein'} "] and td[4][text()=" ${subExample.weighting} "] and td[5][text()=" ${subExample.points} "] and td[6][${subExample.includeThird ? `count(.//input[@type="radio" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]) = 3` : `input[@type="checkbox" ${exerciseSheet.deadlineReached ? 'and @disabled="disabled"' : ''}]`}]`,
-                    locateStrategy: 'xpath'
-                })
-            }
+            exerciseSheetPage.validateExample(example, exerciseSheet);
         }
+        if(exerciseSheet.deadlineReached){
+            exerciseSheetPage.expect.element('@submitButton').to.not.be.enabled;
+        }
+        else{
+            exerciseSheetPage.expect.element('@submitButton').to.be.enabled;
+        }
+    },
+    'modify exerciseSheet type2 invalid': function(browser){
+        const page = browser.page.studentExerciseSheet();
+        exerciseSheet = exerciseSheet || testExerciseSheets[1];
+        this['select exerciseSheet'](browser, undefined, exerciseSheet);
+        const example = testExamplesRight[0];
+
+        page.setKreuzel(example.name, false, 1);
+        page.assert.not.elementPresent({
+            selector: page.description(example.name, false),
+            locateStrategy: 'xpath'
+        })
+
+        page.setKreuzel(example.name, false, 2);
+        page.assert.not.elementPresent({
+            selector: page.description(example.name, false),
+            locateStrategy: 'xpath'
+        })
+
+        page.setKreuzel(example.name, false, 3);
+        page.assert.elementPresent({
+            selector: page.description(example.name, false),
+            locateStrategy: 'xpath'
+        })
+        page.clearValue2(page.description(example.name, false), true);
+        page.assert.isValidInput(page.description(example.name, false), 'valid', false, true)
+        page.submit();
+        page.assert.not.toastPresent();
+    },
+    'modify exerciseSheet type2': function(browser, kInfos){
+        const page = browser.page.studentExerciseSheet();
+        const kreuzelInfos = kInfos || testKreuzel2;
+        const self = this;
+
+        for(const kreuzel of kreuzelInfos){
+            browser.perform(function(done){
+                self['select exerciseSheet'](browser, undefined, kreuzel.exerciseSheet);
+                page.checkMandatory(0, kreuzel.mandatory);
+                page.checkKreuzel(0, kreuzel.kreuzel, kreuzel.exerciseSheet.minKreuzel)
+                page.checkPoints(0, kreuzel.points, kreuzel.exerciseSheet.minPoints)
+                for(const example of kreuzel.examples){
+                    browser.perform(function(done2){
+                        page.setKreuzel(example.name, example.isSubExample, example.type);
+                        if(example.type === 3){
+                            page.clearValue2(page.description(example.name, example.isSubExample), true)
+                                .setValue('xpath',page.description(example.name, example.isSubExample), example.description);
+                        }
+                        if(example.uploadCount !== undefined){
+                            page.checkUploadCount(example.name, example.isSubExample, example.uploadCount);
+                        }
+                        if(example.submitFile){
+                            page.setValue('xpath',page.uploadButton(example.name, example.isSubExample), Path.resolve(`${__dirname}/testFiles/${'testSubmission.zip'}`));
+                            page.assert.successPresent();
+                            page.closeToast();
+                            page.checkExampleAfterUpload(example);
+                        }
+                        done2();
+                    })
+                }
+                page.checkMandatory(kreuzel.mandatoryAfter, kreuzel.mandatory);
+                page.checkKreuzel(kreuzel.kreuzelAfter, kreuzel.kreuzel, kreuzel.exerciseSheet.minKreuzel)
+                page.checkPoints(kreuzel.pointsAfter, kreuzel.points, kreuzel.exerciseSheet.minPoints)
+
+                page.submit();
+                page.assert.successPresent();
+                page.closeToast();
+                
+                browser.refresh().pause(1000);
+                page.validateKreuzelInfo(kreuzel)
+                done();
+            });
+        }
+        
+    },
+    'modify exerciseSheet type1': function(browser, kreuzelInfos){
+        this['modify exerciseSheet type2'](browser, kreuzelInfos || testKreuzel)
     }
 }

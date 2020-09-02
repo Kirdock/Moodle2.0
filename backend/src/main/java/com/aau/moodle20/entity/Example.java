@@ -300,9 +300,6 @@ public class Example {
         return exampleResponseObject;
     }
 
-
-
-
     public Example copy()
     {
         Example example = new Example();
@@ -314,7 +311,7 @@ public class Example {
         example.setMandatory(getMandatory());
         example.setName(getName());
         example.setDescription(getDescription());
-
+        example.setUploadCount(getUploadCount());
 
         return example;
     }
