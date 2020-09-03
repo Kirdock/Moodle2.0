@@ -1,14 +1,14 @@
 package com.aau.moodle20.security;
 
+import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.Example;
 import com.aau.moodle20.entity.ExerciseSheet;
+import com.aau.moodle20.entity.User;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
-import com.aau.moodle20.repository.CourseRepository;
-import com.aau.moodle20.repository.ExampleRepository;
-import com.aau.moodle20.repository.ExerciseSheetRepository;
+import com.aau.moodle20.repository.*;
 import com.aau.moodle20.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +33,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     @Autowired
     private ExerciseSheetRepository exerciseSheetRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Override
     public boolean hasPermission(Authentication authentication, Serializable serializable, String s, Object o) {
@@ -53,6 +56,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             hasPermission = handleUserPermission(authentication,serializable,permission);
         else if("ExerciseSheet".equals(s))
             hasPermission = handleExerciseSheetPermission(authentication,serializable,permission);
+        else if("FinishExample".equals(s))
+            hasPermission = handleFinishExamplePermission(authentication,serializable,permission);
 
         return hasPermission;
     }
@@ -127,6 +132,24 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     }
 
 
+    protected boolean handleFinishExamplePermission(Authentication authentication, Serializable targetId, String permission) {
+        boolean hasPermission = false;
+        Course course = null;
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        if (("update".equals(permission)  || "get".equals(permission))&& targetId instanceof Long) {
+            Optional<User> optionalUser = userRepository.findByMatriculationNumber(userDetails.getMatriculationNumber());
+            course = getCourseFromExample((Long) targetId);
+            Long courseId = course.getId();
+            if (optionalUser.isPresent()) {
+                hasPermission = optionalUser.get().getCourses().stream()
+                        .filter(userInCourse -> !ECourseRole.None.equals(userInCourse.getRole()))
+                        .anyMatch(userInCourse -> userInCourse.getId().getCourseId().equals(courseId));
+            }
+        }
+        return hasPermission;
+    }
+
     protected boolean handleCoursePermission(Authentication authentication, Serializable targetId, String permission)
     {
         boolean hasPermission = false;
@@ -140,7 +163,6 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
         if(courseId!=null)
             hasPermission = isOwnerOfCourse(courseId,userDetails);
-
 
         return hasPermission;
     }
