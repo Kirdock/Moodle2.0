@@ -179,8 +179,8 @@ const messages = {
         passwordNew: 'Neues Passwort',
         passwordNewConfirm: 'Neues Passwort bestätigen',
         passwordOld: 'Altes Passwort',
-        passwordUpdated: 'Passwort wurde aktualisiert',
-        passwordUpdatedError: 'Passwort konnte nicht aktualisiert werden',
+        passwordUpdated: 'Passwort wurde gespeichert',
+        passwordUpdatedError: 'Passwort konnte nicht gespeichert werden',
         pdf: 'PDF',
         points: 'Punkte',
         presentation: {
@@ -469,8 +469,8 @@ const messages = {
         passwordNew: 'New password',
         passwordNewConfirm: 'Confirm new password',
         passwordOld: 'Old Password',
-        passwordUpdated: 'Password updated',
-        passwordUpdatedError: 'Password could not be updated',
+        passwordUpdated: 'Password saved',
+        passwordUpdatedError: 'Password could not be saved',
         pdf: 'PDF',
         points: 'Points',
         presentation: {
