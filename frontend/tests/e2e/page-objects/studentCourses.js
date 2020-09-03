@@ -3,9 +3,12 @@ module.exports = {
     url: '/Courses',
     commands: [
         {
+            courseOption(course){
+                return `//div[@id="courseList"]/div/a[text()=" ${course.number} ${course.name} "]`;
+            },
             coursePresent(course, status = true){
-                return (status ? browser.assert : browser.assert.not).elementPresent({
-                    selector: `//div[@id="courseList"]/div/a[text()="${course.number} ${course.name}"]`,
+                return (status ? this.api.assert : this.api.assert.not).elementPresent({
+                    selector: this.courseOption(course),
                     locateStrategy: 'xpath'
                 });
             },
@@ -14,7 +17,7 @@ module.exports = {
             },
             selectCourse(course){
                 return this.api.click({
-                    selector: `//div[@id="courseList"]/div/a[text()=" ${course.number} ${course.name} "]`,
+                    selector: this.courseOption(course),
                     locateStrategy: 'xpath'
                 }).pause(1000);
             },

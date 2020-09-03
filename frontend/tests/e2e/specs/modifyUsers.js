@@ -336,7 +336,7 @@ module.exports = {
         const creation = page.section.creation;
         const files = ['usersRight'];
         const self = this;
-        const [...users] = testUsers;
+        const users = JSON.parse(JSON.stringify(testUsers));
         for(const user of users){
             user.isAdmin = isAdmin;
         }

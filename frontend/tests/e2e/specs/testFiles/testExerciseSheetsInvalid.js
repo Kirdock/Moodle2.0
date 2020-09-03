@@ -13,7 +13,7 @@ module.exports = [
         },
         submissionDate: {
             value: '31-08-2019T23:55',
-            valid: false
+            valid: true
         },
         minKreuzel: {
             value: 'test',

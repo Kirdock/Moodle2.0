@@ -212,7 +212,7 @@ export default {
     methods:{
         setData(){ //subExamples are not directly edited. They are updated when they are saved
             if(this.value.parentId){
-                this.exampleData = {...this.value};
+                this.exampleData = JSON.parse(JSON.stringify(this.value));;
             }
             else{
                 this.exampleData = this.value;

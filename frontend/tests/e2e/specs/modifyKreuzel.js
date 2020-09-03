@@ -10,7 +10,7 @@ const visibileCourses = [testCourses[0]];
 const hiddenCourses = [testCourses[1]];
 
 module.exports = {
-    before: browser => {
+    before: function(browser) {
         courseTest.before(browser, function (){
             courseTest['create course'](browser); //create two courses, one where the user is in and one where he isn't
             courseTest['assign users'](browser);
@@ -92,7 +92,7 @@ module.exports = {
             exerciseSheetPage.expect.element('@submitButton').to.be.enabled;
         }
     },
-    'modify exerciseSheet type2 invalid': function(browser){
+    'modify exerciseSheet type2 invalid': function(browser, exerciseSheet){
         const page = browser.page.studentExerciseSheet();
         exerciseSheet = exerciseSheet || testExerciseSheets[1];
         this['select exerciseSheet'](browser, undefined, exerciseSheet);
@@ -171,22 +171,25 @@ module.exports = {
     'check edit kreuzel by admin or owner': function(browser){
         const page = browser.page.studentExerciseSheet();
         const self = this;
-        let [...kreuzelInfo ] = testKreuzel;
+        let kreuzelInfo = JSON.parse(JSON.stringify(testKreuzel));
         kreuzelInfo = kreuzelInfo[0];
         kreuzelInfo.exerciseSheet = testExerciseSheets[3];
         
-        let [...kreuzelInfo2] = testKreuzel2;
+        let kreuzelInfo2 = JSON.parse(JSON.stringify(testKreuzel2));
         kreuzelInfo2 = kreuzelInfo2[0];
         kreuzelInfo2.exerciseSheet = testExerciseSheets[2];
+        courseTest.before(browser, function(){
+            courseTest['kreuzel test'](browser, true);
+            browser.logout();
+            browser.loginAsStudent();
 
-        courseTest['kreuzel test'](browser, true);
-
-        for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
-            browser.perform(done => {
-                self['select exerciseSheet'](browser, undefined, kreuzel.exerciseSheet);
-                page.validateKreuzelInfo(kreuzel, true);
-                done();
-            })
-        }
+            for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
+                browser.perform(done => {
+                    self['select exerciseSheet'](browser, undefined, kreuzel.exerciseSheet);
+                    page.validateKreuzelInfo(kreuzel, true);
+                    done();
+                })
+            }
+        })
     }
 }

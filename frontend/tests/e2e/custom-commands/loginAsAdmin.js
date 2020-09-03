@@ -13,7 +13,7 @@ module.exports = {
                 else{ //logged in
                     const page = self.page.userManagement();
                     const url = new URL(page.url, self.launchUrl).href;
-                    page.navigate().pause(200);
+                    page.navigate().pause(1000);
                     self.url(function(result){
                         if(result.value === url){
                             self.log('Already logged in as admin')

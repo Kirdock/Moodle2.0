@@ -815,6 +815,9 @@ export default {
             });
             try{
                 await this.$store.dispatch('updateCourseUsers', data);
+                for(const user of this.courseUsers){
+                    user.oldRole = user.courseRole;
+                }
                 this.$bvToast.toast(this.$t('course.usersSaved'), {
                     title: this.$t('success'),
                     variant: 'success',

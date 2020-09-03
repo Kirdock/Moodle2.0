@@ -6,13 +6,28 @@ const testExerciseSheet = testExerciseSheets[0];
 const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid.js');
 const testUsers = require('./testFiles/testUsers.js');
 const userTest = require('./modifyUsers.js');
-// const modifyExerciseSheet = require('./modifyExerciseSheet.js'); //infinity loop because of it also requires modifyCourse
 const modifyKreuzel = require('./modifyKreuzel.js');
 const testKreuzel = require('./testFiles/testKreuzel.js');
 const testKreuzel2 = require('./testFiles/testKreuzel2.js');
+const modifyExerciseSheet = require('./modifyExerciseSheet.js');
 const exerciseSheetsTab = 2;
 const assignUsersTab = 1;
 const informationTab = 0;
+
+function beforeKreuzel(self, browser){
+    const coursePage = browser.page.courseManagement();
+    self['create course'](browser);
+    self['assign users'](browser);
+    
+    for(const sheet of testExerciseSheets){
+        browser.perform(done=>{
+            self['select exerciseSheet'](browser, sheet.name, false)
+            modifyExerciseSheet['create example'](browser);
+            coursePage.navigate().pause(1000)
+            done();
+        })
+    }
+}
 
 function deSelectAssignedUser(browser){
     const assignedUsers = browser.page.courseManagement().section.assignedUsers;
@@ -135,18 +150,6 @@ module.exports = {
             }
         });
     },
-    'select course': function (browser) {
-        const page = browser.page.courseManagement();
-        page.navigate().pause(1000);
-        courseExists(this, browser, testCourse.number, true)
-
-        page.expect.element('@deleteButton').to.not.be.present
-        page.expect.element('@copyButton').to.not.be.present
-        page.selectCourse(testCourse.number);
-        page.expect.element('@deleteButton').to.be.present
-        page.expect.element('@copyButton').to.be.present
-        page.assert.urlContains('?courseId=');
-    },
     'create course invalid': browser => {
         const page = browser.page.courseManagement();
         page.navigate().pause(1000)
@@ -243,6 +246,18 @@ module.exports = {
             })
         }
         browser.options.globals.asyncHookTimeout = defaultTimeoutBefore;
+    },
+    'select course': function (browser) {
+        const page = browser.page.courseManagement();
+        page.navigate().pause(1000); //with refresh courseId is still set
+        courseExists(this, browser, testCourse.number, true)
+
+        page.expect.element('@deleteButton').to.not.be.present
+        page.expect.element('@copyButton').to.not.be.present
+        page.selectCourse(testCourse.number);
+        page.expect.element('@deleteButton').to.be.present
+        page.expect.element('@copyButton').to.be.present
+        page.assert.urlContains('?courseId=');
     },
     'modify course invalid': function(browser, number){
         number = number || testCourse.number;
@@ -390,20 +405,6 @@ module.exports = {
             .expect.element('@copyButton').to.not.be.present
         page.assert.not.urlContains('?courseId=');
     },
-    'modal_new close test': browser =>{
-        const page = browser.page.courseManagement();
-        page.navigate().pause(1000);
-        
-        const modal_new = page.section.modal_new;
-        const modalCloseVariants = ['cancel', 'cancelX', 'cancelClick'];
-        for(const variant of modalCloseVariants){
-            page.showNewModal();
-            modal_new.pause(1000)[variant]();
-            page.modalNewNotPresent();
-            page.assert.not.toastPresent()
-        }
-        page.expect.element('@container').to.not.be.present;
-    },
     'assign users csv': function (browser){
         const courseText = testCourse.number;
         const page = browser.page.courseManagement();
@@ -458,7 +459,7 @@ module.exports = {
         const exerciseSheetPage = browser.page.exerciseSheetManagement().section.information;
         const exerciseSheets = [];
         if(name === undefined){
-            exerciseSheets.push(testExerciseSheet[0]);
+            exerciseSheets.push(testExerciseSheets[0]);
         }
         else if(name instanceof Array){
             for(const sheetName of name){
@@ -488,7 +489,7 @@ module.exports = {
                 page.closeToast();
                 page.modalNewExerciseSheetNotPresent();
                 exerciseSheetSection.exerciseSheetPresentStrict(exerciseSheet);
-                self['select exerciseSheet'](browser, exerciseSheet.name);
+                self['select exerciseSheet'](browser, exerciseSheet.name, false);
                 
                 exerciseSheetPage.assert.value('@name', exerciseSheet.name)
                     .assert.value('@issueDate', exerciseSheet.issueDateValue)
@@ -525,36 +526,40 @@ module.exports = {
 
         exerciseSheetSection.showNewModal();
         for(const exerciseSheet of testExerciseSheetsInvalid){
-            newModal
-                .clearValue2('@name')
-                .clearDate('@issueDate')
-                .clearDate('@submissionDate')
-                .clearValue('@description') // clear part 1
-                .setValue('@description', ` ${browser.Keys.BACK_SPACE}`) //clear part 2 (custom clear for editor)
-                .clearValue2('@minKreuzel')
-                .clearValue2('@minPoints')
-                .setValue('@name', exerciseSheet.name.value)
-                .setValue('@issueDate', exerciseSheet.issueDate.value.replace('T', browser.Keys.RIGHT_ARROW))
-                .setValue('@submissionDate', exerciseSheet.submissionDate.value.replace('T', browser.Keys.RIGHT_ARROW))
-                .setValue('@description', exerciseSheet.description.value)
-                .setValue('@minKreuzel', exerciseSheet.minKreuzel.value)
-                .setValue('@minPoints', exerciseSheet.minPoints.value)
-                .click(`@kreuzelType${exerciseSheet.kreuzelType}`)
+            browser.perform(done => {
+                newModal
+                    .clearValue2('@name')
+                    .clearDate('@issueDate')
+                    .clearDate('@submissionDate')
+                    .clearValue('@description') // clear part 1
+                    .setValue('@description', ` ${browser.Keys.BACK_SPACE}`) //clear part 2 (custom clear for editor)
+                    .clearValue2('@minKreuzel')
+                    .clearValue2('@minPoints')
+                    .setValue('@name', exerciseSheet.name.value)
+                    .setValue('@issueDate', exerciseSheet.issueDate.value.replace('T', browser.Keys.RIGHT_ARROW))
+                    .setValue('@submissionDate', exerciseSheet.submissionDate.value.replace('T', browser.Keys.RIGHT_ARROW))
+                    .setValue('@description', exerciseSheet.description.value)
+                    .setValue('@minKreuzel', exerciseSheet.minKreuzel.value)
+                    .setValue('@minPoints', exerciseSheet.minPoints.value)
+                    .click(`@kreuzelType${exerciseSheet.kreuzelType}`)
 
-            const {description, kreuzelType, ...keys} = exerciseSheet;
-            for(const key in keys){
-                newModal.assert.isValidInput(`@${key}`, 'valid', exerciseSheet[key].valid)
-            }
-            if(exerciseSheet.minKreuzel.expected !== undefined){
-                newModal.assert.value('@minKreuzel', exerciseSheet.minKreuzel.expected)
-            }
-            if(exerciseSheet.minPoints.expected !== undefined){
-                newModal.assert.value('@minPoints', exerciseSheet.minPoints.expected)
-            }
-            newModal
-                .submit()
-                .assert.not.toastPresent();
+                const {description, kreuzelType, ...keys} = exerciseSheet;
+                for(const key in keys){
+                    newModal.assert.isValidInput(`@${key}`, 'valid', exerciseSheet[key].valid)
+                }
+                if(exerciseSheet.minKreuzel.expected !== undefined){
+                    newModal.assert.value('@minKreuzel', exerciseSheet.minKreuzel.expected)
+                }
+                if(exerciseSheet.minPoints.expected !== undefined){
+                    newModal.assert.value('@minPoints', exerciseSheet.minPoints.expected)
+                }
+                newModal
+                    .submit()
+                    .assert.not.toastPresent();
+                done();
+            })
         }
+        newModal.cancelX();
     },
     'delete exerciseSheet': function(browser, name){
         const courseText = testCourse.number;
@@ -586,7 +591,7 @@ module.exports = {
             })
         })
     },
-    'select exerciseSheet': function(browser, name){
+    'select exerciseSheet': function(browser, name, goBack = true){
         const courseText = testCourse.number;
         const exerciseSheetName = name || testExerciseSheet.name;
         const page = browser.page.courseManagement();
@@ -598,18 +603,24 @@ module.exports = {
         exerciseSheetSection.edit(exerciseSheetName);
         page.pause(1000)
         page.expect.url().to.match(/\/Admin\/Course\/([0-9]+)\/SheetManagement\/([0-9]+)$/)
+        if(goBack){
+            page.navigate().pause(1000)
+        }
     },
     'kreuzel test user': function(browser){
         const coursePage = browser.page.courseManagement();
         const page = coursePage.section.assignedUsers;
-
-        modifyKreuzel.before(browser)
+        
+        beforeKreuzel(this, browser)
+        
+        browser.logout();
+        browser.loginAsStudent();
         modifyKreuzel['modify exerciseSheet type1'](browser)
         modifyKreuzel['modify exerciseSheet type2'](browser)
 
         browser.logout();
         browser.loginAsAdmin()
-            .page.courseManagement().navigate().pause(1000)
+            .page.courseManagement().navigate();
 
         this['select course'](browser);
         coursePage.selectTab(assignUsersTab);
@@ -623,23 +634,24 @@ module.exports = {
                 done();
             })
         }
+        kreuzelModal.cancelX();
     },
     'kreuzel test': function(browser, skipCreation = false){
         const coursePage = browser.page.courseManagement();
         const page = coursePage.section.assignedUsers;
-        let [...kreuzelInfo ] = testKreuzel;
+        let kreuzelInfo = JSON.parse(JSON.stringify(testKreuzel));
         kreuzelInfo = kreuzelInfo[0];
         kreuzelInfo.exerciseSheet = testExerciseSheets[3];
         
-        let [...kreuzelInfo2] = testKreuzel2;
+        let kreuzelInfo2 = JSON.parse(JSON.stringify(testKreuzel2));;
         kreuzelInfo2 = kreuzelInfo2[0];
         kreuzelInfo2.exerciseSheet = testExerciseSheets[2];
         
         if(!skipCreation){
-            modifyKreuzel.before(browser);
+            beforeKreuzel(this, browser)
             browser.logout();
             browser.loginAsAdmin()
-                .page.courseManagement().navigate().pause(1000)
+                .page.courseManagement().navigate()
         }
         this['select course'](browser);
         coursePage.selectTab(assignUsersTab);
@@ -650,7 +662,6 @@ module.exports = {
         kreuzelModal.enterEditMode().pause(1000);
 
         for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
-            console.log(kreuzel.exerciseSheet.name)
             browser.perform(done =>{
                 kreuzelModal.selectExerciseSheet(kreuzel.exerciseSheet.name);
                 kreuzelModal.setKreuzelInfo(testUsers[3], kreuzel.examples);
@@ -661,9 +672,6 @@ module.exports = {
             })
         }
         
-        
-
-        browser.refresh().pause(1000);
         this['select course'](browser);
         coursePage.selectTab(assignUsersTab);
         page.showKreuzelModal();
@@ -767,7 +775,6 @@ module.exports = {
         page.checkPresentationCount(testUsers[3], 1);
 
         //refresh and check
-        browser.refresh().pause(1000);
         this['select course'](browser);
         coursePage.selectTab(assignUsersTab);
         page.showPresentationModal();
