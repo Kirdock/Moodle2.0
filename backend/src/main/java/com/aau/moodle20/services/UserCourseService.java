@@ -6,7 +6,6 @@ import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.entity.User;
 import com.aau.moodle20.entity.UserInCourse;
 import com.aau.moodle20.entity.embeddable.UserCourseKey;
-import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;

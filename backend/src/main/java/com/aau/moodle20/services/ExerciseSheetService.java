@@ -4,7 +4,6 @@ import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
-import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
@@ -189,7 +188,7 @@ public class ExerciseSheetService extends AbstractService{
     }
 
     @Transactional
-    public void deleteExerciseSheet(Long id) throws EntityNotFoundException, IOException {
+    public void deleteExerciseSheet(Long id) throws IOException {
         ExerciseSheet exerciseSheet = readExerciseSheet(id);
         for(Example example: exerciseSheet.getExamples())
         {

@@ -28,17 +28,6 @@ import java.util.List;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 
-
-    @ExceptionHandler(SemesterException.class)
-    protected ResponseEntity<Object> handleSemester(SemesterException ex) {
-        return ResponseEntity.badRequest().body(new MessageResponse(ex.getMessage()));
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    protected ResponseEntity<Object> handleNotFound(EntityNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(ex.getMessage()));
-    }
-
     @ExceptionHandler(ServiceException.class)
     protected ResponseEntity<Object> handleServiceValidationException(ServiceException ex) {
         HttpStatus status = ex.getHttpStatus()!=null?ex.getHttpStatus():HttpStatus.BAD_REQUEST;

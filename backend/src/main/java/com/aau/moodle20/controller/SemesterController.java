@@ -1,7 +1,7 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.Semester;
-import com.aau.moodle20.exception.SemesterException;
+import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;
@@ -26,7 +26,7 @@ public class SemesterController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/semester")
-    public ResponseEntity<?> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  throws SemesterException {
+    public ResponseEntity<?> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  throws ServiceException {
         semesterService.createSemester(createSemesterRequest);
         return ResponseEntity.ok(new MessageResponse("Semester was sucessfully created!"));
     }
