@@ -674,6 +674,106 @@ module.exports = {
                 done();
             })
         }
+        kreuzelModal.cancelX();
+    },
+    'modify presentation': function(browser){
+        const coursePage = browser.page.courseManagement();
+        const page = coursePage.section.assignedUsers;
+        const presentationModal = coursePage.section.presentationModal;
+        const allKreuzel = testKreuzel.concat(testKreuzel2);
+        this['kreuzel test user'](browser) //to make sure, exercise sheets and course have correct data, create everything new
+        this['select course'](browser);
+        coursePage.selectTab(assignUsersTab);
+
+        page.showPresentationModal();
+        presentationModal.studentPresent(testUsers[3]);
+        presentationModal.studentPresent(testUsers[2]);
+
+        presentationModal.selectStudent(testUsers[2])
+        presentationModal.checkExerciseSheetCount(0)
+        presentationModal.checkExampleCount(0)
+
+        presentationModal.selectStudent(testUsers[3])
+        presentationModal.checkExerciseSheetCount(2)
+        presentationModal.checkExampleCount(5)
+        
+        for(const kreuzel of allKreuzel){ //test if every exercise sheet and example that was kreuzelt is present
+            browser.perform(done =>{
+                presentationModal.exerciseSheetPresent(kreuzel.exerciseSheet.name);
+                for(const example of kreuzel.examples){
+                    browser.perform(done2 => {
+                        if(example.type === 3 || example.type === true || example.type === 1){
+                            presentationModal.examplePresent(example.name);
+                        }
+                        done2();
+                    })
+                }
+                done();
+            })
+        }
+
+        for(const kreuzel of allKreuzel){ //test if only kreuzelt examples of specific exercise sheet are present
+            browser.perform(done =>{
+                presentationModal.selectExerciseSheet(kreuzel.exerciseSheet.name);
+                for(const example of kreuzel.examples){
+                    browser.perform(done2 => {
+                        if(example.type === 3 || example.type === true || example.type === 1){
+                            presentationModal.examplePresent(example.name);
+                        }
+                        done2();
+                    })
+                }
+                done();
+            })
+        }
+            //invalid submit check
+            presentationModal.selectStudent(testUsers[2])
+            presentationModal.submit();
+            presentationModal.assert.not.toastPresent();
+            presentationModal.checkPresentationCount(0);
+
+        presentationModal.selectStudent(testUsers[3])
+
+        //enter by example name
+        let presentationInfo1 = {exerciseSheet: testKreuzel[0].exerciseSheet.name, example: testKreuzel[0].examples[0].name};
+
+        presentationModal.selectExample(presentationInfo1.example)
+        presentationModal.submit();
+        presentationModal.assert.successPresent();
+        presentationModal.closeToast();
+            //duplicate check
+            presentationModal.submit();
+            presentationModal.assert.warningPresent();
+            presentationModal.closeToast();
+        
+        presentationModal.presentationPresent(testUsers[3], presentationInfo1)
+
+        //enter by exerciseSheet name and example name
+        let presentationInfo2 = {exerciseSheet: testKreuzel2[0].exerciseSheet.name, example: testKreuzel2[0].examples[0].name};
+        presentationModal.selectExerciseSheet(presentationInfo2.exerciseSheet)
+        presentationModal.selectExample(presentationInfo2.example)
+        presentationModal.submit();
+        presentationModal.assert.successPresent();
+        presentationModal.closeToast();
+        presentationModal.presentationPresent(testUsers[3], presentationInfo2)
+
+        page.checkPresentationCount(testUsers[3], 2);
+
+        //delete example
+        presentationModal.deletePresentation(testUsers[3], presentationInfo2)
+        presentationModal.assert.successPresent();
+        presentationModal.closeToast();
+        presentationModal.presentationNotPresent(testUsers[3], presentationInfo2)
+        page.checkPresentationCount(testUsers[3], 1);
+
+        //refresh and check
+        browser.refresh().pause(1000);
+        this['select course'](browser);
+        coursePage.selectTab(assignUsersTab);
+        page.showPresentationModal();
+        presentationModal.presentationPresent(testUsers[3], presentationInfo1)
+        page.checkPresentationCount(testUsers[3], 1);
+        presentationModal.cancelX();
     },
     after: browser =>{
         browser.end();

@@ -91,7 +91,7 @@
                             </button>
                         </div>
                         <div class="form-group" style="margin-right: 10px">
-                            <button class="btn btn-primary" v-b-modal="'modal-presented'">
+                            <button class="btn btn-primary" @click="showPresentedList()">
                                 <span class="fa fa-list"></span>
                                 {{$t('presentations')}}
                             </button>
@@ -561,6 +561,15 @@ export default {
             else{
                 this.sortOrder.type = 0;
             }
+        },
+        showPresentedList(){
+            this.showExerciseSheet = this.$t('all');
+            this.presentedUser = undefined;
+            this.presentedExample = {};
+            this.presentedExerciseSheet = undefined;
+            this.userKreuzel = [];
+            this.presentedExerciseSheets = [];
+            this.$bvModal.show('modal-presented');
         },
         addPresentation(){
             if(this.presentedUser && this.presentedUser.matriculationNumber && this.presentedExample && this.presentedExample.exampleId){
