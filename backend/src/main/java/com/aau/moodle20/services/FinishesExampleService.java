@@ -38,6 +38,11 @@ public class FinishesExampleService extends AbstractService{
     public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         for (UserKreuzelRequest userKreuzelRequest : userKreuzelRequests) {
+
+            Course course = readExample(userKreuzelRequest.getExampleId()).getExerciseSheet().getCourse();
+            if(!userDetails.getAdmin() && !isOwner(course))
+                throw new ServiceException("Error: Access denied",HttpStatus.FORBIDDEN);
+
             updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription(), false);
         }
     }
@@ -47,9 +52,15 @@ public class FinishesExampleService extends AbstractService{
     {
         for(UserKreuzeMultilRequest userKreuzeMultilRequest: userKreuzeMultilRequests)
         {
+            Course course = readExample(userKreuzeMultilRequest.getExampleId()).getExerciseSheet().getCourse();
+            if(!userDetails.getAdmin() && !isOwner(course))
+                throw new ServiceException("Error: Access denied",HttpStatus.FORBIDDEN);
+
             updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(),userKreuzeMultilRequest.getMatriculationNumber(),userKreuzeMultilRequest.getState(),null, true);
         }
     }
+
+
 
     protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) throws ServiceException {
         FinishesExample finishesExample = null;
