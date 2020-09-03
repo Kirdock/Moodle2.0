@@ -21,13 +21,15 @@ module.exports = {
             page.expect.element('@sSemester').to.not.be.selected;
         }
     },
-    'create semester': (browser) => {
-        const page = browser.page.semesterManagement();
-            // .clearValue('@year') //auto set at start
-            // .setValue('@year', '2020')
-            // .setValue('@wSemester', true)
-        page.submit()
-        page.assert.toastPresent();
-        page.closeToast();
+    'create semester': (browser, startedByCourse = false) => {
+        if(startedByCourse){
+            const page = browser.page.semesterManagement();
+                // .clearValue('@year') //auto set at start
+                // .setValue('@year', '2020')
+                // .setValue('@wSemester', true)
+            page.submit()
+            page.assert.toastPresent();
+            page.closeToast();
+        }
     }
 }

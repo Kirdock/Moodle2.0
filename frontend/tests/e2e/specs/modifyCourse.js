@@ -142,7 +142,7 @@ module.exports = {
                 const semester = require('./modifySemester.js')
                 browser.page.semesterManagement().navigate();
                 browser.perform(() =>{
-                    semester['create semester'](browser);
+                    semester['create semester'](browser, true);
                 }).perform(()=>{
                     page.navigate();
                     page.pause(1000, done);
