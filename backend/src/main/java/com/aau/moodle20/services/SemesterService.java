@@ -1,6 +1,7 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
+import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.entity.UserInCourse;
@@ -94,6 +95,7 @@ public class SemesterService extends AbstractService{
         if (userInCourses != null) {
             responseObjects.addAll(userInCourses.stream()
                     .filter(userInCourse -> userInCourse.getCourse().getSemester().getId().equals(semesterId))
+                    .filter(userInCourse -> !ECourseRole.None.equals(userInCourse.getRole()))
                     .map(userInCourse -> userInCourse.getCourse().createCourseResponseObject())
                     .collect(Collectors.toList())
             );

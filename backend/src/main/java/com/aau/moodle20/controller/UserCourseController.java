@@ -55,7 +55,7 @@ public class UserCourseController {
 
 
     @PostMapping(value = "/course/assign")
-    public ResponseEntity<?> assignCourseToSemester(@Valid @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests)  throws SemesterException {
+    public ResponseEntity<?> assignCourseToSemester(@Valid @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests) throws ServiceException, IOException {
 
         userCourseService.assignUsers(assignUserToCourseRequests);
         return ResponseEntity.ok(new MessageResponse("User were successfully assigned to courses!"));
