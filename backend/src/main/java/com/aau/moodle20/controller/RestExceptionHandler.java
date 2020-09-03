@@ -28,17 +28,6 @@ import java.util.List;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 
-
-    @ExceptionHandler(SemesterException.class)
-    protected ResponseEntity<Object> handleSemester(SemesterException ex) {
-        return ResponseEntity.badRequest().body(new MessageResponse(ex.getMessage()));
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    protected ResponseEntity<Object> handleNotFound(EntityNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(ex.getMessage()));
-    }
-
     @ExceptionHandler(ServiceException.class)
     protected ResponseEntity<Object> handleServiceValidationException(ServiceException ex) {
         HttpStatus status = ex.getHttpStatus()!=null?ex.getHttpStatus():HttpStatus.BAD_REQUEST;
@@ -70,6 +59,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> errors = new ArrayList<String>();
         ApiError apiError =
                 new ApiError(HttpStatus.BAD_REQUEST, "NullPointerException occured", errors);
+        return  ResponseEntity.status(apiError.getStatus()).body(apiError);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
+        List<String> errors = new ArrayList<String>();
+        ApiError apiError = new ApiError(
+                HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), "error occurred");
         return  ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
@@ -117,18 +114,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-
-    @ExceptionHandler({ Exception.class })
+    @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         ApiError apiError = null;
-       if(ex instanceof AccessDeniedException)//TODO make own method for accessdenied execption
-       {
-           apiError = new ApiError(
-                   HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), "error occurred");
-       }else {
-           apiError = new ApiError(
-                   HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
-       }
+
+        apiError = new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
+
         return new ResponseEntity<Object>(
                 apiError, new HttpHeaders(), apiError.getStatus());
     }

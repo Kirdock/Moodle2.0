@@ -1,5 +1,6 @@
 package com.aau.moodle20.payload.request;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 public class UpdateCoursePresets {
@@ -7,6 +8,8 @@ public class UpdateCoursePresets {
     @NotNull
     private Long id;
     private String description;
+    @NotNull
+    @Min(value = 0, message = "Upload count must greater or equal 0")
     private Integer uploadCount;
 
     public Long getId() {

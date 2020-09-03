@@ -37,6 +37,7 @@ public class CourseService extends AbstractService {
     public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceException {
 
         Semester semester = readSemester(createCourseRequest.getSemesterId());
+        User owner = readUser(createCourseRequest.getOwner());
         if(courseRepository.existsByNumberAndSemester_Id(createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
             throw new ServiceException("Course in Semester already exists", ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
@@ -60,10 +61,7 @@ public class CourseService extends AbstractService {
         if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
             throw new ServiceException("Error: Owner cannot be updated because the given matriculationNumber those not exists!", HttpStatus.NOT_FOUND);
 
-        if (!userDetails.getAdmin() && !isOwner(course))
-            throw new ServiceException("Error: User is not owner of this course and thus cannot update this course!", HttpStatus.UNAUTHORIZED);
-
-        // if number  updated check if no course with given number im semester exists
+        // if number is updated check if given number already exists in semester
         if(!updateCourseRequest.getNumber().equals(course.getNumber()))
         {
             if(courseRepository.existsByNumberAndSemester_Id(updateCourseRequest.getNumber(),course.getSemester().getId()))
@@ -108,11 +106,7 @@ public class CourseService extends AbstractService {
 
     public CourseResponseObject getCourse(long courseId) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
-
         Course course = readCourse(courseId);
-        if (!userDetails.getAdmin() && !isOwner(course))
-            throw new ServiceException("Error: neither admin or owner", HttpStatus.UNAUTHORIZED);
-
         CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
         responseObject.setPresented(createCoursePresentedList(course));
 

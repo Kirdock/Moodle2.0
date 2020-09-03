@@ -1,6 +1,5 @@
 package com.aau.moodle20.controller;
 
-import com.aau.moodle20.exception.SemesterException;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CopyCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
@@ -29,11 +28,13 @@ public class CourseController {
         this.courseService = courseService;
     }
 
+    @PreAuthorize("hasPermission(#courseId, 'Course', 'get')")
     @GetMapping(value = "/course/{courseId}")
     public ResponseEntity<CourseResponseObject> getCourse(@PathVariable("courseId") long courseId)  {
         return ResponseEntity.ok(courseService.getCourse(courseId));
     }
 
+    @PreAuthorize("hasPermission(#courseId, 'Course', 'get')")
     @GetMapping(value = "/course/{courseId}/presented")
     public ResponseEntity<List<FinishesExampleResponse>> getCoursePresented(@PathVariable("courseId") long courseId)  {
         return ResponseEntity.ok(courseService.getCoursePresented(courseId));
@@ -41,20 +42,20 @@ public class CourseController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/course")
-    public ResponseEntity<?> createCourse(@Valid @RequestBody CreateCourseRequest createCourseRequest)  throws SemesterException {
+    public ResponseEntity<?> createCourse(@Valid @RequestBody CreateCourseRequest createCourseRequest)  throws ServiceException {
         return ResponseEntity.ok(courseService.createCourse(createCourseRequest));
     }
 
+    @PreAuthorize("hasPermission(#updateCourseRequest.id, 'Course', 'update')")
     @PostMapping(value = "/course")
-    public ResponseEntity<?> updateCourse(@Valid  @RequestBody UpdateCourseRequest updateCourseRequest)  throws SemesterException {
-
+    public ResponseEntity<?> updateCourse(@Valid  @RequestBody UpdateCourseRequest updateCourseRequest)  throws ServiceException {
         courseService.updateCourse(updateCourseRequest);
         return ResponseEntity.ok(new MessageResponse("Course was successfully updated!"));
     }
 
+    @PreAuthorize("hasPermission(#courseId, 'Course', 'update')")
     @PostMapping(value = "/course/presets")
-    public ResponseEntity<?> updateCoursePresets(@Valid  @RequestBody UpdateCoursePresets updateCoursePresets)  throws SemesterException {
-
+    public ResponseEntity<?> updateCoursePresets(@Valid  @RequestBody UpdateCoursePresets updateCoursePresets)  throws ServiceException {
         courseService.updateCoursePresets(updateCoursePresets);
         return ResponseEntity.ok(new MessageResponse("Course Presets were successfully updated!"));
     }
@@ -67,6 +68,7 @@ public class CourseController {
         return ResponseEntity.ok(new MessageResponse("Course was successfully deleted!"));
     }
 
+    @PreAuthorize("hasAuthority('Admin')")
     @PostMapping(value = "/course/copy")
     public ResponseEntity<?> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest) throws ServiceException, IOException {
 

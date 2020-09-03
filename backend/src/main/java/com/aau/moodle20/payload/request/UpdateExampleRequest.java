@@ -1,10 +1,11 @@
 package com.aau.moodle20.payload.request;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public class ExampleRequest {
+public class UpdateExampleRequest {
 
     private Long id;
     private Long parentId;
@@ -13,15 +14,21 @@ public class ExampleRequest {
     @NotBlank
     private String name;
     private String description;
-    private Integer points;
-    private Integer weighting;
-    private Boolean mandatory;
+    @Min(value = 0)
     @NotNull
+    private Integer points;
+    @Min(value = 0)
+    @NotNull
+    private Integer weighting;
+    private Boolean mandatory = Boolean.FALSE;
+    @NotNull
+    @Min(value = 0)
     private Integer order;
     private List<Long> supportedFileTypes;
-    private Boolean submitFile;
+    private Boolean submitFile = Boolean.FALSE;
     private List<String> customFileTypes;
-    private Integer uploadCount;
+    @Min(value = 0)
+    private Integer uploadCount = 0;
 
     public Long getExerciseSheetId() {
         return exerciseSheetId;
@@ -68,7 +75,8 @@ public class ExampleRequest {
     }
 
     public void setMandatory(Boolean mandatory) {
-        this.mandatory = mandatory;
+        if (mandatory != null)
+            this.mandatory = mandatory;
     }
 
     public Integer getOrder() {
@@ -92,7 +100,8 @@ public class ExampleRequest {
     }
 
     public void setSubmitFile(Boolean submitFile) {
-        this.submitFile = submitFile;
+        if (submitFile != null)
+            this.submitFile = submitFile;
     }
 
     public Long getId() {
@@ -124,6 +133,7 @@ public class ExampleRequest {
     }
 
     public void setUploadCount(Integer uploadCount) {
-        this.uploadCount = uploadCount;
+        if (uploadCount != null)
+            this.uploadCount = uploadCount;
     }
 }

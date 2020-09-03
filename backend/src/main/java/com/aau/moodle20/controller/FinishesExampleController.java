@@ -13,6 +13,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,6 +50,7 @@ public class FinishesExampleController {
         return ResponseEntity.ok(finishesExampleService.setKreuzelUserAttachment(file,exampleId));
     }
 
+    @PreAuthorize("hasPermission(#exampleId, 'FinishExample', 'get')")
     @GetMapping(path = "/user/kreuzel/attachment/{exampleId}")
     public ResponseEntity<InputStreamResource> getUserKreuzelAttachment(@PathVariable Long exampleId) {
         FinishesExample example = finishesExampleService.getKreuzelAttachment(exampleId);
@@ -62,12 +64,13 @@ public class FinishesExampleController {
                 .body(new InputStreamResource(inputStream));
     }
 
+    @PreAuthorize("hasPermission(#userExamplePresentedRequest.exampleId, 'Example', 'update')")
     @PostMapping(path = "/user/examplePresented")
     public ResponseEntity<?> setUserExamplePresented(@Valid @RequestBody UserExamplePresentedRequest userExamplePresentedRequest) {
         finishesExampleService.setUserExamplePresented(userExamplePresentedRequest);
         return ResponseEntity.ok(new MessageResponse("Presented flag was successfully updated!"));
     }
-
+    @PreAuthorize("hasPermission(#courseId, 'Course', 'get')")
     @GetMapping(path = "/user/{matriculationNumber}/kreuzel/{courseId}")
     public List<KreuzelResponse> getKreuzelUserCourse(@PathVariable String matriculationNumber, @PathVariable Long courseId) {
         return finishesExampleService.getKreuzelUserCourse(matriculationNumber,courseId);

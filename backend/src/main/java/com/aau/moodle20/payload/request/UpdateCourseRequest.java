@@ -2,19 +2,22 @@ package com.aau.moodle20.payload.request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
-public class UpdateCourseRequest {
+public class UpdateCourseRequest implements Serializable {
 
     @NotNull
     private Long id;
     @NotBlank
+    @Pattern(regexp = "^[0-9]{3}\\.[0-9]{3}$")
     private String number;
     @NotBlank
     private String name;
+
+    private String owner;
     private Integer minKreuzel;
     private Integer minPoints;
-    private String owner;
-    private Boolean includeThird;
     private String description;
 
     public Long getId() {
@@ -55,14 +58,6 @@ public class UpdateCourseRequest {
 
     public void setMinPoints(Integer minPoints) {
         this.minPoints = minPoints;
-    }
-
-    public Boolean getIncludeThird() {
-        return includeThird;
-    }
-
-    public void setIncludeThird(Boolean includeThird) {
-        this.includeThird = includeThird;
     }
 
     public String getOwner() {

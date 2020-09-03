@@ -1,6 +1,5 @@
 package com.aau.moodle20.controller;
 
-import com.aau.moodle20.exception.EntityNotFoundException;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
@@ -13,6 +12,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,17 +33,19 @@ public class ExerciseSheetController {
         this.pdfService = pdfService;
     }
 
+    @PreAuthorize("hasPermission(#createExerciseSheetRequest.courseId, 'ExerciseSheet', 'create')")
     @PutMapping(value = "/exerciseSheet")
     public ResponseEntity<?> createExerciseSheet(@Valid @RequestBody CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceException {
         exerciseSheetService.createExerciseSheet(createExerciseSheetRequest);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was sucessfully created!"));
     }
-
+    @PreAuthorize("hasPermission(#id, 'ExerciseSheet', 'get')")
     @GetMapping(value = "/exerciseSheet/{id}")
     public ExerciseSheetResponseObject getExerciseSheets(@PathVariable("id") long id) {
         return exerciseSheetService.getExerciseSheet(id);
     }
 
+    @PreAuthorize("hasPermission(#id, 'ExerciseSheet', 'get')")
     @GetMapping(value = "/exerciseSheet/{id}/kreuzel")
     public ExerciseSheetKreuzelResponse getExerciseSheetKreuzel(@PathVariable("id") long id) {
         return exerciseSheetService.getExerciseSheetKreuzel(id);
@@ -54,17 +56,19 @@ public class ExerciseSheetController {
         return exerciseSheetService.getExerciseSheetAssigned(id);
     }
 
+    @PreAuthorize("hasPermission(#updateExerciseSheetRequest.id, 'ExerciseSheet', 'update')")
     @PostMapping(value = "/exerciseSheet")
-    public ResponseEntity<?> updateExerciseSheet(@Valid @RequestBody UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceException, EntityNotFoundException {
+    public ResponseEntity<?> updateExerciseSheet(@Valid @RequestBody UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceException {
         exerciseSheetService.updateExerciseSheet(updateExerciseSheetRequest);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was sucessfully updated!"));
     }
-
+    @PreAuthorize("hasPermission(#id, 'Course', 'get')")
     @GetMapping(value = "/course/{id}/exerciseSheets")
-    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(@PathVariable("id") long id) throws EntityNotFoundException {
+    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(@PathVariable("id") long id) throws ServiceException {
         return exerciseSheetService.getExerciseSheetsFromCourse(id);
     }
 
+    @PreAuthorize("hasPermission(#exerciseSheetId, 'ExerciseSheet', 'get')")
     @GetMapping(value = "/exerciseSheet/{id}/kreuzelList")
     public ResponseEntity<InputStreamResource> getKreuzelList(@PathVariable("id") long exerciseSheetId) throws IOException {
 
@@ -92,6 +96,7 @@ public class ExerciseSheetController {
                 .body(new InputStreamResource(bis));
     }
 
+    @PreAuthorize("hasPermission(#id, 'ExerciseSheet', 'delete')")
     @DeleteMapping(value = "/exerciseSheet/{id}")
     public ResponseEntity<?> deleteExerciseSheet(@PathVariable("id") long id) throws IOException {
         exerciseSheetService.deleteExerciseSheet(id);

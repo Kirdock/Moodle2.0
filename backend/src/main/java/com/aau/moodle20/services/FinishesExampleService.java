@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.entity.*;
@@ -38,6 +39,9 @@ public class FinishesExampleService extends AbstractService{
     public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         for (UserKreuzelRequest userKreuzelRequest : userKreuzelRequests) {
+            if(!isAssignedToCourse(userKreuzelRequest.getExampleId(),userDetails.getMatriculationNumber()))
+                throw new ServiceException("Error: Access denied",HttpStatus.FORBIDDEN);
+
             updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription(), false);
         }
     }
@@ -45,11 +49,18 @@ public class FinishesExampleService extends AbstractService{
     @Transactional
     public void setKreuzelUserMulti(List<UserKreuzeMultilRequest> userKreuzeMultilRequests) throws ServiceException
     {
+        UserDetailsImpl userDetails = getUserDetails();
         for(UserKreuzeMultilRequest userKreuzeMultilRequest: userKreuzeMultilRequests)
         {
+            Course course = readExample(userKreuzeMultilRequest.getExampleId()).getExerciseSheet().getCourse();
+            if(!userDetails.getAdmin() && !isOwner(course))
+                throw new ServiceException("Error: Access denied",HttpStatus.FORBIDDEN);
+
             updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(),userKreuzeMultilRequest.getMatriculationNumber(),userKreuzeMultilRequest.getState(),null, true);
         }
     }
+
+
 
     protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) throws ServiceException {
         FinishesExample finishesExample = null;
@@ -84,15 +95,19 @@ public class FinishesExampleService extends AbstractService{
 
     @Transactional
     public ViolationHistoryResponse setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
-        if (file.isEmpty())
-            throw new ServiceException("Error: given file is empty");
-
         List<? extends Violation> violations;
         UserDetailsImpl userDetails = getUserDetails();
         Example example = readExample(exampleId);
 
-        if(!finishesExampleRepository.existsByExample_IdAndUser_MatriculationNumber(exampleId,userDetails.getMatriculationNumber()))
-        {
+        if (Boolean.FALSE.equals(example.getSubmitFile()))
+            throw new ServiceException("Error: not submit file for this example");
+        if (file.isEmpty())
+            throw new ServiceException("Error: given file is empty");
+        if (!isAssignedToCourse(exampleId, userDetails.getMatriculationNumber()))
+            throw new ServiceException("Error: Not assigned to this course", HttpStatus.FORBIDDEN);
+
+
+        if (!finishesExampleRepository.existsByExample_IdAndUser_MatriculationNumber(exampleId, userDetails.getMatriculationNumber())) {
             List<UserKreuzelRequest> requests = new ArrayList<>();
             UserKreuzelRequest kreuzelRequest = new UserKreuzelRequest();
             kreuzelRequest.setDescription(null);
@@ -108,11 +123,8 @@ public class FinishesExampleService extends AbstractService{
             throw new ServiceException("Error: max upload counts reached!");
 
         saveFileToDisk(file, example);
-        String fileName = file.getOriginalFilename();
-//        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-
         String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
-        violations =  executeValidator(filePath, example);
+        violations = executeValidator(filePath, example);
 
         finishesExample.setFileName(file.getOriginalFilename());
         if (finishesExample.getRemainingUploadCount() > 0)
@@ -358,5 +370,19 @@ public class FinishesExampleService extends AbstractService{
         responseObject.setExampleName(example.getName());
         responseObject.setExampleId(example.getId());
         return responseObject;
+    }
+
+    protected boolean isAssignedToCourse(Long exampleId, String matriculationNumber)
+    {
+        boolean hasPermission = false;
+        Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
+        Course course = readExample(exampleId).getExerciseSheet().getCourse();
+        Long courseId = course.getId();
+        if (optionalUser.isPresent()) {
+            hasPermission = optionalUser.get().getCourses().stream()
+                    .filter(userInCourse -> !ECourseRole.None.equals(userInCourse.getRole()))
+                    .anyMatch(userInCourse -> userInCourse.getId().getCourseId().equals(courseId));
+        }
+        return hasPermission;
     }
 }

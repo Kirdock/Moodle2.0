@@ -18,6 +18,7 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -368,7 +369,15 @@ public class PdfService extends AbstractService {
     }
 
     public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceException, IOException {
+        UserDetailsImpl userDetails = getUserDetails();
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
+        boolean isOwner = isOwner(exerciseSheet.getCourse());
+        boolean isStudent = exerciseSheet.getCourse().getStudents().stream()
+                .anyMatch(userInCourse -> userDetails.getMatriculationNumber().equals(userInCourse.getId().getMatriculationNumber()));
+        if(!userDetails.getAdmin() &&  !isOwner && !isStudent)
+            throw new ServiceException("Access is denied", HttpStatus.FORBIDDEN);
+
+
         return new ByteArrayInputStream(createExerciseSheet(exerciseSheet));
     }
 
