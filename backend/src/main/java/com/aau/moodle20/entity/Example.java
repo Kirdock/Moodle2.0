@@ -231,10 +231,14 @@ public class Example {
     public void fillValuesFromRequestObject(UpdateExampleRequest exampleRequest) {
         setName(exampleRequest.getName());
         setDescription(exampleRequest.getDescription());
-        setOrder(exampleRequest.getOrder());
-        setPoints(exampleRequest.getPoints());
-        setWeighting(exampleRequest.getWeighting());
-        setUploadCount(exampleRequest.getUploadCount());
+        if (exampleRequest.getOrder() != null)
+            setOrder(exampleRequest.getOrder());
+        if (exampleRequest.getPoints() != null)
+            setPoints(exampleRequest.getPoints());
+        if (exampleRequest.getWeighting() != null)
+            setWeighting(exampleRequest.getWeighting());
+        if (exampleRequest.getUploadCount() != null)
+            setUploadCount(exampleRequest.getUploadCount());
 
         setSubmitFile(exampleRequest.getSubmitFile() != null ? exampleRequest.getSubmitFile() : Boolean.FALSE);
         setMandatory(exampleRequest.getMandatory() != null ? exampleRequest.getMandatory() : Boolean.FALSE);
