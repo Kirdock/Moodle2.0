@@ -19,11 +19,13 @@ module.exports = class {
     const using = isXpath ? 'xpath' : 'css selector'
     const { RIGHT_ARROW, BACK_SPACE } = this.api.Keys;
     return this.api.getValue(using, selector, result => {
-      const chars = result.value.split('');
-      // Make sure we are at the end of the input
-      chars.forEach(() => this.api.setValue(using, selector, RIGHT_ARROW));
-      // Delete all the existing characters
-      chars.forEach(() => this.api.setValue(using, selector, BACK_SPACE));
+      if(result.status !== -1){
+        const chars = result.value.split('');
+        // Make sure we are at the end of the input
+        chars.forEach(() => this.api.setValue(using, selector, RIGHT_ARROW));
+        // Delete all the existing characters
+        chars.forEach(() => this.api.setValue(using, selector, BACK_SPACE));
+      }
     });
   }
 }

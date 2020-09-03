@@ -1,5 +1,5 @@
 module.exports = {
-    command: function () {
+    command: function (password) {
         const self = this;
         this.perform(function (done){
             const loginPage = self.launchUrl + 'Login';
@@ -32,7 +32,7 @@ module.exports = {
 
         function login(){
             self.setValue('input#user','ppipp')
-            .setValue('input#password','password')
+            .setValue('input#password',password || 'password')
             .click('button[type=submit]')
             .assert.urlEquals(self.launchUrl + 'Courses')
         }

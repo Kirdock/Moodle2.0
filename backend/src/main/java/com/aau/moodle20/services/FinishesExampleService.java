@@ -249,6 +249,19 @@ public class FinishesExampleService extends AbstractService{
         return Files.readAllBytes(path);
     }
 
+    public void deleteFinishExampleData(FinishesExample  finishesExample) throws IOException {
+
+        if(finishesExample.getFileName()==null)
+            return;
+
+        String userDir = "/" + finishesExample.getId().getMatriculationNumber();
+        String filePath = FileConstants.attachmentsDir + createExampleAttachmentDir(finishesExample.getExample()) + userDir;
+
+        Path path = Paths.get(filePath+"/"+finishesExample.getFileName());
+
+        Files.deleteIfExists(path);
+    }
+
     protected String createUserExampleAttachmentDir(Example example)
     {
         String userDir = "/" + getUserDetails().getMatriculationNumber();

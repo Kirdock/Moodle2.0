@@ -2,6 +2,7 @@ package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.Course;
+import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.entity.User;
 import com.aau.moodle20.entity.UserInCourse;
 import com.aau.moodle20.entity.embeddable.UserCourseKey;
@@ -18,14 +19,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserCourseService extends AbstractService {
 
-    @Autowired
     PdfService pdfService;
+    UserService userDetailsService;
+    FinishesExampleService finishesExampleService;
+
+    public UserCourseService(PdfService pdfService, UserService userDetailsService, FinishesExampleService finishesExampleService)
+    {
+        this.pdfService = pdfService;
+        this.userDetailsService = userDetailsService;
+        this.finishesExampleService = finishesExampleService;
+    }
 
     @Autowired
     UserService userService;
@@ -35,7 +46,9 @@ public class UserCourseService extends AbstractService {
     public CourseResponseObject getCourseAssigned(Long courseId) throws ServiceException {
         Course course = readCourse(courseId);
         User currentUser = getCurrentUser();
-        Boolean isCourseAssigned = currentUser.getCourses().stream().anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
+        Boolean isCourseAssigned = currentUser.getCourses().stream()
+                .filter(userInCourse -> !ECourseRole.None.equals(userInCourse.getRole()))
+                .anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
         if (!isCourseAssigned)
             throw new ServiceException("Error: User is not assigned to this course!", HttpStatus.UNAUTHORIZED);
 
@@ -44,9 +57,10 @@ public class UserCourseService extends AbstractService {
 
 
 
+
     @Transactional
-    public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws SemesterException
-    {
+    public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws ServiceException, IOException {
+        UserDetailsImpl userDetails = getUserDetails();
         List<UserInCourse> userInCourses = new ArrayList<>();
         for(AssignUserToCourseRequest assignUserToCourseRequest: assignUserToCourseRequests) {
 
@@ -58,7 +72,6 @@ public class UserCourseService extends AbstractService {
 
             if(!getUserDetails().getAdmin() && !isOwner(assignUserToCourseRequest.getCourseId()))
                 throw new ServiceException("Error: User is not owner of course: "+assignUserToCourseRequest.getCourseId(),HttpStatus.FORBIDDEN);
-
 
             UserCourseKey userCourseKey = new UserCourseKey();
             UserInCourse userInCourse = new UserInCourse();
@@ -75,8 +88,29 @@ public class UserCourseService extends AbstractService {
             userInCourse.setCourse(course);
             userInCourse.setId(userCourseKey);
             userInCourses.add(userInCourse);
+
+            if(ECourseRole.None.equals(userInCourse.getRole()))
+                clearUserInfo(userInCourse);
         }
         userInCourseRepository.saveAll(userInCourses);
+    }
+
+
+    protected void clearUserInfo(UserInCourse userInCourse) throws IOException {
+        List<FinishesExample> finishesExamplesToBeDeleted = new ArrayList<>();
+        Optional<UserInCourse> optionalUserInCourse = userInCourseRepository.findByUser_MatriculationNumberAndCourse_Id(userInCourse.getId().getMatriculationNumber(), userInCourse.getId().getCourseId());
+        // check if user_course assigment role was set to none -> user was removed from course -> delete course related info
+        if (optionalUserInCourse.isPresent() && !ECourseRole.None.equals(optionalUserInCourse.get().getRole()) && ECourseRole.None.equals(userInCourse.getRole())) {
+            User user = readUser(userInCourse.getId().getMatriculationNumber());
+            for (FinishesExample finishesExample : user.getFinishedExamples()) {
+                if (userInCourse.getId().getCourseId().equals(finishesExample.getExample().getExerciseSheet().getCourse().getId()))
+                    finishesExamplesToBeDeleted.add(finishesExample);
+            }
+            for (FinishesExample finishesExample : finishesExamplesToBeDeleted) {
+                finishesExampleService.deleteFinishExampleData(finishesExample);
+            }
+            finishesExampleRepository.deleteAll(finishesExamplesToBeDeleted);
+        }
     }
 
     @Transactional

@@ -136,7 +136,7 @@ module.exports = {
         selectSemesterOption: '#courseSemester_edit option',
         selectCourse: '#selectedCourse',
         selectCourseX: '//select[@id="selectedCourse"]',
-        container: '.tabs'
+        container: '.tabs',
     },
     sections: {
         modal_new: {
@@ -213,7 +213,20 @@ module.exports = {
         },
         assignedUsers: {
             selector: '#assignedUsers',
-            commands: [assignedUsersCommands],
+            commands: [assignedUsersCommands, {
+                showKreuzelModal: function(){
+                    return this.click('@kreuzelButton')
+                },
+                showPresentationModal: function(){
+                    return this.click('@presentationButton').pause(1000)
+                },
+                checkPresentationCount(user, count){
+                    return this.assert.elementPresent({
+                        selector: `//div[@id="assignedUsers"]//tr[td[2][text() =" ${user.matriculationNumber} "] and td[5][text() = " ${count} "]]`,
+                        locateStrategy: 'xpath'
+                    })
+                }
+            }],
             elements: {
                 roleSelect: '#showRoles',
                 table: '#assignedUsers table',
@@ -223,7 +236,9 @@ module.exports = {
                 submitButton: {
                     selector: '#assignedUsers button',
                     index: 3
-                }
+                },
+                kreuzelButton: '#assignedUsers>div>div.form-inline>div:nth-of-type(1)',
+                presentationButton: '#assignedUsers>div>div.form-inline>div:nth-of-type(2)'
             }
         },
         exerciseSheets: {
@@ -304,6 +319,124 @@ module.exports = {
             commands: [modalCommands],
             elements: {
                 submitButton: '.modal-footer button.btn.btn-primary'
+            }
+        },
+        kreuzelModal: {
+            selector: '#modal-kreuzelList',
+            commands: [modalCommands, {
+                selectExerciseSheet(exerciseSheetName){
+                    return this.api.click('xpath',`//div[@id="modal-kreuzelList"]//div[@class="form-group"][1]/select/option[text()=" ${exerciseSheetName} "]`).pause(2000);
+                },
+                validateUser(user, examples, withoutDescription = false){
+                    let validation = `//div[@id="modal-kreuzelList"]//tr[td[1][text() = " ${user.matriculationNumber} "] and td[2][text() = " ${user.surname} "] and td[3][text() = " ${user.forename} "]`;
+                    const offset = 4;
+                    const self = this;
+                    for(let i = 0; i < examples.length; i++){
+                        validation += ` and td[${i+offset}][text() =" ${examples[i].type === 1 || examples[i].type === true ? 'X' : examples[i].type === 3 ? 'O' : ''} " ${examples[i].type === 3 && !withoutDescription ? `and textarea[@readonly="readonly"]` : ''}]`;
+                        if(examples[i].type === 3 && !withoutDescription){
+                            this.api.perform(done => {
+                                self.api.assert.value({
+                                    selector: `//div[@id="modal-kreuzelList"]//tr[td[1][text() = " ${user.matriculationNumber} "]]/td[${i+offset}]/textarea`,
+                                    locateStrategy: 'xpath'
+                                }, examples[i].description)
+                                done();
+                            })
+                        }
+                    }
+                    return this.api.assert.elementPresent({
+                        selector: validation + ']',
+                        locateStrategy: 'xpath'
+                    })
+                },
+                setKreuzelInfo(user, examples){
+                    const offset = 4;
+                    const self = this;
+                    for(let i = 0; i < examples.length; i++){
+                        const option = examples[i].type === 1 || examples[i].type === true ? 'X' : examples[i].type === 3 ? 'O' : false;
+                        self.api.perform(done =>{
+                            self.api.click('xpath', `//div[@id="modal-kreuzelList"]//tr[td[1][text() = " ${user.matriculationNumber} "]]/td[${i+offset}]/select/option[${option === false ? 'last()' : `text()=" ${option} "`}]`)
+                            done();
+                        })
+                    }
+                },
+                enterEditMode(){
+                    return this.click('@editButton');
+                },
+                submit(){
+                    return this.click('@saveButton');
+                }
+            }],
+            elements: {
+                editButton: '#modal-kreuzelList .custom-control.custom-switch label',
+                saveButton: '.kreuzelList>button'
+            }
+        },
+        presentationModal: {
+            selector: '#modal-presented',
+            commands: [modalCommands, {
+                selectStudent(user){
+                    return this.setMultiSelect('@studentSelect', undefined, `${user.matriculationNumber} ${user.surname} ${user.forename}`).pause(1000)
+                },
+                selectExerciseSheet(name){
+                    return this.setMultiSelect('@exerciseSheetSelect', undefined, `${name}`).pause(1000)
+                },
+                selectExample(name){
+                    return this.setMultiSelect('@exampleSelect', undefined, `${name}`).pause(2000)
+                },
+                checkExerciseSheetCount(count){
+                    return this.assert.elementCount('#modal-presented .form-inline>div:nth-of-type(2) .multiselect .multiselect__element', count)
+                },
+                checkExampleCount(count){
+                    return this.assert.elementCount('#modal-presented .form-inline>div:nth-of-type(3) .multiselect .multiselect__element', count)
+                },
+                checkPresentationCount(count){
+                    return this.assert.elementCount('#modal-presented tr', count);
+                },
+                studentPresent(user){
+                    return this.assert.elementPresent({
+                        selector: `//div[@id="modal-presented"]//div[@class="form-inline"]/div[1]//li[@class="multiselect__element"]/span/span[text()="${user.matriculationNumber} ${user.surname} ${user.forename}"]`,
+                        locateStrategy: 'xpath'
+                    })
+                },
+                exerciseSheetPresent(name){
+                    return this.assert.elementPresent({
+                        selector: `//div[@id="modal-presented"]//div[@class="form-inline"]/div[2]//li[@class="multiselect__element"]/span/span[text()="${name}"]`,
+                        locateStrategy: 'xpath'
+                    })
+                },
+                examplePresent(name){
+                    return this.assert.elementPresent({
+                        selector: `//div[@id="modal-presented"]//div[@class="form-inline"]/div[3]//li[@class="multiselect__element"]/span/span[text()="${name}"]`,
+                        locateStrategy: 'xpath'
+                    })
+                },
+                presentationPresent(user, info, negate = false){
+                    return (negate ? this.assert.not : this.assert).elementPresent({
+                        selector: `//div[@id="modal-presented"]//tr[td[1][text()=" ${user.matriculationNumber} "] and td[2][text()=" ${user.surname} "] and td[3][text()=" ${user.forename} "] and td[4][text()=" ${info.exerciseSheet} "] and td[5][text()=" ${info.example} "]]`,
+                        locateStrategy: 'xpath'
+                    })
+                },
+                presentationNotPresent(user, info){
+                    return this.presentationPresent(user, info, true)
+                },
+                deletePresentation(user, info){
+                    return this.api.click('xpath',`//div[@id="modal-presented"]//tr[td[1][text()=" ${user.matriculationNumber} "] and td[2][text()=" ${user.surname} "] and td[3][text()=" ${user.forename} "] and td[4][text()=" ${info.exerciseSheet} "] and td[5][text()=" ${info.example} "]]/td[6]/a`).pause(1000)
+                },
+                submit(){
+                    return this.click('@submitButton').pause(1000)
+                },
+                selectFilterExerciseSheet(name = 'Alle'){
+                    return this.click({
+                        selector: `//div[@id="modal-presented"]//select/option[text()=" ${name} "]`,
+                        locateStrategy: 'xpath'
+                    })
+                }
+            }],
+            elements: {
+                studentSelect: '#modal-presented .form-inline>div:nth-of-type(1) .multiselect',
+                exerciseSheetSelect: '#modal-presented .form-inline>div:nth-of-type(2) .multiselect',
+                exampleSelect: '#modal-presented .form-inline>div:nth-of-type(3) .multiselect',
+                submitButton: '#modal-presented .form-inline>div button'
             }
         }
     }

@@ -18,7 +18,6 @@ function userExists(self, browser, matriculationNumber, create){
     const page = browser.page.userManagement();
     browser.perform(function (done){
         page.userExists(browser, matriculationNumber, function(result){
-    
             if (result.value && result.value.ELEMENT) {
                 // Element is present
                 if(!create){
@@ -69,7 +68,7 @@ module.exports = {
     before: browser => {
         browser
         .loginAsAdmin()
-        .page.userManagement().navigate();
+        .page.userManagement().navigate().pause(1000);
     },
     'Create: invalid input': browser => {
         const page = browser.page.userManagement();
@@ -201,31 +200,34 @@ module.exports = {
         modalNew.expect.element(`@isAdmin`).to.not.be.selected;
         modalNew.cancel();
     },
-    'create user': function(browser) {
+    'create user': function(browser, user) {
         const page = browser.page.userManagement();
         const modalNew = page.section.modal_new;
-        const userData = [testUser]
-        
+        const userData = user ? [user] : [testUser];
+        const self = this;
 
         for(const user of userData){
-            userExists(this,browser,user.matriculationNumber, false);
+            browser.perform(done =>{
+                userExists(self,browser,user.matriculationNumber, false);
 
-            page.showModalNew();
-            const {isAdmin, ...keys} = user;
-            for(const data in keys){
+                page.showModalNew();
+                const {isAdmin, ...keys} = user;
+                for(const data in keys){
+                    modalNew
+                        .clearValue2(`@${data}`)
+                        .setValue(`@${data}`, user[data])
+                        .assert.isValidInput(`@${data}`, 'valid', true)
+                }
                 modalNew
-                    .clearValue2(`@${data}`)
-                    .setValue(`@${data}`, user[data])
-                    .assert.isValidInput(`@${data}`, 'valid', true)
-            }
-            modalNew
-                .setCheckbox(`@isAdmin`, isAdmin)
-                .submit()
-                .assert.successPresent()
-                .closeToast()
-            page.userModalNotPresent();
+                    .setCheckbox(`@isAdmin`, isAdmin)
+                    .submit()
+                    .assert.successPresent()
+                    .closeToast()
+                page.userModalNotPresent();
 
-            userRightCreated(browser,user);
+                userRightCreated(browser,user);
+                done();
+            })
         }
     },
     'modal_delete close test': browser =>{

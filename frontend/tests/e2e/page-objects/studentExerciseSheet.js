@@ -22,7 +22,7 @@ module.exports = {
                     locateStrategy: 'xpath'
                 });
             },
-            checkKreuzelInfo(kreuzelInfo){
+            checkKreuzelInfo(kreuzelInfo, bySystem){
                 if(typeof kreuzelInfo.type === "boolean"){
                     const validation = this.expect.element({
                         selector: this.kreuzel(kreuzelInfo.name, kreuzelInfo.isSubExample),
@@ -40,7 +40,7 @@ module.exports = {
                             selector: this.kreuzelOption(kreuzelInfo.name, kreuzelInfo.isSubExample, kreuzelInfo.type),
                             locateStrategy: 'xpath'
                         }).to.be.selected;
-                    if(kreuzelInfo.type === 3){
+                    if(kreuzelInfo.type === 3 && !bySystem){
                         this.assert.value({
                             selector: this.description(kreuzelInfo.name, kreuzelInfo.isSubExample),
                             locateStrategy: 'xpath'
@@ -62,14 +62,15 @@ module.exports = {
                     this.checkExample(subExample, exerciseSheet, true);
                 }
             },
-            validateKreuzelInfo(kreuzel){
+            validateKreuzelInfo(kreuzel, bySystem = false){
+                //ignore submitFile and description for changes done by owner or admin
                 const self = this;
                 for(const example of kreuzel.examples){
                     self.api.perform(function(done){
-                        self.checkKreuzelInfo(example);
+                        self.checkKreuzelInfo(example, bySystem);
                         if(example.uploadCount !== undefined){
-                            self.checkUploadCount(example.name, example.isSubExample, example.submitFile ? example.uploadCount - 1 : example.uploadCount);
-                            if(example.submitFile){
+                            self.checkUploadCount(example.name, example.isSubExample, example.submitFile && !bySystem ? example.uploadCount - 1 : example.uploadCount);
+                            if(example.submitFile && !bySystem){
                                 self.checkExampleAfterUpload(example);
                             }
                         }
