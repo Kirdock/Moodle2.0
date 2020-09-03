@@ -249,18 +249,18 @@ module.exports = {
                     return this.api.waitForElementVisible(this.elements.submitButton.selector).pause(1000);
                 },
                 showDeleteModal: function(name){
-                    this.api.click('xpath',`//table//tr[td[1][contains(text(),"${name}")]]/td[3]/a[3]`);
+                    this.api.click('xpath',`//table//tr[td[1][text()=" ${name} "]]/td[3]/a[3]`);
                     return this.api.waitForElementVisible(this.elements.submitButton.selector).pause(1000);
                 },
                 edit: function(name){
-                    return this.api.click('xpath',`//table//tr[td[1][contains(text(),"${name}")]]/td[3]/a[1]`);
+                    return this.api.click('xpath',`//table//tr[td[1][text()=" ${name} "]]/td[3]/a[1]`);
                 },
                 exerciseSheetPresent: function(browser, name, callback){
-                    browser.elements('xpath', `//div[@id="exerciseSheets"]//table//tr[td[1][contains(text(),"${name}")]]`, callback)
+                    browser.elements('xpath', `//div[@id="exerciseSheets"]//table//tr[td[1][text() =" ${name} "]]`, callback)
                 },
                 exerciseSheetPresentStrict: function(exerciseSheet){
                     return this.assert.elementPresent({
-                        selector: `//table//tr[td[1][contains(text(),"${exerciseSheet.name}")] and td[2][contains(text(),"${exerciseSheet.submissionDateFormat}")]]`,
+                        selector: `//table//tr[td[1][contains(text(),"${exerciseSheet.name}")] and td[2][text() = " ${exerciseSheet.submissionDateFormat} "]]`,
                         locateStrategy: 'xpath'
                     })
                 },

@@ -95,6 +95,7 @@ function enterInvalidExample(browser, example, index){
         else{
             page.assert.errorPresent();
         }
+        page.closeToast();
     }
 
     exampleSection.save(index);
@@ -102,9 +103,9 @@ function enterInvalidExample(browser, example, index){
 }
 
 module.exports = {
-    before: (browser, done, exerciseSheetName) => {
+    before: (browser, done = ()=>{}, exerciseSheetName) => {
         courseTest.before(browser, function (){
-            courseTest['select exerciseSheet'](browser, exerciseSheetName);
+            courseTest['select exerciseSheet'](browser, exerciseSheetName, false);
             done();
         });
     },
@@ -267,10 +268,13 @@ module.exports = {
                             .setCheckbox(exampleSection.mandatory(index), example.subExamples[i].mandatory)
 
                         if(example.subExamples[i].submitFile){
-                            page.assert.not.elementPresent(exampleSection.validatorContainer(index));
+                            page.assert.elementPresent(exampleSection.validatorContainer(index));
                             for(const fileType of example.subExamples[i].fileTypes){
                                 page.setMultiSelect(exampleSection.fileTypes(index), undefined, fileType)
                             }
+                        }
+                        else{
+                            page.assert.not.elementPresent(exampleSection.validatorContainer(index));
                         }
                         exampleSection.save(index);
                         page.assert.successPresent();
@@ -307,6 +311,7 @@ module.exports = {
             weighting: 1,
             points: 10,
             submitFile: true,
+            uploadCount: '',
             mandatory: false,
             fileTypes: ['Word', 'zip'],
             validator: true,
@@ -317,7 +322,10 @@ module.exports = {
         exampleExists(self, browser, testExample, true);
         page.selectExample(browser, testExample.name, function(index){
             for(const example of testExamplesInvalid){
-                enterInvalidExample(browser, example, index);
+                browser.perform(done => {
+                    enterInvalidExample(browser, example, index);
+                    done();
+                })
             }
         });
     },
@@ -340,6 +348,7 @@ module.exports = {
                     weighting: 1,
                     points: 10,
                     submitFile: true,
+                    uploadCount: 1,
                     mandatory: false,
                     fileTypes: ['Word', 'zip'],
                     validator: true
@@ -354,7 +363,7 @@ module.exports = {
         page.selectExample(browser, testExample.name, function(index){
             exampleSection.selectLastSubExample(index);
             page.assert.not.elementPresent(exampleSection.deleteButton(index));
-            for(const example of testSubExamplesInvalid){
+            for(const example of testExamplesInvalid){
                 enterInvalidExample(browser, example, index);
             }
             exampleSection.selectParent(index);
@@ -382,8 +391,8 @@ module.exports = {
             page
                 .assert.value(exampleSection.weighting(index), 1)
                 .assert.value(exampleSection.points(index), 0)
-                .expect.element(exampleSection.submitFile(index)).to.not.be.checked;
-            page.expect.element(exampleSection.mandatory(index)).to.not.be.checked;
+                .expect.element(exampleSection.submitFile(index)).to.not.be.selected;
+            page.expect.element(exampleSection.mandatory(index)).to.not.be.selected;
         });
     }
 }

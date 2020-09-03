@@ -87,7 +87,7 @@ module.exports = {
                 },
                 subExampleNotPresent: function(exampleName, subExampleName){
                     return this.api.assert.not.elementPresent({
-                        selector: `//div[@id="exerciseSheetTab"]/div[@class="tab-content"]/div[count(//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="${exampleName}"]]/preceding-sibling::*)+1]]//div[contains(@class, 'subExamples')]//tr/td[1][contains(text(),"${subExampleName}")]`,
+                        selector: `//div[@id="exerciseSheetTab"]/div[@class="tab-content"]/div[count(//div[@id="exerciseSheetTab"]/div[1]/ul/li[a[text()="${exampleName}"]]/preceding-sibling::*)+1]//div[contains(@class, 'subExamples')]//tr/td[1][text()=" ${subExampleName} "]`,
                         locateStrategy: 'xpath'
                     });
                 },
