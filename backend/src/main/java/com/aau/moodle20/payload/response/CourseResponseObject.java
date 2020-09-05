@@ -3,6 +3,7 @@ package com.aau.moodle20.payload.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourseResponseObject {
@@ -145,5 +146,31 @@ public class CourseResponseObject {
 
     public void setUploadCount(Integer uploadCount) {
         this.uploadCount = uploadCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CourseResponseObject)) return false;
+        CourseResponseObject that = (CourseResponseObject) o;
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getNumber(), that.getNumber()) &&
+                Objects.equals(getMinKreuzel(), that.getMinKreuzel()) &&
+                Objects.equals(getMinPoints(), that.getMinPoints()) &&
+                Objects.equals(getExerciseSheets(), that.getExerciseSheets()) &&
+                Objects.equals(getDescriptionTemplate(), that.getDescriptionTemplate()) &&
+                Objects.equals(getOwner(), that.getOwner()) &&
+                Objects.equals(getIncludeThird(), that.getIncludeThird()) &&
+                Objects.equals(getSemesterId(), that.getSemesterId()) &&
+                Objects.equals(getPresented(), that.getPresented()) &&
+                Objects.equals(getDescription(), that.getDescription()) &&
+                Objects.equals(getKreuzelList(), that.getKreuzelList()) &&
+                Objects.equals(getUploadCount(), that.getUploadCount());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getNumber(), getMinKreuzel(), getMinPoints(), getExerciseSheets(), getDescriptionTemplate(), getOwner(), getIncludeThird(), getSemesterId(), getPresented(), getDescription(), getKreuzelList(), getUploadCount());
     }
 }
