@@ -3,8 +3,11 @@ package com.aau.moodle20;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.entity.User;
+import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
+import com.aau.moodle20.repository.SemesterRepository;
+import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.services.CourseService;
 import com.aau.moodle20.services.UserDetailsImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,6 +37,7 @@ import java.util.HashSet;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,12 +49,18 @@ public class CourseServiceUnitTests {
 
     private static final Long COURSE_ID = 200L;
     private static final Long SEMESTER_ID = 12L;
+    private static final String OWNER_MATRICULATION_NUMBER = "12345678";
 
     @InjectMocks
     private CourseService courseService;
 
     @Mock
     private CourseRepository courseRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private SemesterRepository semesterRepository;
+
 
 
     @Before
@@ -60,7 +70,7 @@ public class CourseServiceUnitTests {
     }
 
     @Test
-    public void getCourse() throws Exception {
+    public void getCourse()  {
         Course course = getTestCourse();
         when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
 
@@ -69,6 +79,27 @@ public class CourseServiceUnitTests {
 
         CourseResponseObject courseResponseObject = courseService.getCourse(200L);
         assertEquals(responseObject,courseResponseObject);
+    }
+
+    @Test
+    public void createCourse()  {
+        Course course = getTestCourse();
+        when(userRepository.findByMatriculationNumber(OWNER_MATRICULATION_NUMBER)).thenReturn(Optional.of(new User(OWNER_MATRICULATION_NUMBER)));
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(new Semester(SEMESTER_ID)));
+        when(courseRepository.save(any(Course.class))).thenReturn(course);
+
+
+        CreateCourseRequest createCourseRequest = new CreateCourseRequest();
+        createCourseRequest.setOwner(OWNER_MATRICULATION_NUMBER);
+        createCourseRequest.setDescription(course.getDescription());
+        createCourseRequest.setMinKreuzel(course.getMinKreuzel());
+        createCourseRequest.setMinPoints(course.getMinPoints());
+        createCourseRequest.setName(course.getName());
+        createCourseRequest.setNumber(course.getNumber());
+        createCourseRequest.setSemesterId(SEMESTER_ID);
+
+        CourseResponseObject courseResponseObject = courseService.createCourse(createCourseRequest);
+        assertEquals(new CourseResponseObject(course.getId()),courseResponseObject);
     }
 
     private void mockSecurityContext()
@@ -92,7 +123,7 @@ public class CourseServiceUnitTests {
         course.setMinKreuzel(20);
         course.setMinPoints(20);
         course.setName("dd");
-        course.setOwner(new User());
+        course.setOwner(new User(OWNER_MATRICULATION_NUMBER));
         course.setSemester(new Semester(SEMESTER_ID));
         course.setExerciseSheets(new HashSet<>());
         return course;

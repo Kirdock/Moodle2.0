@@ -51,7 +51,7 @@ public class CourseService extends AbstractService {
         course.setOwner(new User(createCourseRequest.getOwner()));
         course.setDescription(createCourseRequest.getDescription());
         course.setUploadCount(0);
-        courseRepository.save(course);
+        course = courseRepository.save(course);
 
         return new CourseResponseObject(course.getId());
     }
