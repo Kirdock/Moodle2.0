@@ -5,8 +5,11 @@ module.exports = {
         getExample: function(browser, name, callback){
             browser.element('xpath', `//ul[@class="nav nav-tabs"]/li[a[text()="${name}"]]`, callback)
         },
+        selectTab(position){
+            return this.api.click(`ul.nav.nav-tabs li:nth-of-type(${position}) a`);
+        },
         newExample: function(browser, callback){
-            this.click('ul.nav.nav-tabs li:last-child').pause(1000, function(){
+            this.click('ul.nav.nav-tabs li:last-child a').pause(1000, function(){
                 browser.elements('css selector', 'ul.nav.nav-tabs li', result => callback(result.value.length - 2))
             })
         },

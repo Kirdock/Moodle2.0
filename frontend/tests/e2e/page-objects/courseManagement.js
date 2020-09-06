@@ -9,11 +9,11 @@ const createCommands = {
     },
     showNewModal: function(){
         this.click('@newButton');
-        return this.section.modal_new.waitForElementVisible('@submitButton', 1000);
+        return this.section.modal_new.waitForElementVisible('@submitButton', 2000).pause(2000);
     },
     showDeleteModal: function(){
         this.click('@deleteButton');
-        return this.section.modal_delete.waitForElementVisible('@submitButton', 1000);
+        return this.section.modal_delete.waitForElementVisible('@submitButton', 2000).pause(2000);
     },
     modalNewPresent: function(){
         return this.expect.section('@modal_new').to.be.visible;

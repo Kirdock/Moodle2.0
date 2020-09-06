@@ -15,6 +15,10 @@ module.exports = [
             valid: false
         },
         submitFile: true,
+        uploadCount: {
+            value: 0,
+            valid: true
+        },
         mandatory: false,
         fileTypes: {
             value: ['Word', 'zip'],

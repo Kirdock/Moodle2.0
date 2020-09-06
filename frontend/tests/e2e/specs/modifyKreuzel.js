@@ -1,7 +1,6 @@
 const Path = require('path');
 const courseTest = require('./modifyCourse.js');
 const testCourses = require('./testFiles/testCourses.js');
-const exerciseSheetTest = require('./modifyExerciseSheet.js');
 const testExerciseSheets = require('./testFiles/testExerciseSheets.js');
 const testExamplesRight = require('./testFiles/testExamplesRight.js');
 const testKreuzel2 = require('./testFiles/testKreuzel2.js');
@@ -11,23 +10,23 @@ const hiddenCourses = [testCourses[1]];
 
 module.exports = {
     before: function(browser) {
-        courseTest.before(browser, function (){
-            courseTest['create course'](browser); //create two courses, one where the user is in and one where he isn't
-            courseTest['assign users'](browser);
-            for(const sheet of testExerciseSheets){
-                browser.perform(done=>{
-                    exerciseSheetTest.before(browser, function (){
-                        exerciseSheetTest['create example'](browser);
-                        done();
-                    }, sheet.name);
-                })
-            }
-            browser.perform(done =>{
-                browser.loginAsStudent();
+        const modifyExerciseSheet = require('./modifyExerciseSheet.js');
+        courseTest.before(browser)
+        courseTest['create course'](browser); //create two courses, one where the user is in and one where he isn't
+        courseTest['assign users'](browser);
+        for(const sheet of testExerciseSheets){
+            browser.perform(done=>{
+                browser.exerciseSheetName = sheet.name; //in order to add parameters to ".before" without accidentally call the function asynchronous
+                modifyExerciseSheet.before(browser);
+                modifyExerciseSheet['create example'](browser);
                 done();
             })
-        });
-        // browser.loginAsStudent();
+        }
+        browser.perform(done =>{
+            delete browser.exerciseSheetName;
+            done();
+        })
+        browser.loginAsStudent();
     },
     'check courses': function(browser){
         const page = browser.page.studentCourses();
@@ -178,18 +177,17 @@ module.exports = {
         let kreuzelInfo2 = JSON.parse(JSON.stringify(testKreuzel2));
         kreuzelInfo2 = kreuzelInfo2[0];
         kreuzelInfo2.exerciseSheet = testExerciseSheets[2];
-        courseTest.before(browser, function(){
-            courseTest['kreuzel test'](browser, true);
-            browser.logout();
-            browser.loginAsStudent();
+        courseTest.before(browser)
+        courseTest['kreuzel test'](browser, true);
+        browser.logout();
+        browser.loginAsStudent();
 
-            for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
-                browser.perform(done => {
-                    self['select exerciseSheet'](browser, undefined, kreuzel.exerciseSheet);
-                    page.validateKreuzelInfo(kreuzel, true);
-                    done();
-                })
-            }
-        })
+        for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
+            browser.perform(done => {
+                self['select exerciseSheet'](browser, undefined, kreuzel.exerciseSheet);
+                page.validateKreuzelInfo(kreuzel, true);
+                done();
+            })
+        }
     }
 }

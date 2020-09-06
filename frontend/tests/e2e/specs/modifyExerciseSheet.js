@@ -1,5 +1,4 @@
 const Path = require('path');
-const courseTest = require('./modifyCourse.js');
 const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid.js');
 const testExamplesRight = require('./testFiles/testExamplesRight.js');
 const testExamplesInvalid = require('./testFiles/testExamplesInvalid.js');
@@ -103,11 +102,11 @@ function enterInvalidExample(browser, example, index){
 }
 
 module.exports = {
-    before: (browser, done = ()=>{}, exerciseSheetName) => {
-        courseTest.before(browser, function (){
-            courseTest['select exerciseSheet'](browser, exerciseSheetName, false);
-            done();
-        });
+    before: (browser) => {
+        const exerciseSheetName = browser.exerciseSheetName; //add parameters without calling ".before" asynchronous
+        const modifyCourse = require('./modifyCourse.js');
+        modifyCourse.before(browser);
+        modifyCourse['select exerciseSheet'](browser, exerciseSheetName, false);
     },
     'modify information': browser => {
         const page = browser.page.exerciseSheetManagement();
@@ -152,6 +151,7 @@ module.exports = {
     },
     'modify information invalid': browser =>{
         const page = browser.page.exerciseSheetManagement();
+        page.selectTab(1).pause(1000);
         const information = page.section.information;
 
         for(const exerciseSheet of testExerciseSheetsInvalid){
@@ -311,7 +311,7 @@ module.exports = {
             weighting: 1,
             points: 10,
             submitFile: true,
-            uploadCount: '',
+            uploadCount: 1,
             mandatory: false,
             fileTypes: ['Word', 'zip'],
             validator: true,
@@ -359,12 +359,16 @@ module.exports = {
         const page = browser.page.exerciseSheetManagement();
         const exampleSection = page.section.example;
         const deleteModal = page.section.deleteModal;
+        exampleExists(self, browser, testExample, false); //recreate to make sure subExample is present
         exampleExists(self, browser, testExample, true);
         page.selectExample(browser, testExample.name, function(index){
             exampleSection.selectLastSubExample(index);
             page.assert.not.elementPresent(exampleSection.deleteButton(index));
             for(const example of testExamplesInvalid){
-                enterInvalidExample(browser, example, index);
+                browser.perform(done =>{
+                    enterInvalidExample(browser, example, index);
+                    done();
+                })
             }
             exampleSection.selectParent(index);
             page
@@ -389,8 +393,8 @@ module.exports = {
                 .assert.elementPresent(exampleSection.submitFile(index))
 
             page
-                .assert.value(exampleSection.weighting(index), 1)
-                .assert.value(exampleSection.points(index), 0)
+                .assert.value(exampleSection.weighting(index), testExample.weighting.toString())
+                .assert.value(exampleSection.points(index), testExample.points.toString())
                 .expect.element(exampleSection.submitFile(index)).to.not.be.selected;
             page.expect.element(exampleSection.mandatory(index)).to.not.be.selected;
         });
