@@ -204,4 +204,26 @@ public class Course {
 
         return responseObject;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Course)) return false;
+        Course course = (Course) o;
+        return Objects.equals(getId(), course.getId()) &&
+                Objects.equals(getSemester(), course.getSemester()) &&
+                Objects.equals(getNumber(), course.getNumber()) &&
+                Objects.equals(getName(), course.getName()) &&
+                Objects.equals(getMinKreuzel(), course.getMinKreuzel()) &&
+                Objects.equals(getMinPoints(), course.getMinPoints()) &&
+                Objects.equals(getDescriptionTemplate(), course.getDescriptionTemplate()) &&
+                Objects.equals(getDescription(), course.getDescription()) &&
+                Objects.equals(getUploadCount(), course.getUploadCount()) &&
+                Objects.equals(getOwner(), course.getOwner());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getSemester(), getNumber(), getName(), getMinKreuzel(), getMinPoints(), getDescriptionTemplate(), getDescription(), getUploadCount(), getOwner());
+    }
 }
