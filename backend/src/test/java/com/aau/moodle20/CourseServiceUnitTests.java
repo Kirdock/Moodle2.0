@@ -6,6 +6,7 @@ import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.entity.User;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
+import com.aau.moodle20.payload.request.UpdateCoursePresets;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
@@ -209,6 +210,58 @@ public class CourseServiceUnitTests {
             courseService.updateCourse(updateCourseRequest);
         });
         String expectedMessage = "Error: Owner cannot be updated because the given matriculationNumber those not exists!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+    }
+
+
+    @Test
+    public void updateCourse_Admin() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+        UpdateCourseRequest updateCourseRequest = getUpdateCourseRequest(course);
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+        when(courseRepository.save(any(Course.class))).thenReturn(course);
+        when(userRepository.existsByMatriculationNumber(course.getOwner().getMatriculationNumber())).thenReturn(Boolean.TRUE);
+
+        Course updatedCourse = courseService.updateCourse(updateCourseRequest);
+        assertEquals(course,updatedCourse);
+    }
+
+    @Test
+    public void updateCoursePresets() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+        UpdateCoursePresets updateCoursePresets = new UpdateCoursePresets();
+        updateCoursePresets.setId(course.getId());
+        updateCoursePresets.setDescription("testDescription");
+        updateCoursePresets.setUploadCount(10);
+
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+        course.setDescription("testDescription");
+        course.setUploadCount(10);
+
+        when(courseRepository.save(any(Course.class))).thenReturn(course);
+        courseService.updateCoursePresets(updateCoursePresets);
+    }
+
+
+    @Test
+    public void updateCoursePresets_course_not_exists() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+        UpdateCoursePresets updateCoursePresets = new UpdateCoursePresets();
+        updateCoursePresets.setId(course.getId());
+        updateCoursePresets.setDescription(course.getDescription());
+        updateCoursePresets.setUploadCount(course.getUploadCount());
+
+        when(courseRepository.save(any(Course.class))).thenReturn(course);
+
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            courseService.updateCoursePresets(updateCoursePresets);
+        });
+        String expectedMessage = "Error: Course not found!";
         assertEquals(expectedMessage,exception.getMessage());
         assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
     }
