@@ -7,6 +7,7 @@ import java.util.List;
 
 public class UpdateExampleRequest {
 
+    @NotNull
     private Long id;
     private Long parentId;
     @NotNull
@@ -14,21 +15,17 @@ public class UpdateExampleRequest {
     @NotBlank
     private String name;
     private String description;
-    @Min(value = 0)
-    @NotNull
     private Integer points;
-    @Min(value = 0)
-    @NotNull
     private Integer weighting;
-    private Boolean mandatory = Boolean.FALSE;
+    private Boolean mandatory;
     @NotNull
     @Min(value = 0)
     private Integer order;
     private List<Long> supportedFileTypes;
-    private Boolean submitFile = Boolean.FALSE;
+    private Boolean submitFile;
     private List<String> customFileTypes;
     @Min(value = 0)
-    private Integer uploadCount = 0;
+    private Integer uploadCount ;
 
     public Long getExerciseSheetId() {
         return exerciseSheetId;
@@ -74,9 +71,7 @@ public class UpdateExampleRequest {
         return mandatory;
     }
 
-    public void setMandatory(Boolean mandatory) {
-        if (mandatory != null)
-            this.mandatory = mandatory;
+    public void setMandatory(Boolean mandatory) { this.mandatory = mandatory;
     }
 
     public Integer getOrder() {
@@ -100,7 +95,6 @@ public class UpdateExampleRequest {
     }
 
     public void setSubmitFile(Boolean submitFile) {
-        if (submitFile != null)
             this.submitFile = submitFile;
     }
 
@@ -133,7 +127,6 @@ public class UpdateExampleRequest {
     }
 
     public void setUploadCount(Integer uploadCount) {
-        if (uploadCount != null)
             this.uploadCount = uploadCount;
     }
 }

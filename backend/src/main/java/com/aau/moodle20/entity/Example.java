@@ -239,11 +239,12 @@ public class Example {
             setWeighting(exampleRequest.getWeighting());
         if (exampleRequest.getUploadCount() != null)
             setUploadCount(exampleRequest.getUploadCount());
-
-        setSubmitFile(exampleRequest.getSubmitFile() != null ? exampleRequest.getSubmitFile() : Boolean.FALSE);
-        setMandatory(exampleRequest.getMandatory() != null ? exampleRequest.getMandatory() : Boolean.FALSE);
-
-        setCustomFileTypesList(exampleRequest.getCustomFileTypes());
+        if (exampleRequest.getSubmitFile() != null)
+            setSubmitFile(exampleRequest.getSubmitFile());
+        if (exampleRequest.getMandatory() != null)
+            setMandatory(exampleRequest.getMandatory());
+        if (exampleRequest.getCustomFileTypes() != null)
+            setCustomFileTypesList(exampleRequest.getCustomFileTypes());
         if (exampleRequest.getParentId() != null)
             setParentExample(new Example(exampleRequest.getParentId()));
         if (exampleRequest.getExerciseSheetId() != null)
