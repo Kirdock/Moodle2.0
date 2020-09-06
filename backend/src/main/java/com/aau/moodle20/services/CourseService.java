@@ -84,8 +84,6 @@ public class CourseService extends AbstractService {
     {
         Course course = readCourse(updateCoursePresets.getId());
         UserDetailsImpl userDetails = getUserDetails();
-        if(!userDetails.getAdmin() && !isOwner(course))
-            throw new ServiceException("Error: not authorized to update course",HttpStatus.UNAUTHORIZED);
 
         course.setDescriptionTemplate(updateCoursePresets.getDescription());
         course.setUploadCount(updateCoursePresets.getUploadCount());
