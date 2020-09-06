@@ -53,7 +53,7 @@ public class CourseController {
         return ResponseEntity.ok(new MessageResponse("Course was successfully updated!"));
     }
 
-    @PreAuthorize("hasPermission(#courseId, 'Course', 'update')")
+    @PreAuthorize("hasPermission(#updateCoursePresets.id, 'Course', 'update')")
     @PostMapping(value = "/course/presets")
     public ResponseEntity<?> updateCoursePresets(@Valid  @RequestBody UpdateCoursePresets updateCoursePresets)  throws ServiceException {
         courseService.updateCoursePresets(updateCoursePresets);
