@@ -26,6 +26,17 @@ in your IDE
 - SPRING_DATASOURCE_USERNAME = password
 - SPRING_JPA_DATABASE-PLATFORM = org.hibernate.dialect.H2Dialect
 - SPRING_H2_CONSOLE_ENABLED = true
+- jwtSecret=moodle20SecretKey;
+- jwtExpirationMs=86400000;
+- adminUserName=admin;
+- adminPassword=admin;
+- SPRING_JPA_HIBERNATE_DDL-AUTO=none;
+- adminMatriculationNumber=00000000;
+- studentEmailPostfix=edu.aau.at;
+- developerMode=true;
+- tempPasswordExpirationHours=24;
+- senderEmailUsername=... (example: pepipp@edu.aau.at);
+- senderEmailPassword=...
 
 Access H2 Console 
 - http://localhost:8098/h2-console
