@@ -56,7 +56,7 @@ public class CourseService extends AbstractService {
         return new CourseResponseObject(course.getId());
     }
 
-    public void updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceException {
+    public Course updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(updateCourseRequest.getId());
         if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
@@ -77,7 +77,7 @@ public class CourseService extends AbstractService {
         if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null)
             course.setOwner(new User(updateCourseRequest.getOwner()));
 
-        courseRepository.save(course);
+        return courseRepository.save(course);
     }
 
     public void updateCoursePresets(UpdateCoursePresets updateCoursePresets) throws ServiceException
