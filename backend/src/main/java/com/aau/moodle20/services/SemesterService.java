@@ -45,6 +45,7 @@ public class SemesterService extends AbstractService{
                     semestersToBeReturned.add(semester);
             }
         }
+        semestersToBeReturned.sort(Comparator.comparing(Semester::getYear).thenComparing(Semester::getType,Comparator.reverseOrder()));
         return semestersToBeReturned;
     }
 
