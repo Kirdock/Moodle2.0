@@ -83,8 +83,6 @@ public class CourseService extends AbstractService {
     public void updateCoursePresets(UpdateCoursePresets updateCoursePresets) throws ServiceException
     {
         Course course = readCourse(updateCoursePresets.getId());
-        UserDetailsImpl userDetails = getUserDetails();
-
         course.setDescriptionTemplate(updateCoursePresets.getDescription());
         course.setUploadCount(updateCoursePresets.getUploadCount());
         courseRepository.save(course);
