@@ -126,9 +126,14 @@ function exerciseSheetExists(self, browser, courseText, name, create){
 
 module.exports = {
     before: (browser) => {
-        const page = browser
-            .loginAsAdmin()
-            .page.courseManagement()
+        const page = browser.page.courseManagement()
+        if(browser.isOwner){
+            page.loginAsOwner()
+        }
+        else{
+            page.loginAsAdmin();
+        }
+            
         page.navigate().pause(1000);
         browser.perform(done =>{
             //check if semester exists
@@ -137,6 +142,10 @@ module.exports = {
                     page.pause(1000, done);
                 }
                 else{
+                    if(browser.isOwner){
+                        page.logout();
+                        page.loginAsAdmin();
+                    }
                     const semester = require('./modifySemester.js')
                     browser.page.semesterManagement().navigate();
                     browser.perform(() =>{
@@ -246,7 +255,7 @@ module.exports = {
         }
         browser.options.globals.asyncHookTimeout = defaultTimeoutBefore;
     },
-    'select course': function (browser) {
+    'select course': function (browser, isOwner = false) {
         const page = browser.page.courseManagement();
         page.navigate().pause(1000); //with refresh courseId is still set
         courseExists(this, browser, testCourse.number, true)
@@ -254,8 +263,10 @@ module.exports = {
         page.expect.element('@deleteButton').to.not.be.present
         page.expect.element('@copyButton').to.not.be.present
         page.selectCourse(testCourse.number);
-        page.expect.element('@deleteButton').to.be.present
-        page.expect.element('@copyButton').to.be.present
+        if(!isOwner){
+            page.expect.element('@deleteButton').to.be.present
+            page.expect.element('@copyButton').to.be.present
+        }
         page.assert.urlContains('?courseId=');
     },
     'modify course invalid': function(browser, number){
@@ -351,6 +362,15 @@ module.exports = {
             }
         ]
         courseExists(self, browser, courseText, true);
+        if(!isOwner){
+            console.log('here')
+            for(const course of courseData){ //delete existing modified courses; if not, it is not possible to save edited course because they have to be unique
+                browser.perform(done => {
+                    courseExists(self, browser, `${course.number.value} ${course.name.value}`, false);
+                    done();
+                })
+            }
+        }
         
         const page = browser.page.courseManagement();
         const courseInfo = page.section.courseInfo;
@@ -358,31 +378,35 @@ module.exports = {
         page.selectTab(informationTab);
         
         for(const course of courseData){
-            const {owner, description, name, number, ...data} = course;
-            if(!isOwner){
-                data.name = name;
-                data.number = number;
-                courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value)
-                    .assert.isValidInput(`@ownerInput`, 'valid', owner.valid)
-            }
-            courseInfo
-                .clearValue('@description')
-                .setValue('@description', ` ${browser.Keys.BACK_SPACE}`)
-                .setValue('@description', description.value);
-            for(const key in data){
-                courseInfo.clearValue2(`@${key}`)
-                    .setValue(`@${key}`, course[key].value)
-
-                if(course[key].expected !== undefined){
-                    courseInfo.assert.value(`@${key}`,course[key].expected)
+            browser.perform(done =>{
+                const {owner, description, name, number, ...data} = course;
+                if(!isOwner){
+                    data.name = name;
+                    data.number = number;
+                    courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value)
+                        .assert.isValidInput(`@ownerInput`, 'valid', owner.valid)
                 }
-                courseInfo.assert.isValidInput(`@${key}`, 'valid', course[key].valid)
-            }
-            courseInfo.submit();
-            courseInfo.assert.successPresent();
-            courseInfo.closeToast();
+                courseInfo
+                    .clearValue('@description')
+                    .setValue('@description', ` ${browser.Keys.BACK_SPACE}`)
+                    .setValue('@description', description.value);
+                for(const key in data){
+                    courseInfo.clearValue2(`@${key}`)
+                        .setValue(`@${key}`, course[key].value)
 
-            page.assert.containsText('@selectCourse', `${course.number.value} ${course.name.value}`);
+                    if(course[key].expected !== undefined){
+                        courseInfo.assert.value(`@${key}`,course[key].expected)
+                    }
+                    courseInfo.assert.isValidInput(`@${key}`, 'valid', course[key].valid)
+                }
+                courseInfo.submit();
+                courseInfo.assert.successPresent();
+                courseInfo.closeToast();
+                if(!isOwner){
+                    page.assert.containsText('@selectCourse', `${course.number.value} ${course.name.value}`);
+                }
+                done();
+            })
         }
     },
     'delete course': function(browser, courseText){
@@ -618,8 +642,8 @@ module.exports = {
         
         browser.logout();
         browser.loginAsStudent();
-        modifyKreuzel['modify exerciseSheet type1'](browser)
-        modifyKreuzel['modify exerciseSheet type2'](browser)
+        modifyKreuzel['modify exerciseSheet type1'](browser, undefined, courseText)
+        modifyKreuzel['modify exerciseSheet type2'](browser, undefined, courseText)
 
         browser.logout();
         if(isOwner){
@@ -630,7 +654,7 @@ module.exports = {
         }
         browser.page.courseManagement().navigate();
 
-        this['select course'](browser, courseText);
+        this['select course'](browser, courseText, isOwner);
         coursePage.selectTab(assignUsersTab);
         const kreuzelModal = coursePage.section.kreuzelModal;
         page.showKreuzelModal();

@@ -1,15 +1,34 @@
 const modifyCourse = require("./modifyCourse");
 const testCourses = require("./testFiles/testCourses");
+const testExerciseSheets = require("./testFiles/testExerciseSheets");
+const modifyExerciseSheet = require("./modifyExerciseSheet");
 const visibleCourses = [testCourses[0]];
 const hiddenCourses = [testCourses[1]];
 const testCourse = visibleCourses[0];
 
 module.exports = {
     before: (browser) => {
-        // modifyCourse.before(browser)
-        // modifyCourse['create course'](browser);
-        // browser.logout();
+        modifyCourse.before(browser)
+        modifyCourse['create course'](browser);
+        browser.logout();
         browser.loginAsOwner();
+        browser.page.courseManagement().navigate().pause(1000)
+        modifyCourse['assign users csv'](browser, testCourse.number);
+        modifyCourse['assign users'](browser, testCourse.number);
+        browser.isOwner = true;
+        for(const sheet of testExerciseSheets){ //here you also test exercise sheet and example creation
+            browser.perform(done=>{
+                browser.exerciseSheetName = sheet.name; //in order to add parameters to ".before" without accidentally call the function asynchronous
+                modifyExerciseSheet.before(browser);
+                modifyExerciseSheet['create example'](browser);
+                done();
+            })
+        }
+        browser.perform(done =>{
+            delete browser.exerciseSheetName;
+            delete browser.isOwner;
+            done();
+        })
     },
     'check courses': function(browser){
         browser.assert.elementPresent({
@@ -51,23 +70,19 @@ module.exports = {
         browser.assert.elementCount('.admin a', 1);
     },
     'modify course': function(browser){
-        browser.page.courseManagement().navigate();
+        browser.page.courseManagement().navigate().pause(1000);
         modifyCourse['modify course'](browser, testCourse.number, true);
     },
-    'assign users': function(browser){
-        browser.page.courseManagement().navigate();
-        modifyCourse['assign users'](browser, testCourse.number);
-        modifyCourse['assign users csv'](browser, testCourse.number);
-    },
     'modify kreuzel': function(browser){
-        browser.page.courseManagement().navigate();
-        modifyCourse['modify presentation'](browser, testCourse.number, true); //'kreuzel test user' test is also executed here
+        browser.page.courseManagement().navigate().pause(1000);
+        modifyCourse['modify presentation'](browser, true, testCourse.number); //'kreuzel test user' test is also executed here
         modifyCourse['kreuzel test'](browser, true, testCourse.number)
     },
     'modify exerciseSheet': function(browser){
-        browser.page.courseManagement().navigate();
+        browser.page.courseManagement().navigate().pause(1000);
         const modifyExerciseSheet = require("./modifyExerciseSheet");
         modifyCourse['select exerciseSheet'](browser, undefined, false, testCourse.number);
         modifyExerciseSheet['modify information'](browser);
+        modifyExerciseSheet['delete example'](browser);
     }
 }

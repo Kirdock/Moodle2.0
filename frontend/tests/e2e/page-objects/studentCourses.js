@@ -4,7 +4,7 @@ module.exports = {
     commands: [
         {
             courseOption(course){
-                return `//div[@id="courseList"]/div/a[text()=" ${course.number} ${course.name} "]`;
+                return `//div[@id="courseList"]/div/a[${typeof course === 'string' ? `contains(text(),"${course}")` : `text()=" ${course.number} ${course.name} "`}]`;
             },
             coursePresent(course, status = true){
                 return (status ? this.api.assert : this.api.assert.not).elementPresent({

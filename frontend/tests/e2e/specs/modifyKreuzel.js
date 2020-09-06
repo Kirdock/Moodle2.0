@@ -54,7 +54,9 @@ module.exports = {
         page.selectCourse(course);
         
         browser.expect.url().to.match(/\/Course\/([0-9]+)$/);
-        coursePage.validateCourse(course);
+        if(typeof course !== 'string'){
+            coursePage.validateCourse(course);
+        }
         for(const exerciseSheet of testExerciseSheets){
             coursePage.validateExerciseSheet(exerciseSheet);
         }
@@ -119,14 +121,14 @@ module.exports = {
         page.submit();
         page.assert.not.toastPresent();
     },
-    'modify exerciseSheet type2': function(browser, kInfos){
+    'modify exerciseSheet type2': function(browser, kInfos, courseText){
         const page = browser.page.studentExerciseSheet();
         const kreuzelInfos = kInfos || testKreuzel2;
         const self = this;
 
         for(const kreuzel of kreuzelInfos){
             browser.perform(function(done){
-                self['select exerciseSheet'](browser, undefined, kreuzel.exerciseSheet);
+                self['select exerciseSheet'](browser, courseText, kreuzel.exerciseSheet);
                 page.checkMandatory(0, kreuzel.mandatory);
                 page.checkKreuzel(0, kreuzel.kreuzel, kreuzel.exerciseSheet.minKreuzel)
                 page.checkPoints(0, kreuzel.points, kreuzel.exerciseSheet.minPoints)
@@ -164,8 +166,8 @@ module.exports = {
         }
         
     },
-    'modify exerciseSheet type1': function(browser, kreuzelInfos){
-        this['modify exerciseSheet type2'](browser, kreuzelInfos || testKreuzel)
+    'modify exerciseSheet type1': function(browser, kreuzelInfos, courseText){
+        this['modify exerciseSheet type2'](browser, kreuzelInfos || testKreuzel, courseText)
     },
     'check edit kreuzel by admin or owner': function(browser){
         const page = browser.page.studentExerciseSheet();

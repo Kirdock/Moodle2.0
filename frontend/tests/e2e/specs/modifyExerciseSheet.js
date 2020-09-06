@@ -329,7 +329,7 @@ module.exports = {
             }
         });
     },
-    'modify subexample invalid': function(browser){
+    'modify subexample invalid': function(browser){ //also check values after subExample is deleted
         const testExample = {
             name: 'TestExample2',
             description: '',
@@ -360,7 +360,7 @@ module.exports = {
         const exampleSection = page.section.example;
         const deleteModal = page.section.deleteModal;
         exampleExists(self, browser, testExample, false); //recreate to make sure subExample is present
-        exampleExists(self, browser, testExample, true);
+        exampleExists(self, browser, testExample, true); //recreate to make sure subExample is present
         page.selectExample(browser, testExample.name, function(index){
             exampleSection.selectLastSubExample(index);
             page.assert.not.elementPresent(exampleSection.deleteButton(index));
