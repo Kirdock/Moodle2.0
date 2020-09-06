@@ -5,17 +5,15 @@ const testExerciseSheets = require('./testFiles/testExerciseSheets.js');
 const testExerciseSheet = testExerciseSheets[0];
 const testExerciseSheetsInvalid = require('./testFiles/testExerciseSheetsInvalid.js');
 const testUsers = require('./testFiles/testUsers.js');
-const userTest = require('./modifyUsers.js');
-const modifyKreuzel = require('./modifyKreuzel.js');
 const testKreuzel = require('./testFiles/testKreuzel.js');
 const testKreuzel2 = require('./testFiles/testKreuzel2.js');
-const modifyExerciseSheet = require('./modifyExerciseSheet.js');
 const exerciseSheetsTab = 2;
 const assignUsersTab = 1;
 const informationTab = 0;
 
 function beforeKreuzel(self, browser){
     const coursePage = browser.page.courseManagement();
+    const modifyExerciseSheet = require('./modifyExerciseSheet.js');
     self['create course'](browser);
     self['assign users'](browser);
     
@@ -52,7 +50,6 @@ function deSelectAssignedUser(browser){
 function ownerExists(browser, name){
     const page = browser.page.courseManagement();
     page.showNewModal()
-    page.pause(1000);
     const defaultTimeoutBefore = browser.options.globals.asyncHookTimeout;
     browser.options.globals.asyncHookTimeout = 60000; //adjust default timeout; creation of users takes more time than 10s
     browser.perform(function(done){
@@ -65,7 +62,7 @@ function ownerExists(browser, name){
                 browser.log('Owner is not present. Owner will now be created');
                 browser.page.userManagement().navigate().pause(2000);
 
-                userTest['upload CSV file'](browser);
+                require('./modifyUsers.js')['upload CSV file'](browser);
                 
                 page.navigate().pause(1000, ()=>{
                     browser.options.globals.asyncHookTimeout = defaultTimeoutBefore;
@@ -128,27 +125,29 @@ function exerciseSheetExists(self, browser, courseText, name, create){
 }
 
 module.exports = {
-    before: (browser, done) => {
+    before: (browser) => {
         const page = browser
             .loginAsAdmin()
             .page.courseManagement()
         page.navigate().pause(1000);
-        //check if semester exists
-        browser.element('css selector', page.elements.selectSemesterOption.selector,function(result){
-            if(result.value && result.value.ELEMENT){
-                page.pause(1000, done);
-            }
-            else{
-                const semester = require('./modifySemester.js')
-                browser.page.semesterManagement().navigate();
-                browser.perform(() =>{
-                    semester['create semester'](browser, true);
-                }).perform(()=>{
-                    page.navigate();
+        browser.perform(done =>{
+            //check if semester exists
+            browser.element('css selector', page.elements.selectSemesterOption.selector,function(result){
+                if(result.value && result.value.ELEMENT){
                     page.pause(1000, done);
-                })
-            }
-        });
+                }
+                else{
+                    const semester = require('./modifySemester.js')
+                    browser.page.semesterManagement().navigate();
+                    browser.perform(() =>{
+                        semester['create semester'](browser, true);
+                    }).perform(()=>{
+                        page.navigate();
+                        page.pause(1000, done);
+                    })
+                }
+            });
+        })
     },
     'create course invalid': browser => {
         const page = browser.page.courseManagement();
@@ -222,7 +221,7 @@ module.exports = {
             browser.perform(function(done){
                 courseExists(self,browser, course.number, false)
                 ownerExists(browser, course.owner.value)
-                page.showNewModal().pause(1000);
+                page.showNewModal()
 
                 modal_new.setMultiSelect('@owner',course.owner.index, course.owner.value);
                 modal_new
@@ -319,7 +318,7 @@ module.exports = {
             courseInfo.assert.not.toastPresent();
         }
     },
-    'modify course': function(browser, courseText){
+    'modify course': function(browser, courseText, isOwner = false){
         courseText = courseText || testCourse.number;
         const self = this;
         const courseData = [
@@ -352,9 +351,6 @@ module.exports = {
             }
         ]
         courseExists(self, browser, courseText, true);
-        for(const course of courseData){
-            courseExists(self, browser, `${course.number.value} ${course.name.value}`, false);
-        }
         
         const page = browser.page.courseManagement();
         const courseInfo = page.section.courseInfo;
@@ -362,10 +358,14 @@ module.exports = {
         page.selectTab(informationTab);
         
         for(const course of courseData){
-            const {owner, description, ...data} = course;
-
-            courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value)
-                .assert.isValidInput(`@ownerInput`, 'valid', owner.valid)
+            const {owner, description, name, number, ...data} = course;
+            if(!isOwner){
+                data.name = name;
+                data.number = number;
+                courseInfo.setMultiSelect('@owner',course.owner.index, course.owner.value)
+                    .assert.isValidInput(`@ownerInput`, 'valid', owner.valid)
+            }
+            courseInfo
                 .clearValue('@description')
                 .setValue('@description', ` ${browser.Keys.BACK_SPACE}`)
                 .setValue('@description', description.value);
@@ -405,8 +405,8 @@ module.exports = {
             .expect.element('@copyButton').to.not.be.present
         page.assert.not.urlContains('?courseId=');
     },
-    'assign users csv': function (browser){
-        const courseText = testCourse.number;
+    'assign users csv': function (browser, courseText){
+        courseText = courseText || testCourse.number;
         const page = browser.page.courseManagement();
         const assignedUsers = page.section.assignedUsers;
         const self = this;
@@ -591,8 +591,8 @@ module.exports = {
             })
         })
     },
-    'select exerciseSheet': function(browser, name, goBack = true){
-        const courseText = testCourse.number;
+    'select exerciseSheet': function(browser, name, goBack = true, courseText){
+        courseText = courseText || testCourse.number;
         const exerciseSheetName = name || testExerciseSheet.name;
         const page = browser.page.courseManagement();
         exerciseSheetExists(this, browser, courseText, exerciseSheetName, true);
@@ -607,11 +607,14 @@ module.exports = {
             page.navigate().pause(1000)
         }
     },
-    'kreuzel test user': function(browser){
+    'kreuzel test user': function(browser, isOwner = false, courseText){
         const coursePage = browser.page.courseManagement();
         const page = coursePage.section.assignedUsers;
+        const modifyKreuzel = require('./modifyKreuzel.js');
         
-        beforeKreuzel(this, browser)
+        if(!isOwner){
+            beforeKreuzel(this, browser)
+        }
         
         browser.logout();
         browser.loginAsStudent();
@@ -619,10 +622,15 @@ module.exports = {
         modifyKreuzel['modify exerciseSheet type2'](browser)
 
         browser.logout();
-        browser.loginAsAdmin()
-            .page.courseManagement().navigate();
+        if(isOwner){
+            browser.loginAsOwner();
+        }
+        else{
+            browser.loginAsAdmin()
+        }
+        browser.page.courseManagement().navigate();
 
-        this['select course'](browser);
+        this['select course'](browser, courseText);
         coursePage.selectTab(assignUsersTab);
         const kreuzelModal = coursePage.section.kreuzelModal;
         page.showKreuzelModal();
@@ -636,14 +644,14 @@ module.exports = {
         }
         kreuzelModal.cancelX();
     },
-    'kreuzel test': function(browser, skipCreation = false){
+    'kreuzel test': function(browser, skipCreation = false, courseText){
         const coursePage = browser.page.courseManagement();
         const page = coursePage.section.assignedUsers;
         let kreuzelInfo = JSON.parse(JSON.stringify(testKreuzel));
         kreuzelInfo = kreuzelInfo[0];
         kreuzelInfo.exerciseSheet = testExerciseSheets[3];
         
-        let kreuzelInfo2 = JSON.parse(JSON.stringify(testKreuzel2));;
+        let kreuzelInfo2 = JSON.parse(JSON.stringify(testKreuzel2));
         kreuzelInfo2 = kreuzelInfo2[0];
         kreuzelInfo2.exerciseSheet = testExerciseSheets[2];
         
@@ -653,7 +661,7 @@ module.exports = {
             browser.loginAsAdmin()
                 .page.courseManagement().navigate()
         }
-        this['select course'](browser);
+        this['select course'](browser, courseText);
         coursePage.selectTab(assignUsersTab);
         const kreuzelModal = coursePage.section.kreuzelModal;
         page.showKreuzelModal();
@@ -672,7 +680,7 @@ module.exports = {
             })
         }
         
-        this['select course'](browser);
+        this['select course'](browser, courseText);
         coursePage.selectTab(assignUsersTab);
         page.showKreuzelModal();
         for(const kreuzel of [kreuzelInfo, kreuzelInfo2]){
@@ -684,13 +692,13 @@ module.exports = {
         }
         kreuzelModal.cancelX();
     },
-    'modify presentation': function(browser){
+    'modify presentation': function(browser, isOwner = false, courseText){
         const coursePage = browser.page.courseManagement();
         const page = coursePage.section.assignedUsers;
         const presentationModal = coursePage.section.presentationModal;
         const allKreuzel = testKreuzel.concat(testKreuzel2);
-        this['kreuzel test user'](browser) //to make sure, exercise sheets and course have correct data, create everything new
-        this['select course'](browser);
+        this['kreuzel test user'](browser, isOwner, courseText) //to make sure, exercise sheets and course have correct data, create everything new
+        this['select course'](browser, courseText);
         coursePage.selectTab(assignUsersTab);
 
         page.showPresentationModal();
@@ -775,7 +783,7 @@ module.exports = {
         page.checkPresentationCount(testUsers[3], 1);
 
         //refresh and check
-        this['select course'](browser);
+        this['select course'](browser, courseText);
         coursePage.selectTab(assignUsersTab);
         page.showPresentationModal();
         presentationModal.presentationPresent(testUsers[3], presentationInfo1)
