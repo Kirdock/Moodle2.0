@@ -2,6 +2,10 @@ sudo: required
 language: java
 addons:
   chrome: stable
+  sonarcloud:
+    organization: "kirdock"
+    token:
+      secure: "VvMtXU65k5um1x7atgJvm9OFASeHF7GkBJuXXG6sqV4X7yPYxX2qyITuy1EvWxUAownkAG0dwJHl8evJ66RPBXtZYpS1Dzrr1ctMUnrQqdtBLmQIGJJ/KSzS/MSkDoGkdiiLN2AC0pozsT7r2kDD+4GGkee6fIrxYiwff8ITe0ymV1LVhx2rpCSvc25KAEfr1755aOT8QM+1EbJDQXjmFUFqatSXwv9UpEVgYPZtDjyYtGOmVDgrNXMPNcyRK7p80vQTgwxHmOSA5BubNQPk3zXPXZocdCVWWe5sG6IsOcu+DNHfswUHldUVl9OjAx7tTu2zcJw+cZHH//37hcVbDIitJssjxKodd3TnPfr9NaxZ5zgrcwnT7X0kCwLuK/ZWgLdM02UCgZ+kbtEfYKdfmXgs2H9RtBWBmBCoNzYZNdgMg2472AicWcGWRglt9GylzdKtopRXYQ9Jjdvk/2837NHzWpZFx+Zfw4R/kwnYLF6Qr7bzTxp+F2HEYvaS0HjKkr76gndcaVRe5OcgleDYZ6fX441312dYQ412DfeQAqfzWnOlAAZSHTIYHWLrPjEdYrPR/os14KDeJFqQ1UoqcfXIQUOAuyFdP2hzBLqMfMj/RS8igRaa85QGdYZJSaIAixVIqhE0JK6+E/fCeI/wBepJEW84XH4RY0vdEB/HYNM="
 jdk:
   - openjdk8
 
@@ -13,4 +17,6 @@ before_script:
   - npm i -g npm@^6
   - sleep 3
 
-script: mvn clean install
+script:
+  - mvn clean install
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=Kirdock_Moodle2.0
