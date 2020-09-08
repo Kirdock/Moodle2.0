@@ -254,6 +254,8 @@ public class UserService  extends AbstractService{
                 responseObject.setCourseRole(ECourseRole.None);
             userResponseObjectList.add(responseObject);
         }
+
+        userResponseObjectList.sort(Comparator.comparing(UserResponseObject::getMatriculationNumber));
         return userResponseObjectList;
     }
 
