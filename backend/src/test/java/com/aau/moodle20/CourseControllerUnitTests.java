@@ -1,5 +1,6 @@
 package com.aau.moodle20;
 
+import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.entity.User;
@@ -13,6 +14,7 @@ import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.services.CourseService;
 import com.aau.moodle20.services.UserDetailsImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +30,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,19 +39,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CourseControllerUnitTests extends AbstractControllerTest{
-
-    @Autowired
-    private MockMvc mvc;
+public class CourseControllerUnitTests extends AbstractControllerTest {
 
     @MockBean
     private CourseService courseService;
@@ -59,13 +60,11 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
     private UserRepository userRepository;
 
 
-
-
     @Before
     public void mockCourseService_Methods() throws IOException {
         when(courseService.getCourse(anyLong())).thenReturn(new CourseResponseObject());
         when(courseService.getCoursePresented(anyLong())).thenReturn(new ArrayList<>());
-        when(courseService.createCourse(any( CreateCourseRequest.class))).thenReturn(new CourseResponseObject());
+        when(courseService.createCourse(any(CreateCourseRequest.class))).thenReturn(new CourseResponseObject());
         when(courseService.updateCourse(any(UpdateCourseRequest.class))).thenReturn(new Course());
         doNothing().when(courseService).updateCoursePresets(any(UpdateCoursePresets.class));
         doNothing().when(courseService).deleteCourse(anyLong());
@@ -93,36 +92,22 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
 
     @Test
     public void check_all_apis_authorized_Admin() throws Exception {
-        String jwtToken = generateValidAdminJWToken();
-        User adminUser = getAdminUser();
-        when(userRepository.findByUsername(adminUser.getUsername())).thenReturn(Optional.of(adminUser));
-
+        String jwtToken = prepareAdminUser();
 
         // get Course
-        this.mvc.perform(get("/api/course/200").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        perform_Get("/api/course/200", jwtToken).andExpect(status().isOk());
         // get course presented
-        this.mvc.perform(get("/api/course/200/presented").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        perform_Get("/api/course/200/presented", jwtToken).andExpect(status().isOk());
         //create course
-        this.mvc.perform(put("/api/course").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getCreateCourseRequest_Json())).andExpect(status().isOk());
+        perform_Put("/api/course", jwtToken, getCreateCourseRequest_Json()).andExpect(status().isOk());
         // update course
-        this.mvc.perform(post("/api/course").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getUpdateCourseRequest_Json())).andExpect(status().isOk());
+        perform_Post("/api/course", jwtToken, getUpdateCourseRequest_Json()).andExpect(status().isOk());
         //update course presets
-        this.mvc.perform(post("/api/course/presets").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getUpdateCoursePresets_Json())).andExpect(status().isOk());
+        perform_Post("/api/course/presets", jwtToken, getUpdateCoursePresets_Json()).andExpect(status().isOk());
         //delete course
-        this.mvc.perform(delete("/api/course/200").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        perform_Delete("/api/course/200", jwtToken).andExpect(status().isOk());
         //copy course
-        this.mvc.perform(post("/api/course/copy").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getCopyCourseRequest_Json())).andExpect(status().isOk());
+        perform_Post("/api/course/copy", jwtToken, getCopyCourseRequest_Json()).andExpect(status().isOk());
     }
 
     @Test
@@ -130,30 +115,19 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
         String jwtToken = "test123";
 
         // get Course
-        this.mvc.perform(get("/api/course/200").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isUnauthorized());
+        perform_Get("/api/course/200", jwtToken).andExpect(status().isUnauthorized());
         // get course presented
-        this.mvc.perform(get("/api/course/200/presented").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isUnauthorized());
+        perform_Get("/api/course/200/presented", jwtToken).andExpect(status().isUnauthorized());
         //create course
-        this.mvc.perform(put("/api/course").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getCreateCourseRequest_Json())).andExpect(status().isUnauthorized());
+        perform_Put("/api/course", jwtToken, getCreateCourseRequest_Json()).andExpect(status().isUnauthorized());
         // update course
-        this.mvc.perform(post("/api/course").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getUpdateCourseRequest_Json())).andExpect(status().isUnauthorized());
+        perform_Post("/api/course", jwtToken, getUpdateCourseRequest_Json()).andExpect(status().isUnauthorized());
         //update course presets
-        this.mvc.perform(post("/api/course/presets").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getUpdateCoursePresets_Json())).andExpect(status().isUnauthorized());
+        perform_Post("/api/course/presets", jwtToken, getUpdateCoursePresets_Json()).andExpect(status().isUnauthorized());
         //delete course
-        this.mvc.perform(delete("/api/course/200").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isUnauthorized());
+        perform_Delete("/api/course/200", jwtToken).andExpect(status().isUnauthorized());
         //copy course
-        this.mvc.perform(post("/api/course/copy").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getCopyCourseRequest_Json())).andExpect(status().isUnauthorized());
+        perform_Post("/api/course/200", jwtToken, getCopyCourseRequest_Json()).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -161,49 +135,294 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
         String jwtToken = generateExpiredAdminJWToken();
 
         // get Course
-        this.mvc.perform(get("/api/course/200").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isUnauthorized());
+        perform_Get("/api/course/200", jwtToken).andExpect(status().isUnauthorized());
         // get course presented
-        this.mvc.perform(get("/api/course/200/presented").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isUnauthorized());
+        perform_Get("/api/course/200/presented", jwtToken).andExpect(status().isUnauthorized());
         //create course
-        this.mvc.perform(put("/api/course").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getCreateCourseRequest_Json())).andExpect(status().isUnauthorized());
+        perform_Put("/api/course", jwtToken, getCreateCourseRequest_Json()).andExpect(status().isUnauthorized());
         // update course
-        this.mvc.perform(post("/api/course").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getUpdateCourseRequest_Json())).andExpect(status().isUnauthorized());
+        perform_Post("/api/course", jwtToken, getUpdateCourseRequest_Json()).andExpect(status().isUnauthorized());
         //update course presets
-        this.mvc.perform(post("/api/course/presets").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getUpdateCoursePresets_Json())).andExpect(status().isUnauthorized());
+        perform_Post("/api/course/presets", jwtToken, getUpdateCoursePresets_Json()).andExpect(status().isUnauthorized());
         //delete course
-        this.mvc.perform(delete("/api/course/200").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isUnauthorized());
+        perform_Delete("/api/course/200", jwtToken).andExpect(status().isUnauthorized());
         //copy course
-        this.mvc.perform(post("/api/course/copy").header("Authorization", jwtToken)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8").content(getCopyCourseRequest_Json())).andExpect(status().isUnauthorized());
+        perform_Post("/api/course/200", jwtToken, getCopyCourseRequest_Json()).andExpect(status().isUnauthorized());
     }
 
 
     @Test
     public void getCourse_authorized_owner() throws Exception {
+        String jwtToken = prepareForAuthorizedOwner();
+        this.mvc.perform(get("/api/course/200").header("Authorization", jwtToken)
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+    }
+
+    @Test
+    public void getCourse_unauthorized_not_owner() throws Exception {
+        String jwtToken = prepareForUnAuthorizedOwner();
+        this.mvc.perform(get("/api/course/200").header("Authorization", jwtToken)
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getCoursePresented_authorized_owner() throws Exception {
+        String jwtToken = prepareForAuthorizedOwner();
+        this.mvc.perform(get("/api/course/200/presented").header("Authorization", jwtToken)
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+    }
+
+    @Test
+    public void getCoursePresented_unauthorized_not_owner() throws Exception {
+        String jwtToken = prepareForUnAuthorizedOwner();
+        perform_Get("/api/course/200/presented", jwtToken).andExpect(status().isForbidden());
+    }
+
+
+    // create course
+    @Test
+    public void createCourse_forbidden_not_admin() throws Exception {
+        String jwtToken = prepareForAuthorizedOwner();
+        perform_Put("/api/course", jwtToken, getCreateCourseRequest_Json()).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createCourse_invalid_Course_Number() throws Exception {
+        String jwtToken = prepareAdminUser();
+        CreateCourseRequest createCourseRequest = createCreateCourseRequest();
+        createCourseRequest.setNumber("12345679");
+
+        perform_Put("/api/course", jwtToken, mapToJson(createCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("number: must match \"^[0-9]{3}\\.[0-9]{3}$\""))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+
+        createCourseRequest.setNumber(null);
+        perform_Put("/api/course", jwtToken, mapToJson(createCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("number: must not be blank"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+
+        createCourseRequest.setNumber("");
+        perform_Put("/api/course", jwtToken, mapToJson(createCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value(Matchers.containsInAnyOrder("number: must match \"^[0-9]{3}\\.[0-9]{3}$\"", "number: must not be blank")))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+    @Test
+    public void createCourse_SemesterId_Not_Null() throws Exception {
+        String jwtToken = prepareAdminUser();
+        CreateCourseRequest createCourseRequest = createCreateCourseRequest();
+        createCourseRequest.setSemesterId(null);
+
+        perform_Put("/api/course", jwtToken, mapToJson(createCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("semesterId: must not be null"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+    @Test
+    public void createCourse_Name_Not_Blank() throws Exception {
+        String jwtToken = prepareAdminUser();
+        CreateCourseRequest createCourseRequest = createCreateCourseRequest();
+
+        createCourseRequest.setName(null);
+        perform_Put("/api/course", jwtToken, mapToJson(createCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("name: must not be blank"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+
+        createCourseRequest.setName("");
+        perform_Put("/api/course", jwtToken, mapToJson(createCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("name: must not be blank"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+    @Test
+    public void createCourse_Owner_Not_Null() throws Exception {
+        String jwtToken = prepareAdminUser();
+        CreateCourseRequest createCourseRequest = createCreateCourseRequest();
+
+        createCourseRequest.setOwner(null);
+        perform_Put("/api/course", jwtToken, mapToJson(createCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("owner: must not be null"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+
+    // create Course end
+
+    // update course
+    @Test
+    public void updateCourse_authorized_owner() throws Exception {
+        String jwtToken = prepareForAuthorizedOwner();
+        // update course
+        this.mvc.perform(post("/api/course").header("Authorization", jwtToken)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8").content(getUpdateCourseRequest_Json())).andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateCourse_unauthorized_not_owner() throws Exception {
+        String jwtToken = prepareForUnAuthorizedOwner();
+        // update course
+        this.mvc.perform(post("/api/course").header("Authorization", jwtToken)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8").content(getUpdateCourseRequest_Json())).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void updateCourse_Owner_Not_Null() throws Exception {
+        String jwtToken = prepareAdminUser();
+        UpdateCourseRequest updateCourseRequest = createUpdateCourseRequest();
+        updateCourseRequest.setId(null);
+
+        perform_Post("/api/course", jwtToken, mapToJson(updateCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("id: must not be null"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+    @Test
+    public void updateCourse_invalid_Course_Number() throws Exception {
+        String jwtToken = prepareAdminUser();
+        UpdateCourseRequest updateCourseRequest = createUpdateCourseRequest();
+        updateCourseRequest.setNumber("123");
+
+        perform_Post("/api/course", jwtToken, mapToJson(updateCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("number: must match \"^[0-9]{3}\\.[0-9]{3}$\""))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+
+        updateCourseRequest.setNumber(null);
+        perform_Post("/api/course", jwtToken, mapToJson(updateCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("number: must not be blank"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+
+        updateCourseRequest.setNumber("");
+        perform_Post("/api/course", jwtToken, mapToJson(updateCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value(Matchers.containsInAnyOrder("number: must match \"^[0-9]{3}\\.[0-9]{3}$\"", "number: must not be blank")))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+    @Test
+    public void updateCourse_Name_Not_Blank() throws Exception {
+        String jwtToken = prepareAdminUser();
+        UpdateCourseRequest updateCourseRequest = createUpdateCourseRequest();
+        updateCourseRequest.setName(null);
+
+        perform_Post("/api/course", jwtToken, mapToJson(updateCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("name: must not be blank"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+
+        updateCourseRequest.setName("");
+        perform_Post("/api/course", jwtToken, mapToJson(updateCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("name: must not be blank"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+    // update course end
+
+    @Test
+    public void updateCoursePresets_authorized_owner() throws Exception {
+        String jwtToken = prepareForAuthorizedOwner();
+        //update course presets
+        this.mvc.perform(post("/api/course/presets").header("Authorization", jwtToken)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8").content(getUpdateCoursePresets_Json())).andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateCoursePresets_unauthorized_not_owner() throws Exception {
+        String jwtToken = prepareForUnAuthorizedOwner();
+        //update course presets
+        this.mvc.perform(post("/api/course/presets").header("Authorization", jwtToken)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8").content(getUpdateCoursePresets_Json())).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void updateCoursePresets_Id_Not_Null() throws Exception {
+        String jwtToken = prepareAdminUser();
+        UpdateCoursePresets updateCoursePresets = createUpdateCoursePresets();
+        updateCoursePresets.setId(null);
+
+        perform_Post("/api/course/presets", jwtToken, mapToJson(updateCoursePresets))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("id: must not be null"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+    @Test
+    public void updateCoursePresets_Invalid_UploadCount() throws Exception {
+        String jwtToken = prepareAdminUser();
+        UpdateCoursePresets updateCoursePresets = createUpdateCoursePresets();
+        updateCoursePresets.setUploadCount(null);
+
+        perform_Post("/api/course/presets", jwtToken, mapToJson(updateCoursePresets))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("uploadCount: must not be null"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+
+        updateCoursePresets.setUploadCount(-1);
+        perform_Post("/api/course/presets", jwtToken, mapToJson(updateCoursePresets))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("uploadCount: Upload count must be greater or equal 0"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+    @Test
+    public void deleteCourse_unauthorized_not_admin() throws Exception {
+        String jwtToken = prepareForAuthorizedOwner();
+        //delete course
+        this.mvc.perform(delete("/api/course/200").header("Authorization", jwtToken)
+                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void copyCourse_unauthorized_not_admin() throws Exception {
+        String jwtToken = prepareForAuthorizedOwner();
+        //copy course
+        perform_Post("/api/course/copy",jwtToken,getCopyCourseRequest_Json()).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void copyCoursePresets_Invalid_Parameter() throws Exception {
+        String jwtToken = prepareAdminUser();
+        CopyCourseRequest copyCourseRequest = createCopyCourseRequest();
+        copyCourseRequest.setSemesterId(null);
+
+        perform_Post("/api/course/copy", jwtToken, mapToJson(copyCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("semesterId: must not be null"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+
+        copyCourseRequest.setSemesterId(200L);
+        copyCourseRequest.setCourseId(null);
+        perform_Post("/api/course/copy", jwtToken, mapToJson(copyCourseRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("courseId: must not be null"))
+                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
+    }
+
+
+    private String prepareForAuthorizedOwner() {
         User user1 = getUser1();
         Course course = getTestCourse(user1);
         String jwtToken = generateValidUserJWToken(user1);
         when(courseRepository.findById(200L)).thenReturn(Optional.of(course));
         when(userRepository.findByUsername(user1.getUsername())).thenReturn(Optional.of(user1));
-
-        // get Course
-        this.mvc.perform(get("/api/course/200").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-
+        return jwtToken;
     }
 
-    @Test
-    public void getCourse_unauthorized_not_owner() throws Exception {
+    private String prepareForUnAuthorizedOwner() {
         User user1 = getUser1();
         User user2 = getUser2();
         Course course = getTestCourse(user1);
@@ -211,16 +430,19 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
         when(courseRepository.findById(200L)).thenReturn(Optional.of(course));
         when(userRepository.findByUsername(user1.getUsername())).thenReturn(Optional.of(user1));
         when(userRepository.findByUsername(user2.getUsername())).thenReturn(Optional.of(user2));
+        return jwtToken;
+    }
 
-        // get Course
-        this.mvc.perform(get("/api/course/200").header("Authorization", jwtToken)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden());
+    private String prepareAdminUser() {
+        String jwtToken = generateValidAdminJWToken();
+        User adminUser = getAdminUser();
+        when(userRepository.findByUsername(adminUser.getUsername())).thenReturn(Optional.of(adminUser));
 
+        return jwtToken;
     }
 
 
-    private Course getTestCourse(User user)
-    {
+    private Course getTestCourse(User user) {
         Course course = new Course();
         course.setId((long) 200);
         course.setDescription("dd");
@@ -237,8 +459,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
     }
 
 
-    private User getUser1()
-    {
+    private User getUser1() {
         User user = new User();
         user.setForename("user1_forename");
         user.setSurname("user1_surname");
@@ -249,8 +470,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
         return user;
     }
 
-    private User getUser2()
-    {
+    private User getUser2() {
         User user = new User();
         user.setForename("user2_forename");
         user.setSurname("user2_surname");
@@ -261,8 +481,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
         return user;
     }
 
-    private User getAdminUser()
-    {
+    private User getAdminUser() {
         User user = new User();
         user.setForename("admin");
         user.setSurname("admin");
@@ -273,26 +492,11 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
         return user;
     }
 
-    private void mockSecurityContext_WithUserDetails(UserDetailsImpl userDetails)
-    {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
-    }
-
-    private UserDetailsImpl getUserDetails_Admin()
-    {
-        UserDetailsImpl userDetails = new UserDetailsImpl("admin","admin", Boolean.TRUE, adminMatriculationNumber,"admin","admin" );
-
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("Admin"));
-        userDetails.setAuthorities(authorities);
-        return userDetails;
-    }
-
     private String getCreateCourseRequest_Json() throws JsonProcessingException {
+        return mapToJson(createCreateCourseRequest());
+    }
+
+    private CreateCourseRequest createCreateCourseRequest() {
         CreateCourseRequest createCourseRequest = new CreateCourseRequest();
         createCourseRequest.setNumber("123.333");
         createCourseRequest.setDescription("");
@@ -301,10 +505,11 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
         createCourseRequest.setOwner("2000000");
         createCourseRequest.setSemesterId(200L);
         createCourseRequest.setName("dd");
-        return mapToJson(createCourseRequest);
+
+        return createCourseRequest;
     }
 
-    private String getUpdateCourseRequest_Json() throws JsonProcessingException {
+    private UpdateCourseRequest createUpdateCourseRequest() {
         UpdateCourseRequest updateCourseRequest = new UpdateCourseRequest();
         updateCourseRequest.setNumber("123.333");
         updateCourseRequest.setDescription("");
@@ -313,23 +518,36 @@ public class CourseControllerUnitTests extends AbstractControllerTest{
         updateCourseRequest.setOwner("2000000");
         updateCourseRequest.setName("dd");
         updateCourseRequest.setId(200L);
-        return mapToJson(updateCourseRequest);
+
+        return updateCourseRequest;
+    }
+
+    private String getUpdateCourseRequest_Json() throws JsonProcessingException {
+        return mapToJson(createUpdateCourseRequest());
     }
 
     private String getCopyCourseRequest_Json() throws JsonProcessingException {
+        return mapToJson(createCopyCourseRequest());
+    }
+
+    private CopyCourseRequest createCopyCourseRequest()
+    {
         CopyCourseRequest copyCourseRequest = new CopyCourseRequest();
         copyCourseRequest.setCourseId(200L);
         copyCourseRequest.setSemesterId(200L);
 
-        return mapToJson(copyCourseRequest);
+        return copyCourseRequest;
     }
 
-    private String getUpdateCoursePresets_Json() throws JsonProcessingException {
+    private UpdateCoursePresets createUpdateCoursePresets() {
         UpdateCoursePresets updateCoursePresets = new UpdateCoursePresets();
         updateCoursePresets.setDescription("");
         updateCoursePresets.setUploadCount(20);
         updateCoursePresets.setId(200L);
+        return updateCoursePresets;
+    }
 
-        return mapToJson(updateCoursePresets);
+    private String getUpdateCoursePresets_Json() throws JsonProcessingException {
+        return mapToJson(createUpdateCoursePresets());
     }
 }

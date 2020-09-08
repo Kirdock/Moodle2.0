@@ -6,11 +6,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 public class AbstractControllerTest {
 
@@ -22,6 +28,34 @@ public class AbstractControllerTest {
 
     @Value("${jwtExpirationMs}")
     protected int jwtExpirationMs;
+
+
+    @Autowired
+    protected MockMvc mvc;
+
+
+    protected ResultActions perform_Put(String uri, String jwtToken, String content) throws Exception {
+        return this.mvc.perform(put(uri).header("Authorization",jwtToken)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8").content(content));
+    }
+
+    protected ResultActions perform_Post(String uri, String jwtToken, String content) throws Exception {
+        return this.mvc.perform(post(uri).header("Authorization",jwtToken)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8").content(content));
+    }
+
+    protected ResultActions perform_Get(String uri, String jwtToken) throws Exception {
+        return this.mvc.perform(get(uri).header("Authorization",jwtToken)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+    }
+
+    protected ResultActions perform_Delete(String uri, String jwtToken) throws Exception {
+        return this.mvc.perform(delete(uri).header("Authorization",jwtToken)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8"));
+    }
 
     protected String  generateValidAdminJWToken()
     {
