@@ -79,7 +79,7 @@ public class UserService  extends AbstractService{
     public void registerUser(SignUpRequest signUpRequest) throws ServiceException
     {
         if (userRepository.existsByMatriculationNumber(signUpRequest.getMatriculationNumber())) {
-            throw new ServiceException("Error: User with this matriculationNumber already exists!", ApiErrorResponseCodes.MATRICULACTIONNUMBER_ALREADY_EXISTS);
+            throw new ServiceException("Error: User with this matriculationNumber already exists!", ApiErrorResponseCodes.MATRICULATION_NUMBER_ALREADY_EXISTS);
         }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             throw new ServiceException("Error: User with this username already exists!",ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
