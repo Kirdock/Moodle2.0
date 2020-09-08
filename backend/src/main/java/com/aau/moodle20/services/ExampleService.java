@@ -189,7 +189,7 @@ public class ExampleService extends AbstractService{
         String fileName = validatorFile.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
         if(fileName!=null) {
-            if (!FileConstants.JarFileExtension.equals(extension))
+            if (!FileConstants.JAR_FILE_EXTENSION.equals(extension))
                 throw new ServiceException("Error: Not a jar File!");
         }
         ValidatorHandler loader = new ValidatorHandler();
@@ -249,6 +249,6 @@ public class ExampleService extends AbstractService{
 
     protected String getValidatorFilePath(Example example)
     {
-        return FileConstants.validatorDir + createExampleAttachmentDir(example);
+        return FileConstants.VALIDATOR_DIR + createExampleAttachmentDir(example);
     }
 }

@@ -51,7 +51,7 @@ public class ValidatorHandler {
 
     public void checkValidatorFile(MultipartFile file,Long exampleId) throws IOException, ClassNotFoundException {
 
-        String filePath = FileConstants.validatorTestDir +"/"+file.getOriginalFilename() ;
+        String filePath = FileConstants.VALIDATOR_TEST_DIR +"/"+file.getOriginalFilename() ;
         File fileValidatorTest = new File(filePath);
         if(fileValidatorTest.exists())
             fileValidatorTest.delete();

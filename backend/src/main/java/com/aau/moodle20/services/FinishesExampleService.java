@@ -158,7 +158,7 @@ public class FinishesExampleService extends AbstractService{
 
     protected List<? extends Violation> executeValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
         List<? extends Violation> violations = new ArrayList<>();
-        String validatorDir = FileConstants.validatorDir + createExampleAttachmentDir(example);
+        String validatorDir = FileConstants.VALIDATOR_DIR + createExampleAttachmentDir(example);
         validatorDir = validatorDir + "/"+ example.getValidator();
 
         ValidatorHandler validationLoader = new ValidatorHandler();
@@ -255,7 +255,7 @@ public class FinishesExampleService extends AbstractService{
             return;
 
         String userDir = "/" + finishesExample.getId().getMatriculationNumber();
-        String filePath = FileConstants.attachmentsDir + createExampleAttachmentDir(finishesExample.getExample()) + userDir;
+        String filePath = FileConstants.ATTACHMENTS_DIR + createExampleAttachmentDir(finishesExample.getExample()) + userDir;
 
         Path path = Paths.get(filePath+"/"+finishesExample.getFileName());
 
@@ -265,7 +265,7 @@ public class FinishesExampleService extends AbstractService{
     protected String createUserExampleAttachmentDir(Example example)
     {
         String userDir = "/" + getUserDetails().getMatriculationNumber();
-        return FileConstants.attachmentsDir + createExampleAttachmentDir(example) + userDir;
+        return FileConstants.ATTACHMENTS_DIR + createExampleAttachmentDir(example) + userDir;
     }
 
     public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceException {
