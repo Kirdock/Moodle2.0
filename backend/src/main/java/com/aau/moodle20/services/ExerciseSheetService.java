@@ -100,6 +100,7 @@ public class ExerciseSheetService extends AbstractService{
         Comparator<UserInCourse> userInCourseComparatorMatriculationNumber = Comparator.comparing(userInCourse -> userInCourse.getUser().getMatriculationNumber());
 
         List<UserInCourse> sortedUserInCourse = exerciseSheet.getCourse().getStudents().stream()
+                .filter(userInCourse -> ECourseRole.Student.equals(userInCourse.getRole()))
                 .sorted(userInCourseComparatorSureName.thenComparing(userInCourseComparatorForename).thenComparing(userInCourseComparatorMatriculationNumber))
                 .collect(Collectors.toList());
         for(UserInCourse userInCourse: sortedUserInCourse)
