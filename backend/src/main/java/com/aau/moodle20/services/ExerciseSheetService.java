@@ -114,6 +114,7 @@ public class ExerciseSheetService extends AbstractService{
             response.getKreuzel().add(kreuzelCourseResponse);
         }
 
+        response.getKreuzel().sort(Comparator.comparing(KreuzelCourseResponse::getMatriculationNumber));
     return response;
     }
 
