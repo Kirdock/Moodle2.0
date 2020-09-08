@@ -3,12 +3,10 @@ package com.aau.moodle20.entity;
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 

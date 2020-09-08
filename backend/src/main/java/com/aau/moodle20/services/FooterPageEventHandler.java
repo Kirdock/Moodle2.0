@@ -1,11 +1,9 @@
 package com.aau.moodle20.services;
 
-import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
-import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;

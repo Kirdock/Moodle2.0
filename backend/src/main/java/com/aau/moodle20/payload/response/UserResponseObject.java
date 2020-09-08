@@ -3,9 +3,6 @@ package com.aau.moodle20.payload.response;
 import com.aau.moodle20.constants.ECourseRole;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseObject {
 

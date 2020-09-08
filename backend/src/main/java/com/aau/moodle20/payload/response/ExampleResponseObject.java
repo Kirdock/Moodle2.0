@@ -1,8 +1,6 @@
 package com.aau.moodle20.payload.response;
 
 import com.aau.moodle20.constants.EFinishesExampleState;
-import com.aau.moodle20.entity.Example;
-import com.aau.moodle20.entity.ViolationHistory;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;

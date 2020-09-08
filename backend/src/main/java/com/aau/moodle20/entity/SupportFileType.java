@@ -1,8 +1,6 @@
 package com.aau.moodle20.entity;
 
-import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
-import com.aau.moodle20.entity.embeddable.UserCourseKey;
 
 import javax.persistence.*;
 

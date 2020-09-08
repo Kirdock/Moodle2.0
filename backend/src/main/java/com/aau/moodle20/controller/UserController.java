@@ -1,8 +1,14 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.exception.UserException;
-import com.aau.moodle20.payload.request.*;
-import com.aau.moodle20.payload.response.*;
+import com.aau.moodle20.payload.request.ChangePasswordRequest;
+import com.aau.moodle20.payload.request.LoginRequest;
+import com.aau.moodle20.payload.request.SignUpRequest;
+import com.aau.moodle20.payload.request.UpdateUserRequest;
+import com.aau.moodle20.payload.response.JwtResponse;
+import com.aau.moodle20.payload.response.MessageResponse;
+import com.aau.moodle20.payload.response.RegisterMultipleUserResponse;
+import com.aau.moodle20.payload.response.UserResponseObject;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import com.aau.moodle20.services.UserService;
 import org.springframework.http.ResponseEntity;

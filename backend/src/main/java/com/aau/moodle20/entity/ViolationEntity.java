@@ -1,7 +1,6 @@
 package com.aau.moodle20.entity;
 
 import com.aau.moodle20.payload.response.ViolationResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;

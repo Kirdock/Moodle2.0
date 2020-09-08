@@ -1,8 +1,9 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
-import com.aau.moodle20.exception.*;
-import com.aau.moodle20.payload.response.MessageResponse;
+import com.aau.moodle20.exception.ApiError;
+import com.aau.moodle20.exception.ServiceException;
+import com.aau.moodle20.exception.UserException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +20,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 

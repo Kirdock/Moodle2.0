@@ -1,7 +1,8 @@
 package com.aau.moodle20.security.jwt;
 
 import com.aau.moodle20.services.UserDetailsImpl;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

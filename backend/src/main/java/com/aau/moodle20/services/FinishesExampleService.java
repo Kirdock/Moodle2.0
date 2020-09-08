@@ -13,7 +13,6 @@ import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
 import com.aau.moodle20.validation.ValidatorHandler;
-import com.aau.moodle20.entity.ViolationEntity;
 import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,5 @@
 package com.aau.moodle20.payload.response;
 
-import java.util.List;
-
 public class JwtResponse {
 
     private String token;

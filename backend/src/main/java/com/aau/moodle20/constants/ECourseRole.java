@@ -1,7 +1,6 @@
 package com.aau.moodle20.constants;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.hibernate.cfg.Environment;
 
 public enum ECourseRole {
 

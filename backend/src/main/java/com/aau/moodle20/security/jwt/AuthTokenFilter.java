@@ -1,7 +1,6 @@
 package com.aau.moodle20.security.jwt;
 
 import com.aau.moodle20.services.UserDetailsServiceImpl;
-import com.aau.moodle20.services.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;

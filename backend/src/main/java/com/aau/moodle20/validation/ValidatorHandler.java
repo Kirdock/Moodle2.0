@@ -4,16 +4,12 @@ package com.aau.moodle20.validation;
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.exception.ServiceException;
-import org.apache.commons.io.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 import validation.IValidator;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;

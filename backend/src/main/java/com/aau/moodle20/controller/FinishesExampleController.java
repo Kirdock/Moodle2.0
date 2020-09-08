@@ -7,7 +7,6 @@ import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.MessageResponse;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
-import com.aau.moodle20.payload.response.ViolationResponse;
 import com.aau.moodle20.services.FinishesExampleService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;

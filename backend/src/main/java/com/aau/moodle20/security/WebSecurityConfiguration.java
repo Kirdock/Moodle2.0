@@ -4,7 +4,6 @@ package com.aau.moodle20.security;
 import com.aau.moodle20.security.jwt.AuthEntryPointJwt;
 import com.aau.moodle20.security.jwt.AuthTokenFilter;
 import com.aau.moodle20.services.UserDetailsServiceImpl;
-import com.aau.moodle20.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;

@@ -1,14 +1,13 @@
 package com.aau.moodle20.entity;
 
-import com.aau.moodle20.constants.ECourseRole;
-import com.aau.moodle20.payload.response.AssignedStudent;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
-import com.aau.moodle20.payload.response.UserPresentedResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
