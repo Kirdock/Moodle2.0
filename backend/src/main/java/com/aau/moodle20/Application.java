@@ -45,16 +45,16 @@ public class Application implements ApplicationRunner, ErrorController {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		if (!userRepository.existsByUsername(adminUserName)) {
+		if (Boolean.FALSE.equals(userRepository.existsByUsername(adminUserName))) {
 			userRepository.save(new User(adminUserName,adminMatriculationNumber,adminUserName, adminPassword, encoder.encode(adminPassword), Boolean.TRUE) );
 		}
-		if (!fileTypeRepository.existsByName("Word")) {
+		if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Word"))) {
 			fileTypeRepository.save(new FileType("Word", "application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
 		}
-		if (!fileTypeRepository.existsByName("Excel")) {
+		if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Excel"))) {
 			fileTypeRepository.save(new FileType("Excel", "application/msexcel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
 		}
-		if (!fileTypeRepository.existsByName("Archiv-Dateien")) {
+		if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Archiv-Dateien"))) {
 			fileTypeRepository.save(new FileType("Archiv-Dateien", "*.zip, *.rar"));
 		}
 	}
