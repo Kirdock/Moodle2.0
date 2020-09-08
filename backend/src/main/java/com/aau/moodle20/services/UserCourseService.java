@@ -46,7 +46,7 @@ public class UserCourseService extends AbstractService {
         Course course = readCourse(courseId);
         User currentUser = getCurrentUser();
         Boolean isCourseAssigned = currentUser.getCourses().stream()
-                .filter(userInCourse -> !ECourseRole.None.equals(userInCourse.getRole()))
+                .filter(userInCourse -> !ECourseRole.NONE.equals(userInCourse.getRole()))
                 .anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
         if (!isCourseAssigned)
             throw new ServiceException("Error: User is not assigned to this course!", HttpStatus.UNAUTHORIZED);
@@ -88,7 +88,7 @@ public class UserCourseService extends AbstractService {
             userInCourse.setId(userCourseKey);
             userInCourses.add(userInCourse);
 
-            if(ECourseRole.None.equals(userInCourse.getRole()))
+            if(ECourseRole.NONE.equals(userInCourse.getRole()))
                 clearUserInfo(userInCourse);
         }
         userInCourseRepository.saveAll(userInCourses);
@@ -99,7 +99,7 @@ public class UserCourseService extends AbstractService {
         List<FinishesExample> finishesExamplesToBeDeleted = new ArrayList<>();
         Optional<UserInCourse> optionalUserInCourse = userInCourseRepository.findByUser_MatriculationNumberAndCourse_Id(userInCourse.getId().getMatriculationNumber(), userInCourse.getId().getCourseId());
         // check if user_course assigment role was set to none -> user was removed from course -> delete course related info
-        if (optionalUserInCourse.isPresent() && !ECourseRole.None.equals(optionalUserInCourse.get().getRole()) && ECourseRole.None.equals(userInCourse.getRole())) {
+        if (optionalUserInCourse.isPresent() && !ECourseRole.NONE.equals(optionalUserInCourse.get().getRole()) && ECourseRole.NONE.equals(userInCourse.getRole())) {
             User user = readUser(userInCourse.getId().getMatriculationNumber());
             for (FinishesExample finishesExample : user.getFinishedExamples()) {
                 if (userInCourse.getId().getCourseId().equals(finishesExample.getExample().getExerciseSheet().getCourse().getId()))
@@ -127,7 +127,7 @@ public class UserCourseService extends AbstractService {
             userCourseKey.setCourseId(courseId);
             userCourseKey.setMatriculationNumber(user.getMatriculationNumber());
 
-            userInCourse.setRole(ECourseRole.Student);
+            userInCourse.setRole(ECourseRole.STUDENT);
             userInCourse.setUser(user);
             userInCourse.setCourse(course);
             userInCourse.setId(userCourseKey);

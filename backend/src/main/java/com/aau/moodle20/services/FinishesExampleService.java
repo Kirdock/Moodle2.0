@@ -379,7 +379,7 @@ public class FinishesExampleService extends AbstractService{
         Long courseId = course.getId();
         if (optionalUser.isPresent()) {
             hasPermission = optionalUser.get().getCourses().stream()
-                    .filter(userInCourse -> !ECourseRole.None.equals(userInCourse.getRole()))
+                    .filter(userInCourse -> !ECourseRole.NONE.equals(userInCourse.getRole()))
                     .anyMatch(userInCourse -> userInCourse.getId().getCourseId().equals(courseId));
         }
         return hasPermission;

@@ -246,12 +246,12 @@ public class UserService  extends AbstractService{
             if (optionalUserInCourse.isPresent()) {
                 responseObject.setCourseRole(optionalUserInCourse.get().getRole());
                 // add presented examples of user
-                if(ECourseRole.Student.equals(optionalUserInCourse.get().getRole())) {
+                if(ECourseRole.STUDENT.equals(optionalUserInCourse.get().getRole())) {
                     responseObject.setPresentedCount(getPresentedExamplesCount(user,optionalUserInCourse.get().getCourse()));
                 }
             }
             else
-                responseObject.setCourseRole(ECourseRole.None);
+                responseObject.setCourseRole(ECourseRole.NONE);
             userResponseObjectList.add(responseObject);
         }
 

@@ -100,7 +100,7 @@ public class ExerciseSheetService extends AbstractService{
         Comparator<UserInCourse> userInCourseComparatorMatriculationNumber = Comparator.comparing(userInCourse -> userInCourse.getUser().getMatriculationNumber());
 
         List<UserInCourse> sortedUserInCourse = exerciseSheet.getCourse().getStudents().stream()
-                .filter(userInCourse -> ECourseRole.Student.equals(userInCourse.getRole()))
+                .filter(userInCourse -> ECourseRole.STUDENT.equals(userInCourse.getRole()))
                 .sorted(userInCourseComparatorSureName.thenComparing(userInCourseComparatorForename).thenComparing(userInCourseComparatorMatriculationNumber))
                 .collect(Collectors.toList());
         for(UserInCourse userInCourse: sortedUserInCourse)
@@ -206,7 +206,7 @@ public class ExerciseSheetService extends AbstractService{
         if (!userDetails.getAdmin()) {
             boolean isOwner = course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber());
             boolean isStudentInCourse = course.getStudents().stream()
-                    .anyMatch(userInCourse -> userInCourse.getRole().equals(ECourseRole.Student) && userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
+                    .anyMatch(userInCourse -> userInCourse.getRole().equals(ECourseRole.STUDENT) && userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
             if (!isOwner && !isStudentInCourse)
                 throw new ServiceException("Error: not authorized to access exerciseSheets", HttpStatus.UNAUTHORIZED);
         }

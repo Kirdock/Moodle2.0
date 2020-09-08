@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ECourseRole {
 
-    Lecturer("l"),
-    Student("s"),
-    Teacher("t"),
-    None("n");
+    LECTURER("l"),
+    STUDENT("s"),
+    TEACHER("t"),
+    NONE("n");
 
     private String role;
 

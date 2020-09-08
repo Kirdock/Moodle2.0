@@ -233,7 +233,7 @@ public class PdfService extends AbstractService {
 
         for (UserInCourse userInCourse : userInCourses) {
 
-            if (!ECourseRole.Student.equals(userInCourse.getRole()))
+            if (!ECourseRole.STUDENT.equals(userInCourse.getRole()))
                 continue;
 
             table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(), TextAlignment.LEFT));
@@ -321,7 +321,7 @@ public class PdfService extends AbstractService {
 
         for (UserInCourse userInCourse : sortedUserInCourse) {
 
-            if (!ECourseRole.Student.equals(userInCourse.getRole()))
+            if (!ECourseRole.STUDENT.equals(userInCourse.getRole()))
                 continue;
 
             table.addCell(createCell(userInCourse.getUser().getMatriculationNumber(), TextAlignment.LEFT));
