@@ -9,7 +9,7 @@ public class UpdateCoursePresets {
     private Long id;
     private String description;
     @NotNull
-    @Min(value = 0, message = "Upload count must greater or equal 0")
+    @Min(value = 0, message = "Upload count must be greater or equal 0")
     private Integer uploadCount;
 
     public Long getId() {
