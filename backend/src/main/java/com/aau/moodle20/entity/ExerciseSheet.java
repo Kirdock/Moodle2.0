@@ -171,7 +171,7 @@ public class ExerciseSheet {
                 Boolean hasFinishedExample = example.getExamplesFinishedByUser().stream()
                         .anyMatch(finishesExample -> finishesExample.getId().getMatriculationNumber().equals(matriculationNumber)
                                 && (EFinishesExampleState.YES.equals(finishesExample.getState()) || EFinishesExampleState.MAYBE.equals(finishesExample.getState())));
-                if (hasFinishedExample) {
+                if (Boolean.TRUE.equals(hasFinishedExample)) {
                     kreuzel++;
                     points = points + (example.getPoints() * example.getWeighting());
                 }
