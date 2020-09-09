@@ -330,7 +330,7 @@ public class UserService  extends AbstractService{
             throw new ServiceException("Error: Root admin cannot be updated!");
 
         User user = readUser(matriculationNumber);
-        boolean hasEmailChanged = !updateUserRequest.equals(user.getEmail());
+        boolean hasEmailChanged = !updateUserRequest.getEmail().equals(user.getEmail());
         user.setEmail(updateUserRequest.getEmail());
         user.setSurname(updateUserRequest.getSurname());
         user.setForename(updateUserRequest.getForename());
