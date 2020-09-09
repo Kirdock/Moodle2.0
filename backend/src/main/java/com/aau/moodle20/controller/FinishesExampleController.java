@@ -33,13 +33,13 @@ public class FinishesExampleController {
     }
 
     @PostMapping(path = "/user/kreuzel")
-    public ResponseEntity<?> setKreuzelUser(@Valid @RequestBody List<UserKreuzelRequest> userKreuzelRequests) {
+    public ResponseEntity<MessageResponse> setKreuzelUser(@Valid @RequestBody List<UserKreuzelRequest> userKreuzelRequests) {
         finishesExampleService.setKreuzelUser(userKreuzelRequests);
         return ResponseEntity.ok(new MessageResponse("Kreuzel were successfully set!"));
     }
 
     @PostMapping(path = "/user/kreuzelMulti")
-    public ResponseEntity<?> setKreuzelUserMulti(@Valid @RequestBody List<UserKreuzeMultilRequest> userKreuzelRequests) {
+    public ResponseEntity<MessageResponse> setKreuzelUserMulti(@Valid @RequestBody List<UserKreuzeMultilRequest> userKreuzelRequests) {
         finishesExampleService.setKreuzelUserMulti(userKreuzelRequests);
         return ResponseEntity.ok(new MessageResponse("Kreuzel of users were successfully set!"));
     }
@@ -65,7 +65,7 @@ public class FinishesExampleController {
 
     @PreAuthorize("hasPermission(#userExamplePresentedRequest.exampleId, 'Example', 'update')")
     @PostMapping(path = "/user/examplePresented")
-    public ResponseEntity<?> setUserExamplePresented(@Valid @RequestBody UserExamplePresentedRequest userExamplePresentedRequest) {
+    public ResponseEntity<MessageResponse> setUserExamplePresented(@Valid @RequestBody UserExamplePresentedRequest userExamplePresentedRequest) {
         finishesExampleService.setUserExamplePresented(userExamplePresentedRequest);
         return ResponseEntity.ok(new MessageResponse("Presented flag was successfully updated!"));
     }
