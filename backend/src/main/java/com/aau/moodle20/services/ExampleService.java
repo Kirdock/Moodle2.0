@@ -187,8 +187,8 @@ public class ExampleService extends AbstractService{
     public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
         Example example = readExample(exampleId);
         String fileName = validatorFile.getOriginalFilename();
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
         if(fileName!=null) {
+            String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
             if (!FileConstants.JAR_FILE_EXTENSION.equals(extension))
                 throw new ServiceException("Error: Not a jar File!");
         }
