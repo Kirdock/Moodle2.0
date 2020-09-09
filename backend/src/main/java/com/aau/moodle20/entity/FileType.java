@@ -17,7 +17,7 @@ public class FileType {
     private String name;
 
     @OneToMany(mappedBy = "fileType", fetch = FetchType.LAZY)
-    Set<SupportFileType> assignedExamples; 
+    Set<SupportFileType> assignedExamples;
 
 
     public FileType() {

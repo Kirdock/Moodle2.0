@@ -41,10 +41,6 @@ public class FinishesExample {
     @OneToMany(mappedBy = "finishesExample", fetch = FetchType.LAZY)
     private Set<ViolationHistory> violationHistories;
 
-    public FinishesExample()
-    {
-    }
-
     public FinishesExampleKey getId() {
         return id;
     }
