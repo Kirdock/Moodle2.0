@@ -47,7 +47,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ClassNotFoundException.class)
     protected ResponseEntity<Object> handleClassNotFoundException(ClassNotFoundException ex) {
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         errors.add("ClassNotFoundException");
         ApiError apiError =
                 new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
@@ -56,7 +56,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         ApiError apiError =
                 new ApiError(HttpStatus.BAD_REQUEST, "NullPointerException occured", errors);
         return  ResponseEntity.status(apiError.getStatus()).body(apiError);
@@ -64,7 +64,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
-        List<String> errors = new ArrayList<String>();
         ApiError apiError = new ApiError(
                 HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), "error occurred");
         return  ResponseEntity.status(apiError.getStatus()).body(apiError);
@@ -72,7 +71,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.add(error.getField() + ": " + error.getDefaultMessage());
         }
@@ -111,7 +110,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ApiError apiError = new ApiError(HttpStatus.METHOD_NOT_ALLOWED,
                 ex.getLocalizedMessage(), builder.toString(),ApiErrorResponseCodes.API_NOT_FOUND);
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), apiError.getStatus());
     }
 
@@ -123,7 +122,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         apiError = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "error occurred");
 
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), apiError.getStatus());
     }
 }
