@@ -14,13 +14,13 @@
                     <i-input id="year" class="form-control"  :max="maxYear" :min="maxYear-100" v-model="semesterInfo.year" required></i-input>
                 </div>
                 <div class="form-check">
-                    <input id="typeSummer" type="radio" value="s" class="form-check-input"  v-model="semesterInfo.type">
+                    <input id="typeSummer" type="radio" value="S" class="form-check-input"  v-model="semesterInfo.type">
                     <label for="typeSummer" class="form-check-label">
                         {{$t('semester.summer')}}
                     </label>
                 </div>
                 <div class="form-check">
-                    <input id="typeWinter" type="radio" value="w" class="form-check-input"  v-model="semesterInfo.type">
+                    <input id="typeWinter" type="radio" value="W" class="form-check-input"  v-model="semesterInfo.type">
                     <label for="typeWinter"   class="form-check-label" style="margin-right:15px">
                         {{$t('semester.winter')}}
                     </label>
@@ -45,7 +45,7 @@ export default {
             maxYear: new Date().getFullYear(),
             semesterInfo: {
                 year: new Date().getFullYear(),
-                type: new Date().getMonth() > 1 && new Date().getMonth() < 9 ? 's' : 'w'
+                type: new Date().getMonth() > 1 && new Date().getMonth() < 9 ? 'S' : 'W'
             }
         }
     },

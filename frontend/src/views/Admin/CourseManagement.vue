@@ -13,7 +13,7 @@
                     <label for="courseSemester_edit" class="control-label">{{ $t('semester.name') }}</label>
                     <select class="form-control" v-model="selectedSemester_edit" id="courseSemester_edit" @change="getCourses(selectedSemester_edit); selectedCourse = {}; selectedCourseId = undefined;">
                         <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
-                            {{semester.year}} {{semester.type === 'w' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
+                            {{semester.year}} {{semester.type === 'W' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
                         </option>
                     </select>
                 </div>
@@ -49,7 +49,7 @@
                     <label for="selectedSemester_copy_course" class="control-label">{{ $t('semester.name') }}</label>
                     <select class="form-control" v-model="courseCopyId" id="selectedSemester_copy_course">
                         <option v-for="semester in semestersWithoutSelected" :value="semester.id" :key="semester.id">
-                            {{semester.year}} {{semester.type === 'w' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
+                            {{semester.year}} {{semester.type === 'W' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
                         </option>
                     </select>
                 </b-modal>

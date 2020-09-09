@@ -331,6 +331,9 @@ module.exports = {
             .closeToast();
         }
     },
+    'upload CSV file admin': function(browser) {
+        this["upload CSV file"](browser, true);
+    },
     'upload CSV file': function(browser, isAdmin = false) {
         const page = browser.page.userManagement();
         const creation = page.section.creation;
@@ -356,9 +359,6 @@ module.exports = {
         for(const user of users){
             userRightCreated(browser, user)
         }
-    },
-    'upload CSV file admin': function(browser) {
-        this["upload CSV file"](browser, true);
     },
     'Edit: invalid input': function(browser) {
         const page = browser.page.userManagement();

@@ -23,7 +23,7 @@ module.exports = {
                 });
             },
             checkKreuzelInfo(kreuzelInfo, bySystem){
-                if(typeof kreuzelInfo.type === "boolean"){
+                if(typeof kreuzelInfo.type === 'boolean'){
                     const validation = this.expect.element({
                         selector: this.kreuzel(kreuzelInfo.name, kreuzelInfo.isSubExample),
                         locateStrategy: 'xpath'

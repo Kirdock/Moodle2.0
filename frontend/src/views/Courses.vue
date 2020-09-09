@@ -5,7 +5,7 @@
             <label for="semester" class="control-label">{{ $t('semester.name') }}</label>
             <select class="form-control" v-model="selectedSemester" id="semester" @change="getCourses(selectedSemester)">
                 <option v-for="semester in semesters" :value="semester.id" :key="semester.id">
-                    {{semester.year}} {{semester.type === 'w' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
+                    {{semester.year}} {{semester.type === 'W' ? $t('semester.winterShortcut') : $t('semester.summerShortcut')}}
                 </option>
             </select>
         </div>
