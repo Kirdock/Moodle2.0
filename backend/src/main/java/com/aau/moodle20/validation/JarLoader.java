@@ -22,13 +22,18 @@ public class JarLoader  extends ClassLoader {
         try {
             return super.loadClass(name);
         } catch (ClassNotFoundException ex) {
-            return getClassFromJar(name);
+            try {
+                return getClassFromJar(name);
+            } catch (IOException e) {
+                throw new ClassNotFoundException(name, ex);
+            }
         }
     }
 
-    private Class<?> getClassFromJar(String name) throws ClassNotFoundException {
+    private Class<?> getClassFromJar(String name) throws ClassNotFoundException, IOException {
+        JarFile jarFile = null;
         try {
-            JarFile jarFile = new JarFile(this.jarDirectory);
+            jarFile = new JarFile(this.jarDirectory);
             Class<?> newClass = null;
             Enumeration<JarEntry> en = jarFile.entries();
             while (en.hasMoreElements()) {
@@ -48,10 +53,13 @@ public class JarLoader  extends ClassLoader {
             if (newClass == null)
                 throw new ClassNotFoundException(name);
 
-            jarFile.close();
             return newClass;
         } catch (IOException ex) {
             throw new ClassNotFoundException(name, ex);
+        }
+        finally {
+            if (jarFile != null)
+                jarFile.close();
         }
     }
 
