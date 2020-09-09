@@ -45,9 +45,6 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
     @MockBean
     private CourseRepository courseRepository;
 
-    @MockBean
-    private UserRepository userRepository;
-
 
     @Before
     public void mockCourseService_Methods() throws IOException {
@@ -422,13 +419,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
         return jwtToken;
     }
 
-    private String prepareAdminUser() {
-        String jwtToken = generateValidAdminJWToken();
-        User adminUser = getAdminUser();
-        when(userRepository.findByUsername(adminUser.getUsername())).thenReturn(Optional.of(adminUser));
 
-        return jwtToken;
-    }
 
 
     private Course getTestCourse(User user) {
@@ -470,16 +461,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
         return user;
     }
 
-    private User getAdminUser() {
-        User user = new User();
-        user.setForename("admin");
-        user.setSurname("admin");
-        user.setUsername("admin");
-        user.setAdmin(Boolean.TRUE);
-        user.setMatriculationNumber(adminMatriculationNumber);
 
-        return user;
-    }
 
     private String getCreateCourseRequest_Json() throws JsonProcessingException {
         return mapToJson(createCreateCourseRequest());

@@ -1,6 +1,7 @@
 package com.aau.moodle20;
 
 import com.aau.moodle20.entity.User;
+import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +9,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -15,7 +17,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Optional;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 public class AbstractControllerTest {
@@ -29,6 +33,9 @@ public class AbstractControllerTest {
     @Value("${jwtExpirationMs}")
     protected int jwtExpirationMs;
 
+
+    @MockBean
+    protected UserRepository userRepository;
 
     @Autowired
     protected MockMvc mvc;
@@ -69,6 +76,26 @@ public class AbstractControllerTest {
                 .claim(JwtUtils.CLAIM_SURNAME,"admin")
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
+    }
+
+
+    protected String prepareAdminUser() {
+        String jwtToken = generateValidAdminJWToken();
+        User adminUser = getAdminUser();
+        when(userRepository.findByUsername(adminUser.getUsername())).thenReturn(Optional.of(adminUser));
+
+        return jwtToken;
+    }
+
+    protected User getAdminUser() {
+        User user = new User();
+        user.setForename("admin");
+        user.setSurname("admin");
+        user.setUsername("admin");
+        user.setAdmin(Boolean.TRUE);
+        user.setMatriculationNumber(adminMatriculationNumber);
+
+        return user;
     }
 
     protected String  generateValidUserJWToken(User user)
