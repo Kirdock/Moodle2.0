@@ -65,35 +65,35 @@ public class ExampleController {
     }
     @PreAuthorize("hasPermission(#updateExampleRequest.id, 'Example', 'update')")
     @PostMapping(value = "/example")
-    public ResponseEntity<?> updateExample(@Valid @RequestBody UpdateExampleRequest updateExampleRequest) throws IOException {
+    public ResponseEntity<MessageResponse> updateExample(@Valid @RequestBody UpdateExampleRequest updateExampleRequest) throws IOException {
         exampleService.updateExample(updateExampleRequest);
-        return ResponseEntity.ok("Example successfully updated");
+        return ResponseEntity.ok(new MessageResponse("Example successfully updated"));
     }
     @PreAuthorize("hasPermission(#exampleOrderRequests, 'Example', 'update')")
     @PostMapping(value = "/examples/order")
-    public ResponseEntity<?> updateExampleOrder(@Valid @RequestBody List<ExampleOrderRequest> exampleOrderRequests)  {
+    public ResponseEntity<MessageResponse> updateExampleOrder(@Valid @RequestBody List<ExampleOrderRequest> exampleOrderRequests)  {
         exampleService.updateExampleOrder(exampleOrderRequests);
-        return ResponseEntity.ok("Example order updated successfully");
+        return ResponseEntity.ok(new MessageResponse("Example order updated successfully"));
     }
     @PreAuthorize("hasPermission(#exampleId, 'Example', 'update')")
     @PostMapping(value = "/example/validator")
-    public ResponseEntity<?> setExampleValidator(@RequestParam(value = "file",required = true) MultipartFile validator, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws  IOException, ClassNotFoundException {
+    public ResponseEntity<MessageResponse> setExampleValidator(@RequestParam(value = "file",required = true) MultipartFile validator, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws  IOException, ClassNotFoundException {
         exampleService.setExampleValidator(validator,exampleId);
-        return ResponseEntity.ok("Validator was successfully set");
+        return ResponseEntity.ok(new MessageResponse("Validator was successfully set"));
     }
 
     @PreAuthorize("hasPermission(#id, 'Example', 'delete')")
     @DeleteMapping(value = "/example/{id}")
-    public ResponseEntity<?> deleteExample(@PathVariable("id") long id) throws IOException {
+    public ResponseEntity<MessageResponse> deleteExample(@PathVariable("id") long id) throws IOException {
         exampleService.deleteExample(id);
         return ResponseEntity.ok(new MessageResponse("Example was successfully deleted!"));
 
     }
     @PreAuthorize("hasPermission(#id, 'Example', 'delete')")
     @DeleteMapping(value = "/example/{id}/validator")
-    public ResponseEntity<?> deleteExampleValidator(@PathVariable("id") long id) throws IOException {
+    public ResponseEntity<MessageResponse> deleteExampleValidator(@PathVariable("id") long id) throws IOException {
         exampleService.deleteExampleValidator(id);
-        return ResponseEntity.ok("Validator was successfully deleted");
+        return ResponseEntity.ok(new MessageResponse("Validator was successfully deleted"));
     }
 
 }
