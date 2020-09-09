@@ -274,7 +274,6 @@ public class FinishesExampleService extends AbstractService{
         try {
             finishesExample.setAttachmentContent(readFileFromDisk(finishesExample));
         } catch (IOException e) {
-            e.printStackTrace();
             throw new ServiceException(e.getMessage());
         }
 
