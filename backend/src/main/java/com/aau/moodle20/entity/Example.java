@@ -26,7 +26,7 @@ public class Example {
     @JoinColumn(name = "parentExample_id", referencedColumnName = "id")
     private Example parentExample;
     @OneToMany(mappedBy="parentExample", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval=true)
-    private Set<Example> subExamples = new HashSet<Example>();
+    private Set<Example> subExamples = new HashSet<>();
 
     private String name;
     private String description;
@@ -194,9 +194,8 @@ public class Example {
         List<String> list = new ArrayList<>();
         if (customFileTypes != null && customFileTypes.length()>0) {
             String[] array = customFileTypes.split(",");
-            if (array != null && array.length > 0) {
-                for (int i = 0; i < array.length; i++)
-                    list.add(array[i]);
+            if (array.length > 0) {
+                list.addAll(Arrays.asList(array));
             }
         }
         return list;
