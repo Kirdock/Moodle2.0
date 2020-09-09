@@ -34,7 +34,7 @@ public class FooterPageEventHandler implements IEventHandler {
         try {
             canvas.setFontAndSize(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD), 9);
         } catch (IOException e) {
-          //Do Nothing
+            System.out.println (e.toString());
         }
         canvas.moveText((pageSize.getRight() - document.getRightMargin() - (pageSize.getLeft() + document.getLeftMargin())) / 2 + document.getLeftMargin(), (pageSize.getBottom() + document.getBottomMargin())-20 /*pageSize.getTop() - document.getTopMargin() + 10*/)
                 .showText(Integer.toString(pageNumber))
