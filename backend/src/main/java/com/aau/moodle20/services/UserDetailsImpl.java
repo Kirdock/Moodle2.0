@@ -135,4 +135,9 @@ public class UserDetailsImpl implements UserDetails {
         return
                 Objects.equals(matriculationNumber, user.matriculationNumber);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getMatriculationNumber());
+    }
 }
