@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
-public class CourseServiceUnitTests {
+public class CourseServiceUnitTest {
 
     private static final Long COURSE_ID = 200L;
     private static final String COURSE_NUMBER= "123.123";
