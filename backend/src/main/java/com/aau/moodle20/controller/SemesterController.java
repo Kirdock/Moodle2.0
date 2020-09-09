@@ -26,7 +26,7 @@ public class SemesterController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/semester")
-    public ResponseEntity<?> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  throws ServiceException {
+    public ResponseEntity<MessageResponse> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  {
         semesterService.createSemester(createSemesterRequest);
         return ResponseEntity.ok(new MessageResponse("Semester was sucessfully created!"));
     }
