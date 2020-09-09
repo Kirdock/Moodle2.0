@@ -71,13 +71,19 @@ public class ValidatorHandler {
 
     protected void saveFile(String filePath, MultipartFile file) throws IOException
     {
-        InputStream initialStream = file.getInputStream();
-        byte[] buffer = new byte[initialStream.available()];
-        initialStream.read(buffer);
-        File targetFile= new File(filePath);
-        OutputStream outStream = new FileOutputStream(targetFile);
-        outStream.write(buffer);
-        outStream.close();
+        OutputStream outStream = null;
+        try {
+            InputStream initialStream = file.getInputStream();
+            byte[] buffer = new byte[initialStream.available()];
+            int readBytes = initialStream.read(buffer);
+            File targetFile = new File(filePath);
+            outStream = new FileOutputStream(targetFile);
+            outStream.write(buffer);
+            outStream.close();
+        }finally {
+            if(outStream!=null)
+                outStream.close();
+        }
     }
 
 }
