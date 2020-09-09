@@ -20,10 +20,7 @@ public class SupportFileType {
     @MapsId("file_type_id")
     @JoinColumn(name = "file_type_id")
     FileType fileType;
-
-    public SupportFileType()
-    {
-    }
+    
 
     public SupportFileTypeKey getId() {
         return id;
