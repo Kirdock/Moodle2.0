@@ -51,7 +51,7 @@ public class UserCourseService extends AbstractService {
         if (!isCourseAssigned)
             throw new ServiceException("Error: User is not assigned to this course!", HttpStatus.UNAUTHORIZED);
 
-        return course.createCourseResponseObject_GetAssignedCourse(currentUser.getMatriculationNumber());
+        return course.createCourseResponseObjectGetAssignedCourse(currentUser.getMatriculationNumber());
     }
 
 

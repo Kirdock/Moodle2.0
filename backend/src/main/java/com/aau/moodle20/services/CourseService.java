@@ -104,7 +104,7 @@ public class CourseService extends AbstractService {
     public CourseResponseObject getCourse(long courseId) throws ServiceException {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(courseId);
-        CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
+        CourseResponseObject responseObject = course.createCourseResponseObjectGetCourse();
         responseObject.setPresented(createCoursePresentedList(course));
 
         if (userDetails.getAdmin())

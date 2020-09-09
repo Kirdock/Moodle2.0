@@ -38,7 +38,7 @@ public class Course {
     private Set<ExerciseSheet> exerciseSheets;
 
     @OneToMany(mappedBy = "course")
-    Set<UserInCourse> students; // TODO find better name
+    Set<UserInCourse> students;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner", referencedColumnName = "matriculation_Number")
@@ -172,7 +172,7 @@ public class Course {
         return course;
     }
 
-    public CourseResponseObject createCourseResponseObject_GetCourse() {
+    public CourseResponseObject createCourseResponseObjectGetCourse() {
         CourseResponseObject responseObject = new CourseResponseObject();
         responseObject.setId(getId());
         responseObject.setName(getName());
@@ -193,8 +193,8 @@ public class Course {
         return responseObject;
     }
 
-    public CourseResponseObject createCourseResponseObject_GetAssignedCourse(String matriculationNumber) {
-        CourseResponseObject responseObject = createCourseResponseObject_GetCourse();
+    public CourseResponseObject createCourseResponseObjectGetAssignedCourse(String matriculationNumber) {
+        CourseResponseObject responseObject = createCourseResponseObjectGetCourse();
         if (getExerciseSheets() != null)
             responseObject.setExerciseSheets(getExerciseSheets().stream()
                     .map(exerciseSheet -> exerciseSheet.getResponseObjectLessInfo_WithExampleInfo(matriculationNumber))

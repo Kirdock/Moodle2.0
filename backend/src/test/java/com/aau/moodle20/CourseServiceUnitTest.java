@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -73,7 +72,7 @@ public class CourseServiceUnitTest {
         Course course = getTestCourse();
         when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
 
-        CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
+        CourseResponseObject responseObject = course.createCourseResponseObjectGetCourse();
         responseObject.setPresented(new ArrayList<>());
         responseObject.setOwner(course.getOwner().getMatriculationNumber());
 
@@ -87,7 +86,7 @@ public class CourseServiceUnitTest {
         Course course = getTestCourse();
         when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
 
-        CourseResponseObject responseObject = course.createCourseResponseObject_GetCourse();
+        CourseResponseObject responseObject = course.createCourseResponseObjectGetCourse();
         responseObject.setPresented(new ArrayList<>());
 
         CourseResponseObject courseResponseObject = courseService.getCourse(200L);
