@@ -107,6 +107,66 @@ public class ExampleControllerUnitTests  extends AbstractControllerTest {
     }
 
 
+
+    @Test
+    public void check_all_apis_unauthorized_invalid_JWTToken() throws Exception {
+        String jwtToken = "prepareAdminUser()";
+
+        perform_Get("/api/fileTypes",jwtToken).andExpect(status().isUnauthorized());
+        //get /example/{id}		getExample
+        perform_Get("/api/example/200",jwtToken).andExpect(status().isUnauthorized());
+        //get /example/{id}/validator	getExampleValidator
+        perform_Get("/api/example/200/validator",jwtToken).andExpect(status().isUnauthorized());
+        //put /example			createExample
+        perform_Put("/api/example",jwtToken,mapToJson(getCreateExampleRequest())).andExpect(status().isUnauthorized());
+        //post /example			updateExample
+        perform_Post("/api/example",jwtToken,mapToJson(createUpdateExampleRequest())).andExpect(status().isUnauthorized());
+        //post /example/order		updateExampleOrder
+        perform_Post("/api/examples/order",jwtToken,mapToJson(createUpdateExampleOrderList())).andExpect(status().isUnauthorized());
+        //post /example/validator	setExampleValidator
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "test.jpg".getBytes());
+        this.mvc.perform(multipart("/api/example/validator")
+                .file(file)
+                .param("id","200")
+                .header("Authorization",jwtToken)).andExpect(status().isUnauthorized());
+
+        //delete /example/{id}		deleteExample
+        perform_Delete("/api/example/200",jwtToken).andExpect(status().isUnauthorized());
+        //delete /example/{id}/validator delete ExampleValidator
+        perform_Delete("/api/example/200/validator",jwtToken).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void check_all_apis_unauthorized_expired_JWTToken() throws Exception {
+        String jwtToken = generateExpiredAdminJWToken();
+
+        perform_Get("/api/fileTypes",jwtToken).andExpect(status().isUnauthorized());
+        //get /example/{id}		getExample
+        perform_Get("/api/example/200",jwtToken).andExpect(status().isUnauthorized());
+        //get /example/{id}/validator	getExampleValidator
+        perform_Get("/api/example/200/validator",jwtToken).andExpect(status().isUnauthorized());
+        //put /example			createExample
+        perform_Put("/api/example",jwtToken,mapToJson(getCreateExampleRequest())).andExpect(status().isUnauthorized());
+        //post /example			updateExample
+        perform_Post("/api/example",jwtToken,mapToJson(createUpdateExampleRequest())).andExpect(status().isUnauthorized());
+        //post /example/order		updateExampleOrder
+        perform_Post("/api/examples/order",jwtToken,mapToJson(createUpdateExampleOrderList())).andExpect(status().isUnauthorized());
+        //post /example/validator	setExampleValidator
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "test.jpg".getBytes());
+        this.mvc.perform(multipart("/api/example/validator")
+                .file(file)
+                .param("id","200")
+                .header("Authorization",jwtToken)).andExpect(status().isUnauthorized());
+
+        //delete /example/{id}		deleteExample
+        perform_Delete("/api/example/200",jwtToken).andExpect(status().isUnauthorized());
+        //delete /example/{id}/validator delete ExampleValidator
+        perform_Delete("/api/example/200/validator",jwtToken).andExpect(status().isUnauthorized());
+    }
+
+
     private List<ExampleOrderRequest> createUpdateExampleOrderList()
     {
         List<ExampleOrderRequest> exampleOrderRequests = new ArrayList<>();
