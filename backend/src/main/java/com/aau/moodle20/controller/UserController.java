@@ -63,7 +63,7 @@ public class UserController {
 
     // post api----------------------------------------------------------------
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -76,13 +76,13 @@ public class UserController {
 
     @PreAuthorize("hasPermission(null, 'User', 'update')")
     @PostMapping(path = "/user/password")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
+    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         userService.changePassword(changePasswordRequest);
         return ResponseEntity.ok(new MessageResponse("User password changed!"));
     }
     @PreAuthorize("hasPermission(#updateUserRequest.matriculationNumber, 'User', 'update')")
     @PostMapping(path = "/user")
-    public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<MessageResponse> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
         userService.updateUser(updateUserRequest);
         return ResponseEntity.ok(new MessageResponse("User was successfully updated!"));
     }
@@ -98,7 +98,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
-    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "isAdmin",required = false) Boolean isAdmin) throws UserException {
+    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "isAdmin",required = false) Boolean isAdmin)  {
         return ResponseEntity.ok(userService.registerUsers(file, isAdmin));
     }
 

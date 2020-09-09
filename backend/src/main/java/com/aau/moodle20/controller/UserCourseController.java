@@ -55,7 +55,7 @@ public class UserCourseController {
 
 
     @PostMapping(value = "/course/assign")
-    public ResponseEntity<?> assignCourseToSemester(@Valid @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests) throws ServiceException, IOException {
+    public ResponseEntity<MessageResponse> assignCourseToSemester(@Valid @RequestBody List<AssignUserToCourseRequest> assignUserToCourseRequests) throws IOException {
 
         userCourseService.assignUsers(assignUserToCourseRequests);
         return ResponseEntity.ok(new MessageResponse("Users were successfully assigned to courses!"));
@@ -63,7 +63,7 @@ public class UserCourseController {
 
     @PreAuthorize("hasPermission(#courseId, 'Course', 'update')")
     @PostMapping(value = "/course/assignFile")
-    public ResponseEntity<RegisterMultipleUserResponse> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  throws ServiceException {
+    public ResponseEntity<RegisterMultipleUserResponse> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  {
         return ResponseEntity.ok(userCourseService.assignFile(file,courseId));
     }
 }
