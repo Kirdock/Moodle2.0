@@ -35,7 +35,7 @@ public class ExerciseSheetController {
 
     @PreAuthorize("hasPermission(#createExerciseSheetRequest.courseId, 'ExerciseSheet', 'create')")
     @PutMapping(value = "/exerciseSheet")
-    public ResponseEntity<?> createExerciseSheet(@Valid @RequestBody CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceException {
+    public ResponseEntity<MessageResponse> createExerciseSheet(@Valid @RequestBody CreateExerciseSheetRequest createExerciseSheetRequest)  {
         exerciseSheetService.createExerciseSheet(createExerciseSheetRequest);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was sucessfully created!"));
     }
@@ -58,13 +58,13 @@ public class ExerciseSheetController {
 
     @PreAuthorize("hasPermission(#updateExerciseSheetRequest.id, 'ExerciseSheet', 'update')")
     @PostMapping(value = "/exerciseSheet")
-    public ResponseEntity<?> updateExerciseSheet(@Valid @RequestBody UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceException {
+    public ResponseEntity<MessageResponse> updateExerciseSheet(@Valid @RequestBody UpdateExerciseSheetRequest updateExerciseSheetRequest)  {
         exerciseSheetService.updateExerciseSheet(updateExerciseSheetRequest);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was sucessfully updated!"));
     }
     @PreAuthorize("hasPermission(#id, 'Course', 'get')")
     @GetMapping(value = "/course/{id}/exerciseSheets")
-    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(@PathVariable("id") long id) throws ServiceException {
+    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(@PathVariable("id") long id)  {
         return exerciseSheetService.getExerciseSheetsFromCourse(id);
     }
 
@@ -98,7 +98,7 @@ public class ExerciseSheetController {
 
     @PreAuthorize("hasPermission(#id, 'ExerciseSheet', 'delete')")
     @DeleteMapping(value = "/exerciseSheet/{id}")
-    public ResponseEntity<?> deleteExerciseSheet(@PathVariable("id") long id) throws IOException {
+    public ResponseEntity<MessageResponse> deleteExerciseSheet(@PathVariable("id") long id) throws IOException {
         exerciseSheetService.deleteExerciseSheet(id);
         return ResponseEntity.ok(new MessageResponse("ExerciseSheet was successfully deleted!"));
     }
