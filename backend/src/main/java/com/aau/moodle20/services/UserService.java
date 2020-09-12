@@ -47,9 +47,7 @@ import static org.passay.CharacterOccurrencesRule.ERROR_CODE;
 public class UserService  extends AbstractService{
 
 
-    private AuthenticationManager authenticationManager;
     private PasswordEncoder encoder;
-    private JwtUtils jwtUtils;
     private EmailService emailService;
     private ResourceBundleMessageSource resourceBundleMessageSource;
 
@@ -67,10 +65,8 @@ public class UserService  extends AbstractService{
 
     private Pattern matriculationPattern = Pattern.compile("^[0-9]{8}$");
 
-    public UserService(AuthenticationManager authenticationManager, PasswordEncoder encoder, JwtUtils jwtUtils, EmailService emailService, ResourceBundleMessageSource resourceBundleMessageSource)
+    public UserService(PasswordEncoder encoder, EmailService emailService, ResourceBundleMessageSource resourceBundleMessageSource)
     {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
         this.encoder = encoder;
         this.emailService = emailService;
         this.resourceBundleMessageSource = resourceBundleMessageSource;
