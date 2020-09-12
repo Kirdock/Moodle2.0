@@ -1,5 +1,7 @@
 package com.aau.moodle20;
 
+import com.aau.moodle20.entity.Course;
+import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.entity.User;
 import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.security.jwt.JwtUtils;
@@ -17,6 +19,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
@@ -39,6 +42,7 @@ public class AbstractControllerTest {
 
     @Autowired
     protected MockMvc mvc;
+    protected Long courseId = 200L;
 
 
     protected ResultActions perform_Put(String uri, String jwtToken, String content) throws Exception {
@@ -110,6 +114,49 @@ public class AbstractControllerTest {
                 .claim(JwtUtils.CLAIM_SURNAME,user.getSurname())
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
+    }
+
+
+
+
+    protected Course getTestCourse(User user) {
+        Course course = new Course();
+        course.setId(courseId);
+        course.setDescription("dd");
+        course.setDescriptionTemplate("dd");
+        course.setId((long) 200);
+        course.setMinKreuzel(20);
+        course.setMinPoints(20);
+        course.setName("dd");
+        course.setNumber("123.456");
+        course.setOwner(user);
+        course.setSemester(new Semester(200L));
+        course.setExerciseSheets(new HashSet<>());
+        return course;
+    }
+
+
+
+    protected User getUser1() {
+        User user = new User();
+        user.setForename("user1_forename");
+        user.setSurname("user1_surname");
+        user.setUsername("user1");
+        user.setAdmin(Boolean.FALSE);
+        user.setMatriculationNumber("12345678");
+
+        return user;
+    }
+
+    protected User getUser2() {
+        User user = new User();
+        user.setForename("user2_forename");
+        user.setSurname("user2_surname");
+        user.setUsername("user2");
+        user.setAdmin(Boolean.FALSE);
+        user.setMatriculationNumber("87654321");
+
+        return user;
     }
 
 

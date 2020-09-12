@@ -10,7 +10,6 @@ import com.aau.moodle20.payload.request.UpdateCoursePresets;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
-import com.aau.moodle20.repository.UserRepository;
 import com.aau.moodle20.services.CourseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.hamcrest.Matchers;
@@ -146,7 +145,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
 
     @Test
     public void getCourse_unauthorized_not_owner() throws Exception {
-        String jwtToken = prepareForUnAuthorizedOwner();
+        String jwtToken = prepareForUserWhoIsNoOwner();
         this.mvc.perform(get("/api/course/200").header("Authorization", jwtToken)
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden());
     }
@@ -160,7 +159,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
 
     @Test
     public void getCoursePresented_unauthorized_not_owner() throws Exception {
-        String jwtToken = prepareForUnAuthorizedOwner();
+        String jwtToken = prepareForUserWhoIsNoOwner();
         perform_Get("/api/course/200/presented", jwtToken).andExpect(status().isForbidden());
     }
 
@@ -253,7 +252,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
 
     @Test
     public void updateCourse_unauthorized_not_owner() throws Exception {
-        String jwtToken = prepareForUnAuthorizedOwner();
+        String jwtToken = prepareForUserWhoIsNoOwner();
         // update course
         this.mvc.perform(post("/api/course").header("Authorization", jwtToken)
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
@@ -327,7 +326,7 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
 
     @Test
     public void updateCoursePresets_unauthorized_not_owner() throws Exception {
-        String jwtToken = prepareForUnAuthorizedOwner();
+        String jwtToken = prepareForUserWhoIsNoOwner();
         //update course presets
         this.mvc.perform(post("/api/course/presets").header("Authorization", jwtToken)
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
@@ -408,58 +407,12 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
         return jwtToken;
     }
 
-    private String prepareForUnAuthorizedOwner() {
-        User user1 = getUser1();
-        User user2 = getUser2();
-        Course course = getTestCourse(user1);
-        String jwtToken = generateValidUserJWToken(user2);
-        when(courseRepository.findById(200L)).thenReturn(Optional.of(course));
-        when(userRepository.findByUsername(user1.getUsername())).thenReturn(Optional.of(user1));
-        when(userRepository.findByUsername(user2.getUsername())).thenReturn(Optional.of(user2));
-        return jwtToken;
-    }
 
 
 
 
-    private Course getTestCourse(User user) {
-        Course course = new Course();
-        course.setId((long) 200);
-        course.setDescription("dd");
-        course.setDescriptionTemplate("dd");
-        course.setId((long) 200);
-        course.setMinKreuzel(20);
-        course.setMinPoints(20);
-        course.setName("dd");
-        course.setNumber("123.456");
-        course.setOwner(user);
-        course.setSemester(new Semester(200L));
-        course.setExerciseSheets(new HashSet<>());
-        return course;
-    }
 
 
-    private User getUser1() {
-        User user = new User();
-        user.setForename("user1_forename");
-        user.setSurname("user1_surname");
-        user.setUsername("user1");
-        user.setAdmin(Boolean.FALSE);
-        user.setMatriculationNumber("12345678");
-
-        return user;
-    }
-
-    private User getUser2() {
-        User user = new User();
-        user.setForename("user2_forename");
-        user.setSurname("user2_surname");
-        user.setUsername("user2");
-        user.setAdmin(Boolean.FALSE);
-        user.setMatriculationNumber("87654321");
-
-        return user;
-    }
 
 
 
@@ -478,6 +431,17 @@ public class CourseControllerUnitTests extends AbstractControllerTest {
         createCourseRequest.setName("dd");
 
         return createCourseRequest;
+    }
+
+    protected String prepareForUserWhoIsNoOwner() {
+        User user1 = getUser1();
+        User user2 = getUser2();
+        Course course = getTestCourse(user1);
+        String jwtToken = generateValidUserJWToken(user2);
+        when(courseRepository.findById(200L)).thenReturn(Optional.of(course));
+        when(userRepository.findByUsername(user1.getUsername())).thenReturn(Optional.of(user1));
+        when(userRepository.findByUsername(user2.getUsername())).thenReturn(Optional.of(user2));
+        return jwtToken;
     }
 
     private UpdateCourseRequest createUpdateCourseRequest() {
