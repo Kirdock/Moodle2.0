@@ -506,7 +506,7 @@ public class ExampleControllerUnitTests  extends AbstractControllerTest {
                 .andExpect(jsonPath("$.errors").value("name: must not be blank"))
                 .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
     }
-    
+
     @Test
     public void check_updateExample_order_invalid() throws Exception {
         String jwtToken = prepareAdminUser();

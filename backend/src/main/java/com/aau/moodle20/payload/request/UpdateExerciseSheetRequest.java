@@ -26,7 +26,7 @@ public class UpdateExerciseSheetRequest {
     private Integer minPoints;
     private String description;
     @NotNull
-    private Boolean includeThird = Boolean.FALSE;
+    private Boolean includeThird;
     @NotNull
     @Min(value = 0)
     private Integer uploadCount;
@@ -93,8 +93,7 @@ public class UpdateExerciseSheetRequest {
     }
 
     public void setIncludeThird(Boolean includeThird) {
-        if (includeThird != null)
-            this.includeThird = includeThird;
+        this.includeThird = includeThird;
     }
 
     public Integer getUploadCount() {
