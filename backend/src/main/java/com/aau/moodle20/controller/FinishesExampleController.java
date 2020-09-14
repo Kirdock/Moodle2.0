@@ -27,8 +27,7 @@ public class FinishesExampleController {
 
     private FinishesExampleService finishesExampleService;
 
-    public FinishesExampleController(FinishesExampleService finishesExampleService)
-    {
+    public FinishesExampleController(FinishesExampleService finishesExampleService) {
         this.finishesExampleService = finishesExampleService;
     }
 
@@ -45,8 +44,8 @@ public class FinishesExampleController {
     }
 
     @PostMapping(path = "/user/kreuzel/attachment")
-    public ResponseEntity<ViolationHistoryResponse> setKreuzelUserAttachment(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws IOException, ClassNotFoundException {
-        return ResponseEntity.ok(finishesExampleService.setKreuzelUserAttachment(file,exampleId));
+    public ResponseEntity<ViolationHistoryResponse> setKreuzelUserAttachment(@Valid @RequestParam(value = "file", required = true) MultipartFile file, @Valid @RequestParam(value = "id", required = true) Long exampleId) throws IOException, ClassNotFoundException {
+        return ResponseEntity.ok(finishesExampleService.setKreuzelUserAttachment(file, exampleId));
     }
 
     @PreAuthorize("hasPermission(#exampleId, 'FinishExample', 'get')")
@@ -55,7 +54,7 @@ public class FinishesExampleController {
         FinishesExample example = finishesExampleService.getKreuzelAttachment(exampleId);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(example.getAttachmentContent());
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename="+example.getFileName());
+        headers.add("Content-Disposition", "inline; filename=" + example.getFileName());
         return ResponseEntity
                 .ok()
                 .headers(headers)
@@ -69,9 +68,10 @@ public class FinishesExampleController {
         finishesExampleService.setUserExamplePresented(userExamplePresentedRequest);
         return ResponseEntity.ok(new MessageResponse("Presented flag was successfully updated!"));
     }
+
     @PreAuthorize("hasPermission(#courseId, 'Course', 'get')")
     @GetMapping(path = "/user/{matriculationNumber}/kreuzel/{courseId}")
     public List<KreuzelResponse> getKreuzelUserCourse(@PathVariable String matriculationNumber, @PathVariable Long courseId) {
-        return finishesExampleService.getKreuzelUserCourse(matriculationNumber,courseId);
+        return finishesExampleService.getKreuzelUserCourse(matriculationNumber, courseId);
     }
 }

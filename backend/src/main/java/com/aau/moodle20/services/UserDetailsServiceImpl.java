@@ -11,10 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDetailsServiceImpl extends AbstractService implements UserDetailsService {
 
 
-
-
-    public UserDetailsServiceImpl()
-    {
+    public UserDetailsServiceImpl() {
 
     }
 
@@ -26,14 +23,6 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
 
         return UserDetailsImpl.build(user);
     }
-
-
-
-
-
-
-
-
 
 
 }

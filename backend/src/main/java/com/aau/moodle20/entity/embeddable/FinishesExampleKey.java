@@ -14,12 +14,10 @@ public class FinishesExampleKey implements Serializable {
     @Column(name = "example_id")
     Long exampleId;
 
-    public FinishesExampleKey()
-    {
+    public FinishesExampleKey() {
     }
 
-    public FinishesExampleKey(String matriculationNumber, Long exampleId)
-    {
+    public FinishesExampleKey(String matriculationNumber, Long exampleId) {
         this.exampleId = exampleId;
         this.matriculationNumber = matriculationNumber;
     }

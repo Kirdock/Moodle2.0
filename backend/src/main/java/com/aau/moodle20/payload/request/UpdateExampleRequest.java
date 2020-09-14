@@ -25,7 +25,7 @@ public class UpdateExampleRequest {
     private Boolean submitFile;
     private List<String> customFileTypes;
     @Min(value = 0)
-    private Integer uploadCount ;
+    private Integer uploadCount;
 
     public Long getExerciseSheetId() {
         return exerciseSheetId;
@@ -71,7 +71,8 @@ public class UpdateExampleRequest {
         return mandatory;
     }
 
-    public void setMandatory(Boolean mandatory) { this.mandatory = mandatory;
+    public void setMandatory(Boolean mandatory) {
+        this.mandatory = mandatory;
     }
 
     public Integer getOrder() {
@@ -95,7 +96,7 @@ public class UpdateExampleRequest {
     }
 
     public void setSubmitFile(Boolean submitFile) {
-            this.submitFile = submitFile;
+        this.submitFile = submitFile;
     }
 
     public Long getId() {
@@ -127,6 +128,6 @@ public class UpdateExampleRequest {
     }
 
     public void setUploadCount(Integer uploadCount) {
-            this.uploadCount = uploadCount;
+        this.uploadCount = uploadCount;
     }
 }

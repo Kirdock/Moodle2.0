@@ -14,12 +14,10 @@ public class SupportFileTypeKey implements Serializable {
     @Column(name = "file_type_id")
     Long fileTypeId;
 
-    public SupportFileTypeKey()
-    {
+    public SupportFileTypeKey() {
     }
 
-    public SupportFileTypeKey(Long fileTypeId, Long exampleId)
-    {
+    public SupportFileTypeKey(Long fileTypeId, Long exampleId) {
         this.exampleId = exampleId;
         this.fileTypeId = fileTypeId;
     }

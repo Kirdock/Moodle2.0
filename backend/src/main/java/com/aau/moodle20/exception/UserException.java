@@ -6,17 +6,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class UserException extends RuntimeException {
 
-    public UserException()
-    {
+    public UserException() {
     }
 
-    public UserException(String message)
-    {
+    public UserException(String message) {
         super(message);
     }
 
-    public UserException(String message, Exception ex)
-    {
-        super(message,ex);
+    public UserException(String message, Exception ex) {
+        super(message, ex);
     }
 }

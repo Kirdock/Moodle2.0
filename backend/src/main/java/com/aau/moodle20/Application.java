@@ -20,55 +20,53 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @SpringBootApplication
 public class Application implements ApplicationRunner, ErrorController {
 
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	FileTypeRepository fileTypeRepository;
-	@Autowired
-	PasswordEncoder encoder;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    FileTypeRepository fileTypeRepository;
+    @Autowired
+    PasswordEncoder encoder;
 
 
+    private static final String PATH = "/error";
 
-	private static final String PATH = "/error";
+    @Value("${adminUserName}")
+    private String adminUserName;
+    @Value("${adminPassword}")
+    private String adminPassword;
+    @Value("${adminMatriculationNumber}")
+    private String adminMatriculationNumber;
 
-	@Value("${adminUserName}")
-	private String adminUserName;
-	@Value("${adminPassword}")
-	private String adminPassword;
-	@Value("${adminMatriculationNumber}")
-	private String adminMatriculationNumber;
-
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
-
-
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		if (Boolean.FALSE.equals(userRepository.existsByUsername(adminUserName))) {
-			userRepository.save(new User(adminUserName,adminMatriculationNumber,adminUserName, adminPassword, encoder.encode(adminPassword), Boolean.TRUE) );
-		}
-		if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Word"))) {
-			fileTypeRepository.save(new FileType("Word", "application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
-		}
-		if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Excel"))) {
-			fileTypeRepository.save(new FileType("Excel", "application/msexcel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-		}
-		if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Archiv-Dateien"))) {
-			fileTypeRepository.save(new FileType("Archiv-Dateien", "*.zip, *.rar"));
-		}
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
 
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        if (Boolean.FALSE.equals(userRepository.existsByUsername(adminUserName))) {
+            userRepository.save(new User(adminUserName, adminMatriculationNumber, adminUserName, adminPassword, encoder.encode(adminPassword), Boolean.TRUE));
+        }
+        if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Word"))) {
+            fileTypeRepository.save(new FileType("Word", "application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        }
+        if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Excel"))) {
+            fileTypeRepository.save(new FileType("Excel", "application/msexcel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        }
+        if (Boolean.FALSE.equals(fileTypeRepository.existsByName("Archiv-Dateien"))) {
+            fileTypeRepository.save(new FileType("Archiv-Dateien", "*.zip, *.rar"));
+        }
+    }
 
-	@RequestMapping(value = PATH)
-	public String error() {
-		return "forward:/";
-	}
 
-	@Override
-	public String getErrorPath() {
-		return PATH;
-	}
+    @RequestMapping(value = PATH)
+    public String error() {
+        return "forward:/";
+    }
+
+    @Override
+    public String getErrorPath() {
+        return PATH;
+    }
 
 }

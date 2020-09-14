@@ -2,7 +2,7 @@ package com.aau.moodle20.payload.response;
 
 public class ViolationResponse {
 
-    String result ;
+    String result;
 
     public String getResult() {
         return result;

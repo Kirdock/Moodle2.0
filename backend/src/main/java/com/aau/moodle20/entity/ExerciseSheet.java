@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name ="exercise_sheet")
+@Table(name = "exercise_sheet")
 public class ExerciseSheet {
 
     @Id
@@ -23,9 +23,9 @@ public class ExerciseSheet {
     private String name;
     private Integer minKreuzel;
     private Integer minPoints;
-    @Column(name = "submission_Date", columnDefinition="DATETIME")
+    @Column(name = "submission_Date", columnDefinition = "DATETIME")
     private LocalDateTime submissionDate;
-    @Column(name = "issue_Date", columnDefinition="DATETIME")
+    @Column(name = "issue_Date", columnDefinition = "DATETIME")
     private LocalDateTime issueDate;
     private String description;
     private Boolean includeThird;
@@ -35,12 +35,11 @@ public class ExerciseSheet {
             fetch = FetchType.LAZY
     )
     private Set<Example> examples;
-    public ExerciseSheet()
-    {
+
+    public ExerciseSheet() {
     }
 
-    public ExerciseSheet(Long id )
-    {
+    public ExerciseSheet(Long id) {
         this.id = id;
     }
 
@@ -117,8 +116,7 @@ public class ExerciseSheet {
     }
 
 
-    public ExerciseSheetResponseObject getResponseObject(String assignedUserMatriculationNumber)
-    {
+    public ExerciseSheetResponseObject getResponseObject(String assignedUserMatriculationNumber) {
         ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
         responseObject.setId(getId());
         responseObject.setCourseId(getCourse().getId());
@@ -144,8 +142,7 @@ public class ExerciseSheet {
         return responseObject;
     }
 
-    public ExerciseSheetResponseObject getResponseObjectLessInfo()
-    {
+    public ExerciseSheetResponseObject getResponseObjectLessInfo() {
         ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
         responseObject.setId(getId());
         responseObject.setName(getName());
@@ -191,8 +188,7 @@ public class ExerciseSheet {
         this.examples = examples;
     }
 
-    public Integer getTotalPoints()
-    {
+    public Integer getTotalPoints() {
         Integer totalPoints = 0;
         for (Example example : getExamples()) {
             totalPoints = totalPoints + (example.getPoints() * example.getWeighting());
@@ -200,8 +196,7 @@ public class ExerciseSheet {
         return totalPoints;
     }
 
-    public ExerciseSheet copy()
-    {
+    public ExerciseSheet copy() {
         ExerciseSheet exerciseSheet = new ExerciseSheet();
         exerciseSheet.setDescription(getDescription());
         exerciseSheet.setIssueDate(getIssueDate());

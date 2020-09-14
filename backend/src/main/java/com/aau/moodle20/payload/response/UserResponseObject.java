@@ -14,8 +14,8 @@ public class UserResponseObject {
     private Boolean isAdmin;
     private ECourseRole courseRole;
     private Integer presentedCount = 0;
-    public UserResponseObject()
-    {
+
+    public UserResponseObject() {
     }
 
     public String getMatriculationNumber() {

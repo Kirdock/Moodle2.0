@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name ="course")
+@Table(name = "course")
 public class Course {
 
     @Id
@@ -44,12 +44,11 @@ public class Course {
     @JoinColumn(name = "owner", referencedColumnName = "matriculation_Number")
     User owner;
 
-    public Course(Long id)
-    {
+    public Course(Long id) {
         this.id = id;
     }
-    public Course()
-    {
+
+    public Course() {
     }
 
     public Long getId() {
@@ -148,8 +147,7 @@ public class Course {
         this.uploadCount = uploadCount;
     }
 
-    public CourseResponseObject createCourseResponseObject()
-    {
+    public CourseResponseObject createCourseResponseObject() {
         CourseResponseObject responseObject = new CourseResponseObject();
         responseObject.setId(getId());
         responseObject.setName(getName());
@@ -158,8 +156,7 @@ public class Course {
         return responseObject;
     }
 
-    public Course copy()
-    {
+    public Course copy() {
         Course course = new Course();
         course.setMinKreuzel(getMinKreuzel());
         course.setName(getName());

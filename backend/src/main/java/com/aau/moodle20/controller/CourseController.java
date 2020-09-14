@@ -23,39 +23,38 @@ public class CourseController {
 
     CourseService courseService;
 
-    public CourseController(CourseService courseService)
-    {
+    public CourseController(CourseService courseService) {
         this.courseService = courseService;
     }
 
     @PreAuthorize("hasPermission(#courseId, 'Course', 'get')")
     @GetMapping(value = "/course/{courseId}")
-    public ResponseEntity<CourseResponseObject> getCourse(@PathVariable("courseId") long courseId)  {
+    public ResponseEntity<CourseResponseObject> getCourse(@PathVariable("courseId") long courseId) {
         return ResponseEntity.ok(courseService.getCourse(courseId));
     }
 
     @PreAuthorize("hasPermission(#courseId, 'Course', 'get')")
     @GetMapping(value = "/course/{courseId}/presented")
-    public ResponseEntity<List<FinishesExampleResponse>> getCoursePresented(@PathVariable("courseId") long courseId)  {
+    public ResponseEntity<List<FinishesExampleResponse>> getCoursePresented(@PathVariable("courseId") long courseId) {
         return ResponseEntity.ok(courseService.getCoursePresented(courseId));
     }
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/course")
-    public ResponseEntity<CourseResponseObject> createCourse(@Valid @RequestBody CreateCourseRequest createCourseRequest)  {
+    public ResponseEntity<CourseResponseObject> createCourse(@Valid @RequestBody CreateCourseRequest createCourseRequest) {
         return ResponseEntity.ok(courseService.createCourse(createCourseRequest));
     }
 
     @PreAuthorize("hasPermission(#updateCourseRequest.id, 'Course', 'update')")
     @PostMapping(value = "/course")
-    public ResponseEntity<MessageResponse> updateCourse(@Valid  @RequestBody UpdateCourseRequest updateCourseRequest)  {
+    public ResponseEntity<MessageResponse> updateCourse(@Valid @RequestBody UpdateCourseRequest updateCourseRequest) {
         courseService.updateCourse(updateCourseRequest);
         return ResponseEntity.ok(new MessageResponse("Course was successfully updated!"));
     }
 
     @PreAuthorize("hasPermission(#updateCoursePresets.id, 'Course', 'update')")
     @PostMapping(value = "/course/presets")
-    public ResponseEntity<MessageResponse> updateCoursePresets(@Valid  @RequestBody UpdateCoursePresets updateCoursePresets)  {
+    public ResponseEntity<MessageResponse> updateCoursePresets(@Valid @RequestBody UpdateCoursePresets updateCoursePresets) {
         courseService.updateCoursePresets(updateCoursePresets);
         return ResponseEntity.ok(new MessageResponse("Course Presets were successfully updated!"));
     }
@@ -70,7 +69,7 @@ public class CourseController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PostMapping(value = "/course/copy")
-    public ResponseEntity<CourseResponseObject> copyCourse(@Valid  @RequestBody CopyCourseRequest copyCourseRequest) throws IOException {
+    public ResponseEntity<CourseResponseObject> copyCourse(@Valid @RequestBody CopyCourseRequest copyCourseRequest) throws IOException {
 
         CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
         return ResponseEntity.ok(responseObject);

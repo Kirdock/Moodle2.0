@@ -19,6 +19,7 @@ public class ApiError {
         this.message = message;
         this.errors = errors;
     }
+
     public ApiError(HttpStatus status, String message, List<String> errors, Integer errorResponseCode) {
         super();
         this.status = status;
@@ -27,7 +28,7 @@ public class ApiError {
         this.errorResponseCode = errorResponseCode;
     }
 
-    public ApiError(HttpStatus status, String message, String error,Integer errorResponseCode) {
+    public ApiError(HttpStatus status, String message, String error, Integer errorResponseCode) {
         super();
         this.status = status;
         this.message = message;

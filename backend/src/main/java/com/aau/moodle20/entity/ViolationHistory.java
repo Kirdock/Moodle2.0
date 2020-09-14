@@ -10,13 +10,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name ="violation_history")
+@Table(name = "violation_history")
 public class ViolationHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "date", columnDefinition="DATETIME")
+    @Column(name = "date", columnDefinition = "DATETIME")
     private LocalDateTime date;
 
 
@@ -28,8 +28,8 @@ public class ViolationHistory {
     private Set<ViolationEntity> violations;
 
     @JoinColumns({
-            @JoinColumn(name="example_id", referencedColumnName="example_id"),
-            @JoinColumn(name="matriculation_Number", referencedColumnName="matriculation_Number")
+            @JoinColumn(name = "example_id", referencedColumnName = "example_id"),
+            @JoinColumn(name = "matriculation_Number", referencedColumnName = "matriculation_Number")
     })
     @ManyToOne
     private FinishesExample finishesExample;
@@ -66,8 +66,7 @@ public class ViolationHistory {
         this.finishesExample = finishesExample;
     }
 
-    public ViolationHistoryResponse createViolationHistoryResponse()
-    {
+    public ViolationHistoryResponse createViolationHistoryResponse() {
         ViolationHistoryResponse response = new ViolationHistoryResponse();
         response.setDate(getDate());
         List<ViolationResponse> violations = getViolations().stream().map(ViolationEntity::createViolationResponse).collect(Collectors.toList());

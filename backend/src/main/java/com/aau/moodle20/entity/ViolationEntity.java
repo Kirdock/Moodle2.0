@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name ="violation")
+@Table(name = "violation")
 public class ViolationEntity {
 
     @Id
@@ -19,12 +19,10 @@ public class ViolationEntity {
     @JoinColumn(name = "violation_history_id", referencedColumnName = "id")
     private ViolationHistory violationHistory;
 
-    public ViolationEntity()
-    {
+    public ViolationEntity() {
     }
 
-    public ViolationEntity(String result)
-    {
+    public ViolationEntity(String result) {
         this.result = result;
     }
 
@@ -52,8 +50,7 @@ public class ViolationEntity {
         this.violationHistory = exerciseSheet;
     }
 
-    public ViolationResponse createViolationResponse()
-    {
+    public ViolationResponse createViolationResponse() {
         ViolationResponse response = new ViolationResponse();
         response.setResult(getResult());
 

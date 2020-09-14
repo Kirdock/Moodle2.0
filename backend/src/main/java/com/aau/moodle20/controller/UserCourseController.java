@@ -27,14 +27,13 @@ public class UserCourseController {
     private UserCourseService userCourseService;
     private PdfService pdfService;
 
-    public UserCourseController(UserCourseService userCourseService, PdfService pdfService)
-    {
+    public UserCourseController(UserCourseService userCourseService, PdfService pdfService) {
         this.userCourseService = userCourseService;
         this.pdfService = pdfService;
     }
 
     @GetMapping(value = "/courseAssigned/{courseId}")
-    public ResponseEntity<CourseResponseObject> isCourseAssigned(@PathVariable("courseId") long courseId)  {
+    public ResponseEntity<CourseResponseObject> isCourseAssigned(@PathVariable("courseId") long courseId) {
         return ResponseEntity.ok(userCourseService.getCourseAssigned(courseId));
     }
 
@@ -44,7 +43,7 @@ public class UserCourseController {
 
         ByteArrayInputStream bis = pdfService.generateCourseAttendanceList(courseId);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename="+courseId+"_attendanceList.pdf");
+        headers.add("Content-Disposition", "inline; filename=" + courseId + "_attendanceList.pdf");
 
         return ResponseEntity
                 .ok()
@@ -63,7 +62,7 @@ public class UserCourseController {
 
     @PreAuthorize("hasPermission(#courseId, 'Course', 'update')")
     @PostMapping(value = "/course/assignFile")
-    public ResponseEntity<RegisterMultipleUserResponse> assignFile(@Valid  @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "id",required = true) Long courseId)  {
-        return ResponseEntity.ok(userCourseService.assignFile(file,courseId));
+    public ResponseEntity<RegisterMultipleUserResponse> assignFile(@Valid @RequestParam(value = "file", required = true) MultipartFile file, @RequestParam(value = "id", required = true) Long courseId) {
+        return ResponseEntity.ok(userCourseService.assignFile(file, courseId));
     }
 }

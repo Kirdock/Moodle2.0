@@ -13,8 +13,7 @@ public class EmailService {
     @Value("${senderEmailUsername}")
     private String from;
 
-    public EmailService (JavaMailSender emailSender)
-    {
+    public EmailService(JavaMailSender emailSender) {
         this.emailSender = emailSender;
     }
 

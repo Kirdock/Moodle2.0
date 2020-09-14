@@ -6,7 +6,7 @@ import com.aau.moodle20.entity.embeddable.UserCourseKey;
 import javax.persistence.*;
 
 @Entity
-@Table(name ="user_in_course")
+@Table(name = "user_in_course")
 public class UserInCourse {
 
     @EmbeddedId
@@ -15,7 +15,7 @@ public class UserInCourse {
     @ManyToOne
     @MapsId("matriculationNumber")
     @JoinColumn(name = "matriculation_Number")
-     User user;
+    User user;
 
     @ManyToOne
     @MapsId("course_id")
@@ -24,8 +24,7 @@ public class UserInCourse {
 
     ECourseRole role;
 
-    public UserInCourse()
-    {
+    public UserInCourse() {
     }
 
     public UserCourseKey getId() {

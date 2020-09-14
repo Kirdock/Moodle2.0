@@ -32,10 +32,10 @@ public class ExampleResponseObject {
     private List<ViolationHistoryResponse> result;
 
 
-    public ExampleResponseObject(){
+    public ExampleResponseObject() {
     }
 
-    public ExampleResponseObject(Long id){
+    public ExampleResponseObject(Long id) {
         this.id = id;
     }
 

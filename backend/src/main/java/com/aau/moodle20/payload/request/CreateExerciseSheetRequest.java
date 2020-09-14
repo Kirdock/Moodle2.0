@@ -25,7 +25,7 @@ public class CreateExerciseSheetRequest {
     @Min(value = 0)
     private Integer minPoints;
     private String description;
-    private Boolean includeThird =  Boolean.FALSE;
+    private Boolean includeThird = Boolean.FALSE;
 
     public Long getCourseId() {
         return courseId;

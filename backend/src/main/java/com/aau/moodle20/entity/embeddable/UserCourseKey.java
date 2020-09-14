@@ -14,13 +14,11 @@ public class UserCourseKey implements Serializable {
     @Column(name = "course_id")
     Long courseId;
 
-    public UserCourseKey()
-    {
+    public UserCourseKey() {
     }
 
-    public UserCourseKey(String matriculationNumber, Long courseId)
-    {
-        this.courseId= courseId;
+    public UserCourseKey(String matriculationNumber, Long courseId) {
+        this.courseId = courseId;
         this.matriculationNumber = matriculationNumber;
     }
 

@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name ="example")
+@Table(name = "example")
 public class Example {
 
     @Id
@@ -25,7 +25,7 @@ public class Example {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parentExample_id", referencedColumnName = "id")
     private Example parentExample;
-    @OneToMany(mappedBy="parentExample", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval=true)
+    @OneToMany(mappedBy = "parentExample", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Set<Example> subExamples = new HashSet<>();
 
     private String name;
@@ -35,7 +35,7 @@ public class Example {
     private Boolean mandatory;
     @Column(name = "sort_order")
     private Integer order;
-    private Boolean submitFile ;
+    private Boolean submitFile;
     private String customFileTypes;
     @OneToMany(mappedBy = "example", fetch = FetchType.LAZY)
     Set<SupportFileType> supportFileTypes;
@@ -46,7 +46,7 @@ public class Example {
     private Integer uploadCount;
 
     @Transient
-    private byte [] validatorContent;
+    private byte[] validatorContent;
 
     public Example() {
     }
@@ -54,6 +54,7 @@ public class Example {
     public Example(Long id) {
         this.id = id;
     }
+
     public Long getId() {
         return id;
     }
@@ -192,7 +193,7 @@ public class Example {
 
     public List<String> getCustomFileTypesList() {
         List<String> list = new ArrayList<>();
-        if (customFileTypes != null && customFileTypes.length()>0) {
+        if (customFileTypes != null && customFileTypes.length() > 0) {
             String[] array = customFileTypes.split(",");
             if (array.length > 0) {
                 list.addAll(Arrays.asList(array));
@@ -226,7 +227,8 @@ public class Example {
         if (exampleRequest.getExerciseSheetId() != null)
             setExerciseSheet(new ExerciseSheet(exampleRequest.getExerciseSheetId()));
     }
-// TODO refactor later
+
+    // TODO refactor later
     public void fillValuesFromRequestObject(UpdateExampleRequest exampleRequest) {
         setName(exampleRequest.getName());
         setDescription(exampleRequest.getDescription());
@@ -304,8 +306,7 @@ public class Example {
         return exampleResponseObject;
     }
 
-    public Example copy()
-    {
+    public Example copy() {
         Example example = new Example();
         example.setSubmitFile(getSubmitFile());
         example.setWeighting(getWeighting());

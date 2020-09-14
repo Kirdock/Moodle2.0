@@ -19,35 +19,34 @@ public class SemesterController {
 
     SemesterService semesterService;
 
-    public SemesterController(SemesterService semesterService)
-    {
+    public SemesterController(SemesterService semesterService) {
         this.semesterService = semesterService;
     }
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/semester")
-    public ResponseEntity<MessageResponse> createSemester(@Valid  @RequestBody CreateSemesterRequest createSemesterRequest)  {
+    public ResponseEntity<MessageResponse> createSemester(@Valid @RequestBody CreateSemesterRequest createSemesterRequest) {
         semesterService.createSemester(createSemesterRequest);
         return ResponseEntity.ok(new MessageResponse("Semester was sucessfully created!"));
     }
 
     @GetMapping(value = "/semesters")
-    public List<Semester> getSemesters()  {
+    public List<Semester> getSemesters() {
         return semesterService.getSemesters();
     }
 
     @GetMapping(value = "/semesters/assigned")
-    public List<Semester> getSemestersAssigned()  {
+    public List<Semester> getSemestersAssigned() {
         return semesterService.getSemestersAssigned();
     }
 
     @GetMapping(value = "/semester/{semesterId}/courses")
-    public ResponseEntity<List<CourseResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
+    public ResponseEntity<List<CourseResponseObject>> getCoursesFromSemester(@PathVariable("semesterId") long semesterId) {
         return ResponseEntity.ok(semesterService.getCoursesFromSemester(semesterId));
     }
 
     @GetMapping(value = "/semester/{semesterId}/coursesAssigned")
-    public ResponseEntity<List<CourseResponseObject>> getAssignedCoursesFromSemester(@PathVariable("semesterId") long semesterId)  {
+    public ResponseEntity<List<CourseResponseObject>> getAssignedCoursesFromSemester(@PathVariable("semesterId") long semesterId) {
         return ResponseEntity.ok(semesterService.getAssignedCoursesFromSemester(semesterId));
     }
 }

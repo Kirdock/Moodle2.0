@@ -11,14 +11,12 @@ public enum ECourseRole {
 
     private String role;
 
-    ECourseRole(String role)
-    {
+    ECourseRole(String role) {
         this.role = role;
     }
 
     @JsonValue
-    public String getRole()
-    {
+    public String getRole() {
         return this.role;
     }
 }

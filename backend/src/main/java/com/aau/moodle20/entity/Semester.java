@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name ="semester")
+@Table(name = "semester")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Semester {
 
@@ -29,14 +29,13 @@ public class Semester {
     @JsonIgnore
     private Set<Course> courses;
 
-    public Semester(Long id)
-    {
+    public Semester(Long id) {
         this.id = id;
     }
 
-    public Semester()
-    {
+    public Semester() {
     }
+
     public Long getId() {
         return id;
     }

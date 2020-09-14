@@ -30,8 +30,7 @@ public class UserController {
     JwtUtils jwtUtils;
     private UserService userService;
 
-    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserService userService)
-    {
+    public UserController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.userService = userService;
@@ -49,6 +48,7 @@ public class UserController {
     public List<UserResponseObject> getUsersWithCourseRoles(@PathVariable("courseId") long courseId) {
         return userService.getUsersWithCourseRoles(courseId);
     }
+
     @GetMapping(path = "/user/isOwner")
     public Boolean isOwner() {
         return userService.isOwner();
@@ -80,6 +80,7 @@ public class UserController {
         userService.changePassword(changePasswordRequest);
         return ResponseEntity.ok(new MessageResponse("User password changed!"));
     }
+
     @PreAuthorize("hasPermission(#updateUserRequest.matriculationNumber, 'User', 'update')")
     @PostMapping(path = "/user")
     public ResponseEntity<MessageResponse> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
@@ -98,7 +99,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
-    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file",required = true) MultipartFile file, @RequestParam(value = "isAdmin",required = false) Boolean isAdmin)  {
+    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file", required = true) MultipartFile file, @RequestParam(value = "isAdmin", required = false) Boolean isAdmin) {
         return ResponseEntity.ok(userService.registerUsers(file, isAdmin));
     }
 

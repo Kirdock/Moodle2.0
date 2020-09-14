@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name ="user",
-uniqueConstraints = {
-        @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "matriculation_Number")
-})
+@Table(name = "user",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "username"),
+                @UniqueConstraint(columnNames = "matriculation_Number")
+        })
 public class User {
 
     @Id
@@ -34,33 +34,30 @@ public class User {
     private String surname;
     private String email;
 
-    @Column(name = "password_Expire_Date", columnDefinition="DATETIME")
+    @Column(name = "password_Expire_Date", columnDefinition = "DATETIME")
     private LocalDateTime passwordExpireDate;
 
     @OneToMany(mappedBy = "user")
     private Set<UserInCourse> courses;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<FinishesExample> finishedExamples;
 
-    public User()
-    {
+    public User() {
 
     }
 
-    public User(String matriculationNumber)
-    {
+    public User(String matriculationNumber) {
         this.matriculationNumber = matriculationNumber;
     }
 
-    public User(String username, String password, Boolean isAdmin)
-    {
+    public User(String username, String password, Boolean isAdmin) {
         this.username = username;
         this.password = password;
-        this.isAdmin  = isAdmin;
+        this.isAdmin = isAdmin;
     }
-    public User(String username, String matriculationNumber, String forename, String surename, String password, Boolean isAdmin)
-    {
+
+    public User(String username, String matriculationNumber, String forename, String surename, String password, Boolean isAdmin) {
         this.username = username;
         this.matriculationNumber = matriculationNumber;
         this.forename = forename;
@@ -149,8 +146,7 @@ public class User {
         this.passwordExpireDate = passwordExpireDate;
     }
 
-    public UserResponseObject createUserResponseObject()
-    {
+    public UserResponseObject createUserResponseObject() {
         UserResponseObject responseObject = new UserResponseObject();
         responseObject.setUsername(getUsername());
         responseObject.setSurname(getSurname());

@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name ="finishes_example")
+@Table(name = "finishes_example")
 public class FinishesExample {
 
     @EmbeddedId
@@ -20,7 +20,7 @@ public class FinishesExample {
     @ManyToOne
     @MapsId("matriculationNumber")
     @JoinColumn(name = "matriculation_Number")
-     private User user;
+    private User user;
 
     @ManyToOne
     @MapsId("example_id")
@@ -30,12 +30,12 @@ public class FinishesExample {
     private String description;
 
     @Transient
-    private byte [] attachmentContent;
+    private byte[] attachmentContent;
     private String fileName;
 
     private Boolean valid = false;
     private Boolean hasPresented = false;
-    private EFinishesExampleState state ;
+    private EFinishesExampleState state;
     private Integer remainingUploadCount;
 
     @OneToMany(mappedBy = "finishesExample", fetch = FetchType.LAZY)

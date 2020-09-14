@@ -33,15 +33,14 @@ public class ValidatorHandler {
                 Class<?> newClass = jarLoader.loadClass(className);
                 Constructor<?> constructor = newClass.getConstructor();
                 Object object = constructor.newInstance();
-                if(object instanceof IValidator) {
+                if (object instanceof IValidator) {
                     validator = (IValidator) object;
                     break;
                 }
             }
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new ClassNotFoundException(directory, e);
-        }
-        finally {
+        } finally {
             jarFile.close();
         }
 
@@ -49,28 +48,25 @@ public class ValidatorHandler {
     }
 
 
-    public void checkValidatorFile(MultipartFile file,Long exampleId) throws IOException, ClassNotFoundException {
+    public void checkValidatorFile(MultipartFile file, Long exampleId) throws IOException, ClassNotFoundException {
 
-        String filePath = FileConstants.VALIDATOR_TEST_DIR +"/"+file.getOriginalFilename() ;
+        String filePath = FileConstants.VALIDATOR_TEST_DIR + "/" + file.getOriginalFilename();
         File fileValidatorTest = new File(filePath);
-        if(fileValidatorTest.exists())
+        if (fileValidatorTest.exists())
             fileValidatorTest.delete();
         try {
-            saveFile(filePath,file);
+            saveFile(filePath, file);
             IValidator validator = loadValidator(filePath);
             if (validator == null) {
                 throw new ServiceException("Error: no validator found in Jar File", ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR);
             }
 
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new ServiceException("Error: classNotFoundException",e, ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR);
+        } catch (ClassNotFoundException e) {
+            throw new ServiceException("Error: classNotFoundException", e, ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR);
         }
     }
 
-    protected void saveFile(String filePath, MultipartFile file) throws IOException
-    {
+    protected void saveFile(String filePath, MultipartFile file) throws IOException {
         OutputStream outStream = null;
         try {
             InputStream initialStream = file.getInputStream();
@@ -80,8 +76,8 @@ public class ValidatorHandler {
             outStream = new FileOutputStream(targetFile);
             outStream.write(buffer);
             outStream.close();
-        }finally {
-            if(outStream!=null)
+        } finally {
+            if (outStream != null)
                 outStream.close();
         }
     }

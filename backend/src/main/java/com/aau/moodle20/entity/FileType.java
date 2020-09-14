@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name ="file_type")
+@Table(name = "file_type")
 public class FileType {
 
     @Id
@@ -27,6 +27,7 @@ public class FileType {
         this.name = name;
         this.value = value;
     }
+
     public Long getId() {
         return id;
     }

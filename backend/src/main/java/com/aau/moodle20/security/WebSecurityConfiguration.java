@@ -25,8 +25,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private AuthEntryPointJwt unauthorizedHandler;
     private CustomPermissionEvaluator customPermissionEvaluator;
 
-    public WebSecurityConfiguration(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler, CustomPermissionEvaluator customPermissionEvaluator)
-    {
+    public WebSecurityConfiguration(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler, CustomPermissionEvaluator customPermissionEvaluator) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
         this.customPermissionEvaluator = customPermissionEvaluator;
@@ -55,8 +54,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception
-    {
+    protected void configure(HttpSecurity http) throws Exception {
         http
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // No session will be created or used by spring security
                 .and()
