@@ -7,7 +7,6 @@ import com.aau.moodle20.entity.FinishesExample;
 import com.aau.moodle20.entity.User;
 import com.aau.moodle20.entity.UserInCourse;
 import com.aau.moodle20.exception.ServiceException;
-import com.aau.moodle20.exception.UserException;
 import com.aau.moodle20.payload.request.ChangePasswordRequest;
 import com.aau.moodle20.payload.request.LoginRequest;
 import com.aau.moodle20.payload.request.SignUpRequest;
@@ -101,7 +100,7 @@ public class UserService extends AbstractService {
 
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RegisterMultipleUserResponse registerUsers(MultipartFile file, Boolean isAdmin) throws UserException {
+    public RegisterMultipleUserResponse registerUsers(MultipartFile file, Boolean isAdmin){
         List<User> users = getUserObjectsFromFile(file);
         List<User> usersToBeSaves = new ArrayList<>();
         RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
@@ -263,7 +262,7 @@ public class UserService extends AbstractService {
         return presentedExamplesInCourse.size();
     }
 
-    protected List<String> readLinesFromFile(MultipartFile file) throws UserException {
+    protected List<String> readLinesFromFile(MultipartFile file){
         BufferedReader br;
         List<String> lines = new ArrayList<>();
         try {
@@ -277,12 +276,12 @@ public class UserService extends AbstractService {
             lines.remove(0); // Remove first line because it only contains column descriptions
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            throw new UserException(e.getMessage(), e);
+            throw new ServiceException(e.getMessage(), e);
         }
         return lines;
     }
 
-    public List<UserResponseObject> getAllUsers() throws UserException {
+    public List<UserResponseObject> getAllUsers(){
         return userRepository.findAll().stream()
                 .sorted(Comparator.comparing(User::getMatriculationNumber))
                 .map(User::createUserResponseObject)

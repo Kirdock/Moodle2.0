@@ -1,7 +1,5 @@
 package com.aau.moodle20.constants;
 
-import com.aau.moodle20.entity.FinishesExample;
-
 public class FileConstants {
 
     private FileConstants(){}
