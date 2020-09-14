@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class SemesterService extends AbstractService{
+public class SemesterService extends AbstractService {
 
 
-    public void createSemester(CreateSemesterRequest createSemesterRequest) throws ServiceException {
+    public void createSemester(CreateSemesterRequest createSemesterRequest) {
         if (semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear()))
             throw new ServiceException("Error: Semester with this year and type already exists!", ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS);
         Semester semester = new Semester();
@@ -29,23 +29,20 @@ public class SemesterService extends AbstractService{
         semesterRepository.save(semester);
     }
 
-    public List<Semester> getSemesters()
-    {
+    public List<Semester> getSemesters() {
         List<Semester> semestersToBeReturned = new ArrayList<>();
         UserDetailsImpl userDetails = getUserDetails();
-        if(userDetails.getAdmin())
-            semestersToBeReturned =  semesterRepository.findAll();
-        else if(courseRepository.existsByOwner_MatriculationNumber(userDetails.getMatriculationNumber()))
-        {
+        if (userDetails.getAdmin())
+            semestersToBeReturned = semesterRepository.findAll();
+        else if (courseRepository.existsByOwner_MatriculationNumber(userDetails.getMatriculationNumber())) {
             List<Course> courses = courseRepository.findByOwner_MatriculationNumber(userDetails.getMatriculationNumber());
             List<Semester> semesters = courses.stream().map(Course::getSemester).collect(Collectors.toList());
-            for(Semester semester: semesters)
-            {
-                if(!semestersToBeReturned.contains(semester))
+            for (Semester semester : semesters) {
+                if (!semestersToBeReturned.contains(semester))
                     semestersToBeReturned.add(semester);
             }
         }
-        semestersToBeReturned.sort(Comparator.comparing(Semester::getYear).thenComparing(Semester::getType,Comparator.reverseOrder()));
+        semestersToBeReturned.sort(Comparator.comparing(Semester::getYear).thenComparing(Semester::getType, Comparator.reverseOrder()));
         return semestersToBeReturned;
     }
 
@@ -59,7 +56,7 @@ public class SemesterService extends AbstractService{
             if (!semestersToBeReturned.contains(semester))
                 semestersToBeReturned.add(semester);
         }
-        semestersToBeReturned.sort(Comparator.comparing(Semester::getYear).thenComparing(Semester::getType,Comparator.reverseOrder()));
+        semestersToBeReturned.sort(Comparator.comparing(Semester::getYear).thenComparing(Semester::getType, Comparator.reverseOrder()));
 
         return semestersToBeReturned;
     }
@@ -103,10 +100,6 @@ public class SemesterService extends AbstractService{
         }
         return responseObjects;
     }
-
-
-
-
 
 
 }

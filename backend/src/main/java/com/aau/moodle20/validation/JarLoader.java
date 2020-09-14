@@ -7,7 +7,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class JarLoader  extends ClassLoader {
+public class JarLoader extends ClassLoader {
 
     private String jarDirectory = null;
 
@@ -56,8 +56,7 @@ public class JarLoader  extends ClassLoader {
             return newClass;
         } catch (IOException ex) {
             throw new ClassNotFoundException(name, ex);
-        }
-        finally {
+        } finally {
             if (jarFile != null)
                 jarFile.close();
         }

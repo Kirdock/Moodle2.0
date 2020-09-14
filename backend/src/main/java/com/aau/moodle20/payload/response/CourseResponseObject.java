@@ -24,13 +24,10 @@ public class CourseResponseObject {
     private Integer uploadCount;
 
 
-
-    public CourseResponseObject()
-    {
+    public CourseResponseObject() {
     }
 
-    public CourseResponseObject(Long id)
-    {
+    public CourseResponseObject(Long id) {
         this.id = id;
     }
 

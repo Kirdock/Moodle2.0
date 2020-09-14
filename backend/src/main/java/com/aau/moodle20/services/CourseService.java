@@ -30,16 +30,16 @@ public class CourseService extends AbstractService {
 
     private ExampleService exampleService;
 
-    public CourseService( ExampleService exampleService) {
+    public CourseService(ExampleService exampleService) {
         this.exampleService = exampleService;
     }
 
-    public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) throws ServiceException {
+    public CourseResponseObject createCourse(CreateCourseRequest createCourseRequest) {
 
         Semester semester = readSemester(createCourseRequest.getSemesterId());
         // check if owner exists
         readUser(createCourseRequest.getOwner());
-        if(courseRepository.existsByNumberAndSemester_Id(createCourseRequest.getNumber(),createCourseRequest.getSemesterId()))
+        if (courseRepository.existsByNumberAndSemester_Id(createCourseRequest.getNumber(), createCourseRequest.getSemesterId()))
             throw new ServiceException("Course in Semester already exists", ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
         Course course = new Course();
@@ -56,17 +56,16 @@ public class CourseService extends AbstractService {
         return new CourseResponseObject(course.getId());
     }
 
-    public Course updateCourse(UpdateCourseRequest updateCourseRequest) throws ServiceException {
+    public Course updateCourse(UpdateCourseRequest updateCourseRequest) {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(updateCourseRequest.getId());
         if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
             throw new ServiceException("Error: Owner cannot be updated because the given matriculationNumber those not exists!", HttpStatus.NOT_FOUND);
 
         // if number is updated check if given number already exists in semester
-        if(!updateCourseRequest.getNumber().equals(course.getNumber()))
-        {
-            if(courseRepository.existsByNumberAndSemester_Id(updateCourseRequest.getNumber(),course.getSemester().getId()))
-                throw new ServiceException("Error: A Course with this number already exists",ApiErrorResponseCodes.CHANGED_COURSE_NUMBER_ALREADY_EXISTS);
+        if (!updateCourseRequest.getNumber().equals(course.getNumber())) {
+            if (courseRepository.existsByNumberAndSemester_Id(updateCourseRequest.getNumber(), course.getSemester().getId()))
+                throw new ServiceException("Error: A Course with this number already exists", ApiErrorResponseCodes.CHANGED_COURSE_NUMBER_ALREADY_EXISTS);
         }
 
         course.setMinKreuzel(updateCourseRequest.getMinKreuzel());
@@ -80,8 +79,7 @@ public class CourseService extends AbstractService {
         return courseRepository.save(course);
     }
 
-    public void updateCoursePresets(UpdateCoursePresets updateCoursePresets) throws ServiceException
-    {
+    public void updateCoursePresets(UpdateCoursePresets updateCoursePresets) {
         Course course = readCourse(updateCoursePresets.getId());
         course.setDescriptionTemplate(updateCoursePresets.getDescription());
         course.setUploadCount(updateCoursePresets.getUploadCount());
@@ -89,19 +87,18 @@ public class CourseService extends AbstractService {
     }
 
     @Transactional
-    public void deleteCourse(Long courseId) throws  IOException {
+    public void deleteCourse(Long courseId) throws IOException {
         Course course = readCourse(courseId);
         Set<ExerciseSheet> exerciseSheets = course.getExerciseSheets();
-        for(ExerciseSheet exerciseSheet: exerciseSheets)
-        {
-            for(Example example: exerciseSheet.getExamples())
+        for (ExerciseSheet exerciseSheet : exerciseSheets) {
+            for (Example example : exerciseSheet.getExamples())
                 exampleService.deleteExampleValidator(example.getId());
         }
 
         courseRepository.delete(course);
     }
 
-    public CourseResponseObject getCourse(long courseId) throws ServiceException {
+    public CourseResponseObject getCourse(long courseId) {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(courseId);
         CourseResponseObject responseObject = course.createCourseResponseObjectGetCourse();
@@ -113,13 +110,12 @@ public class CourseService extends AbstractService {
         return responseObject;
     }
 
-    public List<FinishesExampleResponse> getCoursePresented(Long courseId) throws ServiceException {
+    public List<FinishesExampleResponse> getCoursePresented(Long courseId) {
         Course course = readCourse(courseId);
         return createCoursePresentedList(course);
     }
 
-    protected List<FinishesExampleResponse> createCoursePresentedList(Course course)
-    {
+    protected List<FinishesExampleResponse> createCoursePresentedList(Course course) {
         List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);
         List<ExerciseSheet> sortedExerciseSheets = course.getExerciseSheets().stream()
@@ -129,14 +125,14 @@ public class CourseService extends AbstractService {
         for (ExerciseSheet exerciseSheet : sortedExerciseSheets) {
 
             List<Example> sortedExamples = exerciseSheet.getExamples().stream()
-                    .filter(example -> example.getParentExample()==null)
+                    .filter(example -> example.getParentExample() == null)
                     .sorted(exampleComparator).collect(Collectors.toList());
             for (Example example : sortedExamples) {
                 if (example.getSubExamples() == null || example.getSubExamples().isEmpty())
                     finishesExampleResponses.addAll(createFinishesExampleResponses(example, exerciseSheet));
                 else {
                     List<Example> sortedSubExamples = example.getSubExamples().stream().sorted(exampleComparator).collect(Collectors.toList());
-                    sortedSubExamples.forEach(subExample -> finishesExampleResponses.addAll(createFinishesExampleResponses(subExample,exerciseSheet)));
+                    sortedSubExamples.forEach(subExample -> finishesExampleResponses.addAll(createFinishesExampleResponses(subExample, exerciseSheet)));
                 }
             }
         }
@@ -170,12 +166,11 @@ public class CourseService extends AbstractService {
         return kreuzelCourseResponses;
     }
 
-    protected List<FinishesExampleResponse> createFinishesExampleResponses(Example example, ExerciseSheet exerciseSheet)
-    {
+    protected List<FinishesExampleResponse> createFinishesExampleResponses(Example example, ExerciseSheet exerciseSheet) {
         List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
         for (FinishesExample finishesExample : example.getExamplesFinishedByUser()) {
 
-            if(finishesExample.getHasPresented()) {
+            if (finishesExample.getHasPresented()) {
                 FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
                 finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
                 finishesExampleResponse.setSurname(finishesExample.getUser().getSurname());
@@ -191,21 +186,20 @@ public class CourseService extends AbstractService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public CourseResponseObject copyCourse(CopyCourseRequest copyCourseRequest) throws ServiceException, IOException {
+    public CourseResponseObject copyCourse(CopyCourseRequest copyCourseRequest) throws IOException {
 
         Semester semester = readSemester(copyCourseRequest.getSemesterId());
         Course originalCourse = readCourse(copyCourseRequest.getCourseId());
 
-        if(courseRepository.existsByNumberAndSemester_Id(originalCourse.getNumber(),semester.getId()))
-            throw new ServiceException("Error: A course with this number already exists in given semester!",ApiErrorResponseCodes.COPIED_COURSE_NUMBER_ALREADY_EXISTS);
+        if (courseRepository.existsByNumberAndSemester_Id(originalCourse.getNumber(), semester.getId()))
+            throw new ServiceException("Error: A course with this number already exists in given semester!", ApiErrorResponseCodes.COPIED_COURSE_NUMBER_ALREADY_EXISTS);
 
         // first copy course
         Course copiedCourse = originalCourse.copy();
         copiedCourse.setSemester(semester);
         courseRepository.save(copiedCourse);
 
-        if (originalCourse.getExerciseSheets() == null || originalCourse.getExerciseSheets().isEmpty())
-        {
+        if (originalCourse.getExerciseSheets() == null || originalCourse.getExerciseSheets().isEmpty()) {
             CourseResponseObject courseResponseObject = new CourseResponseObject();
             courseResponseObject.setId(copiedCourse.getId());
             return courseResponseObject;
@@ -230,7 +224,7 @@ public class CourseService extends AbstractService {
                 Example copiedExample = example.copy();
                 copiedExample.setExerciseSheet(copiedExerciseSheet);
                 exampleRepository.save(copiedExample);
-                exampleService.copyValidator(example,copiedExample);
+                exampleService.copyValidator(example, copiedExample);
 
 
                 if (example.getSubExamples() != null) {
@@ -239,7 +233,7 @@ public class CourseService extends AbstractService {
                         copiedSubExample.setExerciseSheet(copiedExerciseSheet);
                         copiedSubExample.setParentExample(copiedExample);
                         exampleRepository.save(copiedSubExample);
-                        exampleService.copyValidator(subExample,copiedSubExample);
+                        exampleService.copyValidator(subExample, copiedSubExample);
                         if (subExample.getSupportFileTypes() != null) {
                             copySupportFileType(subExample.getSupportFileTypes(), copiedSubExample);
                         }
@@ -257,8 +251,7 @@ public class CourseService extends AbstractService {
         return responseObject;
     }
 
-    protected  void copySupportFileType(Set<SupportFileType> supportFileTypes, Example copiedExample)
-    {
+    protected void copySupportFileType(Set<SupportFileType> supportFileTypes, Example copiedExample) {
         for (SupportFileType supportFileType : supportFileTypes) {
 
             SupportFileType copiedSupportFileType = new SupportFileType();

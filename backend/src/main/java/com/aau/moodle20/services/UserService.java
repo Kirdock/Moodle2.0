@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 import static org.passay.CharacterOccurrencesRule.ERROR_CODE;
 
 @Service
-public class UserService  extends AbstractService{
+public class UserService extends AbstractService {
 
 
     private PasswordEncoder encoder;
@@ -65,26 +65,24 @@ public class UserService  extends AbstractService{
 
     private Pattern matriculationPattern = Pattern.compile("^[0-9]{8}$");
 
-    public UserService(PasswordEncoder encoder, EmailService emailService, ResourceBundleMessageSource resourceBundleMessageSource)
-    {
+    public UserService(PasswordEncoder encoder, EmailService emailService, ResourceBundleMessageSource resourceBundleMessageSource) {
         this.encoder = encoder;
         this.emailService = emailService;
         this.resourceBundleMessageSource = resourceBundleMessageSource;
     }
 
-    public void registerUser(SignUpRequest signUpRequest) throws ServiceException
-    {
+    public void registerUser(SignUpRequest signUpRequest) {
         if (userRepository.existsByMatriculationNumber(signUpRequest.getMatriculationNumber())) {
             throw new ServiceException("Error: User with this matriculationNumber already exists!", ApiErrorResponseCodes.MATRICULATION_NUMBER_ALREADY_EXISTS);
         }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new ServiceException("Error: User with this username already exists!",ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
+            throw new ServiceException("Error: User with this username already exists!", ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
         }
 
         String emailSubject = getLocaleMessage("registerUser.email.subject");
         String emailText = getLocaleMessage("registerUser.email.text");
 
-        String password =  developerMode?"password":generateRandomPassword();
+        String password = developerMode ? "password" : generateRandomPassword();
         String encodedPassword = encoder.encode(password);
 
         //username, matrikelNumber, forename, surename, password, isAdmin
@@ -110,7 +108,7 @@ public class UserService  extends AbstractService{
         List<User> usersToBeSaves = new ArrayList<>();
         RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
         String standardPassword = encoder.encode("password");
-        Map<String,String> passwords = new HashMap<>();
+        Map<String, String> passwords = new HashMap<>();
 
         String emailSubject = getLocaleMessage("registerUser.email.subject");
         String emailText = getLocaleMessage("registerUser.email.text");
@@ -130,7 +128,7 @@ public class UserService  extends AbstractService{
 
             if (isAdmin != null)
                 user.setAdmin(isAdmin);
-            validateUserEntry(user,registerMultipleUserResponse,usersToBeSaves,lineNumber);
+            validateUserEntry(user, registerMultipleUserResponse, usersToBeSaves, lineNumber);
             lineNumber++;
         }
         userRepository.saveAll(usersToBeSaves);
@@ -175,7 +173,7 @@ public class UserService  extends AbstractService{
             failedUserResponse.setLineNumber(lineNumber);
             failedUserResponse.setStatusCode(ApiErrorResponseCodes.REGISTER_USERS_MATRICULATION_ALREADY_EXISTS);
             registerMultipleUserResponse.getFailedUsers().add(failedUserResponse);
-        } else if(!alreadyExists)
+        } else if (!alreadyExists)
             userToBeSaved.add(user);
     }
 
@@ -200,19 +198,16 @@ public class UserService  extends AbstractService{
         return users;
     }
 
-    public List<User> registerMissingUsersFromFile(MultipartFile file, RegisterMultipleUserResponse registerMultipleUserResponse)
-    {
-        RegisterMultipleUserResponse registerMultipleUserResponse2 = registerUsers(file,Boolean.FALSE);
+    public List<User> registerMissingUsersFromFile(MultipartFile file, RegisterMultipleUserResponse registerMultipleUserResponse) {
+        RegisterMultipleUserResponse registerMultipleUserResponse2 = registerUsers(file, Boolean.FALSE);
         registerMultipleUserResponse.setFailedUsers(registerMultipleUserResponse2.getFailedUsers());
         registerMultipleUserResponse.setRegisteredUsers(registerMultipleUserResponse2.getRegisteredUsers());
 
         userRepository.flush();
         List<User> users = getUserObjectsFromFile(file);
         List<User> realUsers = new ArrayList<>();
-        for(User user: users)
-        {
-            if(userRepository.existsByMatriculationNumber(user.getMatriculationNumber()))
-            {
+        for (User user : users) {
+            if (userRepository.existsByMatriculationNumber(user.getMatriculationNumber())) {
                 realUsers.add(user);
             }
         }
@@ -222,11 +217,11 @@ public class UserService  extends AbstractService{
     /**
      * returns all users. If user is assigned to course, add course role
      * also join with finishe example and returns all presented examples
+     *
      * @param courseId
      * @return
-     * @throws ServiceException
      */
-    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) throws ServiceException {
+    public List<UserResponseObject> getUsersWithCourseRoles(Long courseId) {
         List<UserResponseObject> userResponseObjectList = new ArrayList<>();
 
         readCourse(courseId);
@@ -235,18 +230,17 @@ public class UserService  extends AbstractService{
         allUsers.removeIf(User::getAdmin);
 
         for (User user : allUsers) {
-            UserResponseObject responseObject =  user.createUserResponseObject();
+            UserResponseObject responseObject = user.createUserResponseObject();
             Optional<UserInCourse> optionalUserInCourse = userInCourses.stream()
                     .filter(userInCourse -> user.getMatriculationNumber().equals(userInCourse.getUser().getMatriculationNumber()))
                     .findFirst();
             if (optionalUserInCourse.isPresent()) {
                 responseObject.setCourseRole(optionalUserInCourse.get().getRole());
                 // add presented examples of user
-                if(ECourseRole.STUDENT.equals(optionalUserInCourse.get().getRole())) {
-                    responseObject.setPresentedCount(getPresentedExamplesCount(user,optionalUserInCourse.get().getCourse()));
+                if (ECourseRole.STUDENT.equals(optionalUserInCourse.get().getRole())) {
+                    responseObject.setPresentedCount(getPresentedExamplesCount(user, optionalUserInCourse.get().getCourse()));
                 }
-            }
-            else
+            } else
                 responseObject.setCourseRole(ECourseRole.NONE);
             userResponseObjectList.add(responseObject);
         }
@@ -255,18 +249,16 @@ public class UserService  extends AbstractService{
         return userResponseObjectList;
     }
 
-    protected Integer getPresentedExamplesCount(User user, Course course)
-    {
+    protected Integer getPresentedExamplesCount(User user, Course course) {
         List<FinishesExample> presentedExamples = user.getFinishedExamples().stream()
                 .filter(FinishesExample::getHasPresented)
                 .collect(Collectors.toList());
 
         // filter example who related to given course
         List<FinishesExample> presentedExamplesInCourse = new ArrayList<>();
-        for(FinishesExample finishesExample: presentedExamples)
-        {
+        for (FinishesExample finishesExample : presentedExamples) {
             Course finishedExampleCourse = finishesExample.getExample().getExerciseSheet().getCourse();
-            if(finishedExampleCourse.getId().equals(course.getId()))
+            if (finishedExampleCourse.getId().equals(course.getId()))
                 presentedExamplesInCourse.add(finishesExample);
         }
 
@@ -299,11 +291,11 @@ public class UserService  extends AbstractService{
                 .collect(Collectors.toList());
     }
 
-    public void changePassword(ChangePasswordRequest changePasswordRequest) throws ServiceException {
+    public void changePassword(ChangePasswordRequest changePasswordRequest) {
         User currentUser = getCurrentUser();
         if (!encoder.matches(changePasswordRequest.getOldPassword(), currentUser.getPassword()))
             throw new ServiceException("Password for User not correct!");
-        if(adminMatriculationNumber.equals(currentUser.getMatriculationNumber()))
+        if (adminMatriculationNumber.equals(currentUser.getMatriculationNumber()))
             throw new ServiceException("Password for Root Admin cannot be changed");
         currentUser.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
         currentUser.setPasswordExpireDate(null);
@@ -311,7 +303,7 @@ public class UserService  extends AbstractService{
     }
 
     @Transactional
-    public void updateUser(UpdateUserRequest updateUserRequest) throws ServiceException {
+    public void updateUser(UpdateUserRequest updateUserRequest) {
         String matriculationNumber = null;
         UserDetailsImpl userDetails = getUserDetails();
         if (updateUserRequest.getMatriculationNumber() != null && updateUserRequest.getMatriculationNumber().length() > 0) {
@@ -322,7 +314,7 @@ public class UserService  extends AbstractService{
             matriculationNumber = userDetails.getMatriculationNumber();
         }
 
-        if(adminMatriculationNumber.equals(matriculationNumber))
+        if (adminMatriculationNumber.equals(matriculationNumber))
             throw new ServiceException("Error: Root admin cannot be updated!");
 
         User user = readUser(matriculationNumber);
@@ -330,17 +322,17 @@ public class UserService  extends AbstractService{
         user.setEmail(updateUserRequest.getEmail());
         user.setSurname(updateUserRequest.getSurname());
         user.setForename(updateUserRequest.getForename());
-        if(userDetails.getAdmin() && updateUserRequest.getIsAdmin()!=null)
+        if (userDetails.getAdmin() && updateUserRequest.getIsAdmin() != null)
             user.setAdmin(updateUserRequest.getIsAdmin());
 
         userRepository.saveAndFlush(user);
-        if(hasEmailChanged && user.getPasswordExpireDate()!=null)
+        if (hasEmailChanged && user.getPasswordExpireDate() != null)
             generateNewTemporaryPassword(user);
     }
 
 
     @Transactional
-    public void deleteUser(String matriculationNumber) throws ServiceException {
+    public void deleteUser(String matriculationNumber) {
         User user = readUser(matriculationNumber);
 
         if (user.getMatriculationNumber().equals(adminMatriculationNumber))
@@ -348,8 +340,7 @@ public class UserService  extends AbstractService{
 
         User adminUser = readUser(adminMatriculationNumber);
         List<Course> courses = courseRepository.findByOwner_MatriculationNumber(matriculationNumber);
-        for(Course course : courses)
-        {
+        for (Course course : courses) {
             course.setOwner(adminUser);
         }
 
@@ -399,18 +390,15 @@ public class UserService  extends AbstractService{
     }
 
 
-    public void checkForTemporaryPassword(LoginRequest loginRequest) throws ServiceException
-    {
-        Optional<User> optionalUser= userRepository.findByUsername(loginRequest.getUsername());
-        if(optionalUser.isPresent()){
-            if(optionalUser.get().getPasswordExpireDate()!=null)
-            {
+    public void checkForTemporaryPassword(LoginRequest loginRequest) {
+        Optional<User> optionalUser = userRepository.findByUsername(loginRequest.getUsername());
+        if (optionalUser.isPresent()) {
+            if (optionalUser.get().getPasswordExpireDate() != null) {
                 LocalDateTime now = LocalDateTime.now();
-                if(now.isAfter(optionalUser.get().getPasswordExpireDate())) {
+                if (now.isAfter(optionalUser.get().getPasswordExpireDate())) {
                     generateNewTemporaryPassword(optionalUser.get());
                     throw new ServiceException("Error: temporary password is expired", ApiErrorResponseCodes.TEMPORARY_PASSWORD_EXPIRED);
-                }else
-                {
+                } else {
                     optionalUser.get().setPasswordExpireDate(null);
                     userRepository.save(optionalUser.get());
                 }
@@ -419,8 +407,7 @@ public class UserService  extends AbstractService{
         }
     }
 
-    protected void generateNewTemporaryPassword(User user)
-    {
+    protected void generateNewTemporaryPassword(User user) {
         String password = developerMode ? "password" : generateRandomPassword();
         String encodedPassword = encoder.encode(password);
         user.setPassword(encodedPassword);
@@ -428,7 +415,7 @@ public class UserService  extends AbstractService{
             user.setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
         userRepository.save(user);
 
-        if(!developerMode) {
+        if (!developerMode) {
             String emailSubject = getLocaleMessage("registerUser.email.subject");
             String emailText = getLocaleMessage("registerUser.email.text");
 

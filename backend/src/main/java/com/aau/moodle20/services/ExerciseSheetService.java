@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ExerciseSheetService extends AbstractService{
+public class ExerciseSheetService extends AbstractService {
 
     private PdfService pdfService;
     private ExampleService exampleService;
@@ -30,10 +30,10 @@ public class ExerciseSheetService extends AbstractService{
         this.exampleService = exampleService;
     }
 
-    public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) throws ServiceException {
+    public void createExerciseSheet(CreateExerciseSheetRequest createExerciseSheetRequest) {
         Course course = readCourse(createExerciseSheetRequest.getCourseId());
 
-        checkExerciseSheetName(course,createExerciseSheetRequest.getName(),null);
+        checkExerciseSheetName(course, createExerciseSheetRequest.getName(), null);
 
         ExerciseSheet exerciseSheet = new ExerciseSheet();
         exerciseSheet.setCourse(course);
@@ -48,27 +48,24 @@ public class ExerciseSheetService extends AbstractService{
         exerciseSheetRepository.save(exerciseSheet);
     }
 
-    protected void checkExerciseSheetName(Course course, String name, ExerciseSheet exerciseSheet) throws ServiceException
-    {
+    protected void checkExerciseSheetName(Course course, String name, ExerciseSheet exerciseSheet) {
         boolean exists;
-        if(exerciseSheet!=null)
-        {
+        if (exerciseSheet != null) {
             exists = course.getExerciseSheets().stream()
                     .filter(exerciseSheet1 -> !exerciseSheet.getName().equals(exerciseSheet1.getName()))
                     .anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
-        }else
-        {
+        } else {
             exists = course.getExerciseSheets().stream().anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
         }
-        if(exists)
+        if (exists)
             throw new ServiceException("Error Exercise Sheet with this name already exists in given course", ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS);
     }
 
 
-    public void updateExerciseSheet(UpdateExerciseSheetRequest updateExerciseSheetRequest) throws ServiceException {
+    public void updateExerciseSheet(UpdateExerciseSheetRequest updateExerciseSheetRequest) {
         ExerciseSheet exerciseSheet = readExerciseSheet(updateExerciseSheetRequest.getId());
 
-        checkExerciseSheetName(exerciseSheet.getCourse(),updateExerciseSheetRequest.getName(),exerciseSheet);
+        checkExerciseSheetName(exerciseSheet.getCourse(), updateExerciseSheetRequest.getName(), exerciseSheet);
 
         exerciseSheet.setMinKreuzel(updateExerciseSheetRequest.getMinKreuzel());
         exerciseSheet.setMinPoints(updateExerciseSheetRequest.getMinPoints());
@@ -81,18 +78,18 @@ public class ExerciseSheetService extends AbstractService{
         exerciseSheetRepository.save(exerciseSheet);
     }
 
-    public ExerciseSheetResponseObject getExerciseSheet(Long id) throws ServiceException {
+    public ExerciseSheetResponseObject getExerciseSheet(Long id) {
         ExerciseSheet exerciseSheet = readExerciseSheet(id);
         return exerciseSheet.getResponseObject(null);
     }
 
-    public ExerciseSheetKreuzelResponse getExerciseSheetKreuzel(Long exerciseSheetId) throws ServiceException {
+    public ExerciseSheetKreuzelResponse getExerciseSheetKreuzel(Long exerciseSheetId) {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         ExerciseSheetKreuzelResponse response = new ExerciseSheetKreuzelResponse();
         response.setIncludeThird(exerciseSheet.getIncludeThird());
 
         List<Example> sortedExampleList = getSortedExampleList(exerciseSheet);
-        for(Example example:sortedExampleList)
+        for (Example example : sortedExampleList)
             response.getExamples().add(createExampleResponseObject(example));
 
         Comparator<UserInCourse> userInCourseComparatorSureName = Comparator.comparing(userInCourse -> userInCourse.getUser().getSurname());
@@ -103,51 +100,46 @@ public class ExerciseSheetService extends AbstractService{
                 .filter(userInCourse -> ECourseRole.STUDENT.equals(userInCourse.getRole()))
                 .sorted(userInCourseComparatorSureName.thenComparing(userInCourseComparatorForename).thenComparing(userInCourseComparatorMatriculationNumber))
                 .collect(Collectors.toList());
-        for(UserInCourse userInCourse: sortedUserInCourse)
-        {
+        for (UserInCourse userInCourse : sortedUserInCourse) {
             User user = userInCourse.getUser();
             KreuzelCourseResponse kreuzelCourseResponse = new KreuzelCourseResponse();
             kreuzelCourseResponse.setMatriculationNumber(user.getMatriculationNumber());
             kreuzelCourseResponse.setSurname(user.getSurname());
             kreuzelCourseResponse.setForename(user.getForename());
-            kreuzelCourseResponse.setStates(getExampleStatesOfExerciseSheet(sortedExampleList,user));
+            kreuzelCourseResponse.setStates(getExampleStatesOfExerciseSheet(sortedExampleList, user));
 
             response.getKreuzel().add(kreuzelCourseResponse);
         }
 
         response.getKreuzel().sort(Comparator.comparing(KreuzelCourseResponse::getMatriculationNumber));
-    return response;
+        return response;
     }
 
-    protected List<KreuzelCourseState> getExampleStatesOfExerciseSheet(List<Example> examplesOfExerciseSheet, User user)
-    {
+    protected List<KreuzelCourseState> getExampleStatesOfExerciseSheet(List<Example> examplesOfExerciseSheet, User user) {
         List<KreuzelCourseState> states = new ArrayList<>();
-        for(Example example: examplesOfExerciseSheet)
-        {
+        for (Example example : examplesOfExerciseSheet) {
             KreuzelCourseState state = new KreuzelCourseState();
 
-           Optional<FinishesExample> optFinishesExample = example.getExamplesFinishedByUser().stream()
-                   .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(user.getMatriculationNumber()))
-                   .findFirst();
-           if(optFinishesExample.isPresent()) {
-               state.setType(optFinishesExample.get().getState().getRole());
-               state.setDescription(optFinishesExample.get().getDescription());
+            Optional<FinishesExample> optFinishesExample = example.getExamplesFinishedByUser().stream()
+                    .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(user.getMatriculationNumber()))
+                    .findFirst();
+            if (optFinishesExample.isPresent()) {
+                state.setType(optFinishesExample.get().getState().getRole());
+                state.setDescription(optFinishesExample.get().getDescription());
 
-               List<ViolationHistoryResponse> violationHistoryResponses = optFinishesExample.get().getViolationHistoryList().stream()
-                       .map(ViolationHistory::createViolationHistoryResponse).collect(Collectors.toList());
-               state.setResult(violationHistoryResponses);
-           }
-           else {
-               state.setType(EFinishesExampleState.NO.getRole());
-               state.setDescription("");
-           }
+                List<ViolationHistoryResponse> violationHistoryResponses = optFinishesExample.get().getViolationHistoryList().stream()
+                        .map(ViolationHistory::createViolationHistoryResponse).collect(Collectors.toList());
+                state.setResult(violationHistoryResponses);
+            } else {
+                state.setType(EFinishesExampleState.NO.getRole());
+                state.setDescription("");
+            }
             states.add(state);
         }
         return states;
     }
 
-    protected ExampleResponseObject createExampleResponseObject(Example example)
-    {
+    protected ExampleResponseObject createExampleResponseObject(Example example) {
         ExampleResponseObject exampleResponseObject = new ExampleResponseObject();
         exampleResponseObject.setName(example.getName());
         exampleResponseObject.setId(example.getId());
@@ -156,8 +148,7 @@ public class ExerciseSheetService extends AbstractService{
         return exampleResponseObject;
     }
 
-    protected List<Example> getSortedExampleList(ExerciseSheet exerciseSheet)
-    {
+    protected List<Example> getSortedExampleList(ExerciseSheet exerciseSheet) {
         List<Example> sortedExampleList = new ArrayList<>();
 
         List<Example> examples = exerciseSheet.getExamples().stream()
@@ -176,7 +167,7 @@ public class ExerciseSheetService extends AbstractService{
         return sortedExampleList;
     }
 
-    public ExerciseSheetResponseObject getExerciseSheetAssigned(Long exerciseSheetId) throws ServiceException {
+    public ExerciseSheetResponseObject getExerciseSheetAssigned(Long exerciseSheetId) {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         UserDetailsImpl userDetails = getUserDetails();
         Boolean isAssignedUser = exerciseSheet.getCourse().getStudents().stream()
@@ -192,15 +183,14 @@ public class ExerciseSheetService extends AbstractService{
     @Transactional
     public void deleteExerciseSheet(Long id) throws IOException {
         ExerciseSheet exerciseSheet = readExerciseSheet(id);
-        for(Example example: exerciseSheet.getExamples())
-        {
+        for (Example example : exerciseSheet.getExamples()) {
             exampleService.deleteExampleValidator(example.getId());
         }
         exampleRepository.flush();
         exerciseSheetRepository.delete(exerciseSheet);
     }
 
-    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) throws ServiceException {
+    public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(courseId);
         if (!userDetails.getAdmin()) {

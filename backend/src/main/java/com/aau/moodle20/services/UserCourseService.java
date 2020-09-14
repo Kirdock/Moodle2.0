@@ -30,8 +30,7 @@ public class UserCourseService extends AbstractService {
     UserService userDetailsService;
     FinishesExampleService finishesExampleService;
 
-    public UserCourseService(PdfService pdfService, UserService userDetailsService, FinishesExampleService finishesExampleService)
-    {
+    public UserCourseService(PdfService pdfService, UserService userDetailsService, FinishesExampleService finishesExampleService) {
         this.pdfService = pdfService;
         this.userDetailsService = userDetailsService;
         this.finishesExampleService = finishesExampleService;
@@ -42,7 +41,7 @@ public class UserCourseService extends AbstractService {
 
     private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
 
-    public CourseResponseObject getCourseAssigned(Long courseId) throws ServiceException {
+    public CourseResponseObject getCourseAssigned(Long courseId) {
         Course course = readCourse(courseId);
         User currentUser = getCurrentUser();
         Boolean isCourseAssigned = currentUser.getCourses().stream()
@@ -55,22 +54,20 @@ public class UserCourseService extends AbstractService {
     }
 
 
-
-
     @Transactional
-    public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws ServiceException, IOException {
+    public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws IOException {
         UserDetailsImpl userDetails = getUserDetails();
         List<UserInCourse> userInCourses = new ArrayList<>();
-        for(AssignUserToCourseRequest assignUserToCourseRequest: assignUserToCourseRequests) {
+        for (AssignUserToCourseRequest assignUserToCourseRequest : assignUserToCourseRequests) {
 
-            if(!userRepository.existsByMatriculationNumber(assignUserToCourseRequest.getMatriculationNumber()))
-                throw new ServiceException("Error: User with matrikulationNumber:"+assignUserToCourseRequest.getMatriculationNumber()+" does not exist");
+            if (!userRepository.existsByMatriculationNumber(assignUserToCourseRequest.getMatriculationNumber()))
+                throw new ServiceException("Error: User with matrikulationNumber:" + assignUserToCourseRequest.getMatriculationNumber() + " does not exist");
 
-            if(!courseRepository.existsById(assignUserToCourseRequest.getCourseId()))
-                throw new ServiceException("Error: Course with id:"+assignUserToCourseRequest.getCourseId()+" does not exist");
+            if (!courseRepository.existsById(assignUserToCourseRequest.getCourseId()))
+                throw new ServiceException("Error: Course with id:" + assignUserToCourseRequest.getCourseId() + " does not exist");
 
-            if(!getUserDetails().getAdmin() && !isOwner(assignUserToCourseRequest.getCourseId()))
-                throw new ServiceException("Error: User is not owner of course: "+assignUserToCourseRequest.getCourseId(),HttpStatus.FORBIDDEN);
+            if (!getUserDetails().getAdmin() && !isOwner(assignUserToCourseRequest.getCourseId()))
+                throw new ServiceException("Error: User is not owner of course: " + assignUserToCourseRequest.getCourseId(), HttpStatus.FORBIDDEN);
 
             UserCourseKey userCourseKey = new UserCourseKey();
             UserInCourse userInCourse = new UserInCourse();
@@ -88,7 +85,7 @@ public class UserCourseService extends AbstractService {
             userInCourse.setId(userCourseKey);
             userInCourses.add(userInCourse);
 
-            if(ECourseRole.NONE.equals(userInCourse.getRole()))
+            if (ECourseRole.NONE.equals(userInCourse.getRole()))
                 clearUserInfo(userInCourse);
         }
         userInCourseRepository.saveAll(userInCourses);
@@ -113,10 +110,10 @@ public class UserCourseService extends AbstractService {
     }
 
     @Transactional
-    public RegisterMultipleUserResponse assignFile(MultipartFile file, Long courseId) throws ServiceException {
+    public RegisterMultipleUserResponse assignFile(MultipartFile file, Long courseId) {
         Course course = readCourse(courseId);
         RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
-        List<User> allGivenUsers = userService.registerMissingUsersFromFile(file,registerMultipleUserResponse);
+        List<User> allGivenUsers = userService.registerMissingUsersFromFile(file, registerMultipleUserResponse);
         List<UserInCourse> userInCourses = new ArrayList<>();
 
         for (User user : allGivenUsers) {

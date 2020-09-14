@@ -5,7 +5,7 @@ import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import javax.persistence.*;
 
 @Entity
-@Table(name ="support_file_type")
+@Table(name = "support_file_type")
 public class SupportFileType {
 
     @EmbeddedId
@@ -14,13 +14,13 @@ public class SupportFileType {
     @ManyToOne
     @MapsId("example_id")
     @JoinColumn(name = "example_id")
-     Example example;
+    Example example;
 
     @ManyToOne
     @MapsId("file_type_id")
     @JoinColumn(name = "file_type_id")
     FileType fileType;
-    
+
 
     public SupportFileTypeKey getId() {
         return id;
@@ -46,8 +46,7 @@ public class SupportFileType {
         this.fileType = fileType;
     }
 
-    public SupportFileType copy()
-    {
+    public SupportFileType copy() {
         SupportFileType supportFileType = new SupportFileType();
         supportFileType.setFileType(getFileType());
         supportFileType.setExample(getExample());

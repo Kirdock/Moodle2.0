@@ -97,9 +97,8 @@ public class PdfService extends AbstractService {
                 .sorted(Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName))
                 .collect(Collectors.toList());
         int exerciseSheetNumber = 1;
-        for(ExerciseSheet exerciseSheet1: exerciseSheetsOfCourse)
-        {
-            if(exerciseSheet1.equals(exerciseSheet))
+        for (ExerciseSheet exerciseSheet1 : exerciseSheetsOfCourse) {
+            if (exerciseSheet1.equals(exerciseSheet))
                 break;
             exerciseSheetNumber++;
         }
@@ -127,20 +126,20 @@ public class PdfService extends AbstractService {
                 .sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
         for (Example example : sortedExamples) {
 
-            String exampleText = exerciseSheetNumber+"."+(example.getOrder()+1) +" "+ example.getName();
+            String exampleText = exerciseSheetNumber + "." + (example.getOrder() + 1) + " " + example.getName();
             if (example.getSubExamples().isEmpty()) {
                 addExampleHeader(exampleText, "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", exampleHeaderFontSize, doc);
                 addHtmlToPdfDocument(example.getDescription(), doc);
                 addEmptyLinesToDocument(doc, 1);
             } else {
-                addExampleHeader(exampleText, "", exampleHeaderFontSize,doc);
+                addExampleHeader(exampleText, "", exampleHeaderFontSize, doc);
                 addHtmlToPdfDocument(example.getDescription(), doc);
                 addEmptyLinesToDocument(doc, 1);
                 List<Example> subExamples = example.getSubExamples().stream().sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
                 for (Example subExample : subExamples) {
-                    String subExampleText = exerciseSheetNumber+"."+(example.getOrder()+1) +"."+ (subExample.getOrder() +1) +" "+subExample.getName();
+                    String subExampleText = exerciseSheetNumber + "." + (example.getOrder() + 1) + "." + (subExample.getOrder() + 1) + " " + subExample.getName();
 
-                    addExampleHeader(subExampleText, "(" + subExample.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", subExampleHeaderFontSize,doc);
+                    addExampleHeader(subExampleText, "(" + subExample.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", subExampleHeaderFontSize, doc);
                     addHtmlToPdfDocument(subExample.getDescription(), doc);
                     addEmptyLinesToDocument(doc, 1);
                 }
@@ -161,7 +160,7 @@ public class PdfService extends AbstractService {
     }
 
     protected void addHtmlToPdfDocument(String html, Document document) {
-        if(html == null)
+        if (html == null)
             return;
 
         List<IElement> elements = HtmlConverter.convertToElements(html);
@@ -171,7 +170,7 @@ public class PdfService extends AbstractService {
         }
     }
 
-    protected void addExampleHeader(String leftText, String rightText, Float fontSize,Document document) {
+    protected void addExampleHeader(String leftText, String rightText, Float fontSize, Document document) {
         Table table = new Table(2);
         table.addCell(getCell(leftText, TextAlignment.LEFT).setFontSize(fontSize).setBold());
         table.addCell(getCell(rightText, TextAlignment.RIGHT));
@@ -332,7 +331,7 @@ public class PdfService extends AbstractService {
                 Optional<FinishesExample> finishesExample = example.getExamplesFinishedByUser().stream()
                         .filter(finishesExample1 -> finishesExample1.getUser().getMatriculationNumber().equals(userInCourse.getUser().getMatriculationNumber()))
                         .findFirst();
-                 table.addCell(getKreuzelCell(finishesExample));
+                table.addCell(getKreuzelCell(finishesExample));
             }
         }
 
@@ -346,14 +345,13 @@ public class PdfService extends AbstractService {
         }
     }
 
-    private Cell getKreuzelCell( Optional<FinishesExample> finishesExample) {
+    private Cell getKreuzelCell(Optional<FinishesExample> finishesExample) {
 
         String text = " ";
-        if(finishesExample.isPresent())
-        {
-            if(EFinishesExampleState.YES.equals(finishesExample.get().getState()))
+        if (finishesExample.isPresent()) {
+            if (EFinishesExampleState.YES.equals(finishesExample.get().getState()))
                 text = "X";
-            else if(EFinishesExampleState.MAYBE.equals(finishesExample.get().getState()))
+            else if (EFinishesExampleState.MAYBE.equals(finishesExample.get().getState()))
                 text = "O";
         }
         return createCell(text, TextAlignment.CENTER);
@@ -363,25 +361,25 @@ public class PdfService extends AbstractService {
         return resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
     }
 
-    public ByteArrayInputStream generateKreuzelList(Long exerciseSheetId) throws ServiceException, IOException {
+    public ByteArrayInputStream generateKreuzelList(Long exerciseSheetId) throws IOException {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         return new ByteArrayInputStream(createKreuzelList(exerciseSheet));
     }
 
-    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws ServiceException, IOException {
+    public ByteArrayInputStream generateExerciseSheetDocument(Long exerciseSheetId) throws IOException {
         UserDetailsImpl userDetails = getUserDetails();
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         boolean isOwner = isOwner(exerciseSheet.getCourse());
         boolean isStudent = exerciseSheet.getCourse().getStudents().stream()
                 .anyMatch(userInCourse -> userDetails.getMatriculationNumber().equals(userInCourse.getId().getMatriculationNumber()));
-        if(!userDetails.getAdmin() &&  !isOwner && !isStudent)
+        if (!userDetails.getAdmin() && !isOwner && !isStudent)
             throw new ServiceException("Access is denied", HttpStatus.FORBIDDEN);
 
 
         return new ByteArrayInputStream(createExerciseSheet(exerciseSheet));
     }
 
-    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws ServiceException, IOException {
+    public ByteArrayInputStream generateCourseAttendanceList(Long courseId) throws IOException {
         Course course = readCourse(courseId);
         return new ByteArrayInputStream(createAttendanceList(course));
     }

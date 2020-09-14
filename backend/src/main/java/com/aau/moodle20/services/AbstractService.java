@@ -51,35 +51,35 @@ public class AbstractService {
     ViolationRepository violationRepository;
 
 
-    protected Semester readSemester(Long semesterId) throws ServiceException {
+    protected Semester readSemester(Long semesterId) {
         Optional<Semester> optionalSemester = semesterRepository.findById(semesterId);
         if (!optionalSemester.isPresent())
             throw new ServiceException("Error: Semester not found!", HttpStatus.NOT_FOUND);
         return optionalSemester.get();
     }
 
-    protected Course readCourse(Long courseId) throws ServiceException {
+    protected Course readCourse(Long courseId) {
         Optional<Course> optionalCourse = courseRepository.findById(courseId);
         if (!optionalCourse.isPresent())
             throw new ServiceException("Error: Course not found!", HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 
-    protected User readUser(String matriculationNumber) throws ServiceException {
+    protected User readUser(String matriculationNumber) {
         Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
         if (!optionalUser.isPresent())
             throw new ServiceException("Error: User not found!", HttpStatus.NOT_FOUND);
         return optionalUser.get();
     }
 
-    protected ExerciseSheet readExerciseSheet(Long exerciseSheetId) throws ServiceException {
+    protected ExerciseSheet readExerciseSheet(Long exerciseSheetId) {
         Optional<ExerciseSheet> optionalExerciseSheet = exerciseSheetRepository.findById(exerciseSheetId);
         if (!optionalExerciseSheet.isPresent())
             throw new ServiceException("Error: ExerciseSheet not found!", HttpStatus.NOT_FOUND);
         return optionalExerciseSheet.get();
     }
 
-    protected Example readExample(Long exampleId) throws ServiceException {
+    protected Example readExample(Long exampleId) {
         Optional<Example> optionalExample = exampleRepository.findById(exampleId);
         if (!optionalExample.isPresent())
             throw new ServiceException("Error: Example not found!", HttpStatus.NOT_FOUND);
@@ -107,38 +107,37 @@ public class AbstractService {
         return readUser(getUserDetails().getMatriculationNumber());
     }
 
-    protected void saveFile(String filePath, MultipartFile file) throws IOException
-    {
-        File fileToBeSaved= new File(filePath);
+    protected void saveFile(String filePath, MultipartFile file) throws IOException {
+        File fileToBeSaved = new File(filePath);
         // if path does not exists create it
-        if(!fileToBeSaved.exists()) {
+        if (!fileToBeSaved.exists()) {
             fileToBeSaved.mkdirs();
         }
 
-        Path path = Paths.get(filePath + "/"+file.getOriginalFilename());
-        Files.write(path,file.getBytes());
+        Path path = Paths.get(filePath + "/" + file.getOriginalFilename());
+        Files.write(path, file.getBytes());
     }
 
     protected byte[] readFileFromDisk(String filePath, String fileName) throws IOException {
-        Path path = Paths.get(filePath+"/"+fileName);
+        Path path = Paths.get(filePath + "/" + fileName);
         return Files.readAllBytes(path);
     }
 
     protected boolean deleteFileFromDisk(String filePath, String fileName) throws IOException, ServiceException {
-        Path path = Paths.get(filePath+"/"+fileName);
+        Path path = Paths.get(filePath + "/" + fileName);
         return Files.deleteIfExists(path);
     }
-    protected String createExampleAttachmentDir(Example example)
-    {
+
+    protected String createExampleAttachmentDir(Example example) {
         Semester semester = example.getExerciseSheet().getCourse().getSemester();
         Course course = example.getExerciseSheet().getCourse();
         ExerciseSheet exerciseSheet = example.getExerciseSheet();
 
-        String semesterDir = "/"+semester.getType().name()+"_"+semester.getYear();
-        String courseDir = "/" +course.getNumber();
+        String semesterDir = "/" + semester.getType().name() + "_" + semester.getYear();
+        String courseDir = "/" + course.getNumber();
         String exerciseSheetDir = "/" + exerciseSheet.getId();
         String exampleDir = "";
-        if(example.getParentExample()!=null)
+        if (example.getParentExample() != null)
             exampleDir = "/" + example.getParentExample().getId() + "/" + example.getId();
         else
             exampleDir = "/" + example.getId();

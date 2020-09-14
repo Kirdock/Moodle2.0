@@ -22,11 +22,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ExampleService extends AbstractService{
+public class ExampleService extends AbstractService {
 
 
     @Transactional
-    public ExampleResponseObject createExample (CreateExampleRequest createExampleRequest) throws ServiceException, IOException {
+    public ExampleResponseObject createExample(CreateExampleRequest createExampleRequest) throws IOException {
         List<SupportFileType> supportFileTypes;
         Example example = new Example();
         Example parentExample = null;
@@ -36,20 +36,19 @@ public class ExampleService extends AbstractService{
                     (createExampleRequest.getCustomFileTypes() == null || createExampleRequest.getCustomFileTypes().isEmpty()))
                 throw new ServiceException("Error:either supported file types or custom file types  must be specified!");
         }
-        if(createExampleRequest.getParentId()!=null)
+        if (createExampleRequest.getParentId() != null)
             parentExample = readExample(createExampleRequest.getParentId());
 
         ExerciseSheet exerciseSheet = readExerciseSheet(createExampleRequest.getExerciseSheetId());
-        checkIfExampleNameAlreadyUsed(exerciseSheet,createExampleRequest.getName(),null,parentExample);
+        checkIfExampleNameAlreadyUsed(exerciseSheet, createExampleRequest.getName(), null, parentExample);
 
         // if this is an subExample remove all finishesExample entries of parentExample
         // and set points to 0
-        if(createExampleRequest.getParentId()!=null && parentExample!=null)
-        {
+        if (createExampleRequest.getParentId() != null && parentExample != null) {
             List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_Id(createExampleRequest.getParentId());
             finishesExampleRepository.deleteAll(finishesExamples);
             parentExample.setPoints(0);
-            if(parentExample.getValidator()!=null && !parentExample.getValidator().isEmpty())
+            if (parentExample.getValidator() != null && !parentExample.getValidator().isEmpty())
                 deleteExampleValidator(parentExample.getId());
 
             parentExample.setSubmitFile(Boolean.FALSE);
@@ -64,7 +63,7 @@ public class ExampleService extends AbstractService{
 
         example.fillValuesFromRequestObject(createExampleRequest);
         exampleRepository.save(example);
-        supportFileTypes = createSupportedFileTypesEntries(example,createExampleRequest.getSupportedFileTypes());
+        supportFileTypes = createSupportedFileTypesEntries(example, createExampleRequest.getSupportedFileTypes());
         supportFileTypeRepository.saveAll(supportFileTypes);
 
         ExampleResponseObject responseObject = new ExampleResponseObject();
@@ -74,22 +73,19 @@ public class ExampleService extends AbstractService{
         return responseObject;
     }
 
-    protected void checkIfExampleNameAlreadyUsed(ExerciseSheet exerciseSheet,String exampleName,Long exampleId, Example parentExample) throws ServiceException
-    {
-        if(parentExample==null)
-        {
+    protected void checkIfExampleNameAlreadyUsed(ExerciseSheet exerciseSheet, String exampleName, Long exampleId, Example parentExample) {
+        if (parentExample == null) {
             List<Example> examples = exerciseSheet.getExamples().stream()
-                    .filter(example -> example.getParentExample()==null)
+                    .filter(example -> example.getParentExample() == null)
                     .filter(example -> !example.getId().equals(exampleId)).collect(Collectors.toList());
             boolean alreadyExists = examples.stream().anyMatch(example -> example.getName().equals(exampleName));
-            if(alreadyExists)
+            if (alreadyExists)
                 throw new ServiceException("Error: example with this name already exists in exerciseSheet", ApiErrorResponseCodes.EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS);
-        }else
-        {
+        } else {
             boolean alreadyExists = parentExample.getSubExamples().stream()
                     .filter(example -> !example.getId().equals(exampleId))
                     .anyMatch(example -> example.getName().equals(exampleName));
-            if(alreadyExists)
+            if (alreadyExists)
                 throw new ServiceException("Error: sub example with this name already exists in exerciseSheet", ApiErrorResponseCodes.SUB_EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS);
         }
     }
@@ -97,7 +93,7 @@ public class ExampleService extends AbstractService{
 
     protected List<SupportFileType> createSupportedFileTypesEntries(Example example, List<Long> supportedFileTypes) {
         List<SupportFileType> supportFileTypes = new ArrayList<>();
-        if(supportedFileTypes==null)
+        if (supportedFileTypes == null)
             return supportFileTypes;
 
         for (Long fileTypeId : supportedFileTypes) {
@@ -118,7 +114,7 @@ public class ExampleService extends AbstractService{
     }
 
     @Transactional
-    public void updateExample(UpdateExampleRequest updateExampleRequest) throws ServiceException, IOException {
+    public void updateExample(UpdateExampleRequest updateExampleRequest) throws IOException {
         List<SupportFileType> supportFileTypes;
         if (updateExampleRequest.getSubmitFile() != null && updateExampleRequest.getSubmitFile()) {
             if ((updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty()) &&
@@ -126,11 +122,11 @@ public class ExampleService extends AbstractService{
                 throw new ServiceException("Error:either supported file types or custom file types  must be specified!");
         }
         ExerciseSheet exerciseSheet = readExerciseSheet(updateExampleRequest.getExerciseSheetId());
-        Example parentExample = updateExampleRequest.getParentId()!=null?readExample(updateExampleRequest.getParentId()):null;
-        checkIfExampleNameAlreadyUsed(exerciseSheet,updateExampleRequest.getName(),updateExampleRequest.getId(),parentExample);
+        Example parentExample = updateExampleRequest.getParentId() != null ? readExample(updateExampleRequest.getParentId()) : null;
+        checkIfExampleNameAlreadyUsed(exerciseSheet, updateExampleRequest.getName(), updateExampleRequest.getId(), parentExample);
 
         Example example = readExample(updateExampleRequest.getId());
-        if((updateExampleRequest.getSubmitFile()!=null && !updateExampleRequest.getSubmitFile()) && (example.getValidator()!=null && !example.getValidator().isEmpty()) )
+        if ((updateExampleRequest.getSubmitFile() != null && !updateExampleRequest.getSubmitFile()) && (example.getValidator() != null && !example.getValidator().isEmpty()))
             deleteExampleValidator(example.getId());
 
         example.fillValuesFromRequestObject(updateExampleRequest);
@@ -141,11 +137,11 @@ public class ExampleService extends AbstractService{
     }
 
     @Transactional
-    public void deleteExample(Long exampleId) throws ServiceException, IOException {
+    public void deleteExample(Long exampleId) throws IOException {
         Example example = readExample(exampleId);
         ExerciseSheet exerciseSheet = example.getExerciseSheet();
         Example parentExample = example.getParentExample();
-        if(example.getValidator()!=null && !example.getValidator().isEmpty())
+        if (example.getValidator() != null && !example.getValidator().isEmpty())
             deleteExampleValidator(exampleId);
 
         exampleRepository.deleteById(exampleId);
@@ -171,12 +167,12 @@ public class ExampleService extends AbstractService{
         return fileTypeRepository.findAll().stream().map(FileType::createFileTypeResponseObject).collect(Collectors.toList());
     }
 
-    public ExampleResponseObject getExample(Long id) throws ServiceException {
+    public ExampleResponseObject getExample(Long id) {
         Example example = readExample(id);
         return example.createExampleResponseObject(null);
     }
 
-    public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) throws ServiceException {
+    public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) {
         for (ExampleOrderRequest exampleOrderRequest : exampleOrderRequests) {
             Example example = readExample(exampleOrderRequest.getId());
             example.setOrder(exampleOrderRequest.getOrder());
@@ -184,38 +180,37 @@ public class ExampleService extends AbstractService{
         }
     }
 
-    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
+    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws IOException, ClassNotFoundException {
         Example example = readExample(exampleId);
         String fileName = validatorFile.getOriginalFilename();
-        if(fileName!=null) {
+        if (fileName != null) {
             String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
             if (!FileConstants.JAR_FILE_EXTENSION.equals(extension))
                 throw new ServiceException("Error: Not a jar File!");
         }
         ValidatorHandler loader = new ValidatorHandler();
-        loader.checkValidatorFile(validatorFile,example.getId());
+        loader.checkValidatorFile(validatorFile, example.getId());
 
         String validatorFilePath = getValidatorFilePath(example);
         clearDirectory(validatorFilePath);
-        saveFile(validatorFilePath,validatorFile);
+        saveFile(validatorFilePath, validatorFile);
         example.setValidator(validatorFile.getOriginalFilename());
         example.setSubmitFile(Boolean.TRUE);
         exampleRepository.save(example);
     }
 
-    protected void clearDirectory(String filePath) throws IOException
-    {
-        File fileToBeDeleted= new File(filePath);
+    protected void clearDirectory(String filePath) throws IOException {
+        File fileToBeDeleted = new File(filePath);
         // if path does not exists create it
-        if(fileToBeDeleted.exists()) {
+        if (fileToBeDeleted.exists()) {
             FileUtils.cleanDirectory(fileToBeDeleted);
         }
     }
 
-    public Example getExampleValidator(Long exampleId) throws ServiceException, IOException {
+    public Example getExampleValidator(Long exampleId) throws IOException {
         Example example = readExample(exampleId);
         String validatorFilePath = getValidatorFilePath(example);
-        byte [] content = readFileFromDisk(validatorFilePath,example.getValidator());
+        byte[] content = readFileFromDisk(validatorFilePath, example.getValidator());
         example.setValidatorContent(content);
 
         return example;
@@ -235,20 +230,19 @@ public class ExampleService extends AbstractService{
 
     }
 
-    public void deleteExampleValidator(Long exampleId) throws ServiceException, IOException {
+    public void deleteExampleValidator(Long exampleId) throws IOException {
         Example example = readExample(exampleId);
-        if(example.getValidator()==null || example.getValidator().isEmpty())
-            return ;
+        if (example.getValidator() == null || example.getValidator().isEmpty())
+            return;
         String validatorFilePath = getValidatorFilePath(example);
-        deleteFileFromDisk(validatorFilePath,example.getValidator());
+        deleteFileFromDisk(validatorFilePath, example.getValidator());
 
         example.setValidator(null);
         exampleRepository.save(example);
     }
 
 
-    protected String getValidatorFilePath(Example example)
-    {
+    protected String getValidatorFilePath(Example example) {
         return FileConstants.VALIDATOR_DIR + createExampleAttachmentDir(example);
     }
 }

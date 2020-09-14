@@ -45,21 +45,21 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             return false;
         }
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        if(userDetails.getAdmin())
+        if (userDetails.getAdmin())
             return true;
 
         boolean hasPermission = false;
-        String permission = (String)o;
-        if("Course".equals(s))
-            hasPermission = handleCoursePermission(authentication,serializable, permission);
-        else if("Example".equals(s))
-            hasPermission = handleExamplePermission(authentication,serializable,permission);
-        else if("User".equals(s))
-            hasPermission = handleUserPermission(authentication,serializable,permission);
-        else if("ExerciseSheet".equals(s))
-            hasPermission = handleExerciseSheetPermission(authentication,serializable,permission);
-        else if("FinishExample".equals(s))
-            hasPermission = handleFinishExamplePermission(authentication,serializable,permission);
+        String permission = (String) o;
+        if ("Course".equals(s))
+            hasPermission = handleCoursePermission(authentication, serializable, permission);
+        else if ("Example".equals(s))
+            hasPermission = handleExamplePermission(authentication, serializable, permission);
+        else if ("User".equals(s))
+            hasPermission = handleUserPermission(authentication, serializable, permission);
+        else if ("ExerciseSheet".equals(s))
+            hasPermission = handleExerciseSheetPermission(authentication, serializable, permission);
+        else if ("FinishExample".equals(s))
+            hasPermission = handleFinishExamplePermission(authentication, serializable, permission);
 
         return hasPermission;
     }
@@ -70,25 +70,23 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return false;
     }
 
-    protected boolean handleExamplePermission(Authentication authentication, Serializable targetId, String permission)
-    {
+    protected boolean handleExamplePermission(Authentication authentication, Serializable targetId, String permission) {
         boolean hasPermission = false;
         Long exampleId = null;
         Long exerciseSheetId = null;
-        Course course =null;
+        Course course = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         if ("update".equals(permission) && targetId instanceof Long) {
             exampleId = (Long) targetId;
-        }else if("update".equals(permission) && targetId instanceof List){
+        } else if ("update".equals(permission) && targetId instanceof List) {
             List<ExampleOrderRequest> exampleOrderRequests = (List<ExampleOrderRequest>) targetId;
-            hasPermission = handleExampleOrderRequests(exampleOrderRequests,userDetails);
-        }  else if ("get".equals(permission) && targetId instanceof Long) {
+            hasPermission = handleExampleOrderRequests(exampleOrderRequests, userDetails);
+        } else if ("get".equals(permission) && targetId instanceof Long) {
             exampleId = (Long) targetId;
         } else if ("create".equals(permission) && targetId instanceof Long) {
             exerciseSheetId = (Long) targetId;
-        }
-        else if ("delete".equals(permission) && targetId instanceof Long) {
+        } else if ("delete".equals(permission) && targetId instanceof Long) {
             exampleId = (Long) targetId;
         }
 
@@ -104,12 +102,11 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     }
 
 
-    protected boolean handleExerciseSheetPermission(Authentication authentication, Serializable targetId, String permission)
-    {
+    protected boolean handleExerciseSheetPermission(Authentication authentication, Serializable targetId, String permission) {
         boolean hasPermission = false;
         Long exerciseSheetId = null;
         Long courseId = null;
-        Course course =null;
+        Course course = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         if ("update".equals(permission) && targetId instanceof Long)
@@ -139,7 +136,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         Course course = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if (("update".equals(permission)  || "get".equals(permission))&& targetId instanceof Long) {
+        if (("update".equals(permission) || "get".equals(permission)) && targetId instanceof Long) {
             Optional<User> optionalUser = userRepository.findByMatriculationNumber(userDetails.getMatriculationNumber());
             course = getCourseFromExample((Long) targetId);
             Long courseId = course.getId();
@@ -152,25 +149,23 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return hasPermission;
     }
 
-    protected boolean handleCoursePermission(Authentication authentication, Serializable targetId, String permission)
-    {
+    protected boolean handleCoursePermission(Authentication authentication, Serializable targetId, String permission) {
         boolean hasPermission = false;
         Long courseId = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         if ("update".equals(permission) && targetId instanceof Long) {
             courseId = (Long) targetId;
-        }else if("get".equals(permission) && targetId instanceof Long)
+        } else if ("get".equals(permission) && targetId instanceof Long)
             courseId = (Long) targetId;
 
-        if(courseId!=null)
-            hasPermission = isOwnerOfCourse(courseId,userDetails);
+        if (courseId != null)
+            hasPermission = isOwnerOfCourse(courseId, userDetails);
 
         return hasPermission;
     }
 
-    protected boolean handleUserPermission(Authentication authentication, Serializable targetId, String permission)
-    {
+    protected boolean handleUserPermission(Authentication authentication, Serializable targetId, String permission) {
         boolean hasPermission = false;
         String matriculationNumber = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -190,13 +185,11 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     }
 
 
-    protected boolean handleExampleOrderRequests(List<ExampleOrderRequest> exampleOrderRequests, UserDetailsImpl userDetails)
-    {
+    protected boolean handleExampleOrderRequests(List<ExampleOrderRequest> exampleOrderRequests, UserDetailsImpl userDetails) {
         List<Long> exampleIds = exampleOrderRequests.stream().map(ExampleOrderRequest::getId).collect(Collectors.toList());
-        for(Long exampleId: exampleIds)
-        {
+        for (Long exampleId : exampleIds) {
             Course course = getCourseFromExample(exampleId);
-            if(!isOwnerOfCourse(course.getId(),userDetails))
+            if (!isOwnerOfCourse(course.getId(), userDetails))
                 return false;
         }
         return true;
@@ -207,35 +200,33 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         return course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber());
     }
 
-    protected Course readCourse(Long courseId) throws ServiceException {
+    protected Course readCourse(Long courseId) {
         Optional<Course> optionalCourse = courseRepository.findById(courseId);
         if (!optionalCourse.isPresent())
             throw new ServiceException("Error: Course not found!", HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 
-    protected Example readExample(Long exampleId) throws ServiceException {
+    protected Example readExample(Long exampleId) {
         Optional<Example> optionalCourse = exampleRepository.findById(exampleId);
         if (!optionalCourse.isPresent())
             throw new ServiceException("Error: Example not found!", HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 
-    protected ExerciseSheet readExerciseSheet(Long exampleId) throws ServiceException {
+    protected ExerciseSheet readExerciseSheet(Long exampleId) {
         Optional<ExerciseSheet> optionalCourse = exerciseSheetRepository.findById(exampleId);
         if (!optionalCourse.isPresent())
             throw new ServiceException("Error: ExerciseSheet not found!", HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 
-    public Course getCourseFromExample(Long exampleId)
-    {
+    public Course getCourseFromExample(Long exampleId) {
         Example example = readExample(exampleId);
         return example.getExerciseSheet().getCourse();
     }
 
-    public Course getCourseFromExerciseSheet(Long exerciseSheetId)
-    {
+    public Course getCourseFromExerciseSheet(Long exerciseSheetId) {
         ExerciseSheet exerciseSheet = readExerciseSheet(exerciseSheetId);
         return exerciseSheet.getCourse();
     }

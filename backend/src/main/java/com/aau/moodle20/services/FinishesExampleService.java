@@ -32,36 +32,33 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class FinishesExampleService extends AbstractService{
+public class FinishesExampleService extends AbstractService {
 
     @Transactional
-    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) throws ServiceException {
+    public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) {
         UserDetailsImpl userDetails = getUserDetails();
         for (UserKreuzelRequest userKreuzelRequest : userKreuzelRequests) {
-            if(!isAssignedToCourse(userKreuzelRequest.getExampleId(),userDetails.getMatriculationNumber()))
-                throw new ServiceException("Error: Access denied",HttpStatus.FORBIDDEN);
+            if (!isAssignedToCourse(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber()))
+                throw new ServiceException("Error: Access denied", HttpStatus.FORBIDDEN);
 
             updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription(), false);
         }
     }
 
     @Transactional
-    public void setKreuzelUserMulti(List<UserKreuzeMultilRequest> userKreuzeMultilRequests) throws ServiceException
-    {
+    public void setKreuzelUserMulti(List<UserKreuzeMultilRequest> userKreuzeMultilRequests) {
         UserDetailsImpl userDetails = getUserDetails();
-        for(UserKreuzeMultilRequest userKreuzeMultilRequest: userKreuzeMultilRequests)
-        {
+        for (UserKreuzeMultilRequest userKreuzeMultilRequest : userKreuzeMultilRequests) {
             Course course = readExample(userKreuzeMultilRequest.getExampleId()).getExerciseSheet().getCourse();
-            if(!userDetails.getAdmin() && !isOwner(course))
-                throw new ServiceException("Error: Access denied",HttpStatus.FORBIDDEN);
+            if (!userDetails.getAdmin() && !isOwner(course))
+                throw new ServiceException("Error: Access denied", HttpStatus.FORBIDDEN);
 
-            updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(),userKreuzeMultilRequest.getMatriculationNumber(),userKreuzeMultilRequest.getState(),null, true);
+            updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(), userKreuzeMultilRequest.getMatriculationNumber(), userKreuzeMultilRequest.getState(), null, true);
         }
     }
 
 
-
-    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) throws ServiceException {
+    protected void updateOrCreateUserKreuzel(Long exampleId, String matriculationNumber, EFinishesExampleState state, String description, boolean kreuzelMulti) {
         FinishesExample finishesExample = null;
         Example example = readExample(exampleId);
         User user = readUser(matriculationNumber);
@@ -93,7 +90,7 @@ public class FinishesExampleService extends AbstractService{
     }
 
     @Transactional
-    public ViolationHistoryResponse setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws ServiceException, IOException, ClassNotFoundException {
+    public ViolationHistoryResponse setKreuzelUserAttachment(MultipartFile file, Long exampleId) throws IOException, ClassNotFoundException {
         List<? extends Violation> violations;
         UserDetailsImpl userDetails = getUserDetails();
         Example example = readExample(exampleId);
@@ -144,11 +141,9 @@ public class FinishesExampleService extends AbstractService{
     }
 
 
-    protected  Set<ViolationEntity> createViolationEntities(List<? extends Violation> violations)
-    {
+    protected Set<ViolationEntity> createViolationEntities(List<? extends Violation> violations) {
         Set<ViolationEntity> violationEntities = new HashSet<>();
-        for(Violation violation: violations)
-        {
+        for (Violation violation : violations) {
             ViolationEntity entity = new ViolationEntity();
             entity.setResult(violation.getResult());
             violationEntities.add(entity);
@@ -159,15 +154,15 @@ public class FinishesExampleService extends AbstractService{
     protected List<? extends Violation> executeValidator(String filePath, Example example) throws IOException, ClassNotFoundException {
         List<? extends Violation> violations = new ArrayList<>();
         String validatorDir = FileConstants.VALIDATOR_DIR + createExampleAttachmentDir(example);
-        validatorDir = validatorDir + "/"+ example.getValidator();
+        validatorDir = validatorDir + "/" + example.getValidator();
 
         ValidatorHandler validationLoader = new ValidatorHandler();
         IValidator validator = validationLoader.loadValidator(validatorDir);
-        if(validator!=null)
+        if (validator != null)
             violations = validator.validate(filePath);
 
         validator = null;
-        return violations; 
+        return violations;
 
 //        unzipMavenProject(filePath,new File(destDir));
 //        installMavenProject(destDir);
@@ -175,11 +170,10 @@ public class FinishesExampleService extends AbstractService{
 //        deleteMavenProject(destDir);
     }
 
-    protected void installMavenProject(String destDir) throws ServiceException
-    {
+    protected void installMavenProject(String destDir) {
         MavenCli cli = new MavenCli();
         int result = cli.doMain(new String[]{"clean", "install"}, destDir, System.out, System.out);
-        if(result !=0)
+        if (result != 0)
             throw new ServiceException("Error: maven project could not be build!");
 
 //        InvocationRequest request = new DefaultInvocationRequest();
@@ -236,39 +230,38 @@ public class FinishesExampleService extends AbstractService{
     protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
         String filePath = createUserExampleAttachmentDir(example);
         File directory = new File(filePath);
-        if(directory.exists())
+        if (directory.exists())
             FileUtils.cleanDirectory(directory);
 
-        saveFile(filePath,file);
+        saveFile(filePath, file);
     }
 
-    protected byte[] readFileFromDisk(FinishesExample  finishesExample) throws IOException {
+    protected byte[] readFileFromDisk(FinishesExample finishesExample) throws IOException {
         String filePath = createUserExampleAttachmentDir(finishesExample.getExample());
-        Path path = Paths.get(filePath+"/"+finishesExample.getFileName());
+        Path path = Paths.get(filePath + "/" + finishesExample.getFileName());
 
         return Files.readAllBytes(path);
     }
 
-    public void deleteFinishExampleData(FinishesExample  finishesExample) throws IOException {
+    public void deleteFinishExampleData(FinishesExample finishesExample) throws IOException {
 
-        if(finishesExample.getFileName()==null)
+        if (finishesExample.getFileName() == null)
             return;
 
         String userDir = "/" + finishesExample.getId().getMatriculationNumber();
         String filePath = FileConstants.ATTACHMENTS_DIR + createExampleAttachmentDir(finishesExample.getExample()) + userDir;
 
-        Path path = Paths.get(filePath+"/"+finishesExample.getFileName());
+        Path path = Paths.get(filePath + "/" + finishesExample.getFileName());
 
         Files.deleteIfExists(path);
     }
 
-    protected String createUserExampleAttachmentDir(Example example)
-    {
+    protected String createUserExampleAttachmentDir(Example example) {
         String userDir = "/" + getUserDetails().getMatriculationNumber();
         return FileConstants.ATTACHMENTS_DIR + createExampleAttachmentDir(example) + userDir;
     }
 
-    public FinishesExample getKreuzelAttachment(Long exampleId) throws ServiceException {
+    public FinishesExample getKreuzelAttachment(Long exampleId) {
         UserDetailsImpl userDetails = getUserDetails();
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
         try {
@@ -280,7 +273,7 @@ public class FinishesExampleService extends AbstractService{
         return finishesExample;
     }
 
-    public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) throws ServiceException {
+    public void setUserExamplePresented(UserExamplePresentedRequest userExamplePresented) {
         readExample(userExamplePresented.getExampleId()); // checks if example exits
         readUser(userExamplePresented.getMatriculationNumber()); // checks if user exists
         FinishesExample finishesExample = readFinishesExample(userExamplePresented.getExampleId(), userExamplePresented.getMatriculationNumber());
@@ -288,7 +281,7 @@ public class FinishesExampleService extends AbstractService{
         finishesExampleRepository.save(finishesExample);
     }
 
-    protected FinishesExample readFinishesExample(Long exampleId, String matriculationNumber) throws ServiceException {
+    protected FinishesExample readFinishesExample(Long exampleId, String matriculationNumber) {
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
                 .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
         if (!optionalFinishesExample.isPresent())
@@ -299,12 +292,12 @@ public class FinishesExampleService extends AbstractService{
 
     /**
      * returns all examples which the given user finihsed in given course
+     *
      * @param matriculationNumber
      * @param courseId
      * @return list of example id and name
-     * @throws ServiceException
      */
-    public List<KreuzelResponse> getKreuzelUserCourse(String matriculationNumber, Long courseId) throws ServiceException {
+    public List<KreuzelResponse> getKreuzelUserCourse(String matriculationNumber, Long courseId) {
         List<KreuzelResponse> responseObjects = new ArrayList<>();
 
         User user = readUser(matriculationNumber);
@@ -352,6 +345,7 @@ public class FinishesExampleService extends AbstractService{
 
     /**
      * checks if the given user has finished given example
+     *
      * @param example
      * @param user
      * @return True or False
@@ -370,8 +364,7 @@ public class FinishesExampleService extends AbstractService{
         return responseObject;
     }
 
-    protected boolean isAssignedToCourse(Long exampleId, String matriculationNumber)
-    {
+    protected boolean isAssignedToCourse(Long exampleId, String matriculationNumber) {
         boolean hasPermission = false;
         Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
         Course course = readExample(exampleId).getExerciseSheet().getCourse();

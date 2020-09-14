@@ -10,14 +10,12 @@ public enum EFinishesExampleState {
 
     private String role;
 
-    EFinishesExampleState(String role)
-    {
+    EFinishesExampleState(String role) {
         this.role = role;
     }
 
     @JsonValue
-    public String getRole()
-    {
+    public String getRole() {
         return this.role;
     }
 }

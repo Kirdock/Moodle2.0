@@ -8,7 +8,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RegisterMultipleUserResponse {
 
-    List<FailedUserResponse> failedUsers  = new ArrayList<>();
+    List<FailedUserResponse> failedUsers = new ArrayList<>();
     List<UserResponseObject> registeredUsers = new ArrayList<>();
 
     public List<FailedUserResponse> getFailedUsers() {

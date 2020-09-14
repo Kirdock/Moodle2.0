@@ -16,10 +16,10 @@ public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    public static final String CLAIM_IS_ADMIN ="isAdmin";
-    public static final String CLAIM_MATRICULATION_NUMBER ="matriculationNumber";
-    public static final String CLAIM_FORENAME ="forename";
-    public static final String CLAIM_SURNAME ="surname";
+    public static final String CLAIM_IS_ADMIN = "isAdmin";
+    public static final String CLAIM_MATRICULATION_NUMBER = "matriculationNumber";
+    public static final String CLAIM_FORENAME = "forename";
+    public static final String CLAIM_SURNAME = "surname";
 
 
     @Value("${jwtSecret}")
@@ -36,10 +36,10 @@ public class JwtUtils {
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .claim(CLAIM_IS_ADMIN,userPrincipal.getAdmin())
+                .claim(CLAIM_IS_ADMIN, userPrincipal.getAdmin())
                 .claim(CLAIM_MATRICULATION_NUMBER, userPrincipal.getMatriculationNumber())
-                .claim(CLAIM_FORENAME,userPrincipal.getForename())
-                .claim(CLAIM_SURNAME,userPrincipal.getSurname())
+                .claim(CLAIM_FORENAME, userPrincipal.getForename())
+                .claim(CLAIM_SURNAME, userPrincipal.getSurname())
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
@@ -52,15 +52,14 @@ public class JwtUtils {
         return (String) Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get(CLAIM_MATRICULATION_NUMBER);
     }
 
-    public Boolean getAdminFromJwtToken(String jwtToken)
-    {
+    public Boolean getAdminFromJwtToken(String jwtToken) {
         return (Boolean) Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwtToken).getBody().get(CLAIM_IS_ADMIN);
     }
 
     public boolean validateJwtToken(String authToken) throws Exception {
 //        try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
-            return true;
+        Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+        return true;
 //        } catch (SignatureException e) {
 //            logger.error("Invalid JWT signature: {}", e.getMessage());
 //        } catch (MalformedJwtException e) {

@@ -28,28 +28,28 @@ public class ExampleController {
 
     ExampleService exampleService;
 
-    public ExampleController(ExampleService exampleService)
-    {
+    public ExampleController(ExampleService exampleService) {
         this.exampleService = exampleService;
     }
 
     @GetMapping(value = "/fileTypes")
-    public List<FileTypeResponseObject> getFileTypes()  {
+    public List<FileTypeResponseObject> getFileTypes() {
         return exampleService.getFileTypes();
     }
 
     @PreAuthorize("hasPermission(#id, 'Example', 'get')")
     @GetMapping(value = "/example/{id}")
-    public ExampleResponseObject getExample(@PathVariable("id") long id) throws ServiceException {
+    public ExampleResponseObject getExample(@PathVariable("id") long id) {
         return exampleService.getExample(id);
     }
+
     @PreAuthorize("hasPermission(#id, 'Example', 'get')")
     @GetMapping(value = "/example/{id}/validator")
     public ResponseEntity<InputStreamResource> getExampleValidator(@PathVariable("id") long id) throws IOException {
         Example example = exampleService.getExampleValidator(id);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(example.getValidatorContent());
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename="+example.getValidator());
+        headers.add("Content-Disposition", "inline; filename=" + example.getValidator());
         return ResponseEntity
                 .ok()
                 .headers(headers)
@@ -63,22 +63,25 @@ public class ExampleController {
         ExampleResponseObject exampleResponseObject = exampleService.createExample(createExampleRequest);
         return ResponseEntity.ok(exampleResponseObject);
     }
+
     @PreAuthorize("hasPermission(#updateExampleRequest.id, 'Example', 'update')")
     @PostMapping(value = "/example")
     public ResponseEntity<MessageResponse> updateExample(@Valid @RequestBody UpdateExampleRequest updateExampleRequest) throws IOException {
         exampleService.updateExample(updateExampleRequest);
         return ResponseEntity.ok(new MessageResponse("Example successfully updated"));
     }
+
     @PreAuthorize("hasPermission(#exampleOrderRequests, 'Example', 'update')")
     @PostMapping(value = "/examples/order")
-    public ResponseEntity<MessageResponse> updateExampleOrder(@Valid @RequestBody List<ExampleOrderRequest> exampleOrderRequests)  {
+    public ResponseEntity<MessageResponse> updateExampleOrder(@Valid @RequestBody List<ExampleOrderRequest> exampleOrderRequests) {
         exampleService.updateExampleOrder(exampleOrderRequests);
         return ResponseEntity.ok(new MessageResponse("Example order updated successfully"));
     }
+
     @PreAuthorize("hasPermission(#exampleId, 'Example', 'update')")
     @PostMapping(value = "/example/validator")
-    public ResponseEntity<MessageResponse> setExampleValidator(@RequestParam(value = "file",required = true) MultipartFile validator, @Valid  @RequestParam(value = "id",required = true) Long exampleId) throws  IOException, ClassNotFoundException {
-        exampleService.setExampleValidator(validator,exampleId);
+    public ResponseEntity<MessageResponse> setExampleValidator(@RequestParam(value = "file", required = true) MultipartFile validator, @Valid @RequestParam(value = "id", required = true) Long exampleId) throws IOException, ClassNotFoundException {
+        exampleService.setExampleValidator(validator, exampleId);
         return ResponseEntity.ok(new MessageResponse("Validator was successfully set"));
     }
 
@@ -89,6 +92,7 @@ public class ExampleController {
         return ResponseEntity.ok(new MessageResponse("Example was successfully deleted!"));
 
     }
+
     @PreAuthorize("hasPermission(#id, 'Example', 'delete')")
     @DeleteMapping(value = "/example/{id}/validator")
     public ResponseEntity<MessageResponse> deleteExampleValidator(@PathVariable("id") long id) throws IOException {
