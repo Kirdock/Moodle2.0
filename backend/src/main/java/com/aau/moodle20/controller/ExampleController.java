@@ -1,7 +1,6 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.Example;
-import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateExampleRequest;
 import com.aau.moodle20.payload.request.ExampleOrderRequest;
 import com.aau.moodle20.payload.request.UpdateExampleRequest;

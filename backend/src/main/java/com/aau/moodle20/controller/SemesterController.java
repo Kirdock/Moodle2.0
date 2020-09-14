@@ -1,7 +1,6 @@
 package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.Semester;
-import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.MessageResponse;

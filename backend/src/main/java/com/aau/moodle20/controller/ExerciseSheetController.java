@@ -1,6 +1,5 @@
 package com.aau.moodle20.controller;
 
-import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.ExerciseSheetKreuzelResponse;
