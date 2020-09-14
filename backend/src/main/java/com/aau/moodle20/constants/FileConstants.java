@@ -1,6 +1,10 @@
 package com.aau.moodle20.constants;
 
+import com.aau.moodle20.entity.FinishesExample;
+
 public class FileConstants {
+
+    private FileConstants(){}
 
     public static final String ATTACHMENTS_DIR = "./backend/attachments";
     public static final String VALIDATOR_DIR = ATTACHMENTS_DIR + "/validators";
