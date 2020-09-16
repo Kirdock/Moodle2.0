@@ -40,8 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ExampleControllerUnitTests  extends AbstractControllerTest {
 
-    private Long exampleId = 200L;
-    private Long exerciseSheetId = 100L;
+    private final Long exampleId = 200L;
+    private final Long exerciseSheetId = 100L;
 
 
     @MockBean

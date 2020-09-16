@@ -141,13 +141,6 @@ public class SemesterControllerUnitTests extends AbstractControllerTest {
 
         perform_Put("/api/semester", jwtToken, mapToJson(createSemesterRequest))
                 .andExpect(status().isForbidden());
-
-//        createExerciseSheetRequest.setMinKreuzel(-1);
-//
-//        perform_Put("/api/exerciseSheet", jwtToken, mapToJson(createExerciseSheetRequest))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.errors").value("minKreuzel: must be greater than or equal to 0"))
-//                .andExpect(jsonPath("$.errorResponseCode").value(ApiErrorResponseCodes.INVALID_METHOD_PARAMETER));
     }
 
 
