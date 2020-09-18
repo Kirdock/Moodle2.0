@@ -1,30 +1,14 @@
-package com.aau.moodle20;
+package com.aau.moodle20.controller;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ESemesterType;
-import com.aau.moodle20.entity.Course;
-import com.aau.moodle20.entity.Example;
-import com.aau.moodle20.entity.ExerciseSheet;
 import com.aau.moodle20.entity.User;
-import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
-import com.aau.moodle20.payload.request.ExampleOrderRequest;
-import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
-import com.aau.moodle20.payload.response.ExerciseSheetKreuzelResponse;
-import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
-import com.aau.moodle20.repository.CourseRepository;
-import com.aau.moodle20.repository.ExampleRepository;
-import com.aau.moodle20.repository.ExerciseSheetRepository;
 import com.aau.moodle20.repository.SemesterRepository;
-import com.aau.moodle20.services.ExerciseSheetService;
-import com.aau.moodle20.services.PdfService;
 import com.aau.moodle20.services.SemesterService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,11 +18,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;

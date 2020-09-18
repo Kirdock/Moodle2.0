@@ -1,4 +1,4 @@
-package com.aau.moodle20;
+package com.aau.moodle20.controller;
 
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.Semester;

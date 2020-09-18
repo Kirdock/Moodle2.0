@@ -1,24 +1,16 @@
-package com.aau.moodle20;
+package com.aau.moodle20.controller;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
-import com.aau.moodle20.constants.ESemesterType;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.UserCourseKey;
-import com.aau.moodle20.payload.request.CreateSemesterRequest;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
-import com.aau.moodle20.payload.request.UserKreuzelRequest;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.ExampleRepository;
 import com.aau.moodle20.repository.ExerciseSheetRepository;
-import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.services.ExampleService;
 import com.aau.moodle20.services.FinishesExampleService;
-import com.aau.moodle20.services.SemesterService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,8 +1,7 @@
-package com.aau.moodle20;
+package com.aau.moodle20.controller;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.entity.Course;
-import com.aau.moodle20.entity.Semester;
 import com.aau.moodle20.entity.User;
 import com.aau.moodle20.payload.request.CopyCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
@@ -24,7 +23,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
