@@ -12,15 +12,12 @@ import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserRepository;
-import com.aau.moodle20.services.CourseService;
-import com.aau.moodle20.services.UserDetailsImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -35,7 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,7 +41,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
-public class CourseServiceUnitTest {
+public class CourseServiceUnitTest extends AbstractServiceTest{
 
     private static final Long COURSE_ID = 200L;
     private static final String COURSE_NUMBER= "123.123";
@@ -58,8 +56,7 @@ public class CourseServiceUnitTest {
     private UserRepository userRepository;
     @Mock
     private SemesterRepository semesterRepository;
-    private String adminMatriculationNumber ="00000000";
-    private String normalMatriculationNumber = "12345678";
+
 
 
     @Before
@@ -293,35 +290,6 @@ public class CourseServiceUnitTest {
         updateCourseRequest.setId(course.getId());
 
         return updateCourseRequest;
-    }
-
-
-
-    private void mockSecurityContext_WithUserDetails(UserDetailsImpl userDetails)
-    {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
-    }
-
-    private UserDetailsImpl getUserDetails_Admin()
-    {
-        UserDetailsImpl userDetails = new UserDetailsImpl("admin","admin", Boolean.TRUE, adminMatriculationNumber,"admin","admin" );
-
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("Admin"));
-        userDetails.setAuthorities(authorities);
-        return userDetails;
-    }
-
-    private UserDetailsImpl getUserDetails_Not_Admin()
-    {
-        UserDetailsImpl userDetails = new UserDetailsImpl("normal","normal", Boolean.FALSE, normalMatriculationNumber,"normal","normal" );
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        userDetails.setAuthorities(authorities);
-        return userDetails;
     }
 
     private Course getTestCourse()
