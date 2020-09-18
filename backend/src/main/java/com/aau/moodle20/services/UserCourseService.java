@@ -27,20 +27,15 @@ import java.util.Optional;
 public class UserCourseService extends AbstractService {
 
     PdfService pdfService;
-    UserService userDetailsService;
+    UserService userService;
     FinishesExampleService finishesExampleService;
 
-    public UserCourseService(PdfService pdfService, UserService userDetailsService, FinishesExampleService finishesExampleService) {
+    public UserCourseService(PdfService pdfService, UserService userService, FinishesExampleService finishesExampleService) {
         this.pdfService = pdfService;
-        this.userDetailsService = userDetailsService;
+        this.userService = userService;
         this.finishesExampleService = finishesExampleService;
     }
-
-    @Autowired
-    UserService userService;
-
-    private static final Logger logger = LoggerFactory.getLogger(SemesterService.class);
-
+    
     public CourseResponseObject getCourseAssigned(Long courseId) {
         Course course = readCourse(courseId);
         User currentUser = getCurrentUser();
