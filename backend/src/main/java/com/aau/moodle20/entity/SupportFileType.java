@@ -3,6 +3,7 @@ package com.aau.moodle20.entity;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "support_file_type")
@@ -51,5 +52,19 @@ public class SupportFileType {
         supportFileType.setFileType(getFileType());
         supportFileType.setExample(getExample());
         return supportFileType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SupportFileType)) return false;
+        SupportFileType that = (SupportFileType) o;
+        return Objects.equals(getExample(), that.getExample()) &&
+                Objects.equals(getFileType(), that.getFileType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getExample(), getFileType());
     }
 }
