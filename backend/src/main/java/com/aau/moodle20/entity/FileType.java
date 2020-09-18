@@ -3,6 +3,7 @@ package com.aau.moodle20.entity;
 import com.aau.moodle20.payload.response.FileTypeResponseObject;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -69,9 +70,17 @@ public class FileType {
         return responseObject;
     }
 
-    public FileTypeResponseObject createFileTypeResponseObjectOnlyId() {
-        FileTypeResponseObject responseObject = new FileTypeResponseObject();
-        responseObject.setId(getId());
-        return responseObject;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FileType)) return false;
+        FileType fileType = (FileType) o;
+        return Objects.equals(getValue(), fileType.getValue()) &&
+                Objects.equals(getName(), fileType.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getValue(), getName());
     }
 }
