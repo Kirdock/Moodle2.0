@@ -1,4 +1,4 @@
-package com.aau.moodle20;
+package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.entity.Course;
