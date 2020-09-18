@@ -320,4 +320,26 @@ public class Example {
 
         return example;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Example)) return false;
+        Example example = (Example) o;
+        return Objects.equals(getName(), example.getName()) &&
+                Objects.equals(getDescription(), example.getDescription()) &&
+                Objects.equals(getPoints(), example.getPoints()) &&
+                Objects.equals(getWeighting(), example.getWeighting()) &&
+                Objects.equals(getMandatory(), example.getMandatory()) &&
+                Objects.equals(getOrder(), example.getOrder()) &&
+                Objects.equals(getSubmitFile(), example.getSubmitFile()) &&
+                Objects.equals(getCustomFileTypes(), example.getCustomFileTypes()) &&
+                Objects.equals(getValidator(), example.getValidator()) &&
+                Objects.equals(getUploadCount(), example.getUploadCount());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getDescription(), getPoints(), getWeighting(), getMandatory(), getOrder(), getSubmitFile(), getCustomFileTypes(), getValidator(), getUploadCount());
+    }
 }
