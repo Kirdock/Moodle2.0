@@ -291,21 +291,4 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
 
         return updateCourseRequest;
     }
-
-    private Course getTestCourse()
-    {
-        Course course = new Course();
-        course.setId((long) 200);
-        course.setDescription("dd");
-        course.setDescriptionTemplate("dd");
-        course.setId((long) 200);
-        course.setMinKreuzel(20);
-        course.setMinPoints(20);
-        course.setName("dd");
-        course.setNumber(COURSE_NUMBER);
-        course.setOwner(new User(OWNER_MATRICULATION_NUMBER));
-        course.setSemester(new Semester(SEMESTER_ID));
-        course.setExerciseSheets(new HashSet<>());
-        return course;
-    }
 }
