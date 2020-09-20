@@ -140,32 +140,6 @@ public class CourseService extends AbstractService {
         return finishesExampleResponses;
     }
 
-    protected List<KreuzelCourseResponse> createKreuzelCourseResponses(Course course) {
-        List<KreuzelCourseResponse> kreuzelCourseResponses = new ArrayList<>();
-        List<Example> examplesInCourse = new ArrayList<>();
-
-        for (ExerciseSheet exerciseSheet : course.getExerciseSheets()) {
-            examplesInCourse.addAll(exerciseSheet.getExamples());
-        }
-        List<Long> exampleIds = examplesInCourse.stream().map(example -> example.getId()).collect(Collectors.toList());
-        List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_IdIn(exampleIds);
-        finishesExamples.removeIf(finishesExample -> EFinishesExampleState.NO.equals(finishesExample.getState()));
-
-        for (FinishesExample finishesExample : finishesExamples) {
-            KreuzelCourseResponse kreuzelCourseResponse = new KreuzelCourseResponse();
-            kreuzelCourseResponse.setExampleId(finishesExample.getExample().getId());
-            kreuzelCourseResponse.setExampleName(finishesExample.getExample().getName());
-            kreuzelCourseResponse.setExerciseSheetName(finishesExample.getExample().getExerciseSheet().getName());
-            kreuzelCourseResponse.setForename(finishesExample.getUser().getForename());
-            kreuzelCourseResponse.setSurname(finishesExample.getUser().getSurname());
-            kreuzelCourseResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
-            kreuzelCourseResponse.setState(finishesExample.getState());
-
-            kreuzelCourseResponses.add(kreuzelCourseResponse);
-        }
-        return kreuzelCourseResponses;
-    }
-
     protected List<FinishesExampleResponse> createFinishesExampleResponses(Example example, ExerciseSheet exerciseSheet) {
         List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
         for (FinishesExample finishesExample : example.getExamplesFinishedByUser()) {
