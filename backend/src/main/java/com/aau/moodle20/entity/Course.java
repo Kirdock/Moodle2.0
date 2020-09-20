@@ -206,8 +206,7 @@ public class Course {
         if (this == o) return true;
         if (!(o instanceof Course)) return false;
         Course course = (Course) o;
-        return Objects.equals(getId(), course.getId()) &&
-                Objects.equals(getSemester(), course.getSemester()) &&
+        return  Objects.equals(getSemester(), course.getSemester()) &&
                 Objects.equals(getNumber(), course.getNumber()) &&
                 Objects.equals(getName(), course.getName()) &&
                 Objects.equals(getMinKreuzel(), course.getMinKreuzel()) &&
@@ -220,6 +219,6 @@ public class Course {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getSemester(), getNumber(), getName(), getMinKreuzel(), getMinPoints(), getDescriptionTemplate(), getDescription(), getUploadCount(), getOwner());
+        return Objects.hash(getSemester(), getNumber(), getName(), getMinKreuzel(), getMinPoints(), getDescriptionTemplate(), getDescription(), getUploadCount(), getOwner());
     }
 }
