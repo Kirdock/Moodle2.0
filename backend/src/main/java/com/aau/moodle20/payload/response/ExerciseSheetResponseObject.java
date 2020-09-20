@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExerciseSheetResponseObject {
@@ -165,5 +166,34 @@ public class ExerciseSheetResponseObject {
 
     public void setUploadCount(Integer uploadCount) {
         this.uploadCount = uploadCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ExerciseSheetResponseObject)) return false;
+        ExerciseSheetResponseObject that = (ExerciseSheetResponseObject) o;
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getCourseId(), that.getCourseId()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getMinKreuzel(), that.getMinKreuzel()) &&
+                Objects.equals(getMinPoints(), that.getMinPoints()) &&
+                Objects.equals(getSubmissionDate(), that.getSubmissionDate()) &&
+                Objects.equals(getIssueDate(), that.getIssueDate()) &&
+                Objects.equals(getDescription(), that.getDescription()) &&
+                Objects.equals(getExamples(), that.getExamples()) &&
+                Objects.equals(getCourseName(), that.getCourseName()) &&
+                Objects.equals(getCourseNumber(), that.getCourseNumber()) &&
+                Objects.equals(getIncludeThird(), that.getIncludeThird()) &&
+                Objects.equals(getExampleCount(), that.getExampleCount()) &&
+                Objects.equals(getPointsTotal(), that.getPointsTotal()) &&
+                Objects.equals(getKreuzel(), that.getKreuzel()) &&
+                Objects.equals(getPoints(), that.getPoints()) &&
+                Objects.equals(getUploadCount(), that.getUploadCount());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getCourseId(), getName(), getMinKreuzel(), getMinPoints(), getSubmissionDate(), getIssueDate(), getDescription(), getExamples(), getCourseName(), getCourseNumber(), getIncludeThird(), getExampleCount(), getPointsTotal(), getKreuzel(), getPoints(), getUploadCount());
     }
 }

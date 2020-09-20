@@ -35,7 +35,7 @@ public class UserCourseService extends AbstractService {
         this.userService = userService;
         this.finishesExampleService = finishesExampleService;
     }
-    
+
     public CourseResponseObject getCourseAssigned(Long courseId) {
         Course course = readCourse(courseId);
         User currentUser = getCurrentUser();

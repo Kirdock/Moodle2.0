@@ -1,8 +1,6 @@
 package com.aau.moodle20.services;
 
-import com.aau.moodle20.entity.Course;
-import com.aau.moodle20.entity.Semester;
-import com.aau.moodle20.entity.User;
+import com.aau.moodle20.entity.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,6 +20,8 @@ public class AbstractServiceTest {
     protected String normalMatriculationNumber = "12345678";
 
     protected  final Long COURSE_ID = 200L;
+    protected  final Long EXERCISE_SHEET_ID = 230L;
+    protected  final Long EXAMPLE_ID = 230L;
     protected  final String COURSE_NUMBER= "123.123";
     protected  final Long SEMESTER_ID = 111L;
     protected  final String OWNER_MATRICULATION_NUMBER = "12345678";
@@ -68,6 +68,27 @@ public class AbstractServiceTest {
         course.setOwner(new User(OWNER_MATRICULATION_NUMBER));
         course.setSemester(new Semester(SEMESTER_ID));
         course.setExerciseSheets(new HashSet<>());
+        return course;
+    }
+
+    protected Course getTestCourseWithExerciseSheet()
+    {
+        Course course = getTestCourse();
+
+        Example example = new Example() ;
+        example.setId(EXAMPLE_ID);
+        example.setValidator("test.txt");
+        example.setExamplesFinishedByUser(new HashSet<>());
+
+
+        ExerciseSheet exerciseSheet = new ExerciseSheet();
+        exerciseSheet.setCourse(course);
+        exerciseSheet.setId(EXERCISE_SHEET_ID);
+        exerciseSheet.setIncludeThird(Boolean.FALSE);
+        exerciseSheet.setDescription("dd");
+        exerciseSheet.setExamples(new HashSet<>());
+        exerciseSheet.getExamples().add(example);
+        course.getExerciseSheets().add(exerciseSheet);
         return course;
     }
 }

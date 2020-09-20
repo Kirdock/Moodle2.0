@@ -1,14 +1,14 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
-import com.aau.moodle20.entity.Course;
-import com.aau.moodle20.entity.Semester;
-import com.aau.moodle20.entity.User;
+import com.aau.moodle20.entity.*;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.UpdateCoursePresets;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
+import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
+import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.SemesterRepository;
 import com.aau.moodle20.repository.UserRepository;
@@ -20,33 +20,24 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
 public class CourseServiceUnitTest extends AbstractServiceTest{
-
-    private static final Long COURSE_ID = 200L;
-    private static final String COURSE_NUMBER= "123.123";
-    private static final Long SEMESTER_ID = 12L;
-    private static final String OWNER_MATRICULATION_NUMBER = "12345678";
 
     @InjectMocks
     private CourseService courseService;
@@ -56,6 +47,9 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
     private UserRepository userRepository;
     @Mock
     private SemesterRepository semesterRepository;
+
+    @Mock
+    private ExampleService exampleService;
 
 
 
@@ -263,6 +257,233 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    public void deleteCourse_course_not_exists() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        doNothing().when(courseRepository).delete(any(Course.class));
+
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            courseService.deleteCourse(COURSE_ID);
+        });
+        String expectedMessage = "Error: Course not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void deleteCourse_without_ExerciseSheets() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        doNothing().when(courseRepository).delete(any(Course.class));
+        courseService.deleteCourse(COURSE_ID);
+    }
+
+    @Test
+    public void deleteCourse_with_ExerciseSheets() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourseWithExerciseSheet();
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        doNothing().when(courseRepository).delete(any(Course.class));
+        doNothing().when(exampleService).deleteExampleValidator(anyLong());
+
+        courseService.deleteCourse(COURSE_ID);
+    }
+
+    @Test
+    public void getCourse_course_not_exists() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            courseService.getCourse(COURSE_ID);
+        });
+        String expectedMessage = "Error: Course not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void getCourse_without_ExerciseSheets_admin() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+        CourseResponseObject testResponseObject = getCourseResponseObject(course);
+        testResponseObject.setPresented(new ArrayList<>());
+        testResponseObject.setOwner(course.getOwner().getMatriculationNumber());
+        testResponseObject.setExerciseSheets(new ArrayList<>());
+
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        CourseResponseObject responseObject = courseService.getCourse(COURSE_ID);
+        assertEquals(testResponseObject,responseObject);
+    }
+
+    @Test
+    public void getCourse_without_ExerciseSheets_non_admin() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        Course course = getTestCourse();
+        CourseResponseObject testResponseObject = getCourseResponseObject(course);
+        testResponseObject.setPresented(new ArrayList<>());
+        testResponseObject.setExerciseSheets(new ArrayList<>());
+
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        CourseResponseObject responseObject = courseService.getCourse(COURSE_ID);
+        assertEquals(testResponseObject,responseObject);
+    }
+
+    @Test
+    public void getCourse_with_ExerciseSheets_admin() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourseWithMultipleExerciseSheets();
+        CourseResponseObject testResponseObject = getCourseResponseObject(course);
+        testResponseObject.setPresented(new ArrayList<>());
+        testResponseObject.setOwner(course.getOwner().getMatriculationNumber());
+        testResponseObject.setExerciseSheets(new ArrayList<>());
+        testResponseObject.getExerciseSheets().addAll(course.getExerciseSheets().stream()
+                .map(ExerciseSheet::getResponseObjectLessInfo)
+                .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate).thenComparing(ExerciseSheetResponseObject::getName))
+                .collect(Collectors.toList()));
+
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        CourseResponseObject responseObject = courseService.getCourse(COURSE_ID);
+        assertEquals(testResponseObject,responseObject);
+    }
+
+    @Test
+    public void getCoursePresented_without_ExerciseSheets() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        List<FinishesExampleResponse> finishesExampleResponses = courseService.getCoursePresented(COURSE_ID);
+        assertEquals(0,finishesExampleResponses.size());
+    }
+
+    @Test
+    public void getCoursePresented_with_ExerciseSheet() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+
+        User adminUser = new User();
+        adminUser.setMatriculationNumber(adminMatriculationNumber);
+        adminUser.setForename("admin");
+        adminUser.setSurname("admin");
+
+        List<FinishesExample> finishesExamples = new ArrayList<>();
+        List<FinishesExampleResponse> testFinishExampleResponses = new ArrayList<>();
+
+        ExerciseSheet exerciseSheet = new ExerciseSheet();
+        exerciseSheet.setCourse(course);
+        exerciseSheet.setName("aaaa");
+        exerciseSheet.setId(EXERCISE_SHEET_ID);
+        exerciseSheet.setIncludeThird(Boolean.FALSE);
+        exerciseSheet.setDescription("dd");
+        exerciseSheet.setSubmissionDate(LocalDateTime.now().plusDays(10));
+        exerciseSheet.setExamples(new HashSet<>());
+        course.getExerciseSheets().add(exerciseSheet);
+
+        Example example1 = new Example();
+        example1.setId(200L);
+        example1.setExerciseSheet(exerciseSheet);
+        example1.setOrder(0);
+        example1.setExamplesFinishedByUser(new HashSet<>());
+
+        Example parentExample = new Example();
+        parentExample.setId(210L);
+        parentExample.setExerciseSheet(exerciseSheet);
+        parentExample.setSubExamples(new HashSet<>());
+        parentExample.setOrder(1);
+
+        Example subExample = new Example();
+        subExample.setId(220L);
+        subExample.setExerciseSheet(exerciseSheet);
+        subExample.setOrder(2);
+
+        Example subExample2 = new Example();
+        subExample2.setId(230L);
+        subExample2.setExerciseSheet(exerciseSheet);
+        subExample2.setOrder(0);
+
+        parentExample.getSubExamples().add(subExample);
+        parentExample.getSubExamples().add(subExample2);
+
+        subExample.setParentExample(parentExample);
+        subExample2.setParentExample(parentExample);
+
+        exerciseSheet.getExamples().add(example1);
+        exerciseSheet.getExamples().add(parentExample);
+        exerciseSheet.getExamples().add(subExample);
+        exerciseSheet.getExamples().add(subExample2);
+
+        FinishesExample finishesExample = getTextFinisExample(adminUser);
+        example1.setExamplesFinishedByUser(new HashSet<>());
+        finishesExample.setExample(example1);
+        example1.getExamplesFinishedByUser().add(finishesExample);
+        finishesExamples.add(finishesExample);
+
+        finishesExample = getTextFinisExample(adminUser);
+        subExample2.setExamplesFinishedByUser(new HashSet<>());
+        finishesExample.setExample(subExample2);
+        subExample2.getExamplesFinishedByUser().add(finishesExample);
+        finishesExamples.add(finishesExample);
+
+         finishesExample = getTextFinisExample(adminUser);
+        subExample.setExamplesFinishedByUser(new HashSet<>());
+        finishesExample.setExample(subExample);
+        subExample.getExamplesFinishedByUser().add(finishesExample);
+        finishesExamples.add(finishesExample);
+
+
+        for (FinishesExample finishesExample1 : finishesExamples ) {
+
+            FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
+            finishesExampleResponse.setMatriculationNumber(finishesExample1.getUser().getMatriculationNumber());
+            finishesExampleResponse.setSurname(finishesExample1.getUser().getSurname());
+            finishesExampleResponse.setForename(finishesExample1.getUser().getForename());
+            finishesExampleResponse.setExampleId(finishesExample1.getExample().getId());
+            finishesExampleResponse.setExampleName(finishesExample1.getExample().getName());
+            finishesExampleResponse.setExerciseSheetName(exerciseSheet.getName());
+            finishesExampleResponse.setExerciseSheetId(exerciseSheet.getId());
+            testFinishExampleResponses.add(finishesExampleResponse);
+        }
+
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        List<FinishesExampleResponse> finishesExampleResponses = courseService.getCoursePresented(COURSE_ID);
+        assertEquals(3,finishesExampleResponses.size());
+        assertEquals(testFinishExampleResponses, finishesExampleResponses);
+    }
+
+    private FinishesExample getTextFinisExample(User user)
+    {
+        FinishesExample finishesExample = new FinishesExample();
+        finishesExample.setHasPresented(Boolean.TRUE);
+        finishesExample.setDescription("dd");
+        finishesExample.setFileName("dd");
+        finishesExample.setValid(Boolean.TRUE);
+        finishesExample.setUser(user);
+
+        return finishesExample;
+    }
+
+    private CourseResponseObject getCourseResponseObject (Course course)
+    {
+        CourseResponseObject testResponseObject = new CourseResponseObject();
+        testResponseObject.setId(course.getId());
+        testResponseObject.setName(course.getName());
+        testResponseObject.setNumber(course.getNumber());
+        testResponseObject.setMinKreuzel(course.getMinKreuzel());
+        testResponseObject.setMinPoints(course.getMinPoints());
+        testResponseObject.setDescriptionTemplate(course.getDescriptionTemplate());
+        testResponseObject.setSemesterId(course.getSemester().getId());
+        testResponseObject.setDescription(course.getDescription());
+        testResponseObject.setUploadCount(course.getUploadCount());
+
+        return testResponseObject;
+    }
 
     private CreateCourseRequest getCourseCreateRequest(Course course)
     {
@@ -290,5 +511,44 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         updateCourseRequest.setId(course.getId());
 
         return updateCourseRequest;
+    }
+
+    protected Course getTestCourseWithMultipleExerciseSheets()
+    {
+        Course course = getTestCourse();
+
+        ExerciseSheet exerciseSheet = new ExerciseSheet();
+        exerciseSheet.setCourse(course);
+        exerciseSheet.setName("aaaa");
+        exerciseSheet.setId(EXERCISE_SHEET_ID);
+        exerciseSheet.setIncludeThird(Boolean.FALSE);
+        exerciseSheet.setDescription("dd");
+        exerciseSheet.setSubmissionDate(LocalDateTime.now().plusDays(10));
+        exerciseSheet.setExamples(new HashSet<>());
+        course.getExerciseSheets().add(exerciseSheet);
+
+
+        LocalDateTime now = LocalDateTime.now();
+
+        ExerciseSheet exerciseSheet1 = new ExerciseSheet();
+        exerciseSheet1.setCourse(course);
+        exerciseSheet1.setId(EXERCISE_SHEET_ID+10);
+        exerciseSheet1.setName("bbbb");
+        exerciseSheet1.setIncludeThird(Boolean.FALSE);
+        exerciseSheet1.setDescription("dd");
+        exerciseSheet1.setSubmissionDate(now);
+        exerciseSheet1.setExamples(new HashSet<>());
+        course.getExerciseSheets().add(exerciseSheet1);
+
+        ExerciseSheet exerciseSheet2 = new ExerciseSheet();
+        exerciseSheet2.setCourse(course);
+        exerciseSheet2.setId(EXERCISE_SHEET_ID+20);
+        exerciseSheet2.setName("aaaa");
+        exerciseSheet2.setIncludeThird(Boolean.FALSE);
+        exerciseSheet2.setSubmissionDate(now);
+        exerciseSheet2.setDescription("dd");
+        exerciseSheet2.setExamples(new HashSet<>());
+        course.getExerciseSheets().add(exerciseSheet2);
+        return course;
     }
 }

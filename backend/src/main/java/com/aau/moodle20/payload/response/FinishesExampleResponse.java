@@ -2,6 +2,8 @@ package com.aau.moodle20.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Objects;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FinishesExampleResponse {
 
@@ -86,5 +88,26 @@ public class FinishesExampleResponse {
 
     public void setExerciseSheetId(Long exerciseSheetId) {
         this.exerciseSheetId = exerciseSheetId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FinishesExampleResponse)) return false;
+        FinishesExampleResponse that = (FinishesExampleResponse) o;
+        return Objects.equals(getExampleId(), that.getExampleId()) &&
+                Objects.equals(getParentOrder(), that.getParentOrder()) &&
+                Objects.equals(getOrder(), that.getOrder()) &&
+                Objects.equals(getExampleName(), that.getExampleName()) &&
+                Objects.equals(getExerciseSheetName(), that.getExerciseSheetName()) &&
+                Objects.equals(getMatriculationNumber(), that.getMatriculationNumber()) &&
+                Objects.equals(getSurname(), that.getSurname()) &&
+                Objects.equals(getForename(), that.getForename()) &&
+                Objects.equals(getExerciseSheetId(), that.getExerciseSheetId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getExampleId(), getParentOrder(), getOrder(), getExampleName(), getExerciseSheetName(), getMatriculationNumber(), getSurname(), getForename(), getExerciseSheetId());
     }
 }
