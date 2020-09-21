@@ -252,8 +252,6 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
 
         userCourseService.assignUsers(assignUserToCourseRequests);
     }
-    //        Optional<UserInCourse> optionalUserInCourse = userInCourseRepository.findByUser_MatriculationNumberAndCourse_Id(userInCourse.getId().getMatriculationNumber(), userInCourse.getId().getCourseId());
-
     @Test
     public void assignUsers_none_role() throws IOException {
         mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
