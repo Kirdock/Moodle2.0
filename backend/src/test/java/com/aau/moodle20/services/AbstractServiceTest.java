@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.constants.ESemesterType;
 import com.aau.moodle20.entity.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -69,6 +70,16 @@ public class AbstractServiceTest {
         course.setSemester(new Semester(SEMESTER_ID));
         course.setExerciseSheets(new HashSet<>());
         return course;
+    }
+
+    protected Semester getTestSemester()
+    {
+        Semester semester = new Semester();
+        semester.setYear(2020);
+        semester.setId(SEMESTER_ID);
+        semester.setType(ESemesterType.S);
+
+        return semester;
     }
 
     protected Course getTestCourseWithExerciseSheet()

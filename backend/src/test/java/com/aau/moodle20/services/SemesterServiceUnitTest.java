@@ -331,7 +331,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         return updateCourseRequest;
     }
 
-    private Semester getTestSemester()
+    protected Semester getTestSemester()
     {
        Semester semester = new Semester();
        semester.setId(SEMESTER_ID);

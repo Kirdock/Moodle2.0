@@ -171,7 +171,7 @@ public class CourseService extends AbstractService {
         // first copy course
         Course copiedCourse = originalCourse.copy();
         copiedCourse.setSemester(semester);
-        courseRepository.save(copiedCourse);
+        copiedCourse = courseRepository.save(copiedCourse);
 
         if (originalCourse.getExerciseSheets() == null || originalCourse.getExerciseSheets().isEmpty()) {
             CourseResponseObject courseResponseObject = new CourseResponseObject();

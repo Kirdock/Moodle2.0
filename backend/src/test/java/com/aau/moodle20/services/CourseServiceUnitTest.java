@@ -3,15 +3,15 @@ package com.aau.moodle20.services;
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.exception.ServiceException;
+import com.aau.moodle20.payload.request.CopyCourseRequest;
 import com.aau.moodle20.payload.request.CreateCourseRequest;
 import com.aau.moodle20.payload.request.UpdateCoursePresets;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
-import com.aau.moodle20.repository.CourseRepository;
-import com.aau.moodle20.repository.SemesterRepository;
-import com.aau.moodle20.repository.UserRepository;
+import com.aau.moodle20.repository.*;
+import org.assertj.core.api.OptionalAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,9 +47,15 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
     private UserRepository userRepository;
     @Mock
     private SemesterRepository semesterRepository;
-
+    @Mock
+    private ExerciseSheetRepository exerciseSheetRepository;
     @Mock
     private ExampleService exampleService;
+    @Mock
+    private ExampleRepository exampleRepository;
+    @Mock
+    private SupportFileTypeRepository supportFileTypeRepository;
+
 
 
 
@@ -457,6 +463,196 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         assertEquals(testFinishExampleResponses, finishesExampleResponses);
     }
 
+    @Test
+    public void copyCourse_semester_not_exists() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        CopyCourseRequest copyCourseRequest = new CopyCourseRequest();
+        copyCourseRequest.setSemesterId(SEMESTER_ID);
+        copyCourseRequest.setCourseId(COURSE_ID);
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            courseService.copyCourse(copyCourseRequest);
+        });
+        String expectedMessage = "Error: Semester not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void copyCourse_course_not_exists() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Semester semester = getTestSemester();
+        CopyCourseRequest copyCourseRequest = new CopyCourseRequest();
+        copyCourseRequest.setSemesterId(SEMESTER_ID);
+        copyCourseRequest.setCourseId(COURSE_ID);
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            courseService.copyCourse(copyCourseRequest);
+        });
+        String expectedMessage = "Error: Course not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void copyCourse_course_no_exerciseSheets() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Semester semester = getTestSemester();
+        Course course = getTestCourse();
+        CopyCourseRequest copyCourseRequest = getCopyCourseRequest();
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
+        when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
+        Course copiedCourse = new Course();
+        copiedCourse.setId(455L);
+        when(courseRepository.save(any(Course.class))).thenReturn(copiedCourse);
+
+        CourseResponseObject courseResponseObject_expected = new CourseResponseObject();
+        courseResponseObject_expected.setId(copiedCourse.getId());
+
+        CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
+        assertEquals(courseResponseObject_expected,responseObject);
+    }
+
+    @Test
+    public void copyCourse_course_exerciseSheets_no_examples() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Semester semester = getTestSemester();
+        Course course = getTestCourse();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        course.getExerciseSheets().add(exerciseSheet);
+        exerciseSheet.setCourse(course);
+        CopyCourseRequest copyCourseRequest = getCopyCourseRequest();
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
+        when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
+        Course copiedCourse = new Course();
+        copiedCourse.setId(455L);
+        when(courseRepository.save(any(Course.class))).thenReturn(copiedCourse);
+
+        CourseResponseObject courseResponseObject_expected = new CourseResponseObject();
+        courseResponseObject_expected.setId(copiedCourse.getId());
+
+        CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
+        assertEquals(courseResponseObject_expected,responseObject);
+    }
+
+    @Test
+    public void copyCourse_course_exerciseSheets_with_examples() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Semester semester = getTestSemester();
+        Course course = getTestCourseWithExerciseSheet();
+        CopyCourseRequest copyCourseRequest = getCopyCourseRequest();
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
+        when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
+        Course copiedCourse = new Course();
+        copiedCourse.setId(455L);
+        when(courseRepository.save(any(Course.class))).thenReturn(copiedCourse);
+
+        CourseResponseObject courseResponseObject_expected = new CourseResponseObject();
+        courseResponseObject_expected.setId(copiedCourse.getId());
+
+        CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
+        assertEquals(courseResponseObject_expected,responseObject);
+    }
+
+    @Test
+    public void copyCourse_course_exerciseSheets_with_subExamples() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Semester semester = getTestSemester();
+        Course course = getTestCourse();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        Example example = getTestExample();
+        Example subExample = getTestExample();
+        course.getExerciseSheets().add(exerciseSheet);
+        exerciseSheet.getExamples().add(example);
+        exerciseSheet.getExamples().add(subExample);
+        subExample.setParentExample(example);
+        example.getSubExamples().add(subExample);
+
+
+        CopyCourseRequest copyCourseRequest = getCopyCourseRequest();
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
+        when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
+        Course copiedCourse = new Course();
+        copiedCourse.setId(455L);
+        when(courseRepository.save(any(Course.class))).thenReturn(copiedCourse);
+
+        CourseResponseObject courseResponseObject_expected = new CourseResponseObject();
+        courseResponseObject_expected.setId(copiedCourse.getId());
+
+        CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
+        assertEquals(courseResponseObject_expected,responseObject);
+    }
+
+    @Test
+    public void copyCourse_course_exerciseSheets_with_subExamples_supportFileTypes() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Semester semester = getTestSemester();
+        Course course = getTestCourse();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        Example example = getTestExample();
+        Example subExample = getTestExample();
+        course.getExerciseSheets().add(exerciseSheet);
+        exerciseSheet.getExamples().add(example);
+        exerciseSheet.getExamples().add(subExample);
+        subExample.setParentExample(example);
+        example.getSubExamples().add(subExample);
+
+        SupportFileType supportFileType = getTestSupportFileType(example);
+        SupportFileType supportFileTypeSubExample = getTestSupportFileType(subExample);
+
+        example.getSupportFileTypes().add(supportFileType);
+        subExample.getSupportFileTypes().add(supportFileTypeSubExample);
+
+        CopyCourseRequest copyCourseRequest = getCopyCourseRequest();
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
+        when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
+        Course copiedCourse = new Course();
+        copiedCourse.setId(455L);
+        when(courseRepository.save(any(Course.class))).thenReturn(copiedCourse);
+
+        CourseResponseObject courseResponseObject_expected = new CourseResponseObject();
+        courseResponseObject_expected.setId(copiedCourse.getId());
+
+        CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
+        assertEquals(courseResponseObject_expected,responseObject);
+    }
+
+    private CopyCourseRequest getCopyCourseRequest()
+    {
+        CopyCourseRequest copyCourseRequest = new CopyCourseRequest();
+        copyCourseRequest.setSemesterId(SEMESTER_ID);
+        copyCourseRequest.setCourseId(COURSE_ID);
+
+        return copyCourseRequest;
+    }
+
+    private SupportFileType getTestSupportFileType(Example example) {
+        SupportFileType supportFileType = new SupportFileType();
+        supportFileType.setExample(example);
+        supportFileType.setFileType(getTestFileType());
+
+        return supportFileType;
+    }
+
+    private FileType getTestFileType() {
+        FileType fileType = new FileType();
+        fileType.setName("word");
+        fileType.setValue("*.docx");
+        fileType.setId(200L);
+
+        return fileType;
+    }
+
+    private Example getTestExample()
+    {
+        Example example = new Example() ;
+        example.setId(EXAMPLE_ID);
+        example.setValidator("test.txt");
+        example.setExamplesFinishedByUser(new HashSet<>());
+        example.setSupportFileTypes(new HashSet<>());
+
+        return example;
+    }
+
     private FinishesExample getTextFinisExample(User user)
     {
         FinishesExample finishesExample = new FinishesExample();
@@ -467,6 +663,16 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         finishesExample.setUser(user);
 
         return finishesExample;
+    }
+
+    private ExerciseSheet getTestExerciseSheet() {
+        ExerciseSheet exerciseSheet = new ExerciseSheet();
+        exerciseSheet.setId(EXERCISE_SHEET_ID);
+        exerciseSheet.setIncludeThird(Boolean.FALSE);
+        exerciseSheet.setDescription("dd");
+        exerciseSheet.setExamples(new HashSet<>());
+
+        return exerciseSheet;
     }
 
     private CourseResponseObject getCourseResponseObject (Course course)
