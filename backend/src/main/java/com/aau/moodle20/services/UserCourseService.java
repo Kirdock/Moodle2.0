@@ -26,12 +26,10 @@ import java.util.Optional;
 @Service
 public class UserCourseService extends AbstractService {
 
-    PdfService pdfService;
     UserService userService;
     FinishesExampleService finishesExampleService;
 
-    public UserCourseService(PdfService pdfService, UserService userService, FinishesExampleService finishesExampleService) {
-        this.pdfService = pdfService;
+    public UserCourseService(UserService userService, FinishesExampleService finishesExampleService) {
         this.userService = userService;
         this.finishesExampleService = finishesExampleService;
     }
@@ -51,7 +49,6 @@ public class UserCourseService extends AbstractService {
 
     @Transactional
     public void assignUsers(List<AssignUserToCourseRequest> assignUserToCourseRequests) throws IOException {
-        UserDetailsImpl userDetails = getUserDetails();
         List<UserInCourse> userInCourses = new ArrayList<>();
         for (AssignUserToCourseRequest assignUserToCourseRequest : assignUserToCourseRequests) {
 
