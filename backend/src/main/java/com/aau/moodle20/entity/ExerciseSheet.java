@@ -7,6 +7,7 @@ import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -207,5 +208,25 @@ public class ExerciseSheet {
         exerciseSheet.setName(getName());
 
         return exerciseSheet;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ExerciseSheet)) return false;
+        ExerciseSheet that = (ExerciseSheet) o;
+        return Objects.equals(getCourse(), that.getCourse()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getMinKreuzel(), that.getMinKreuzel()) &&
+                Objects.equals(getMinPoints(), that.getMinPoints()) &&
+                Objects.equals(getSubmissionDate(), that.getSubmissionDate()) &&
+                Objects.equals(getIssueDate(), that.getIssueDate()) &&
+                Objects.equals(getDescription(), that.getDescription()) &&
+                Objects.equals(getIncludeThird(), that.getIncludeThird());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCourse(), getName(), getMinKreuzel(), getMinPoints(), getSubmissionDate(), getIssueDate(), getDescription(), getIncludeThird());
     }
 }
