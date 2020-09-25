@@ -5,11 +5,9 @@ import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.ESemesterType;
 import com.aau.moodle20.entity.Course;
 import com.aau.moodle20.entity.Semester;
-import com.aau.moodle20.entity.User;
 import com.aau.moodle20.entity.UserInCourse;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateSemesterRequest;
-import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.repository.CourseRepository;
 import com.aau.moodle20.repository.SemesterRepository;
@@ -25,13 +23,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -64,8 +64,12 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         when(semesterRepository.existsByTypeAndYear(semester.getType(),semester.getYear())).thenReturn(Boolean.FALSE);
 
         CreateSemesterRequest createSemesterRequest = getSemesterCreateRequest();
+        Semester semester_expected = new Semester();
+        semester_expected.setType(createSemesterRequest.getType());
+        semester_expected.setYear(createSemesterRequest.getYear());
 
         semesterService.createSemester(createSemesterRequest);
+        verify(semesterRepository).save(semester_expected);
     }
 
     @Test
@@ -315,20 +319,6 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         createSemesterRequest.setYear(2020);
 
         return createSemesterRequest;
-    }
-
-    private UpdateCourseRequest getUpdateCourseRequest(Course course)
-    {
-        UpdateCourseRequest updateCourseRequest = new UpdateCourseRequest();
-        updateCourseRequest.setOwner(course.getOwner().getMatriculationNumber());
-        updateCourseRequest.setDescription(course.getDescription());
-        updateCourseRequest.setMinKreuzel(course.getMinKreuzel());
-        updateCourseRequest.setMinPoints(course.getMinPoints());
-        updateCourseRequest.setName(course.getName());
-        updateCourseRequest.setNumber(course.getNumber());
-        updateCourseRequest.setId(course.getId());
-
-        return updateCourseRequest;
     }
 
     protected Semester getTestSemester()

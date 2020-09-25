@@ -68,18 +68,18 @@ public class Semester {
         this.courses = courses;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Semester)) return false;
         Semester semester = (Semester) o;
-        return getId().equals(semester.getId());
+        return Objects.equals(getYear(), semester.getYear()) &&
+                getType() == semester.getType();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getYear(), getType());
     }
-
-
 }
