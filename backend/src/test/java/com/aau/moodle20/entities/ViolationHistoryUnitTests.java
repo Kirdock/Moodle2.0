@@ -1,28 +1,20 @@
 package com.aau.moodle20.entities;
 
-import com.aau.moodle20.entity.*;
+import com.aau.moodle20.entity.ViolationEntity;
+import com.aau.moodle20.entity.ViolationHistory;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
-import com.aau.moodle20.payload.response.ViolationResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
-import validation.Violation;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @RunWith(SpringRunner.class)
 public class ViolationHistoryUnitTests {
-
-    private final Long exampleId = 100L;
-    private final Long exerciseSheetId = 120L;
-
-
 
     @Test
     public void test_violationHistory_response()  {
