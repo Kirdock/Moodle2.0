@@ -45,6 +45,7 @@ public class ExerciseSheetService extends AbstractService {
         exerciseSheet.setDescription(createExerciseSheetRequest.getDescription());
         exerciseSheet.setIncludeThird(createExerciseSheetRequest.getIncludeThird());
 
+
         exerciseSheetRepository.save(exerciseSheet);
     }
 
@@ -52,7 +53,7 @@ public class ExerciseSheetService extends AbstractService {
         boolean exists;
         if (exerciseSheet != null) {
             exists = course.getExerciseSheets().stream()
-                    .filter(exerciseSheet1 -> !exerciseSheet.getName().equals(exerciseSheet1.getName()))
+                    .filter(exerciseSheet1 -> !exerciseSheet.getId().equals(exerciseSheet1.getId()))
                     .anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
         } else {
             exists = course.getExerciseSheets().stream().anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
