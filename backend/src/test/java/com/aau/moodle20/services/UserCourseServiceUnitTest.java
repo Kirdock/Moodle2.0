@@ -334,13 +334,4 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         return example;
 
     }
-    private ExerciseSheet getTestExerciseSheet()
-    {
-        ExerciseSheet exerciseSheet = new ExerciseSheet();
-        exerciseSheet.setId(EXERCISE_SHEET_ID);
-        exerciseSheet.setIncludeThird(Boolean.FALSE);
-        exerciseSheet.setDescription("dd");
-        exerciseSheet.setExamples(new HashSet<>());
-        return exerciseSheet;
-    }
 }

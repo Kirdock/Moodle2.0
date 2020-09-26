@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,6 +71,21 @@ public class AbstractServiceTest {
         course.setSemester(new Semester(SEMESTER_ID));
         course.setExerciseSheets(new HashSet<>());
         return course;
+    }
+
+    protected ExerciseSheet getTestExerciseSheet()
+    {
+        ExerciseSheet exerciseSheet = new ExerciseSheet();
+        exerciseSheet.setId(EXERCISE_SHEET_ID);
+        exerciseSheet.setMinPoints(20);
+        exerciseSheet.setMinKreuzel(30);
+        exerciseSheet.setIssueDate(LocalDateTime.now());
+        exerciseSheet.setSubmissionDate(LocalDateTime.now());
+        exerciseSheet.setName("exerciseSheet");
+        exerciseSheet.setDescription("DD");
+        exerciseSheet.setIncludeThird(Boolean.FALSE);
+
+        return exerciseSheet;
     }
 
     protected Semester getTestSemester()

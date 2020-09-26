@@ -665,16 +665,6 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         return finishesExample;
     }
 
-    private ExerciseSheet getTestExerciseSheet() {
-        ExerciseSheet exerciseSheet = new ExerciseSheet();
-        exerciseSheet.setId(EXERCISE_SHEET_ID);
-        exerciseSheet.setIncludeThird(Boolean.FALSE);
-        exerciseSheet.setDescription("dd");
-        exerciseSheet.setExamples(new HashSet<>());
-
-        return exerciseSheet;
-    }
-
     private CourseResponseObject getCourseResponseObject (Course course)
     {
         CourseResponseObject testResponseObject = new CourseResponseObject();

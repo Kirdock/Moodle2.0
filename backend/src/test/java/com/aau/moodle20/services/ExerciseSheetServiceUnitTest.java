@@ -274,7 +274,6 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         ExerciseSheetKreuzelResponse response = exerciseSheetService.getExerciseSheetKreuzel(EXERCISE_SHEET_ID);
         assertEquals(4,response.getExamples().size());
         assertEquals(0,response.getKreuzel().size());
-
         assertEquals(Boolean.FALSE,response.isIncludeThird());
     }
 
@@ -313,7 +312,6 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
                 assertEquals(EFinishesExampleState.NO.getRole(), response.getKreuzel().get(i).getStates().get(j).getType());
                 assertEquals("", response.getKreuzel().get(i).getStates().get(j).getDescription());
             }
-
         assertEquals(Boolean.FALSE,response.isIncludeThird());
     }
 
@@ -328,8 +326,6 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
 
         exerciseSheet.setCourse(course);
         exerciseSheet.setExamples(new HashSet<>());
-
-
 
         List<UserInCourse> userInCourseList = getTestUserInCourse();
         course.getStudents().addAll(userInCourseList);
@@ -353,8 +349,6 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         testExamples.get(4).getExamplesFinishedByUser().add(finishesExample2);
 
         exerciseSheet.getExamples().addAll(testExamples);
-
-
         when(exerciseSheetRepository.findById(EXERCISE_SHEET_ID)).thenReturn(Optional.of(exerciseSheet));
 
         ExerciseSheetKreuzelResponse response = exerciseSheetService.getExerciseSheetKreuzel(EXERCISE_SHEET_ID);
@@ -649,20 +643,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         return responseObject;
     }
 
-    private ExerciseSheet getTestExerciseSheet()
-    {
-        ExerciseSheet exerciseSheet = new ExerciseSheet();
-        exerciseSheet.setId(EXERCISE_SHEET_ID);
-        exerciseSheet.setMinPoints(20);
-        exerciseSheet.setMinKreuzel(30);
-        exerciseSheet.setIssueDate(LocalDateTime.now());
-        exerciseSheet.setSubmissionDate(LocalDateTime.now());
-        exerciseSheet.setName("exerciseSheet");
-        exerciseSheet.setDescription("DD");
-        exerciseSheet.setIncludeThird(Boolean.FALSE);
 
-        return exerciseSheet;
-    }
 
     private UpdateExerciseSheetRequest getUpdateExerciseSheetRequest()
     {
