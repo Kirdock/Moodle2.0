@@ -262,15 +262,11 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         exerciseSheet.setExamples(new HashSet<>());
         exerciseSheet.getExamples().addAll(getTextExamples());
 
-        ExerciseSheetKreuzelResponse exerciseSheetKreuzelResponse_expected = new ExerciseSheetKreuzelResponse();
-        exerciseSheetKreuzelResponse_expected.setIncludeThird(exerciseSheet.getIncludeThird());
-        exerciseSheetKreuzelResponse_expected.setExamples(new ArrayList<>());
-        exerciseSheetKreuzelResponse_expected.setKreuzel(new ArrayList<>());
-
         List<UserInCourse> userInCourseList = getTestUserInCourse();
         userInCourseList.get(0).setRole(ECourseRole.TEACHER);
         userInCourseList.get(1).setRole(ECourseRole.TEACHER);
         userInCourseList.get(2).setRole(ECourseRole.LECTURER);
+        userInCourseList.get(3).setRole(ECourseRole.LECTURER);
         course.getStudents().addAll(userInCourseList);
 
         when(exerciseSheetRepository.findById(EXERCISE_SHEET_ID)).thenReturn(Optional.of(exerciseSheet));
@@ -294,11 +290,6 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         exerciseSheet.setExamples(new HashSet<>());
         exerciseSheet.getExamples().addAll(getTextExamples());
 
-        ExerciseSheetKreuzelResponse exerciseSheetKreuzelResponse_expected = new ExerciseSheetKreuzelResponse();
-        exerciseSheetKreuzelResponse_expected.setIncludeThird(exerciseSheet.getIncludeThird());
-        exerciseSheetKreuzelResponse_expected.setExamples(new ArrayList<>());
-        exerciseSheetKreuzelResponse_expected.setKreuzel(new ArrayList<>());
-
         List<UserInCourse> userInCourseList = getTestUserInCourse();
         course.getStudents().addAll(userInCourseList);
         exerciseSheet.setCourse(course);
@@ -307,10 +298,17 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
 
         ExerciseSheetKreuzelResponse response = exerciseSheetService.getExerciseSheetKreuzel(EXERCISE_SHEET_ID);
         assertEquals(4,response.getExamples().size());
-        assertEquals(3,response.getKreuzel().size());
-        for (int i = 0; i < 3; i++)
+        assertEquals(4,response.getKreuzel().size());
+        for (int i = 0; i < 4; i++)
             assertEquals(4, response.getKreuzel().get(i).getStates().size());
-        for (int i = 0; i < 3; i++)
+        // check kreuzel sorting
+
+        assertEquals("11111111", response.getKreuzel().get(0).getMatriculationNumber());
+        assertEquals("22222222", response.getKreuzel().get(1).getMatriculationNumber());
+        assertEquals("33333333", response.getKreuzel().get(2).getMatriculationNumber());
+        assertEquals("44444444", response.getKreuzel().get(3).getMatriculationNumber());
+
+        for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++) {
                 assertEquals(EFinishesExampleState.NO.getRole(), response.getKreuzel().get(i).getStates().get(j).getType());
                 assertEquals("", response.getKreuzel().get(i).getStates().get(j).getDescription());
@@ -330,35 +328,49 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
 
         exerciseSheet.setCourse(course);
         exerciseSheet.setExamples(new HashSet<>());
-        exerciseSheet.getExamples().addAll(getTextExamples());
-        //TODO finish this test case
 
-        ExerciseSheetKreuzelResponse exerciseSheetKreuzelResponse_expected = new ExerciseSheetKreuzelResponse();
-        exerciseSheetKreuzelResponse_expected.setIncludeThird(exerciseSheet.getIncludeThird());
-        exerciseSheetKreuzelResponse_expected.setExamples(new ArrayList<>());
-        exerciseSheetKreuzelResponse_expected.setKreuzel(new ArrayList<>());
+
 
         List<UserInCourse> userInCourseList = getTestUserInCourse();
         course.getStudents().addAll(userInCourseList);
         exerciseSheet.setCourse(course);
 
+        List<Example> testExamples = getTextExamples();
+
+        FinishesExample finishesExample = new FinishesExample();
+        finishesExample.setUser(userInCourseList.get(0).getUser());
+        finishesExample.setDescription("hallo");
+        finishesExample.setState(EFinishesExampleState.MAYBE);
+        finishesExample.setViolationHistories(new HashSet<>());
+
+        FinishesExample finishesExample2 = new FinishesExample();
+        finishesExample2.setUser(userInCourseList.get(1).getUser());
+        finishesExample2.setDescription("hallo2");
+        finishesExample2.setState(EFinishesExampleState.YES);
+        finishesExample2.setViolationHistories(new HashSet<>());
+
+        testExamples.get(3).getExamplesFinishedByUser().add(finishesExample);
+        testExamples.get(4).getExamplesFinishedByUser().add(finishesExample2);
+
+        exerciseSheet.getExamples().addAll(testExamples);
+
+
         when(exerciseSheetRepository.findById(EXERCISE_SHEET_ID)).thenReturn(Optional.of(exerciseSheet));
 
         ExerciseSheetKreuzelResponse response = exerciseSheetService.getExerciseSheetKreuzel(EXERCISE_SHEET_ID);
         assertEquals(4,response.getExamples().size());
-        assertEquals(3,response.getKreuzel().size());
-        for (int i = 0; i < 3; i++)
-            assertEquals(4, response.getKreuzel().get(i).getStates().size());
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 4; j++) {
-                assertEquals(EFinishesExampleState.NO.getRole(), response.getKreuzel().get(i).getStates().get(j).getType());
-                assertEquals("", response.getKreuzel().get(i).getStates().get(j).getDescription());
-            }
+        assertEquals(4,response.getKreuzel().size());
+
+        assertEquals("hallo2",response.getKreuzel().get(2).getStates().get(0).getDescription());
+        assertEquals(EFinishesExampleState.YES.getRole(),response.getKreuzel().get(2).getStates().get(0).getType());
+        assertEquals(new ArrayList<>(),response.getKreuzel().get(2).getStates().get(0).getResult());
+
+        assertEquals("hallo",response.getKreuzel().get(3).getStates().get(1).getDescription());
+        assertEquals(EFinishesExampleState.MAYBE.getRole(),response.getKreuzel().get(3).getStates().get(1).getType());
+        assertEquals(new ArrayList<>(),response.getKreuzel().get(3).getStates().get(1).getResult());
 
         assertEquals(Boolean.FALSE,response.isIncludeThird());
     }
-
-
 
     @Test
     public void getExerciseSheetAssigned_exerciseSheet_not_found()  {
@@ -438,17 +450,6 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
     }
 
     @Test
-    public void getExerciseSheetsFromCourse_course_not_found()  {
-        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            exerciseSheetService.deleteExerciseSheet(EXERCISE_SHEET_ID);
-        });
-        String expectedMessage = "Error: ExerciseSheet not found!";
-        assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
-    }
-
-    @Test
     public void deleteExerciseSheet() throws IOException {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         doNothing().when(exampleService).deleteExampleValidator(anyLong());
@@ -460,6 +461,120 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         exerciseSheetService.deleteExerciseSheet(EXERCISE_SHEET_ID);
         verify(exampleRepository).flush();
         verify(exerciseSheetRepository).delete(exerciseSheet);
+    }
+
+    @Test
+    public void getExerciseSheetsFromCourse_course_not_found()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            exerciseSheetService.deleteExerciseSheet(EXERCISE_SHEET_ID);
+        });
+        String expectedMessage = "Error: ExerciseSheet not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void getExerciseSheetsFromCourse_no_exerciseSheets_in_course() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        List<ExerciseSheetResponseObject> responseObjects = exerciseSheetService.getExerciseSheetsFromCourse(course.getId());
+        assertEquals(new ArrayList<>(), responseObjects);
+    }
+
+    @Test
+    public void getExerciseSheetsFromCourse_not_owner_of_course_nor_student()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        Course course = getTestCourse();
+        course.setOwner(new User(adminMatriculationNumber));
+        course.setStudents(new HashSet<>());
+
+        UserInCourse userInCourse = new UserInCourse();
+        userInCourse.setUser(new User(adminMatriculationNumber));
+        userInCourse.setRole(ECourseRole.STUDENT);
+
+        UserInCourse userInCourse2 = new UserInCourse();
+        userInCourse2.setUser(new User(adminMatriculationNumber));
+        userInCourse2.setRole(ECourseRole.NONE);
+        course.getStudents().add(userInCourse);
+        course.getStudents().add(userInCourse2);
+
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            exerciseSheetService.getExerciseSheetsFromCourse(course.getId());
+        });
+        String expectedMessage = "Error: not authorized to access exerciseSheets";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(exception.getHttpStatus(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void getExerciseSheetsFromCourse_owner_no_exerciseSheets()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        Course course = getTestCourse();
+        course.setOwner(new User(getUserDetails_Not_Admin().getMatriculationNumber()));
+        course.setStudents(new HashSet<>());
+
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        List<ExerciseSheetResponseObject> responseObjects = exerciseSheetService.getExerciseSheetsFromCourse(course.getId());
+        assertEquals(new ArrayList<>(), responseObjects);
+    }
+
+    @Test
+    public void getExerciseSheetsFromCourse_student_no_exerciseSheets()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Course course = getTestCourse();
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+        List<ExerciseSheet> exerciseSheetList = new ArrayList<>();
+
+        ExerciseSheet exerciseSheet = new ExerciseSheet(EXERCISE_SHEET_ID);
+        exerciseSheet.setSubmissionDate(LocalDateTime.now().minusDays(10));
+        exerciseSheet.setName("abc");
+
+        ExerciseSheet exerciseSheet2 = new ExerciseSheet(EXERCISE_SHEET_ID+20);
+        exerciseSheet2.setSubmissionDate(LocalDateTime.now().minusDays(3));
+        exerciseSheet2.setName("abc");
+
+        ExerciseSheet exerciseSheet3 = new ExerciseSheet(EXERCISE_SHEET_ID+30);
+        exerciseSheet3.setSubmissionDate(LocalDateTime.now().minusDays(5));
+        exerciseSheet3.setName("abc");
+
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        ExerciseSheet exerciseSheet4 = new ExerciseSheet(EXERCISE_SHEET_ID+40);
+        exerciseSheet4.setSubmissionDate(dateTime);
+        exerciseSheet4.setName("abc");
+
+        ExerciseSheet exerciseSheet5 = new ExerciseSheet(EXERCISE_SHEET_ID+50);
+        exerciseSheet5.setSubmissionDate(dateTime);
+        exerciseSheet5.setName("ccc");
+
+        ExerciseSheet exerciseSheet6 = new ExerciseSheet(EXERCISE_SHEET_ID+60);
+        exerciseSheet6.setSubmissionDate(dateTime);
+        exerciseSheet6.setName("bbb");
+
+        exerciseSheetList.add(exerciseSheet);
+        exerciseSheetList.add(exerciseSheet2);
+        exerciseSheetList.add(exerciseSheet3);
+        exerciseSheetList.add(exerciseSheet4);
+        exerciseSheetList.add(exerciseSheet5);
+        exerciseSheetList.add(exerciseSheet6);
+
+        when(exerciseSheetRepository.findByCourse_Id(course.getId())).thenReturn(exerciseSheetList);
+
+        List<ExerciseSheetResponseObject> responseObjects_expected = exerciseSheetList.stream()
+                .map(exerciseSheet1 -> createExerciseSheetResponseObject(exerciseSheet1))
+                .collect(Collectors.toList());
+
+        responseObjects_expected.sort(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate)
+                .thenComparing(ExerciseSheetResponseObject::getName));
+
+        List<ExerciseSheetResponseObject> responseObjects = exerciseSheetService.getExerciseSheetsFromCourse(course.getId());
+        assertEquals(responseObjects_expected, responseObjects);
     }
 
 
@@ -632,17 +747,22 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         User user1 = new User();
         user1.setMatriculationNumber("44444444");
         user1.setForename("forename1");
-        user1.setSurname("surname1");
+        user1.setSurname("bbbb");
 
         User user2 = new User();
-        user2.setMatriculationNumber("11111111");
-        user2.setForename("forename2");
-        user2.setSurname("surname2");
+        user2.setMatriculationNumber("33333333");
+        user2.setForename("bforename");
+        user2.setSurname("aaaa");
 
         User user3 = new User();
         user3.setMatriculationNumber("22222222");
-        user3.setForename("forename3");
-        user3.setSurname("surname3");
+        user3.setForename("aforename");
+        user3.setSurname("aaaa");
+
+        User user4 = new User();
+        user4.setMatriculationNumber("11111111");
+        user4.setForename("bforename");
+        user4.setSurname("aaaa");
 
         UserInCourse userInCourse1 = new UserInCourse();
         userInCourse1.setUser(user1);
@@ -656,10 +776,24 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         userInCourse3.setUser(user3);
         userInCourse3.setRole(ECourseRole.STUDENT);
 
+        UserInCourse userInCourse4 = new UserInCourse();
+        userInCourse4.setUser(user4);
+        userInCourse4.setRole(ECourseRole.STUDENT);
+
         userInCourses.add(userInCourse1);
         userInCourses.add(userInCourse2);
         userInCourses.add(userInCourse3);
+        userInCourses.add(userInCourse4);
 
         return userInCourses;
+    }
+
+    private ExerciseSheetResponseObject createExerciseSheetResponseObject(ExerciseSheet exerciseSheet) {
+        ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
+        responseObject.setName(exerciseSheet.getName());
+        responseObject.setSubmissionDate(exerciseSheet.getSubmissionDate());
+        responseObject.setId(exerciseSheet.getId());
+
+        return responseObject;
     }
 }
