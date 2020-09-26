@@ -43,7 +43,7 @@ public class Application implements ApplicationRunner, ErrorController {
 
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         if (Boolean.FALSE.equals(userRepository.existsByUsername(adminUserName))) {
             userRepository.save(new User(adminUserName, adminMatriculationNumber, adminUserName, adminPassword, encoder.encode(adminPassword), Boolean.TRUE));
         }
