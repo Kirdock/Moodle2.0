@@ -10,9 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserDetailsServiceImpl extends AbstractService implements UserDetailsService {
 
-
     public UserDetailsServiceImpl() {
-
     }
 
     @Override
@@ -23,6 +21,4 @@ public class UserDetailsServiceImpl extends AbstractService implements UserDetai
 
         return UserDetailsImpl.build(user);
     }
-
-
 }
