@@ -62,7 +62,7 @@ public class ExampleService extends AbstractService {
         }
 
         example.fillValuesFromRequestObject(createExampleRequest);
-        exampleRepository.save(example);
+        example = exampleRepository.save(example);
         supportFileTypes = createSupportedFileTypesEntries(example, createExampleRequest.getSupportedFileTypes());
         supportFileTypeRepository.saveAll(supportFileTypes);
 
