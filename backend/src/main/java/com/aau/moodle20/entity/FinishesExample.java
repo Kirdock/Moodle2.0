@@ -132,15 +132,4 @@ public class FinishesExample {
     public void setViolationHistories(Set<ViolationHistory> violationHistories) {
         this.violationHistories = violationHistories;
     }
-
-    public FinishesExampleResponse getFinishesExampleResponse() {
-        FinishesExampleResponse response = new FinishesExampleResponse();
-        response.setExampleName(getExample().getName());
-        response.setExampleId(getExample().getId());
-        response.setOrder(getExample().getOrder());
-        if (getExample().getParentExample() != null)
-            response.setParentOrder(getExample().getParentExample().getOrder());
-
-        return response;
-    }
 }
