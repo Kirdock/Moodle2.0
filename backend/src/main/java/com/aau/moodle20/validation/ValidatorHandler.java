@@ -4,6 +4,7 @@ package com.aau.moodle20.validation;
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.FileConstants;
 import com.aau.moodle20.exception.ServiceException;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import validation.IValidator;
 
@@ -14,6 +15,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+@Component
 public class ValidatorHandler {
 
     public IValidator loadValidator(String directory) throws ClassNotFoundException, IOException {
@@ -48,7 +50,7 @@ public class ValidatorHandler {
     }
 
 
-    public void checkValidatorFile(MultipartFile file, Long exampleId) throws IOException, ClassNotFoundException {
+    public void checkValidatorFile(MultipartFile file) throws IOException {
 
         String filePath = FileConstants.VALIDATOR_TEST_DIR + "/" + file.getOriginalFilename();
         File fileValidatorTest = new File(filePath);
