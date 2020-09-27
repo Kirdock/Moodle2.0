@@ -24,6 +24,12 @@ import java.util.stream.Collectors;
 @Service
 public class ExampleService extends AbstractService {
 
+    private ValidatorHandler validatorHandler;
+
+    public ExampleService(ValidatorHandler validatorHandler)
+    {
+        this.validatorHandler = validatorHandler;
+    }
 
     @Transactional
     public ExampleResponseObject createExample(CreateExampleRequest createExampleRequest) throws IOException {
@@ -172,6 +178,7 @@ public class ExampleService extends AbstractService {
         return example.createExampleResponseObject(null);
     }
 
+    @Transactional
     public void updateExampleOrder(List<ExampleOrderRequest> exampleOrderRequests) {
         for (ExampleOrderRequest exampleOrderRequest : exampleOrderRequests) {
             Example example = readExample(exampleOrderRequest.getId());
@@ -188,8 +195,7 @@ public class ExampleService extends AbstractService {
             if (!FileConstants.JAR_FILE_EXTENSION.equals(extension))
                 throw new ServiceException("Error: Not a jar File!");
         }
-        ValidatorHandler loader = new ValidatorHandler();
-        loader.checkValidatorFile(validatorFile, example.getId());
+        validatorHandler.checkValidatorFile(validatorFile);
 
         String validatorFilePath = getValidatorFilePath(example);
         clearDirectory(validatorFilePath);
@@ -227,7 +233,6 @@ public class ExampleService extends AbstractService {
         FileUtils.copyDirectory(source, dest);
         copiedExample.setValidator(originalExample.getValidator());
         exampleRepository.save(copiedExample);
-
     }
 
     public void deleteExampleValidator(Long exampleId) throws IOException {
