@@ -163,70 +163,8 @@ public class FinishesExampleService extends AbstractService {
 
         validator = null;
         return violations;
-
-//        unzipMavenProject(filePath,new File(destDir));
-//        installMavenProject(destDir);
-//        executeValidator(destDir);
-//        deleteMavenProject(destDir);
     }
-
-    protected void installMavenProject(String destDir) {
-        MavenCli cli = new MavenCli();
-        int result = cli.doMain(new String[]{"clean", "install"}, destDir, System.out, System.out);
-        if (result != 0)
-            throw new ServiceException("Error: maven project could not be build!");
-
-//        InvocationRequest request = new DefaultInvocationRequest();
-//        request.setPomFile( new File( "/path/to/pom.xml" ) );
-//        request.setGoals( Collections.singletonList( "install" ) );
-//
-//        Invoker invoker = new DefaultInvoker();
-//        invoker.execute( request );
-    }
-
-//    protected void executeValidator(String destDir)
-//    {
-//        MavenCli cli = new MavenCli();
-//        int result = cli.doMain(new String[]{"test"}, destDir, System.out, System.out);
-//        if(result !=0)
-//            throw new ServiceException("Error: maven project could not be tested!");
-//
-//    }
-//
-//    protected void deleteMavenProject(String destDir) throws IOException {
-//        File directory = new File(destDir);
-//        if(directory.exists())
-//            FileUtils.deleteDirectory(directory);
-//    }
-//
-//    protected void unzipMavenProject(String zipFilePath, File destDir) throws IOException {
-//        ZipFile zipFile = new ZipFile(zipFilePath);
-//        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-//        while (zipEntries.hasMoreElements()) {
-//            ZipEntry zipEntry = zipEntries.nextElement();
-//            if (zipEntry.isDirectory()) {
-//                String subDir = destDir + "\\" + zipEntry.getName();
-//                File as = new File(subDir);
-//                as.mkdirs();
-//            } else {
-//                // Create new  file
-//                File newFile = new File(destDir, zipEntry.getName());
-//                String extractedDirectoryPath = destDir.getCanonicalPath();
-//                String extractedFilePath = newFile.getCanonicalPath();
-//                if (!extractedFilePath.startsWith(extractedDirectoryPath + File.separator))
-//                    throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-//
-//                BufferedInputStream inputStream = new BufferedInputStream(zipFile.getInputStream(zipEntry));
-//                try (FileOutputStream outputStream = new FileOutputStream(newFile)) {
-//                    while (inputStream.available() > 0) {
-//                        outputStream.write(inputStream.read());
-//                    }
-//                }
-//            }
-//        }
-//        zipFile.close();
-//    }
-
+    
     protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
         String filePath = createUserExampleAttachmentDir(example);
         File directory = new File(filePath);
