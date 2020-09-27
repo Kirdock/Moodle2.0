@@ -2,6 +2,8 @@ package com.aau.moodle20.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Objects;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileTypeResponseObject {
 
@@ -31,5 +33,20 @@ public class FileTypeResponseObject {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FileTypeResponseObject)) return false;
+        FileTypeResponseObject that = (FileTypeResponseObject) o;
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getValue(), that.getValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getValue());
     }
 }
