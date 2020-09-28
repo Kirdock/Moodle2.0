@@ -34,6 +34,13 @@ import java.util.stream.Collectors;
 @Service
 public class FinishesExampleService extends AbstractService {
 
+    private ValidatorHandler validatorHandler;
+
+    public FinishesExampleService(ValidatorHandler validatorHandler)
+    {
+        this.validatorHandler = validatorHandler;
+    }
+
     @Transactional
     public void setKreuzelUser(List<UserKreuzelRequest> userKreuzelRequests) {
         UserDetailsImpl userDetails = getUserDetails();
@@ -156,8 +163,7 @@ public class FinishesExampleService extends AbstractService {
         String validatorDir = FileConstants.VALIDATOR_DIR + createExampleAttachmentDir(example);
         validatorDir = validatorDir + "/" + example.getValidator();
 
-        ValidatorHandler validationLoader = new ValidatorHandler();
-        IValidator validator = validationLoader.loadValidator(validatorDir);
+        IValidator validator = validatorHandler.loadValidator(validatorDir);
         if (validator != null)
             violations = validator.validate(filePath);
 
