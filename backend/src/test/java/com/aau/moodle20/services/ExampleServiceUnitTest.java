@@ -917,7 +917,9 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         return getTestExample(PARENT_EXAMPLE_ID);
     }
 
-    private Example getTestExample(Long exampleId) {
+
+    @Override
+    protected Example getTestExample(Long exampleId) {
         Example example = new Example(exampleId);
         example.setValidator("test.jar");
         example.setPoints(30);

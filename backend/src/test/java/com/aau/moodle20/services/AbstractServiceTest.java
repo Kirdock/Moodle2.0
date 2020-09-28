@@ -47,6 +47,29 @@ public class AbstractServiceTest {
         userDetails.setAuthorities(authorities);
         return userDetails;
     }
+    protected User getAdminUser()
+    {
+       User user = new User();
+       user.setMatriculationNumber(adminMatriculationNumber);
+       user.setSurname("admin");
+       user.setForename("admin");
+       user.setAdmin(Boolean.TRUE);
+       user.setCourses(new HashSet<>());
+
+       return user;
+    }
+
+    protected User getNormalUser()
+    {
+        User user = new User();
+        user.setMatriculationNumber(normalMatriculationNumber);
+        user.setSurname("normal");
+        user.setForename("normal");
+        user.setAdmin(Boolean.FALSE);
+        user.setCourses(new HashSet<>());
+
+        return user;
+    }
 
     protected UserDetailsImpl getUserDetails_Not_Admin()
     {
@@ -118,4 +141,17 @@ public class AbstractServiceTest {
         course.getExerciseSheets().add(exerciseSheet);
         return course;
     }
+
+    protected Example getTestExample(Long exampleId) {
+        Example example = new Example(exampleId);
+        example.setValidator("test.jar");
+        example.setPoints(30);
+        example.setSubmitFile(Boolean.TRUE);
+        example.setSupportFileTypes(new HashSet<>());
+        example.setCustomFileTypes("test.java,hhh");
+        example.setUploadCount(2);
+
+        return example;
+    }
+
 }
