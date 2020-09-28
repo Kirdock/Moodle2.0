@@ -7,6 +7,7 @@ import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import javax.persistence.*;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -131,5 +132,24 @@ public class FinishesExample {
 
     public void setViolationHistories(Set<ViolationHistory> violationHistories) {
         this.violationHistories = violationHistories;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FinishesExample)) return false;
+        FinishesExample that = (FinishesExample) o;
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getDescription(), that.getDescription()) &&
+                Objects.equals(getFileName(), that.getFileName()) &&
+                Objects.equals(getValid(), that.getValid()) &&
+                Objects.equals(getHasPresented(), that.getHasPresented()) &&
+                getState() == that.getState() &&
+                Objects.equals(getRemainingUploadCount(), that.getRemainingUploadCount());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getDescription(), getFileName(), getValid(), getHasPresented(), getState(), getRemainingUploadCount());
     }
 }
