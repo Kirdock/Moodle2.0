@@ -39,6 +39,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private UserRepository userRepository;
 
 
+
+
     @Override
     public boolean hasPermission(Authentication authentication, Serializable serializable, String s, Object o) {
         if ((authentication == null) || (s == null) || !(o instanceof String)) {

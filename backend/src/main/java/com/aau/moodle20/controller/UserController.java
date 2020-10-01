@@ -73,7 +73,6 @@ public class UserController {
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
-    @PreAuthorize("hasPermission(null, 'User', 'update')")
     @PostMapping(path = "/user/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         userService.changePassword(changePasswordRequest);
@@ -98,7 +97,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/users")
-    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file", required = true) MultipartFile file, @RequestParam(value = "isAdmin", required = false) Boolean isAdmin) {
+    public ResponseEntity<RegisterMultipleUserResponse> registerUsers(@Valid @RequestParam(value = "file") MultipartFile file, @RequestParam(value = "isAdmin", required = false) Boolean isAdmin) {
         return ResponseEntity.ok(userService.registerUsers(file, isAdmin));
     }
 
