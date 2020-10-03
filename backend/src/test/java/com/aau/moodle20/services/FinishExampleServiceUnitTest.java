@@ -6,14 +6,19 @@ import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
 import com.aau.moodle20.entity.embeddable.UserCourseKey;
 import com.aau.moodle20.exception.ServiceException;
+import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
 import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
+import com.aau.moodle20.payload.response.FinishesExampleResponse;
+import com.aau.moodle20.payload.response.KreuzelResponse;
+import com.aau.moodle20.payload.response.ViolationHistoryResponse;
+import com.aau.moodle20.payload.response.ViolationResponse;
 import com.aau.moodle20.repository.*;
 import com.aau.moodle20.validation.ValidatorHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -26,13 +31,11 @@ import validation.IValidator;
 import validation.Violation;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -54,6 +57,8 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
     private ValidatorHandler validatorHandler;
     @Mock
     private ViolationHistoryRepository violationHistoryRepository;
+    @Mock
+    private CourseRepository courseRepository;
 
 
     @Before
@@ -408,22 +413,387 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         Example example = mockExample();
         example.setSubmitFile(Boolean.TRUE);
         User normalUser = getNormalUser();
-        FinishesExample finishesExample = new FinishesExample();
-        finishesExample.setExample(example);
-        finishesExample.setUser(normalUser);
+        FinishesExample finishesExample = createFinishExample(example,normalUser);
         finishesExample.setRemainingUploadCount(4);
+
+        FinishesExample finishesExample_expected = createFinishExample(example,normalUser);
+        finishesExample_expected.setRemainingUploadCount(3);
+        finishesExample_expected.setFileName(file.getOriginalFilename());
 
         UserInCourse userInCourse = createUserInCourse(normalUser,example.getExerciseSheet().getCourse());
         normalUser.getCourses().add(userInCourse);
+        List<Violation> violations = new ArrayList<>();
+        violations.add(new Violation("ddd"));
 
-        when(validator.validate(anyString())).thenReturn(new ArrayList<>());
+
+        doReturn(violations).when(validator).validate(anyString());
         when(userRepository.findByMatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(Optional.of(normalUser));
         when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(finishesExampleRepository.existsByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Boolean.TRUE);
+        when(validatorHandler.loadValidator(anyString())).thenReturn(validator);
 
-        finishesExampleService.setKreuzelUserAttachment(file,EXAMPLE_ID);
-        // TODO add verification
+        ViolationHistoryResponse response = finishesExampleService.setKreuzelUserAttachment(file,EXAMPLE_ID);
+
+        verify(finishesExampleRepository).existsByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
+        verify(finishesExampleRepository).saveAndFlush(finishesExample_expected);
+
+        ArgumentCaptor<ViolationHistory> argumentCaptor = ArgumentCaptor.forClass(ViolationHistory.class);
+        verify(violationHistoryRepository).saveAndFlush(argumentCaptor.capture());
+        ViolationHistory violationHistory = argumentCaptor.getValue();
+        assertEquals(1,violationHistory.getViolations().size());
+        assertEquals(createViolationEntities(violations).iterator().next(),violationHistory.getViolations().iterator().next());
+        assertNotNull(violationHistory.getDate());
+
+        verify(violationHistoryRepository).save(argumentCaptor.capture());
+        violationHistory = argumentCaptor.getValue();
+
+        assertEquals(finishesExample_expected,violationHistory.getFinishesExample());
+        assertNotNull(violationHistory.getViolations());
+        for(ViolationEntity violation: violationHistory.getViolations())
+        {
+            assertEquals(violationHistory,violation.getViolationHistory());
+        }
+        assertEquals(createViolationHistoryResponse(violationHistory),response);
     }
 
+    @Test
+    public void setKreuzelUserAttachment_create_finish_example() throws IOException, ClassNotFoundException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "test.jpg".getBytes());
+        IValidator validator = mock(IValidator.class);
+
+        Example example = mockExample();
+        example.setSubmitFile(Boolean.TRUE);
+        User normalUser = getNormalUser();
+        FinishesExample finishesExample = createFinishExample(example,normalUser);
+        finishesExample.setRemainingUploadCount(4);
+
+        FinishesExample finishesExample_expected = createFinishExample(example,normalUser);
+        finishesExample_expected.setRemainingUploadCount(3);
+        finishesExample_expected.setFileName(file.getOriginalFilename());
+
+        UserInCourse userInCourse = createUserInCourse(normalUser,example.getExerciseSheet().getCourse());
+        normalUser.getCourses().add(userInCourse);
+        List<Violation> violations = new ArrayList<>();
+        violations.add(new Violation("ddd"));
+
+        // define mock method results
+        doReturn(violations).when(validator).validate(anyString());
+        when(userRepository.findByMatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(Optional.of(normalUser));
+        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(finishesExampleRepository.existsByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Boolean.FALSE);
+        when(validatorHandler.loadValidator(anyString())).thenReturn(validator);
+
+        ViolationHistoryResponse response = finishesExampleService.setKreuzelUserAttachment(file,EXAMPLE_ID);
+
+        // verify method correctness
+        verify(finishesExampleRepository).existsByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
+        verify(finishesExampleRepository,times(2)).findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
+        verify(finishesExampleRepository).save(any(FinishesExample.class));
+        verify(finishesExampleRepository).flush();
+    }
+
+
+    @Test
+    public void deleteFinishExampleData_fileName_null() throws IOException, ClassNotFoundException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        Example example = getTestExample(EXAMPLE_ID);
+        FinishesExample finishesExample = mock(FinishesExample.class);
+
+        // define mock method results
+        when(finishesExample.getFileName()).thenReturn(null);
+
+        finishesExampleService.deleteFinishExampleData(finishesExample);
+
+        // verify method correctness
+        verify(finishesExample,times(1)).getFileName();
+    }
+
+    @Test
+    public void deleteFinishExampleData() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        Example example = getTestExample(EXAMPLE_ID);
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
+        Semester semester = getTestSemester();
+        Course course = getTestCourse();
+        example.setExerciseSheet(exerciseSheet);
+        exerciseSheet.setCourse(course);
+        course.setSemester(semester);
+
+        FinishesExample finishesExample = mock(FinishesExample.class);
+        FinishesExampleKey key = new FinishesExampleKey(normalMatriculationNumber,EXAMPLE_ID);
+
+        // define mock method results
+        when(finishesExample.getFileName()).thenReturn("test.jar");
+        when(finishesExample.getId()).thenReturn(key);
+        when(finishesExample.getExample()).thenReturn(example);
+
+        finishesExampleService.deleteFinishExampleData(finishesExample);
+
+        // verify method correctness
+        verify(finishesExample,times(2)).getFileName();
+        verify(finishesExample,times(1)).getId();
+        verify(finishesExample,times(1)).getExample();
+    }
+
+
+    @Test
+    public void getKreuzelAttachment_finishExample_notFound()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            finishesExampleService.getKreuzelAttachment(EXAMPLE_ID);
+        });
+        String expectedMessage = "Error: user did not check this example";
+        assertEquals(expectedMessage,exception.getMessage());
+    }
+
+    @Test
+    public void getKreuzelAttachment_ServiceException()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        Example example = getExampleWithSemester();
+        User normalUser = getNormalUser();
+        FinishesExample finishesExample = createFinishExample(example,normalUser);
+
+        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            finishesExampleService.getKreuzelAttachment(EXAMPLE_ID);
+        });
+        String expectedMessage = ".\\backend\\attachments\\S_2020\\123.123\\230\\230\\12345678\\null";
+        assertEquals(expectedMessage,exception.getMessage());
+    }
+
+    //TODO somehow mock Files.readAllBytes method so this test can pass
+//    @Test
+//    public void getKreuzelAttachment()  {
+//        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+//
+//
+//        Example example = getExampleWithSemester();
+//        User normalUser = getNormalUser();
+//        FinishesExample finishesExample = createFinishExample(example,normalUser);
+//        finishesExample.setFileName("test.jar");
+//        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+//        FinishesExample finishesExample1 = finishesExampleService.getKreuzelAttachment(EXAMPLE_ID);
+//
+//        assertNotNull(finishesExample1.getAttachmentContent());
+//    }
+
+    @Test
+    public void setUserExamplePresented_example_not_found()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+
+        UserExamplePresentedRequest request = createUserExamplePresentedRequest();
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            finishesExampleService.setUserExamplePresented(request);
+        });
+        String expectedMessage = "Error: Example not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+    }
+
+    @Test
+    public void setUserExamplePresented_user_not_found()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+
+        UserExamplePresentedRequest request = createUserExamplePresentedRequest();
+        Example example = getTestExample(EXAMPLE_ID);
+        when(exampleRepository.findById(EXAMPLE_ID)).thenReturn(Optional.of(example));
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            finishesExampleService.setUserExamplePresented(request);
+        });
+        String expectedMessage = "Error: User not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+    }
+
+    @Test
+    public void setUserExamplePresented_finishExample_not_found()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+
+        UserExamplePresentedRequest request = createUserExamplePresentedRequest();
+        Example example = getTestExample(EXAMPLE_ID);
+        User normalUser = getNormalUser();
+        when(exampleRepository.findById(EXAMPLE_ID)).thenReturn(Optional.of(example));
+        when(userRepository.findByMatriculationNumber(normalMatriculationNumber)).thenReturn(Optional.of(normalUser));
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            finishesExampleService.setUserExamplePresented(request);
+        });
+        String expectedMessage = "Error: user did not check this example";
+        assertEquals(expectedMessage,exception.getMessage());
+    }
+
+    @Test
+    public void setUserExamplePresented()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+
+        UserExamplePresentedRequest request = createUserExamplePresentedRequest();
+        Example example = getTestExample(EXAMPLE_ID);
+        User normalUser = getNormalUser();
+        FinishesExample finishesExample = createFinishExample(example,normalUser);
+        finishesExample.setHasPresented(Boolean.FALSE);
+        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(exampleRepository.findById(EXAMPLE_ID)).thenReturn(Optional.of(example));
+        when(userRepository.findByMatriculationNumber(normalMatriculationNumber)).thenReturn(Optional.of(normalUser));
+
+        finishesExampleService.setUserExamplePresented(request);
+        FinishesExample finishesExampleExpected = createFinishExample(example,normalUser);
+        finishesExampleExpected.setHasPresented(Boolean.TRUE);
+        verify(finishesExampleRepository).save(finishesExampleExpected);
+    }
+
+    //getKreuzelUserCourse
+
+    @Test
+    public void getKreuzelUserCourse_user_not_found()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            finishesExampleService.getKreuzelUserCourse(normalMatriculationNumber,COURSE_ID);
+        });
+        String expectedMessage = "Error: User not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+    }
+
+    @Test
+    public void getKreuzelUserCourse_course_not_found()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        User normalUser = getNormalUser();
+        when(userRepository.findByMatriculationNumber(normalMatriculationNumber)).thenReturn(Optional.of(normalUser));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            finishesExampleService.getKreuzelUserCourse(normalMatriculationNumber,COURSE_ID);
+        });
+        String expectedMessage = "Error: Course not found!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+    }
+
+
+    @Test
+    public void getKreuzelUserCourse_not_admin_not_owner()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        User normalUser = getNormalUser();
+        Course course = getTestCourse();
+        course.setOwner(getAdminUser());
+        when(userRepository.findByMatriculationNumber(normalMatriculationNumber)).thenReturn(Optional.of(normalUser));
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            finishesExampleService.getKreuzelUserCourse(normalMatriculationNumber,COURSE_ID);
+        });
+        String expectedMessage = "Error: Not admin or Course Owner!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(HttpStatus.FORBIDDEN, exception.getHttpStatus());
+    }
+
+    @Test
+    public void getKreuzelUserCourse_no_exerciseSheets()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        User normalUser = getNormalUser();
+        Course course = getTestCourse();
+        course.setOwner(normalUser);
+        course.setExerciseSheets(new HashSet<>());
+        when(userRepository.findByMatriculationNumber(normalMatriculationNumber)).thenReturn(Optional.of(normalUser));
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        List<KreuzelResponse> responseList =  finishesExampleService.getKreuzelUserCourse(normalMatriculationNumber,COURSE_ID);
+        assertEquals(new ArrayList<>(), responseList);
+    }
+
+    @Test
+    public void getKreuzelUserCourse_exerciseSheets_no_example()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        User normalUser = getNormalUser();
+        Course course = getTestCourse();
+        course.setOwner(normalUser);
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
+        exerciseSheet.setCourse(course);
+        exerciseSheet.setExamples(new HashSet<>());
+        course.getExerciseSheets().add(exerciseSheet);
+        when(userRepository.findByMatriculationNumber(normalMatriculationNumber)).thenReturn(Optional.of(normalUser));
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        List<KreuzelResponse> responseList =  finishesExampleService.getKreuzelUserCourse(normalMatriculationNumber,COURSE_ID);
+        assertEquals(new ArrayList<>(), responseList);
+    }
+
+
+    @Test
+    public void getKreuzelUserCourse_exerciseSheets_and_examples()  {
+        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
+        User normalUser = getNormalUser();
+        Course course = getTestCourse();
+        course.setOwner(normalUser);
+
+        course.getExerciseSheets().addAll(getTestExerciseSheets(course,normalUser));
+        when(userRepository.findByMatriculationNumber(normalMatriculationNumber)).thenReturn(Optional.of(normalUser));
+        when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+
+        List<KreuzelResponse> responseList =  finishesExampleService.getKreuzelUserCourse(normalMatriculationNumber,COURSE_ID);
+        assertEquals(3, responseList.size());
+        assertEquals("aaaa",responseList.get(0).getExerciseSheetName());
+        assertEquals("bbbb",responseList.get(1).getExerciseSheetName());
+        assertEquals("zzzz",responseList.get(2).getExerciseSheetName());
+        for(KreuzelResponse response: responseList)
+        {
+            assertEquals(EXAMPLE_ID+10, response.getExamples().get(0).getExampleId());
+            assertEquals(EXAMPLE_ID, response.getExamples().get(1).getExampleId());
+        }
+    }
+
+    private UserExamplePresentedRequest createUserExamplePresentedRequest()
+    {
+        UserExamplePresentedRequest request = new UserExamplePresentedRequest();
+        request.setHasPresented(Boolean.TRUE);
+        request.setExampleId(EXAMPLE_ID);
+        request.setMatriculationNumber(normalMatriculationNumber);
+
+        return request;
+    }
+
+    private  ViolationHistoryResponse createViolationHistoryResponse(ViolationHistory violationHistory) {
+        ViolationHistoryResponse response = new ViolationHistoryResponse();
+        response.setDate(violationHistory.getDate());
+        List<ViolationResponse> violations = violationHistory.getViolations().stream().map(ViolationEntity::createViolationResponse).collect(Collectors.toList());
+        response.setViolations(violations);
+
+        return response;
+    }
+
+    private  Set<ViolationEntity> createViolationEntities(List<? extends Violation> violations) {
+        Set<ViolationEntity> violationEntities = new HashSet<>();
+        for (Violation violation : violations) {
+            ViolationEntity entity = new ViolationEntity();
+            entity.setResult(violation.getResult());
+            violationEntities.add(entity);
+        }
+        return violationEntities;
+    }
+
+    private FinishesExample createFinishExample(Example example, User user)
+    {
+        FinishesExample finishesExample = new FinishesExample();
+        finishesExample.setExample(example);
+        finishesExample.setUser(user);
+        finishesExample.setRemainingUploadCount(4);
+
+        return finishesExample;
+    }
+
+    private Example getExampleWithSemester()
+    {
+        Example example = getTestExample(EXAMPLE_ID);
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
+        Semester semester = getTestSemester();
+        Course course = getTestCourse();
+        example.setExerciseSheet(exerciseSheet);
+        exerciseSheet.setCourse(course);
+        course.setSemester(semester);
+
+        return example;
+    }
 
     private UserKreuzelRequest createUserKreuzelRequest()
     {
@@ -448,7 +818,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
 
     private Example mockExample() {
         Example example = getTestExample(EXAMPLE_ID);
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Course course = getTestCourse();
         Semester semester = getTestSemester();
         example.setExerciseSheet(exerciseSheet);
@@ -502,4 +872,57 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
     }
 
 
+    protected List<ExerciseSheet> getTestExerciseSheets(Course course,User user)
+    {
+        List<ExerciseSheet> exerciseSheetList = new ArrayList<>();
+
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
+        exerciseSheet.setCourse(course);
+        exerciseSheet.setName("zzzz");
+        exerciseSheet.setSubmissionDate(LocalDateTime.now().plusDays(10));
+        exerciseSheet.getExamples().addAll(getTestExamples(user));
+        course.getExerciseSheets().add(exerciseSheet);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        ExerciseSheet exerciseSheet1 = getTestExerciseSheet(EXERCISE_SHEET_ID+10);
+        exerciseSheet1.setCourse(course);
+        exerciseSheet1.setName("bbbb");
+        exerciseSheet1.setSubmissionDate(now);
+        exerciseSheet1.getExamples().addAll(getTestExamples(user));
+
+        course.getExerciseSheets().add(exerciseSheet1);
+
+        ExerciseSheet exerciseSheet2 = getTestExerciseSheet(EXERCISE_SHEET_ID+20);
+        exerciseSheet2.setCourse(course);
+        exerciseSheet2.setName("aaaa");
+        exerciseSheet2.setSubmissionDate(now);
+        exerciseSheet2.getExamples().addAll(getTestExamples(user));
+
+        course.getExerciseSheets().add(exerciseSheet2);
+
+        exerciseSheetList.add(exerciseSheet);
+        exerciseSheetList.add(exerciseSheet1);
+        exerciseSheetList.add(exerciseSheet2);
+
+        return exerciseSheetList;
+    }
+
+    private List<Example> getTestExamples(User user)
+    {
+        Example example = getTestExample(EXAMPLE_ID);
+        example.setOrder(1);
+        example.getExamplesFinishedByUser().add(createFinishExample(example,user));
+
+        Example example1 = getTestExample(EXAMPLE_ID+10);
+        example1.setOrder(0);
+        example1.getExamplesFinishedByUser().add(createFinishExample(example1,user));
+
+
+        List<Example> exampleList = new ArrayList<>();
+        exampleList.add(example);
+        exampleList.add(example1);
+
+        return exampleList;
+    }
 }

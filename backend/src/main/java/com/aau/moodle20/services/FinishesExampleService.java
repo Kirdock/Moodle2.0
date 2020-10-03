@@ -188,13 +188,11 @@ public class FinishesExampleService extends AbstractService {
     }
 
     public void deleteFinishExampleData(FinishesExample finishesExample) throws IOException {
-
         if (finishesExample.getFileName() == null)
             return;
 
         String userDir = "/" + finishesExample.getId().getMatriculationNumber();
         String filePath = FileConstants.ATTACHMENTS_DIR + createExampleAttachmentDir(finishesExample.getExample()) + userDir;
-
         Path path = Paths.get(filePath + "/" + finishesExample.getFileName());
 
         Files.deleteIfExists(path);
@@ -249,7 +247,7 @@ public class FinishesExampleService extends AbstractService {
 
         // check permission
         if (!isAdmin() && !isOwner(course))
-            throw new ServiceException("Error: Not admin or Course Owner!", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Error: Not admin or Course Owner!", HttpStatus.FORBIDDEN);
 
         Comparator<ExerciseSheet> exerciseSheetComparator = Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName);
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);

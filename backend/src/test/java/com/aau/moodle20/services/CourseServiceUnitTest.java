@@ -11,7 +11,6 @@ import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.repository.*;
-import org.assertj.core.api.OptionalAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -517,7 +516,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Semester semester = getTestSemester();
         Course course = getTestCourse();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         course.getExerciseSheets().add(exerciseSheet);
         exerciseSheet.setCourse(course);
         CopyCourseRequest copyCourseRequest = getCopyCourseRequest();
@@ -558,7 +557,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Semester semester = getTestSemester();
         Course course = getTestCourse();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Example example = getTestExample();
         Example subExample = getTestExample();
         course.getExerciseSheets().add(exerciseSheet);
@@ -587,7 +586,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Semester semester = getTestSemester();
         Course course = getTestCourse();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Example example = getTestExample();
         Example subExample = getTestExample();
         course.getExerciseSheets().add(exerciseSheet);

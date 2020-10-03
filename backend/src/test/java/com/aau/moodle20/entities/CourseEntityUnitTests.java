@@ -166,29 +166,7 @@ public class CourseEntityUnitTests {
     }
 
 
-    private Example getTestExample() {
-        Example example = new Example();
-        example.setId(exampleId);
-        example.setExerciseSheet(new ExerciseSheet(exerciseSheetId));
-        example.setUploadCount(10);
-        example.setMandatory(Boolean.FALSE);
-        example.setValidator("test.jar");
-        example.setDescription("dd");
-        example.setName("test");
-        example.setOrder(2);
-        example.setWeighting(20);
-        example.setPoints(30);
 
-        return example;
-    }
-
-    private FileType getTestFileType() {
-        FileType fileType = new FileType();
-        fileType.setName("word");
-        fileType.setValue("*.docx");
-
-        return fileType;
-    }
 
     protected Course getTestCourse()
     {

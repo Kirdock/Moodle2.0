@@ -3,11 +3,9 @@ package com.aau.moodle20.services;
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
 import com.aau.moodle20.constants.ECourseRole;
 import com.aau.moodle20.constants.EFinishesExampleState;
-import com.aau.moodle20.constants.ESemesterType;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.CreateExerciseSheetRequest;
-import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.request.UpdateExerciseSheetRequest;
 import com.aau.moodle20.payload.response.*;
 import com.aau.moodle20.repository.*;
@@ -56,7 +54,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
     public void createExerciseSheet() {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Course course = getTestCourse();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setCourse(course);
         when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
         CreateExerciseSheetRequest createExerciseSheetRequest = getExerciseSheetCreateRequest(exerciseSheet);
@@ -69,7 +67,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
     public void createExerciseSheet_course_not_exists()  {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Course course = getTestCourse();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setCourse(course);
         CreateExerciseSheetRequest createExerciseSheetRequest = getExerciseSheetCreateRequest(exerciseSheet);
 
@@ -85,7 +83,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
     public void createExerciseSheet_name_exists_in_course()  {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Course course = getTestCourse();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setCourse(course);
         course.getExerciseSheets().add(exerciseSheet);
         CreateExerciseSheetRequest createExerciseSheetRequest = getExerciseSheetCreateRequest(exerciseSheet);
@@ -103,14 +101,14 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
     public void updateExerciseSheet() {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Course course = getTestCourse();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setCourse(course);
         UpdateExerciseSheetRequest updateExerciseSheetRequest = getUpdateExerciseSheetRequest();
         when(exerciseSheetRepository.findById(exerciseSheet.getId())).thenReturn(Optional.of(exerciseSheet));
 
         exerciseSheetService.updateExerciseSheet(updateExerciseSheetRequest);
 
-        ExerciseSheet exerciseSheet_expected = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet_expected = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet_expected.setMinKreuzel(updateExerciseSheetRequest.getMinKreuzel());
         exerciseSheet_expected.setMinPoints(updateExerciseSheetRequest.getMinPoints());
         exerciseSheet_expected.setName(updateExerciseSheetRequest.getName());
@@ -140,10 +138,9 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
     public void updateExerciseSheet_name_exists_in_course()  {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Course course = getTestCourse();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setCourse(course);
-        ExerciseSheet exerciseSheet_2 = getTestExerciseSheet();
-        exerciseSheet_2.setId(EXERCISE_SHEET_ID+10);
+        ExerciseSheet exerciseSheet_2 = getTestExerciseSheet(EXERCISE_SHEET_ID+10);
         course.getExerciseSheets().add(exerciseSheet);
         course.getExerciseSheets().add(exerciseSheet_2);
 
@@ -199,7 +196,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         Course course = getTestCourse();
         course.setStudents(new HashSet<>());
 
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setCourse(course);
         exerciseSheet.setExamples(new HashSet<>());
 
@@ -220,7 +217,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
     @Test
     public void getExerciseSheetKreuzel_with_Examples()  {
         List<Example> testExamples = getTextExamples();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Course course = getTestCourse();
         ExerciseSheetKreuzelResponse exerciseSheetKreuzelResponse_expected = prepareForGetExerciseSheetKreuzel(exerciseSheet,course);
         exerciseSheetKreuzelResponse_expected.getExamples().add(createExampleResponse(testExamples.get(4)));
@@ -252,7 +249,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
 
     @Test
     public void getExerciseSheetKreuzel_with_UserInCorse_but_no_Student()  {
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Course course = getTestCourse();
         course.setStudents(new HashSet<>());
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
@@ -279,7 +276,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
 
     @Test
     public void getExerciseSheetKreuzel_with_UserInCorse_no_finished_example()  {
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Course course = getTestCourse();
         course.setStudents(new HashSet<>());
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
@@ -318,7 +315,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
 
     @Test
     public void getExerciseSheetKreuzel_with_UserInCorse_with_finished_example()  {
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Course course = getTestCourse();
         course.setStudents(new HashSet<>());
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
@@ -447,7 +444,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
     public void deleteExerciseSheet() throws IOException {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         doNothing().when(exampleService).deleteExampleValidator(anyLong());
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Example example = new Example(EXAMPLE_ID);
         exerciseSheet.setExamples(new HashSet<>());
         exerciseSheet.getExamples().add(example);

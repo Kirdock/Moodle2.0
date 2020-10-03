@@ -266,7 +266,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         userInCourse.setRole(ECourseRole.STUDENT);
 
         Example example = getTestExample();
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         example.setExerciseSheet(exerciseSheet);
         exerciseSheet.setCourse(course);
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class ViolationHistoryResponse {
 
@@ -26,5 +27,19 @@ public class ViolationHistoryResponse {
 
     public void setViolations(List<ViolationResponse> violations) {
         this.violations = violations;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ViolationHistoryResponse)) return false;
+        ViolationHistoryResponse response = (ViolationHistoryResponse) o;
+        return Objects.equals(getDate(), response.getDate()) &&
+                Objects.equals(getViolations(), response.getViolations());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDate(), getViolations());
     }
 }

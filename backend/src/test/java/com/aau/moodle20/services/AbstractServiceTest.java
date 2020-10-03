@@ -96,10 +96,10 @@ public class AbstractServiceTest {
         return course;
     }
 
-    protected ExerciseSheet getTestExerciseSheet()
+    protected ExerciseSheet getTestExerciseSheet(Long exerciseSheetId)
     {
         ExerciseSheet exerciseSheet = new ExerciseSheet();
-        exerciseSheet.setId(EXERCISE_SHEET_ID);
+        exerciseSheet.setId(exerciseSheetId);
         exerciseSheet.setMinPoints(20);
         exerciseSheet.setMinKreuzel(30);
         exerciseSheet.setIssueDate(LocalDateTime.now());
@@ -107,9 +107,11 @@ public class AbstractServiceTest {
         exerciseSheet.setName("exerciseSheet");
         exerciseSheet.setDescription("DD");
         exerciseSheet.setIncludeThird(Boolean.FALSE);
+        exerciseSheet.setExamples(new HashSet<>());
 
         return exerciseSheet;
     }
+
 
     protected Semester getTestSemester()
     {
@@ -150,6 +152,7 @@ public class AbstractServiceTest {
         example.setSupportFileTypes(new HashSet<>());
         example.setCustomFileTypes("test.java,hhh");
         example.setUploadCount(2);
+        example.setExamplesFinishedByUser(new HashSet<>());
 
         return example;
     }

@@ -4,6 +4,7 @@ import com.aau.moodle20.payload.response.ViolationResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
@@ -55,5 +56,18 @@ public class ViolationEntity {
         response.setResult(getResult());
 
         return response;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ViolationEntity)) return false;
+        ViolationEntity that = (ViolationEntity) o;
+        return Objects.equals(getResult(), that.getResult());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getResult(), getViolationHistory());
     }
 }

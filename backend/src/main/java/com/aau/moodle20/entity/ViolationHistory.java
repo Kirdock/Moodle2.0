@@ -6,6 +6,7 @@ import com.aau.moodle20.payload.response.ViolationResponse;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -73,5 +74,19 @@ public class ViolationHistory {
         response.setViolations(violations);
 
         return response;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ViolationHistory)) return false;
+        ViolationHistory that = (ViolationHistory) o;
+        return Objects.equals(getDate(), that.getDate()) &&
+                Objects.equals(getFinishesExample(), that.getFinishesExample());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDate(), getFinishesExample());
     }
 }

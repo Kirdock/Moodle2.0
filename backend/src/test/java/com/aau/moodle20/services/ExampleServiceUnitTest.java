@@ -130,7 +130,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         CreateExampleRequest request = getCreateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Example example = new Example(EXAMPLE_ID+30);
         example.setName(request.getName());
         exerciseSheet.setExamples(new HashSet<>());
@@ -152,7 +152,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         CreateExampleRequest request = getCreateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
         request.setParentId(EXAMPLE_ID+10);
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
 
         Example example = new Example(EXAMPLE_ID+30);
         example.setName(request.getName());
@@ -178,7 +178,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         CreateExampleRequest request = getCreateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
         request.setSupportedFileTypes(new ArrayList<>());
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setExamples(new HashSet<>());
         request.setSupportedFileTypes(new ArrayList<>());
         request.getSupportedFileTypes().add(FILE_TYPE_ID);
@@ -208,7 +208,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         CreateExampleRequest request = getCreateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
         request.setSupportedFileTypes(new ArrayList<>());
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setExamples(new HashSet<>());
         request.setSupportedFileTypes(new ArrayList<>());
         request.getSupportedFileTypes().add(FILE_TYPE_ID);
@@ -313,7 +313,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         UpdateExampleRequest request = getUpdateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
         request.setParentId(300L);
-        when(exerciseSheetRepository.findById(request.getExerciseSheetId())).thenReturn(Optional.of(getTestExerciseSheet()));
+        when(exerciseSheetRepository.findById(request.getExerciseSheetId())).thenReturn(Optional.of(getTestExerciseSheet(request.getExerciseSheetId())));
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
             exampleService.updateExample(request);
@@ -328,7 +328,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         UpdateExampleRequest request = getUpdateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Example example = new Example(EXAMPLE_ID+30);
         example.setName(request.getName());
         exerciseSheet.setExamples(new HashSet<>());
@@ -350,7 +350,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         UpdateExampleRequest request = getUpdateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
         request.setParentId(EXAMPLE_ID+10);
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
 
         Example example = new Example(EXAMPLE_ID+30);
         example.setName(request.getName());
@@ -376,7 +376,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         UpdateExampleRequest request = getUpdateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
         request.setSupportedFileTypes(new ArrayList<>());
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setExamples(new HashSet<>());
         request.setSupportedFileTypes(new ArrayList<>());
         request.getSupportedFileTypes().add(FILE_TYPE_ID);
@@ -404,7 +404,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         UpdateExampleRequest request = getUpdateExampleRequest();
         request.setSubmitFile(Boolean.FALSE);
         request.setSupportedFileTypes(new ArrayList<>());
-        ExerciseSheet exerciseSheet = getTestExerciseSheet();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         exerciseSheet.setExamples(new HashSet<>());
         request.setSupportedFileTypes(new ArrayList<>());
         request.getSupportedFileTypes().add(FILE_TYPE_ID);
