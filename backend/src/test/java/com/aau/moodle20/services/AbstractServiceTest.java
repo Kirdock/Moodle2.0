@@ -55,6 +55,7 @@ public class AbstractServiceTest {
        user.setForename("admin");
        user.setAdmin(Boolean.TRUE);
        user.setCourses(new HashSet<>());
+       user.setPassword("password");
 
        return user;
     }
@@ -67,6 +68,7 @@ public class AbstractServiceTest {
         user.setForename("normal");
         user.setAdmin(Boolean.FALSE);
         user.setCourses(new HashSet<>());
+        user.setPassword("password");
 
         return user;
     }

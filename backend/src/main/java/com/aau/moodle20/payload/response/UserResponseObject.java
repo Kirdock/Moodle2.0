@@ -3,6 +3,8 @@ package com.aau.moodle20.payload.response;
 import com.aau.moodle20.constants.ECourseRole;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Objects;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseObject {
 
@@ -80,5 +82,25 @@ public class UserResponseObject {
 
     public void setPresentedCount(Integer presentedCount) {
         this.presentedCount = presentedCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserResponseObject)) return false;
+        UserResponseObject that = (UserResponseObject) o;
+        return Objects.equals(getMatriculationNumber(), that.getMatriculationNumber()) &&
+                Objects.equals(getUsername(), that.getUsername()) &&
+                Objects.equals(getForename(), that.getForename()) &&
+                Objects.equals(getSurname(), that.getSurname()) &&
+                Objects.equals(getEmail(), that.getEmail()) &&
+                Objects.equals(getIsAdmin(), that.getIsAdmin()) &&
+                getCourseRole() == that.getCourseRole() &&
+                Objects.equals(getPresentedCount(), that.getPresentedCount());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getMatriculationNumber(), getUsername(), getForename(), getSurname(), getEmail(), getIsAdmin(), getCourseRole(), getPresentedCount());
     }
 }

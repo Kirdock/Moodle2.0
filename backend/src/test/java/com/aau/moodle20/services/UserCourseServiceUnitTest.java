@@ -181,7 +181,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
     @Test
     public void assignFile_course()  {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
-        MockMultipartFile file = new MockMultipartFile("file", "test.csv", MediaType.MULTIPART_FORM_DATA_VALUE, "test.csv".getBytes());
+        MockMultipartFile file = new MockMultipartFile("file", "resources/test.csv", MediaType.MULTIPART_FORM_DATA_VALUE, "resources/test.csv".getBytes());
         Course course = getTestCourse();
         User user = getTestUser();
         List<User> allGivenUsers = new ArrayList<>();
@@ -241,7 +241,6 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
     @Test
     public void assignUsers_none_role_no_UserInCourse_found() throws IOException {
         mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
-        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
         Course course = getTestCourse();
         course.setOwner(getTestUser());
         List<AssignUserToCourseRequest> assignUserToCourseRequests = getListAssignUserRequest();
@@ -254,7 +253,6 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
     }
     @Test
     public void assignUsers_none_role() throws IOException {
-        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
         mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
         Course course = getTestCourseWithExerciseSheet();
         User testUser = getTestUser();
@@ -288,7 +286,6 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
     }
     @Test
     public void assignUsers() throws IOException {
-        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
         mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
         Course course = getTestCourse();
         course.setOwner(getTestUser());

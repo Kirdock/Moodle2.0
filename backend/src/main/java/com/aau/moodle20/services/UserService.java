@@ -351,7 +351,6 @@ public class UserService extends AbstractService {
     }
 
     public UserResponseObject getUser(String matriculationNumber) {
-
         return readUser(matriculationNumber).createUserResponseObject();
     }
 
