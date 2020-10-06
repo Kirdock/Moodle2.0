@@ -35,7 +35,7 @@ public class FooterPageEventHandler implements IEventHandler {
         } catch (IOException e) {
             System.out.println(e.toString());
         }
-        canvas.moveText((pageSize.getRight() - document.getRightMargin() - (pageSize.getLeft() + document.getLeftMargin())) / 2 + document.getLeftMargin(), (pageSize.getBottom() + document.getBottomMargin()) - 20 /*pageSize.getTop() - document.getTopMargin() + 10*/)
+        canvas.moveText((pageSize.getRight() - document.getRightMargin() - (pageSize.getLeft() + document.getLeftMargin())) / 2 + document.getLeftMargin(), (pageSize.getBottom() + document.getBottomMargin()) - 20)
                 .showText(Integer.toString(pageNumber))
                 .endText()
                 .release();
