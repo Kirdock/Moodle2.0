@@ -11,9 +11,6 @@ public class ServiceException extends RuntimeException {
     private List<String> errors = new ArrayList<>();
     private HttpStatus httpStatus = null;
 
-    public ServiceException() {
-    }
-
     public ServiceException(String message, Throwable throwable) {
         super(message, throwable);
     }

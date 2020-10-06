@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -156,5 +157,24 @@ public class User {
         responseObject.setAdmin(getAdmin());
 
         return responseObject;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return Objects.equals(getMatriculationNumber(), user.getMatriculationNumber()) &&
+                Objects.equals(isAdmin, user.isAdmin) &&
+                Objects.equals(getUsername(), user.getUsername()) &&
+                Objects.equals(getForename(), user.getForename()) &&
+                Objects.equals(getSurname(), user.getSurname()) &&
+                Objects.equals(getEmail(), user.getEmail()) &&
+                Objects.equals(getPasswordExpireDate(), user.getPasswordExpireDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getMatriculationNumber(), isAdmin, getUsername(), getForename(), getSurname(), getEmail(), getPasswordExpireDate());
     }
 }

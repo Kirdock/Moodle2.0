@@ -14,6 +14,7 @@ import com.aau.moodle20.repository.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -30,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)
@@ -102,6 +102,14 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
 
         CourseResponseObject courseResponseObject = courseService.createCourse(createCourseRequest);
         assertEquals(new CourseResponseObject(course.getId()),courseResponseObject);
+
+        Course expectedCourse = getTestCourse();
+        expectedCourse.setDescriptionTemplate(null);
+        expectedCourse.setUploadCount(0);
+        ArgumentCaptor<Course> courseArgumentCaptor = ArgumentCaptor.forClass(Course.class);
+
+        verify(courseRepository).save(courseArgumentCaptor.capture());
+        assertEquals(expectedCourse,courseArgumentCaptor.getValue());
     }
 
     @Test
@@ -171,8 +179,6 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
             courseService.updateCourse(updateCourseRequest);
         });
         String expectedMessage = "Error: Course not found!";
-        String actualMessage = exception.getMessage();
-
         assertEquals(expectedMessage,exception.getMessage());
         assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
     }
@@ -239,6 +245,10 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
 
         when(courseRepository.save(any(Course.class))).thenReturn(course);
         courseService.updateCoursePresets(updateCoursePresets);
+        ArgumentCaptor<Course> courseArgumentCaptor = ArgumentCaptor.forClass(Course.class);
+        verify(courseRepository).save(courseArgumentCaptor.capture());
+        assertEquals(updateCoursePresets.getDescription(),courseArgumentCaptor.getValue().getDescriptionTemplate());
+        assertEquals(updateCoursePresets.getUploadCount(),courseArgumentCaptor.getValue().getUploadCount());
     }
 
 
@@ -252,8 +262,6 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         updateCoursePresets.setUploadCount(course.getUploadCount());
 
         when(courseRepository.save(any(Course.class))).thenReturn(course);
-
-
         ServiceException exception = assertThrows(ServiceException.class, () -> {
             courseService.updateCoursePresets(updateCoursePresets);
         });
@@ -266,7 +274,6 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
     public void deleteCourse_course_not_exists() {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         doNothing().when(courseRepository).delete(any(Course.class));
-
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
             courseService.deleteCourse(COURSE_ID);
@@ -282,8 +289,8 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         Course course = getTestCourse();
         when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
 
-        doNothing().when(courseRepository).delete(any(Course.class));
         courseService.deleteCourse(COURSE_ID);
+        verify(courseRepository).delete(course);
     }
 
     @Test
@@ -296,6 +303,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         doNothing().when(exampleService).deleteExampleValidator(anyLong());
 
         courseService.deleteCourse(COURSE_ID);
+        verify(exampleService,times(1)).deleteExampleValidator(EXAMPLE_ID);
     }
 
     @Test
@@ -493,6 +501,26 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
     }
 
     @Test
+    public void copyCourse_course_already_exists_in_semester() {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Semester semester = getTestSemester();
+        Course course = getTestCourse();
+        CopyCourseRequest copyCourseRequest = new CopyCourseRequest();
+        copyCourseRequest.setSemesterId(SEMESTER_ID);
+        copyCourseRequest.setCourseId(COURSE_ID);
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
+        when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
+        when(courseRepository.existsByNumberAndSemester_Id(course.getNumber(),copyCourseRequest.getSemesterId())).thenReturn(Boolean.TRUE);
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            courseService.copyCourse(copyCourseRequest);
+        });
+        String expectedMessage = "Error: A course with this number already exists in given semester!";
+        assertEquals(expectedMessage,exception.getMessage());
+        assertEquals(ApiErrorResponseCodes.COPIED_COURSE_NUMBER_ALREADY_EXISTS, exception.getErrorResponseCode());
+    }
+
+    @Test
     public void copyCourse_course_no_exerciseSheets() throws IOException {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Semester semester = getTestSemester();
@@ -509,6 +537,11 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
 
         CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
         assertEquals(courseResponseObject_expected,responseObject);
+
+        Course expectedCourse = course.copy();
+        expectedCourse.setSemester(semester);
+
+        verify(courseRepository).save(expectedCourse);
     }
 
     @Test
@@ -531,6 +564,48 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
 
         CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
         assertEquals(courseResponseObject_expected,responseObject);
+
+        Course expectedCourse = course.copy();
+        expectedCourse.setSemester(semester);
+
+        verify(courseRepository).save(expectedCourse);
+        ExerciseSheet copiedExerciseSheet = exerciseSheet.copy();
+        copiedExerciseSheet.setCourse(expectedCourse);
+
+        verify(exerciseSheetRepository).save(any(ExerciseSheet.class));
+    }
+
+
+    @Test
+    public void copyCourse_course_exerciseSheets_no_examples_2() throws IOException {
+        mockSecurityContext_WithUserDetails(getUserDetails_Admin());
+        Semester semester = getTestSemester();
+        Course course = getTestCourse();
+        ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
+        exerciseSheet.setExamples(null);
+        course.getExerciseSheets().add(exerciseSheet);
+        exerciseSheet.setCourse(course);
+        CopyCourseRequest copyCourseRequest = getCopyCourseRequest();
+        when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
+        when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
+        Course copiedCourse = new Course();
+        copiedCourse.setId(455L);
+        when(courseRepository.save(any(Course.class))).thenReturn(copiedCourse);
+
+        CourseResponseObject courseResponseObject_expected = new CourseResponseObject();
+        courseResponseObject_expected.setId(copiedCourse.getId());
+
+        CourseResponseObject responseObject = courseService.copyCourse(copyCourseRequest);
+        assertEquals(courseResponseObject_expected,responseObject);
+
+        Course expectedCourse = course.copy();
+        expectedCourse.setSemester(semester);
+
+        verify(courseRepository).save(expectedCourse);
+        ExerciseSheet copiedExerciseSheet = exerciseSheet.copy();
+        copiedExerciseSheet.setCourse(expectedCourse);
+
+        verify(exerciseSheetRepository).save(any(ExerciseSheet.class));
     }
 
     @Test
@@ -560,6 +635,9 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         ExerciseSheet exerciseSheet = getTestExerciseSheet(EXERCISE_SHEET_ID);
         Example example = getTestExample();
         Example subExample = getTestExample();
+        subExample.setId(4000L);
+        subExample.setName("subExample1");
+
         course.getExerciseSheets().add(exerciseSheet);
         exerciseSheet.getExamples().add(example);
         exerciseSheet.getExamples().add(subExample);

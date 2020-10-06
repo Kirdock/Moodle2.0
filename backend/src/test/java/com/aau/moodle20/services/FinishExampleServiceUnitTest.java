@@ -736,10 +736,12 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         assertEquals("aaaa",responseList.get(0).getExerciseSheetName());
         assertEquals("bbbb",responseList.get(1).getExerciseSheetName());
         assertEquals("zzzz",responseList.get(2).getExerciseSheetName());
+
         for(KreuzelResponse response: responseList)
         {
             assertEquals(EXAMPLE_ID+10, response.getExamples().get(0).getExampleId());
-            assertEquals(EXAMPLE_ID, response.getExamples().get(1).getExampleId());
+            assertEquals(EXAMPLE_ID+30, response.getExamples().get(1).getExampleId());
+            assertEquals(EXAMPLE_ID+20, response.getExamples().get(2).getExampleId());
         }
     }
 
@@ -917,6 +919,20 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         Example example1 = getTestExample(EXAMPLE_ID+10);
         example1.setOrder(0);
         example1.getExamplesFinishedByUser().add(createFinishExample(example1,user));
+
+        Example example2 = getTestExample(EXAMPLE_ID+20);
+        example2.setOrder(1);
+        example2.setParentExample(example);
+        example2.getExamplesFinishedByUser().add(createFinishExample(example2,user));
+        example.setSubExamples(new HashSet<>());
+        example.getSubExamples().add(example2);
+
+        Example example3 = getTestExample(EXAMPLE_ID+30);
+        example3.setOrder(0);
+        example3.setName("testExample3");
+        example3.setParentExample(example);
+        example3.getExamplesFinishedByUser().add(createFinishExample(example3,user));
+        example.getSubExamples().add(example3);
 
 
         List<Example> exampleList = new ArrayList<>();
