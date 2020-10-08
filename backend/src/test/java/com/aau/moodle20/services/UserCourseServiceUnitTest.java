@@ -11,6 +11,7 @@ import com.aau.moodle20.repository.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -30,8 +31,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)
@@ -250,6 +250,14 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         when(courseRepository.findById(assignUserToCourseRequests.get(0).getCourseId())).thenReturn(Optional.of(course));
 
         userCourseService.assignUsers(assignUserToCourseRequests);
+        final ArgumentCaptor<List<UserInCourse>> listCaptor
+                = ArgumentCaptor.forClass(List.class);
+        verify(userInCourseRepository).saveAll(listCaptor.capture());
+        List<UserInCourse> userInCourseList = listCaptor.getValue();
+        assertEquals(1,userInCourseList.size());
+        assertEquals(assignUserToCourseRequests.get(0).getCourseId(),userInCourseList.get(0).getCourse().getId());
+        assertEquals(assignUserToCourseRequests.get(0).getMatriculationNumber(),userInCourseList.get(0).getUser().getMatriculationNumber());
+        assertEquals(assignUserToCourseRequests.get(0).getRole(),userInCourseList.get(0).getRole());
     }
     @Test
     public void assignUsers_none_role() throws IOException {
@@ -283,6 +291,16 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         doNothing().when(finishesExampleService).deleteFinishExampleData(any(FinishesExample.class));
 
         userCourseService.assignUsers(assignUserToCourseRequests);
+        verify(finishesExampleRepository).deleteAll(any(List.class));
+
+        final ArgumentCaptor<List<UserInCourse>> listCaptor
+                = ArgumentCaptor.forClass(List.class);
+        verify(userInCourseRepository).saveAll(listCaptor.capture());
+        List<UserInCourse> userInCourseList = listCaptor.getValue();
+        assertEquals(1,userInCourseList.size());
+        assertEquals(assignUserToCourseRequests.get(0).getCourseId(),userInCourseList.get(0).getCourse().getId());
+        assertEquals(assignUserToCourseRequests.get(0).getMatriculationNumber(),userInCourseList.get(0).getUser().getMatriculationNumber());
+        assertEquals(assignUserToCourseRequests.get(0).getRole(),userInCourseList.get(0).getRole());
     }
     @Test
     public void assignUsers() throws IOException {
@@ -295,6 +313,15 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         when(courseRepository.findById(assignUserToCourseRequests.get(0).getCourseId())).thenReturn(Optional.of(course));
 
         userCourseService.assignUsers(assignUserToCourseRequests);
+
+        final ArgumentCaptor<List<UserInCourse>> listCaptor
+                = ArgumentCaptor.forClass(List.class);
+        verify(userInCourseRepository).saveAll(listCaptor.capture());
+        List<UserInCourse> userInCourseList = listCaptor.getValue();
+        assertEquals(1,userInCourseList.size());
+        assertEquals(assignUserToCourseRequests.get(0).getCourseId(),userInCourseList.get(0).getCourse().getId());
+        assertEquals(assignUserToCourseRequests.get(0).getMatriculationNumber(),userInCourseList.get(0).getUser().getMatriculationNumber());
+        assertEquals(assignUserToCourseRequests.get(0).getRole(),userInCourseList.get(0).getRole());
     }
 
     private User getTestUser()
