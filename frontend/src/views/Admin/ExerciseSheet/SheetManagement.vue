@@ -102,7 +102,7 @@ export default {
             onMove: evt => {
                 const lastIndex = (this.sheetInfo.examples.length + 1);
                 const oldIndex = Sortable.utils.index(evt.dragged, '>*');
-                const newIndex = Sortable.utils.index(evt.related, '>*')
+                const newIndex = Sortable.utils.index(evt.related, '>*');
                 return oldIndex !== 0 && oldIndex !== lastIndex && newIndex !== 0 && newIndex !== lastIndex; //exclude "Information" and "new example" tab
             },
             onEnd: async evt =>{

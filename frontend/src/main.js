@@ -14,9 +14,6 @@ import IntegerInput from '@/components/IntegerInput.vue';
 
 Vue.config.productionTip = true;
 Vue.use(BVConfigPlugin, {
-  BModal:{
-    cancelTitle: 'Abbrechen'
-  },
   BToast:{
     autoHideDelay: 8000
   }

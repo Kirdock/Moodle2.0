@@ -359,6 +359,11 @@ module.exports = {
         for(const user of users){
             userRightCreated(browser, user)
         }
+        
+        browser.refresh().pause(1000);
+        for(const user of users){
+            userRightCreated(browser, user)
+        }
     },
     'Edit: invalid input': function(browser) {
         const page = browser.page.userManagement();

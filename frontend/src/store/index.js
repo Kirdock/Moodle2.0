@@ -177,7 +177,7 @@ export default new Vuex.Store({
               user.oldRole = user.courseRole;
             });
           }
-          resolve({data: response.data});
+          resolve(response);
         }).catch(reject);
         
       })
