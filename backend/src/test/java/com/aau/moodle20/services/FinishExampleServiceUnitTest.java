@@ -547,39 +547,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         String expectedMessage = "Error: user did not check this example";
         assertEquals(expectedMessage,exception.getMessage());
     }
-
-    @Test
-    public void getKreuzelAttachment_ServiceException()  {
-        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
-        Example example = getExampleWithSemester();
-        User normalUser = getNormalUser();
-        FinishesExample finishesExample = createFinishExample(example,normalUser);
-
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
-
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            finishesExampleService.getKreuzelAttachment(EXAMPLE_ID);
-        });
-        String expectedMessage = ".\\backend\\attachments\\S_2020\\123.123\\230\\230\\12345678\\null";
-        assertEquals(expectedMessage,exception.getMessage());
-    }
-
-    //TODO somehow mock Files.readAllBytes method so this test can pass
-//    @Test
-//    public void getKreuzelAttachment()  {
-//        mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
-//
-//
-//        Example example = getExampleWithSemester();
-//        User normalUser = getNormalUser();
-//        FinishesExample finishesExample = createFinishExample(example,normalUser);
-//        finishesExample.setFileName("test.jar");
-//        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
-//        FinishesExample finishesExample1 = finishesExampleService.getKreuzelAttachment(EXAMPLE_ID);
-//
-//        assertNotNull(finishesExample1.getAttachmentContent());
-//    }
-
+    
     @Test
     public void setUserExamplePresented_example_not_found()  {
         mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
