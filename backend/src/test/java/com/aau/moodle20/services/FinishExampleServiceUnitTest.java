@@ -9,7 +9,6 @@ import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.UserExamplePresentedRequest;
 import com.aau.moodle20.payload.request.UserKreuzeMultilRequest;
 import com.aau.moodle20.payload.request.UserKreuzelRequest;
-import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
 import com.aau.moodle20.payload.response.ViolationResponse;
@@ -72,7 +71,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         List<UserKreuzelRequest> userKreuzelRequests = new ArrayList<>();
         finishesExampleService.setKreuzelUser(userKreuzelRequests);
-        verify(finishesExampleRepository,times(0)).findByExample_IdAndUser_MatriculationNumber(anyLong(),anyString());
+        verify(finishesExampleRepository,times(0)).findByExampleIdAndUserMatriculationNumber(anyLong(),anyString());
         verify(finishesExampleRepository,times(0)).save(any(FinishesExample.class));
     }
 
@@ -156,10 +155,10 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         adminUser.getCourses().add(createUserInCourse(adminUser,example.getExerciseSheet().getCourse()));
         FinishesExample expectedFinishExample = createFinishExample(adminUser,example,userKreuzelRequests.get(0));
         when(userRepository.findByMatriculationNumber(adminUser.getMatriculationNumber())).thenReturn(Optional.of(adminUser));
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,adminUser.getMatriculationNumber())).thenReturn(Optional.empty());
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,adminUser.getMatriculationNumber())).thenReturn(Optional.empty());
 
         finishesExampleService.setKreuzelUser(userKreuzelRequests);
-        verify(finishesExampleRepository,times(1)).findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,adminMatriculationNumber);
+        verify(finishesExampleRepository,times(1)).findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,adminMatriculationNumber);
         verify(finishesExampleRepository,times(1)).save(expectedFinishExample);
     }
 
@@ -179,7 +178,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         FinishesExample finishesExample = createFinishExample(adminUser,example,userKreuzelRequests.get(0));
         finishesExample.setDescription("strange description");
         finishesExample.setState(EFinishesExampleState.NO);
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),adminUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(example.getId(),adminUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
 
         FinishesExample expectedFinishExample = createFinishExample(adminUser,example,userKreuzelRequests.get(0));
         finishesExampleService.setKreuzelUser(userKreuzelRequests);
@@ -191,7 +190,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         List<UserKreuzeMultilRequest> userKreuzelRequests = new ArrayList<>();
         finishesExampleService.setKreuzelUserMulti(userKreuzelRequests);
-        verify(finishesExampleRepository,times(0)).findByExample_IdAndUser_MatriculationNumber(anyLong(),anyString());
+        verify(finishesExampleRepository,times(0)).findByExampleIdAndUserMatriculationNumber(anyLong(),anyString());
         verify(finishesExampleRepository,times(0)).save(any(FinishesExample.class));
         verify(exampleRepository,times(0)).findById(anyLong());
 
@@ -228,7 +227,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         userKreuzelRequests.add(createKreuzelMultiRequest(adminUser.getMatriculationNumber()));
 
         when(userRepository.findByMatriculationNumber(adminUser.getMatriculationNumber())).thenReturn(Optional.of(adminUser));
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,adminUser.getMatriculationNumber())).thenReturn(Optional.empty());
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,adminUser.getMatriculationNumber())).thenReturn(Optional.empty());
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
             finishesExampleService.setKreuzelUserMulti(userKreuzelRequests);
@@ -249,7 +248,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
 
         userKreuzelRequests.add(createKreuzelMultiRequest(normalMatriculationNumber));
         when(userRepository.findByMatriculationNumber(adminUser.getMatriculationNumber())).thenReturn(Optional.of(adminUser));
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,adminUser.getMatriculationNumber())).thenReturn(Optional.empty());
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,adminUser.getMatriculationNumber())).thenReturn(Optional.empty());
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
             finishesExampleService.setKreuzelUserMulti(userKreuzelRequests);
@@ -270,10 +269,10 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         userKreuzelRequests.add(createKreuzelMultiRequest(adminUser.getMatriculationNumber()));
         FinishesExample expectedFinishExample = createFinishExample(adminUser,example,userKreuzelRequests.get(0));
         when(userRepository.findByMatriculationNumber(adminUser.getMatriculationNumber())).thenReturn(Optional.of(adminUser));
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,adminUser.getMatriculationNumber())).thenReturn(Optional.empty());
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,adminUser.getMatriculationNumber())).thenReturn(Optional.empty());
 
         finishesExampleService.setKreuzelUserMulti(userKreuzelRequests);
-        verify(finishesExampleRepository,times(1)).findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,adminMatriculationNumber);
+        verify(finishesExampleRepository,times(1)).findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,adminMatriculationNumber);
         verify(finishesExampleRepository,times(1)).save(expectedFinishExample);
     }
 
@@ -289,10 +288,10 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         userKreuzelRequests.add(createKreuzelMultiRequest(normalUser.getMatriculationNumber()));
         FinishesExample expectedFinishExample = createFinishExample(normalUser,example,userKreuzelRequests.get(0));
         when(userRepository.findByMatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(Optional.of(normalUser));
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,normalUser.getMatriculationNumber())).thenReturn(Optional.empty());
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,normalUser.getMatriculationNumber())).thenReturn(Optional.empty());
 
         finishesExampleService.setKreuzelUserMulti(userKreuzelRequests);
-        verify(finishesExampleRepository,times(1)).findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,normalMatriculationNumber);
+        verify(finishesExampleRepository,times(1)).findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,normalMatriculationNumber);
         verify(finishesExampleRepository,times(1)).save(expectedFinishExample);
     }
 
@@ -311,12 +310,12 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
 
         FinishesExample finishesExample = createFinishExample(normalUser,example,userKreuzelRequests.get(0));
         finishesExample.setState(EFinishesExampleState.NO);
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
 
         FinishesExample expectedFinishExample = createFinishExample(normalUser,example,userKreuzelRequests.get(0));
         expectedFinishExample.setDescription(null);
         finishesExampleService.setKreuzelUserMulti(userKreuzelRequests);
-        verify(finishesExampleRepository,times(1)).findByExample_IdAndUser_MatriculationNumber(EXAMPLE_ID,normalMatriculationNumber);
+        verify(finishesExampleRepository,times(1)).findByExampleIdAndUserMatriculationNumber(EXAMPLE_ID,normalMatriculationNumber);
         verify(finishesExampleRepository,times(1)).save(expectedFinishExample);
     }
 
@@ -395,7 +394,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         normalUser.getCourses().add(userInCourse);
 
         when(userRepository.findByMatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(Optional.of(normalUser));
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
             finishesExampleService.setKreuzelUserAttachment(file,EXAMPLE_ID);
@@ -428,13 +427,13 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
 
         doReturn(violations).when(validator).validate(anyString());
         when(userRepository.findByMatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(Optional.of(normalUser));
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
-        when(finishesExampleRepository.existsByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Boolean.TRUE);
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(finishesExampleRepository.existsByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Boolean.TRUE);
         when(validatorHandler.loadValidator(anyString())).thenReturn(validator);
 
         ViolationHistoryResponse response = finishesExampleService.setKreuzelUserAttachment(file,EXAMPLE_ID);
 
-        verify(finishesExampleRepository).existsByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
+        verify(finishesExampleRepository).existsByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
         verify(finishesExampleRepository).saveAndFlush(finishesExample_expected);
 
         ArgumentCaptor<ViolationHistory> argumentCaptor = ArgumentCaptor.forClass(ViolationHistory.class);
@@ -480,15 +479,15 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         // define mock method results
         doReturn(violations).when(validator).validate(anyString());
         when(userRepository.findByMatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(Optional.of(normalUser));
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
-        when(finishesExampleRepository.existsByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Boolean.FALSE);
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(finishesExampleRepository.existsByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Boolean.FALSE);
         when(validatorHandler.loadValidator(anyString())).thenReturn(validator);
 
         ViolationHistoryResponse response = finishesExampleService.setKreuzelUserAttachment(file,EXAMPLE_ID);
 
         // verify method correctness
-        verify(finishesExampleRepository).existsByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
-        verify(finishesExampleRepository,times(2)).findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
+        verify(finishesExampleRepository).existsByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
+        verify(finishesExampleRepository,times(2)).findByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber());
         verify(finishesExampleRepository).save(any(FinishesExample.class));
         verify(finishesExampleRepository).flush();
     }
@@ -547,7 +546,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         String expectedMessage = "Error: user did not check this example";
         assertEquals(expectedMessage,exception.getMessage());
     }
-    
+
     @Test
     public void setUserExamplePresented_example_not_found()  {
         mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
@@ -601,7 +600,7 @@ public class FinishExampleServiceUnitTest extends AbstractServiceTest{
         User normalUser = getNormalUser();
         FinishesExample finishesExample = createFinishExample(example,normalUser);
         finishesExample.setHasPresented(Boolean.FALSE);
-        when(finishesExampleRepository.findByExample_IdAndUser_MatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
+        when(finishesExampleRepository.findByExampleIdAndUserMatriculationNumber(example.getId(),normalUser.getMatriculationNumber())).thenReturn(Optional.of(finishesExample));
         when(exampleRepository.findById(EXAMPLE_ID)).thenReturn(Optional.of(example));
         when(userRepository.findByMatriculationNumber(normalMatriculationNumber)).thenReturn(Optional.of(normalUser));
 
