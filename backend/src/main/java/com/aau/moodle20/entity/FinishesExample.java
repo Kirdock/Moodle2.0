@@ -2,7 +2,6 @@ package com.aau.moodle20.entity;
 
 import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
-import com.aau.moodle20.payload.response.FinishesExampleResponse;
 
 import javax.persistence.*;
 import java.util.Comparator;

@@ -29,7 +29,6 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -271,7 +270,7 @@ public class UserServiceUnitTests extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
         Course course = getTestCourse();
         when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
-        when(userInCourseRepository.findByCourse_Id(COURSE_ID)).thenReturn(new ArrayList<>());
+        when(userInCourseRepository.findByCourseId(COURSE_ID)).thenReturn(new ArrayList<>());
         when(userRepository.findAll()).thenReturn(new ArrayList<>());
 
         List<UserResponseObject> userResponseObjects = userService.getUsersWithCourseRoles(COURSE_ID);
@@ -314,7 +313,7 @@ public class UserServiceUnitTests extends AbstractServiceTest{
         userList.get(1).getFinishedExamples().add(finishesExample2);
 
         when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
-        when(userInCourseRepository.findByCourse_Id(COURSE_ID)).thenReturn(userInCourseList);
+        when(userInCourseRepository.findByCourseId(COURSE_ID)).thenReturn(userInCourseList);
         when(userRepository.findAll()).thenReturn(userList);
 
         List<UserResponseObject> userResponseObjects = userService.getUsersWithCourseRoles(COURSE_ID);
@@ -507,7 +506,7 @@ public class UserServiceUnitTests extends AbstractServiceTest{
         when(userRepository.findByMatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(Optional.of(normalUser));
         when(userRepository.findByMatriculationNumber(getAdminUser().getMatriculationNumber())).thenReturn(Optional.of(getAdminUser()));
 
-        when(courseRepository.findByOwner_MatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(courses);
+        when(courseRepository.findByOwnerMatriculationNumber(normalUser.getMatriculationNumber())).thenReturn(courses);
 
         userService.deleteUser(normalMatriculationNumber);
         Course course_expected = getTestCourse();
@@ -527,7 +526,7 @@ public class UserServiceUnitTests extends AbstractServiceTest{
         Boolean isOwner = userService.isOwner();
         assertEquals(Boolean.FALSE,isOwner);
 
-        when(courseRepository.existsByOwner_MatriculationNumber(getUserDetails_Not_Admin().getMatriculationNumber())).thenReturn(Boolean.TRUE);
+        when(courseRepository.existsByOwnerMatriculationNumber(getUserDetails_Not_Admin().getMatriculationNumber())).thenReturn(Boolean.TRUE);
         isOwner = userService.isOwner();
         assertEquals(Boolean.TRUE,isOwner);
     }

@@ -21,12 +21,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class ExerciseSheetService extends AbstractService {
-
-    private PdfService pdfService;
+    
     private ExampleService exampleService;
 
-    public ExerciseSheetService(PdfService pdfService, ExampleService exampleService) {
-        this.pdfService = pdfService;
+    public ExerciseSheetService(ExampleService exampleService) {
         this.exampleService = exampleService;
     }
 
@@ -197,7 +195,7 @@ public class ExerciseSheetService extends AbstractService {
                 throw new ServiceException("Error: not authorized to access exerciseSheets", HttpStatus.UNAUTHORIZED);
         }
 
-        List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourse_Id(courseId);
+        List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourseId(courseId);
         exerciseSheets.sort(Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName));
         List<ExerciseSheetResponseObject> responseObjects = new ArrayList<>();
         for (ExerciseSheet sheet : exerciseSheets) {

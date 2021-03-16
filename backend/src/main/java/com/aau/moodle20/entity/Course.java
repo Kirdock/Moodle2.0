@@ -194,7 +194,7 @@ public class Course {
         CourseResponseObject responseObject = createCourseResponseObjectGetCourse();
         if (getExerciseSheets() != null)
             responseObject.setExerciseSheets(getExerciseSheets().stream()
-                    .map(exerciseSheet -> exerciseSheet.getResponseObjectLessInfo_WithExampleInfo(matriculationNumber))
+                    .map(exerciseSheet -> exerciseSheet.getResponseObjectLessInfoWithExampleInfo(matriculationNumber))
                     .sorted(Comparator.comparing(ExerciseSheetResponseObject::getSubmissionDate).thenComparing(ExerciseSheetResponseObject::getName))
                     .collect(Collectors.toList()));
 

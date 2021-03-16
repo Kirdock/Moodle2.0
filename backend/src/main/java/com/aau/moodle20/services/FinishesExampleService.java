@@ -13,7 +13,6 @@ import com.aau.moodle20.payload.response.FinishesExampleResponse;
 import com.aau.moodle20.payload.response.KreuzelResponse;
 import com.aau.moodle20.payload.response.ViolationHistoryResponse;
 import com.aau.moodle20.validation.ValidatorHandler;
-import org.apache.maven.cli.MavenCli;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -73,7 +72,7 @@ public class FinishesExampleService extends AbstractService {
             throw new ServiceException("Error: Example has sub-examples and can therefore not be kreuzelt");
 
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
-                .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
+                .findByExampleIdAndUserMatriculationNumber(exampleId, matriculationNumber);
         //update
         if (optionalFinishesExample.isPresent()) {
             finishesExample = optionalFinishesExample.get();
@@ -110,7 +109,7 @@ public class FinishesExampleService extends AbstractService {
             throw new ServiceException("Error: Not assigned to this course", HttpStatus.FORBIDDEN);
 
 
-        if (!finishesExampleRepository.existsByExample_IdAndUser_MatriculationNumber(exampleId, userDetails.getMatriculationNumber())) {
+        if (!finishesExampleRepository.existsByExampleIdAndUserMatriculationNumber(exampleId, userDetails.getMatriculationNumber())) {
             List<UserKreuzelRequest> requests = new ArrayList<>();
             UserKreuzelRequest kreuzelRequest = new UserKreuzelRequest();
             kreuzelRequest.setDescription(null);
@@ -225,7 +224,7 @@ public class FinishesExampleService extends AbstractService {
 
     protected FinishesExample readFinishesExample(Long exampleId, String matriculationNumber) {
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
-                .findByExample_IdAndUser_MatriculationNumber(exampleId, matriculationNumber);
+                .findByExampleIdAndUserMatriculationNumber(exampleId, matriculationNumber);
         if (!optionalFinishesExample.isPresent())
             throw new ServiceException("Error: user did not check this example");
 

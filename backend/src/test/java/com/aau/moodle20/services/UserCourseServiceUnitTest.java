@@ -285,7 +285,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         when(userRepository.existsByMatriculationNumber(assignUserToCourseRequests.get(0).getMatriculationNumber())).thenReturn(Boolean.TRUE);
         when(courseRepository.existsById(assignUserToCourseRequests.get(0).getCourseId())).thenReturn(Boolean.TRUE);
         when(courseRepository.findById(assignUserToCourseRequests.get(0).getCourseId())).thenReturn(Optional.of(course));
-        when(userInCourseRepository.findByUser_MatriculationNumberAndCourse_Id(assignUserToCourseRequests.get(0).getMatriculationNumber(),assignUserToCourseRequests.get(0).getCourseId()))
+        when(userInCourseRepository.findByUserMatriculationNumberAndCourseId(assignUserToCourseRequests.get(0).getMatriculationNumber(),assignUserToCourseRequests.get(0).getCourseId()))
                 .thenReturn(Optional.of(userInCourse));
         when(userRepository.findByMatriculationNumber(testUser.getMatriculationNumber())).thenReturn(Optional.of(testUser));
         doNothing().when(finishesExampleService).deleteFinishExampleData(any(FinishesExample.class));

@@ -70,8 +70,8 @@ public class ViolationHistory {
     public ViolationHistoryResponse createViolationHistoryResponse() {
         ViolationHistoryResponse response = new ViolationHistoryResponse();
         response.setDate(getDate());
-        List<ViolationResponse> violations = getViolations().stream().map(ViolationEntity::createViolationResponse).collect(Collectors.toList());
-        response.setViolations(violations);
+        List<ViolationResponse> violationResponseList = getViolations().stream().map(ViolationEntity::createViolationResponse).collect(Collectors.toList());
+        response.setViolations(violationResponseList);
 
         return response;
     }

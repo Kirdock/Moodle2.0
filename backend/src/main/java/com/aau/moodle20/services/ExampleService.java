@@ -51,7 +51,7 @@ public class ExampleService extends AbstractService {
         // if this is an subExample remove all finishesExample entries of parentExample
         // and set points to 0
         if (createExampleRequest.getParentId() != null && parentExample != null) {
-            List<FinishesExample> finishesExamples = finishesExampleRepository.findByExample_Id(createExampleRequest.getParentId());
+            List<FinishesExample> finishesExamples = finishesExampleRepository.findByExampleId(createExampleRequest.getParentId());
             finishesExampleRepository.deleteAll(finishesExamples);
             parentExample.setPoints(0);
             if (parentExample.getValidator() != null && !parentExample.getValidator().isEmpty())

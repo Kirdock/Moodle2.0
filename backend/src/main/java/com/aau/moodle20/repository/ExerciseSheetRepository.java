@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ExerciseSheetRepository extends JpaRepository<ExerciseSheet, Long> {
 
-    List<ExerciseSheet> findByCourse_Id(Long courseId);
+    List<ExerciseSheet> findByCourseId(Long courseId);
 }
 
 

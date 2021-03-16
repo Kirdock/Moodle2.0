@@ -9,11 +9,9 @@ import java.util.Optional;
 
 public interface FinishesExampleRepository extends JpaRepository<FinishesExample, FinishesExampleKey> {
 
-    Optional<FinishesExample> findByExample_IdAndUser_MatriculationNumber(Long exampleId, String matriculationNumber);
+    Optional<FinishesExample> findByExampleIdAndUserMatriculationNumber(Long exampleId, String matriculationNumber);
 
-    List<FinishesExample> findByExample_Id(Long exampleId);
+    List<FinishesExample> findByExampleId(Long exampleId);
 
-    List<FinishesExample> findByExample_IdIn(List<Long> exampleIds);
-
-    Boolean existsByExample_IdAndUser_MatriculationNumber(Long exampleId, String matriculationNumber);
+    Boolean existsByExampleIdAndUserMatriculationNumber(Long exampleId, String matriculationNumber);
 }

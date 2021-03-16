@@ -222,7 +222,7 @@ public class UserService extends AbstractService {
         List<UserResponseObject> userResponseObjectList = new ArrayList<>();
 
         readCourse(courseId);
-        List<UserInCourse> userInCourses = userInCourseRepository.findByCourse_Id(courseId);
+        List<UserInCourse> userInCourses = userInCourseRepository.findByCourseId(courseId);
         List<User> allUsers = userRepository.findAll();
         allUsers.removeIf(User::getAdmin);
 
@@ -336,7 +336,7 @@ public class UserService extends AbstractService {
             throw new ServiceException("Super Admin user cannot be deleted!");
 
         User adminUser = readUser(adminMatriculationNumber);
-        List<Course> courses = courseRepository.findByOwner_MatriculationNumber(matriculationNumber);
+        List<Course> courses = courseRepository.findByOwnerMatriculationNumber(matriculationNumber);
         for (Course course : courses) {
             course.setOwner(adminUser);
         }
@@ -347,7 +347,7 @@ public class UserService extends AbstractService {
 
     public Boolean isOwner() {
         UserDetailsImpl userDetails = getUserDetails();
-        return courseRepository.existsByOwner_MatriculationNumber(userDetails.getMatriculationNumber());
+        return courseRepository.existsByOwnerMatriculationNumber(userDetails.getMatriculationNumber());
     }
 
     public UserResponseObject getUser(String matriculationNumber) {

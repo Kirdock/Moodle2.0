@@ -5,7 +5,6 @@ import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.FinishesExampleKey;
 import com.aau.moodle20.payload.response.ExampleResponseObject;
 import com.aau.moodle20.payload.response.ExerciseSheetResponseObject;
-import com.aau.moodle20.payload.response.FileTypeResponseObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -126,7 +125,7 @@ public class ExerciseSheetEntityUnitTests {
         when(example1.getExamplesFinishedByUser()).thenReturn(new HashSet<>());
         when(example2.getExamplesFinishedByUser()).thenReturn(new HashSet<>());
 
-        ExerciseSheetResponseObject responseObject = exerciseSheet.getResponseObjectLessInfo_WithExampleInfo("12345678");
+        ExerciseSheetResponseObject responseObject = exerciseSheet.getResponseObjectLessInfoWithExampleInfo("12345678");
 
         assertNull(responseObject.getCourseId());
         assertNull(responseObject.getIssueDate());

@@ -226,7 +226,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         when(exampleRepository.findById(PARENT_EXAMPLE_ID)).thenReturn(Optional.of(parentExample));
         when(fileTypeRepository.findById(FILE_TYPE_ID)).thenReturn(Optional.of(getFileType()));
         when(exampleRepository.save(getExampleFromCreateRequest(request))).thenReturn(example);
-        when(finishesExampleRepository.findByExample_Id(PARENT_EXAMPLE_ID)).thenReturn(finishesExampleList);
+        when(finishesExampleRepository.findByExampleId(PARENT_EXAMPLE_ID)).thenReturn(finishesExampleList);
 
 
         List<SupportFileType> supportFileTypes = new ArrayList<>();

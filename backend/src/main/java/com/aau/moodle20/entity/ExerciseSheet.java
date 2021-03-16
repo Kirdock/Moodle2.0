@@ -154,7 +154,7 @@ public class ExerciseSheet {
         return responseObject;
     }
 
-    public ExerciseSheetResponseObject getResponseObjectLessInfo_WithExampleInfo(String matriculationNumber) {
+    public ExerciseSheetResponseObject getResponseObjectLessInfoWithExampleInfo(String matriculationNumber) {
         ExerciseSheetResponseObject responseObject = getResponseObjectLessInfo();
         if (getExamples() != null) {
             Integer totalPoints = 0;

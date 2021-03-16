@@ -10,9 +10,6 @@ import com.aau.moodle20.exception.ServiceException;
 import com.aau.moodle20.payload.request.AssignUserToCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.RegisterMultipleUserResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,7 +83,7 @@ public class UserCourseService extends AbstractService {
 
     protected void clearUserInfo(UserInCourse userInCourse) throws IOException {
         List<FinishesExample> finishesExamplesToBeDeleted = new ArrayList<>();
-        Optional<UserInCourse> optionalUserInCourse = userInCourseRepository.findByUser_MatriculationNumberAndCourse_Id(userInCourse.getId().getMatriculationNumber(), userInCourse.getId().getCourseId());
+        Optional<UserInCourse> optionalUserInCourse = userInCourseRepository.findByUserMatriculationNumberAndCourseId(userInCourse.getId().getMatriculationNumber(), userInCourse.getId().getCourseId());
         // check if user_course assigment role was set to none -> user was removed from course -> delete course related info
         if (optionalUserInCourse.isPresent() && !ECourseRole.NONE.equals(optionalUserInCourse.get().getRole()) && ECourseRole.NONE.equals(userInCourse.getRole())) {
             User user = readUser(userInCourse.getId().getMatriculationNumber());

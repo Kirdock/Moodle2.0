@@ -157,7 +157,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         when(userRepository.findByMatriculationNumber(OWNER_MATRICULATION_NUMBER)).thenReturn(Optional.of(new User(OWNER_MATRICULATION_NUMBER)));
         when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(new Semester(SEMESTER_ID)));
         when(courseRepository.save(any(Course.class))).thenReturn(course);
-        when(courseRepository.existsByNumberAndSemester_Id(COURSE_NUMBER, SEMESTER_ID)).thenReturn(Boolean.TRUE);
+        when(courseRepository.existsByNumberAndSemesterId(COURSE_NUMBER, SEMESTER_ID)).thenReturn(Boolean.TRUE);
 
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
@@ -186,7 +186,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
     public void updateCourse_where_new_course_number_already_exists() {
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Course course = getTestCourse();
-        when(courseRepository.existsByNumberAndSemester_Id("333.333", course.getSemester().getId())).thenReturn(Boolean.TRUE);
+        when(courseRepository.existsByNumberAndSemesterId("333.333", course.getSemester().getId())).thenReturn(Boolean.TRUE);
         when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
         when(userRepository.existsByMatriculationNumber(course.getOwner().getMatriculationNumber())).thenReturn(Boolean.TRUE);
         UpdateCourseRequest updateCourseRequest = getUpdateCourseRequest(course);
@@ -509,7 +509,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest{
         copyCourseRequest.setCourseId(COURSE_ID);
         when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
         when(courseRepository.findById(COURSE_ID)).thenReturn(Optional.of(course));
-        when(courseRepository.existsByNumberAndSemester_Id(course.getNumber(),copyCourseRequest.getSemesterId())).thenReturn(Boolean.TRUE);
+        when(courseRepository.existsByNumberAndSemesterId(course.getNumber(),copyCourseRequest.getSemesterId())).thenReturn(Boolean.TRUE);
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
             courseService.copyCourse(copyCourseRequest);

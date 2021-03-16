@@ -90,7 +90,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @PutMapping(value = "/user")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         userService.registerUser(signUpRequest);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
@@ -104,7 +104,7 @@ public class UserController {
     // delete api -------------------------------------------------------------------------
     @PreAuthorize("hasAuthority('Admin')")
     @DeleteMapping(path = "/user/{matriculationNumber}")
-    public ResponseEntity<?> deleteUser(@PathVariable String matriculationNumber) {
+    public ResponseEntity<MessageResponse> deleteUser(@PathVariable String matriculationNumber) {
         userService.deleteUser(matriculationNumber);
         return ResponseEntity.ok(new MessageResponse("User was deleted!"));
     }

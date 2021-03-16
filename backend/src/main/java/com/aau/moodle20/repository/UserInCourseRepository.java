@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface UserInCourseRepository extends JpaRepository<UserInCourse, UserCourseKey> {
 
-    List<UserInCourse> findByCourse_Id(Long courseId);
+    List<UserInCourse> findByCourseId(Long courseId);
 
-    List<UserInCourse> findByUser_MatriculationNumber(String matriculationNumber);
+    List<UserInCourse> findByUserMatriculationNumber(String matriculationNumber);
 
-    Optional<UserInCourse> findByUser_MatriculationNumberAndCourse_Id(String matriculationNumber, Long courseId);
+    Optional<UserInCourse> findByUserMatriculationNumberAndCourseId(String matriculationNumber, Long courseId);
 
 }
 

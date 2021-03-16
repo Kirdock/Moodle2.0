@@ -34,8 +34,8 @@ public class SemesterService extends AbstractService {
         UserDetailsImpl userDetails = getUserDetails();
         if (userDetails.getAdmin())
             semestersToBeReturned = semesterRepository.findAll();
-        else if (courseRepository.existsByOwner_MatriculationNumber(userDetails.getMatriculationNumber())) {
-            List<Course> courses = courseRepository.findByOwner_MatriculationNumber(userDetails.getMatriculationNumber());
+        else if (courseRepository.existsByOwnerMatriculationNumber(userDetails.getMatriculationNumber())) {
+            List<Course> courses = courseRepository.findByOwnerMatriculationNumber(userDetails.getMatriculationNumber());
             List<Semester> semesters = courses.stream().map(Course::getSemester).collect(Collectors.toList());
             for (Semester semester : semesters) {
                 if (!semestersToBeReturned.contains(semester))
@@ -50,7 +50,7 @@ public class SemesterService extends AbstractService {
         List<Semester> semestersToBeReturned = new ArrayList<>();
         UserDetailsImpl userDetails = getUserDetails();
 
-        List<UserInCourse> userInCourses = userInCourseRepository.findByUser_MatriculationNumber(userDetails.getMatriculationNumber());
+        List<UserInCourse> userInCourses = userInCourseRepository.findByUserMatriculationNumber(userDetails.getMatriculationNumber());
         List<Semester> semesters = userInCourses.stream().map(userInCourse -> userInCourse.getCourse().getSemester()).collect(Collectors.toList());
         for (Semester semester : semesters) {
             if (!semestersToBeReturned.contains(semester))
@@ -68,9 +68,9 @@ public class SemesterService extends AbstractService {
         List<Course> courses = null;
 
         if (userDetails.getAdmin())
-            courses = courseRepository.findCoursesBySemester_Id(semesterId);
+            courses = courseRepository.findCoursesBySemesterId(semesterId);
         else
-            courses = courseRepository.findCoursesBySemester_IdAndOwner_MatriculationNumber(semesterId, userDetails.getMatriculationNumber());
+            courses = courseRepository.findCoursesBySemesterIdAndOwnerMatriculationNumber(semesterId, userDetails.getMatriculationNumber());
 
         if (courses != null && !courses.isEmpty()) {
             for (Course course : courses) {
@@ -88,7 +88,7 @@ public class SemesterService extends AbstractService {
 
         List<CourseResponseObject> responseObjects = new ArrayList<>();
 
-        List<UserInCourse> userInCourses = userInCourseRepository.findByUser_MatriculationNumber(userDetails.getMatriculationNumber());
+        List<UserInCourse> userInCourses = userInCourseRepository.findByUserMatriculationNumber(userDetails.getMatriculationNumber());
 
         if (userInCourses != null) {
             responseObjects.addAll(userInCourses.stream()

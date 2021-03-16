@@ -1,7 +1,6 @@
 package com.aau.moodle20.services;
 
 import com.aau.moodle20.constants.ApiErrorResponseCodes;
-import com.aau.moodle20.constants.EFinishesExampleState;
 import com.aau.moodle20.entity.*;
 import com.aau.moodle20.entity.embeddable.SupportFileTypeKey;
 import com.aau.moodle20.exception.ServiceException;
@@ -11,7 +10,6 @@ import com.aau.moodle20.payload.request.UpdateCoursePresets;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
-import com.aau.moodle20.payload.response.KreuzelCourseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,7 +37,7 @@ public class CourseService extends AbstractService {
         Semester semester = readSemester(createCourseRequest.getSemesterId());
         // check if owner exists
         readUser(createCourseRequest.getOwner());
-        if (courseRepository.existsByNumberAndSemester_Id(createCourseRequest.getNumber(), createCourseRequest.getSemesterId()))
+        if (courseRepository.existsByNumberAndSemesterId(createCourseRequest.getNumber(), createCourseRequest.getSemesterId()))
             throw new ServiceException("Course in Semester already exists", ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS);
 
         Course course = new Course();
@@ -59,12 +57,12 @@ public class CourseService extends AbstractService {
     public Course updateCourse(UpdateCourseRequest updateCourseRequest) {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(updateCourseRequest.getId());
-        if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
+        if (Boolean.TRUE.equals(userDetails.getAdmin()) && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
             throw new ServiceException("Error: Owner cannot be updated because the given matriculationNumber those not exists!", HttpStatus.NOT_FOUND);
 
         // if number is updated check if given number already exists in semester
         if (!updateCourseRequest.getNumber().equals(course.getNumber())) {
-            if (courseRepository.existsByNumberAndSemester_Id(updateCourseRequest.getNumber(), course.getSemester().getId()))
+            if (courseRepository.existsByNumberAndSemesterId(updateCourseRequest.getNumber(), course.getSemester().getId()))
                 throw new ServiceException("Error: A Course with this number already exists", ApiErrorResponseCodes.CHANGED_COURSE_NUMBER_ALREADY_EXISTS);
         }
 
@@ -165,7 +163,7 @@ public class CourseService extends AbstractService {
         Semester semester = readSemester(copyCourseRequest.getSemesterId());
         Course originalCourse = readCourse(copyCourseRequest.getCourseId());
 
-        if (courseRepository.existsByNumberAndSemester_Id(originalCourse.getNumber(), semester.getId()))
+        if (courseRepository.existsByNumberAndSemesterId(originalCourse.getNumber(), semester.getId()))
             throw new ServiceException("Error: A course with this number already exists in given semester!", ApiErrorResponseCodes.COPIED_COURSE_NUMBER_ALREADY_EXISTS);
 
         // first copy course

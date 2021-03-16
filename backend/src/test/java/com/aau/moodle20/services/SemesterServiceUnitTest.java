@@ -120,8 +120,8 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         courses.add(course1);
         courses.add(course2);
 
-        when(courseRepository.existsByOwner_MatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(Boolean.TRUE);
-        when(courseRepository.findByOwner_MatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(courses);
+        when(courseRepository.existsByOwnerMatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(Boolean.TRUE);
+        when(courseRepository.findByOwnerMatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(courses);
 
 
         List<Semester> responseSemesters = semesterService.getSemesters();
@@ -151,7 +151,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         userInCourses.add(userInCourse);
         userInCourses.add(userInCourse2);
 
-        when(userInCourseRepository.findByUser_MatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(userInCourses);
+        when(userInCourseRepository.findByUserMatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(userInCourses);
 
         List<Semester> responseSemesters = semesterService.getSemestersAssigned();
         assertEquals(2,responseSemesters.size());
@@ -184,7 +184,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         courses.add(course2);
         List<CourseResponseObject> testResponseObject = courses.stream().map(Course::createCourseResponseObject).collect(Collectors.toList());
         when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
-        when(courseRepository.findCoursesBySemester_Id(SEMESTER_ID)).thenReturn(courses);
+        when(courseRepository.findCoursesBySemesterId(SEMESTER_ID)).thenReturn(courses);
 
         List<CourseResponseObject> responseObjects = semesterService.getCoursesFromSemester(SEMESTER_ID);
         assertEquals(2,responseObjects.size());
@@ -205,7 +205,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         courses.add(course2);
         List<CourseResponseObject> testResponseObject = courses.stream().map(Course::createCourseResponseObject).collect(Collectors.toList());
         when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
-        when(courseRepository.findCoursesBySemester_IdAndOwner_MatriculationNumber(SEMESTER_ID,userDetails.getMatriculationNumber())).thenReturn(courses);
+        when(courseRepository.findCoursesBySemesterIdAndOwnerMatriculationNumber(SEMESTER_ID,userDetails.getMatriculationNumber())).thenReturn(courses);
 
         List<CourseResponseObject> responseObjects = semesterService.getCoursesFromSemester(SEMESTER_ID);
         assertEquals(2,responseObjects.size());
@@ -237,7 +237,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         List<CourseResponseObject> testResponseObjects = userInCourses.stream()
                 .map(userInCourse -> userInCourse.getCourse().createCourseResponseObject()).collect(Collectors.toList());
         when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
-        when(userInCourseRepository.findByUser_MatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(userInCourses);
+        when(userInCourseRepository.findByUserMatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(userInCourses);
 
         List<CourseResponseObject> responseObjects = semesterService.getAssignedCoursesFromSemester(SEMESTER_ID);
         assertEquals(2,responseObjects.size());
@@ -261,7 +261,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
                 .filter(userInCourse -> !ECourseRole.NONE.equals(userInCourse.getRole()))
                 .map(userInCourse -> userInCourse.getCourse().createCourseResponseObject()).collect(Collectors.toList());
         when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
-        when(userInCourseRepository.findByUser_MatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(userInCourses);
+        when(userInCourseRepository.findByUserMatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(userInCourses);
 
         List<CourseResponseObject> responseObjects = semesterService.getAssignedCoursesFromSemester(SEMESTER_ID);
         assertEquals(2,responseObjects.size());
@@ -287,7 +287,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
                 .filter(userInCourse -> userInCourse.getCourse().getSemester().getId().equals(SEMESTER_ID))
                 .map(userInCourse -> userInCourse.getCourse().createCourseResponseObject()).collect(Collectors.toList());
         when(semesterRepository.findById(SEMESTER_ID)).thenReturn(Optional.of(semester));
-        when(userInCourseRepository.findByUser_MatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(userInCourses);
+        when(userInCourseRepository.findByUserMatriculationNumber(userDetails.getMatriculationNumber())).thenReturn(userInCourses);
 
         List<CourseResponseObject> responseObjects = semesterService.getAssignedCoursesFromSemester(SEMESTER_ID);
         assertEquals(2,responseObjects.size());

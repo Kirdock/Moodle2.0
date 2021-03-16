@@ -25,6 +25,7 @@ public class UserInCourse {
     ECourseRole role;
 
     public UserInCourse() {
+        //empty constructor
     }
 
     public UserCourseKey getId() {

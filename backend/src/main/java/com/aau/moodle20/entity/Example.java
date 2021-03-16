@@ -227,8 +227,7 @@ public class Example {
         if (exampleRequest.getExerciseSheetId() != null)
             setExerciseSheet(new ExerciseSheet(exampleRequest.getExerciseSheetId()));
     }
-
-    // TODO refactor later
+    
     public void fillValuesFromRequestObject(UpdateExampleRequest exampleRequest) {
         setName(exampleRequest.getName());
         setDescription(exampleRequest.getDescription());

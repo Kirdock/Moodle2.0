@@ -555,7 +555,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         exerciseSheetList.add(exerciseSheet5);
         exerciseSheetList.add(exerciseSheet6);
 
-        when(exerciseSheetRepository.findByCourse_Id(course.getId())).thenReturn(exerciseSheetList);
+        when(exerciseSheetRepository.findByCourseId(course.getId())).thenReturn(exerciseSheetList);
 
         List<ExerciseSheetResponseObject> responseObjects_expected = exerciseSheetList.stream()
                 .map(exerciseSheet1 -> createExerciseSheetResponseObject(exerciseSheet1))
