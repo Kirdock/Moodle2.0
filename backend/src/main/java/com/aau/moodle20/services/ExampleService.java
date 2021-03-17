@@ -37,10 +37,10 @@ public class ExampleService extends AbstractService {
         Example example = new Example();
         Example parentExample = null;
 
-        if (createExampleRequest.getSubmitFile() != null && createExampleRequest.getSubmitFile()) {
-            if ((createExampleRequest.getSupportedFileTypes() == null || createExampleRequest.getSupportedFileTypes().isEmpty()) &&
-                    (createExampleRequest.getCustomFileTypes() == null || createExampleRequest.getCustomFileTypes().isEmpty()))
-                throw new ServiceException("Error:either supported file types or custom file types  must be specified!", null, null, null, null);
+        if (Boolean.TRUE.equals(createExampleRequest.getSubmitFile()) &&
+                (createExampleRequest.getSupportedFileTypes() == null || createExampleRequest.getSupportedFileTypes().isEmpty()) &&
+                (createExampleRequest.getCustomFileTypes() == null || createExampleRequest.getCustomFileTypes().isEmpty())) {
+            throw new ServiceException("Error:either supported file types or custom file types  must be specified!", null, null, null, null);
         }
         if (createExampleRequest.getParentId() != null)
             parentExample = readExample(createExampleRequest.getParentId());
@@ -122,11 +122,12 @@ public class ExampleService extends AbstractService {
     @Transactional
     public void updateExample(UpdateExampleRequest updateExampleRequest) throws IOException {
         List<SupportFileType> supportFileTypes;
-        if (updateExampleRequest.getSubmitFile() != null && updateExampleRequest.getSubmitFile()) {
-            if ((updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty()) &&
-                    (updateExampleRequest.getCustomFileTypes() == null || updateExampleRequest.getCustomFileTypes().isEmpty()))
-                throw new ServiceException("Error:either supported file types or custom file types  must be specified!", null, null, null, null);
-        }
+
+        if (Boolean.TRUE.equals(updateExampleRequest.getSubmitFile()) && (updateExampleRequest.getSupportedFileTypes() == null ||
+                updateExampleRequest.getSupportedFileTypes().isEmpty()) &&
+                (updateExampleRequest.getCustomFileTypes() == null || updateExampleRequest.getCustomFileTypes().isEmpty()))
+            throw new ServiceException("Error:either supported file types or custom file types  must be specified!", null, null, null, null);
+
         ExerciseSheet exerciseSheet = readExerciseSheet(updateExampleRequest.getExerciseSheetId());
         Example parentExample = updateExampleRequest.getParentId() != null ? readExample(updateExampleRequest.getParentId()) : null;
         checkIfExampleNameAlreadyUsed(exerciseSheet, updateExampleRequest.getName(), updateExampleRequest.getId(), parentExample);

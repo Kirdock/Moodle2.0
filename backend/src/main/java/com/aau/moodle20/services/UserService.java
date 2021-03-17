@@ -390,18 +390,16 @@ public class UserService extends AbstractService {
 
     public void checkForTemporaryPassword(LoginRequest loginRequest) {
         Optional<User> optionalUser = userRepository.findByUsername(loginRequest.getUsername());
-        if (optionalUser.isPresent()) {
-            if (optionalUser.get().getPasswordExpireDate() != null) {
-                LocalDateTime now = LocalDateTime.now();
-                if (now.isAfter(optionalUser.get().getPasswordExpireDate())) {
-                    generateNewTemporaryPassword(optionalUser.get());
-                    throw new ServiceException("Error: temporary password is expired", null,ApiErrorResponseCodes.TEMPORARY_PASSWORD_EXPIRED,null,null);
-                } else {
-                    optionalUser.get().setPasswordExpireDate(null);
-                    userRepository.save(optionalUser.get());
-                }
-
+        if (optionalUser.isPresent() && optionalUser.get().getPasswordExpireDate() != null) {
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isAfter(optionalUser.get().getPasswordExpireDate())) {
+                generateNewTemporaryPassword(optionalUser.get());
+                throw new ServiceException("Error: temporary password is expired", null, ApiErrorResponseCodes.TEMPORARY_PASSWORD_EXPIRED, null, null);
+            } else {
+                optionalUser.get().setPasswordExpireDate(null);
+                userRepository.save(optionalUser.get());
             }
+
         }
     }
 
