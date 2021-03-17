@@ -95,7 +95,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         builder.append(
                 " method is not supported for this request. Supported methods are ");
         if (ex.getSupportedHttpMethods() != null) {
-            ex.getSupportedHttpMethods().forEach(t -> builder.append(t + " "));
+            ex.getSupportedHttpMethods().forEach(t -> {
+                if (t != null) {
+                    builder.append(t).append(" ");
+                }
+            });
         }
 
 

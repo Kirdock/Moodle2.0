@@ -194,7 +194,7 @@ public class UserService extends AbstractService {
 
         return users;
     }
-
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public List<User> registerMissingUsersFromFile(MultipartFile file, RegisterMultipleUserResponse registerMultipleUserResponse) {
         RegisterMultipleUserResponse registerMultipleUserResponse2 = registerUsers(file, Boolean.FALSE);
         registerMultipleUserResponse.setFailedUsers(registerMultipleUserResponse2.getFailedUsers());
