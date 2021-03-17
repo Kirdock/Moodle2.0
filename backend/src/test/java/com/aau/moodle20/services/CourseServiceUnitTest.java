@@ -476,7 +476,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest {
         });
         String expectedMessage = "Error: Semester not found!";
         assertEquals(expectedMessage, exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
     }
 
     @Test
@@ -492,7 +492,7 @@ public class CourseServiceUnitTest extends AbstractServiceTest {
         });
         String expectedMessage = "Error: Course not found!";
         assertEquals(expectedMessage, exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
     }
 
     @Test
