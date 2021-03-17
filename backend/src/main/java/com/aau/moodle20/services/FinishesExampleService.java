@@ -165,7 +165,6 @@ public class FinishesExampleService extends AbstractService {
         if (validator != null)
             violations = validator.validate(filePath);
 
-        validator = null;
         return violations;
     }
 

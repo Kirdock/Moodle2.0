@@ -17,8 +17,6 @@ public class UserResponseObject {
     private ECourseRole courseRole;
     private Integer presentedCount = 0;
 
-    public UserResponseObject() {
-    }
 
     public String getMatriculationNumber() {
         return matriculationNumber;

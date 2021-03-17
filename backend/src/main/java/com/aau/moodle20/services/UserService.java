@@ -44,6 +44,10 @@ import static org.passay.CharacterOccurrencesRule.ERROR_CODE;
 public class UserService extends AbstractService {
 
 
+    private static final String REGISTER_USER_EMAIL_SUBJECT = "registerUser.email.subject";
+    public static final String REGISTER_USER_EMAIL_TEXT = "registerUser.email.text";
+    public static final String PASSWORD = "password";
+    public static final String PASSWORD_PLACEHOLDER = "{password}";
     private PasswordEncoder encoder;
     private EmailService emailService;
     private ResourceBundleMessageSource resourceBundleMessageSource;
@@ -76,10 +80,10 @@ public class UserService extends AbstractService {
             throw new ServiceException("Error: User with this username already exists!", null, ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS, null, null);
         }
 
-        String emailSubject = getLocaleMessage("registerUser.email.subject");
-        String emailText = getLocaleMessage("registerUser.email.text");
+        String emailSubject = getLocaleMessage(REGISTER_USER_EMAIL_SUBJECT);
+        String emailText = getLocaleMessage(REGISTER_USER_EMAIL_TEXT);
 
-        String password = Boolean.TRUE.equals(developerMode) ? "password" : generateRandomPassword();
+        String password = Boolean.TRUE.equals(developerMode) ? PASSWORD : generateRandomPassword();
         String encodedPassword = encoder.encode(password);
 
         //username, matrikelNumber, forename, surename, password, isAdmin
@@ -95,7 +99,7 @@ public class UserService extends AbstractService {
             user.setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
         userRepository.save(user);
         if (Boolean.FALSE.equals(developerMode))
-            emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace("{password}", password));
+            emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace(PASSWORD_PLACEHOLDER, password));
     }
 
 
@@ -104,11 +108,11 @@ public class UserService extends AbstractService {
         List<User> users = getUserObjectsFromFile(file);
         List<User> usersToBeSaves = new ArrayList<>();
         RegisterMultipleUserResponse registerMultipleUserResponse = new RegisterMultipleUserResponse();
-        String standardPassword = encoder.encode("password");
+        String standardPassword = encoder.encode(PASSWORD);
         Map<String, String> passwords = new HashMap<>();
 
-        String emailSubject = getLocaleMessage("registerUser.email.subject");
-        String emailText = getLocaleMessage("registerUser.email.text");
+        String emailSubject = getLocaleMessage(REGISTER_USER_EMAIL_SUBJECT);
+        String emailText = getLocaleMessage(REGISTER_USER_EMAIL_TEXT);
 
 
         Integer lineNumber = 1;
@@ -131,7 +135,7 @@ public class UserService extends AbstractService {
         userRepository.saveAll(usersToBeSaves);
         if (Boolean.FALSE.equals(developerMode)) {
             for (User user : usersToBeSaves) {
-                emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace("{password}", passwords.get(user.getMatriculationNumber())));
+                emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace(PASSWORD_PLACEHOLDER, passwords.get(user.getMatriculationNumber())));
             }
         }
         List<UserResponseObject> registeredUsers = usersToBeSaves.stream().map(User::createUserResponseObject).collect(Collectors.toList());
@@ -402,7 +406,7 @@ public class UserService extends AbstractService {
     }
 
     protected void generateNewTemporaryPassword(User user) {
-        String password = developerMode ? "password" : generateRandomPassword();
+        String password = developerMode ? PASSWORD : generateRandomPassword();
         String encodedPassword = encoder.encode(password);
         user.setPassword(encodedPassword);
         if (Boolean.FALSE.equals(developerMode))
@@ -410,10 +414,10 @@ public class UserService extends AbstractService {
         userRepository.save(user);
 
         if (Boolean.FALSE.equals(developerMode)) {
-            String emailSubject = getLocaleMessage("registerUser.email.subject");
-            String emailText = getLocaleMessage("registerUser.email.text");
+            String emailSubject = getLocaleMessage(REGISTER_USER_EMAIL_SUBJECT);
+            String emailText = getLocaleMessage(REGISTER_USER_EMAIL_TEXT);
 
-            emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace("{password}", password));
+            emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace(PASSWORD_PLACEHOLDER, password));
         }
     }
 

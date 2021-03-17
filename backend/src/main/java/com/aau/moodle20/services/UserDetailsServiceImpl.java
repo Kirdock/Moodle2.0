@@ -10,9 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserDetailsServiceImpl extends AbstractService implements UserDetailsService {
 
-    public UserDetailsServiceImpl() {
-    }
-
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

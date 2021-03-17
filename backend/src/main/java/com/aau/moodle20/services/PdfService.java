@@ -32,9 +32,10 @@ import java.util.stream.Collectors;
 @Service
 public class PdfService extends AbstractService {
 
-    private static final Integer exampleNumberToSwitchLandScape = 7;
-    private static final Float exampleHeaderFontSize = 13f;
-    private static final Float subExampleHeaderFontSize = 11f;
+    private static final Integer EXAMPLE_NUMBER_TO_SWITCH_LAND_SCAPE = 7;
+    private static final Float EXAMPLE_HEADER_FONT_SIZE = 13f;
+    private static final Float SUB_EXAMPLE_HEADER_FONT_SIZE = 11f;
+    private static final String EXERCISE_SHEET_POINTS_CODE = "exerciseSheet.points";
     private ResourceBundleMessageSource resourceBundleMessageSource;
 
     public PdfService(ResourceBundleMessageSource resourceBundleMessageSource) {
@@ -68,7 +69,7 @@ public class PdfService extends AbstractService {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
         Document doc = new Document(pdfDoc);
-        if (exampleNumber > exampleNumberToSwitchLandScape)
+        if (exampleNumber > EXAMPLE_NUMBER_TO_SWITCH_LAND_SCAPE)
             pdfDoc.setDefaultPageSize(PageSize.A4.rotate());
 
         Paragraph titleParagraph = getTitleParagraph(getLocaleMessage("kreuzelList.title"));
@@ -113,7 +114,7 @@ public class PdfService extends AbstractService {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         Table table = new Table(2);
         table.addCell(getCell(getLocaleMessage("exerciseSheet.issueDate") + ": " + exerciseSheet.getIssueDate().format(dateFormatter), TextAlignment.LEFT));
-        table.addCell(getCell(exerciseSheet.getTotalPoints() + " " + getLocaleMessage("exerciseSheet.points"), TextAlignment.RIGHT));
+        table.addCell(getCell(exerciseSheet.getTotalPoints() + " " + getLocaleMessage(EXERCISE_SHEET_POINTS_CODE), TextAlignment.RIGHT));
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
         table.setWidth(UnitValue.createPercentValue(100));
         doc.add(table);
@@ -128,18 +129,18 @@ public class PdfService extends AbstractService {
 
             String exampleText = exerciseSheetNumber + "." + (example.getOrder() + 1) + " " + example.getName();
             if (example.getSubExamples().isEmpty()) {
-                addExampleHeader(exampleText, "(" + example.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", exampleHeaderFontSize, doc);
+                addExampleHeader(exampleText, "(" + example.getPoints() + " " + getLocaleMessage(EXERCISE_SHEET_POINTS_CODE) + ")", EXAMPLE_HEADER_FONT_SIZE, doc);
                 addHtmlToPdfDocument(example.getDescription(), doc);
                 addEmptyLinesToDocument(doc, 1);
             } else {
-                addExampleHeader(exampleText, "", exampleHeaderFontSize, doc);
+                addExampleHeader(exampleText, "", EXAMPLE_HEADER_FONT_SIZE, doc);
                 addHtmlToPdfDocument(example.getDescription(), doc);
                 addEmptyLinesToDocument(doc, 1);
                 List<Example> subExamples = example.getSubExamples().stream().sorted(Comparator.comparing(Example::getOrder)).collect(Collectors.toList());
                 for (Example subExample : subExamples) {
                     String subExampleText = exerciseSheetNumber + "." + (example.getOrder() + 1) + "." + (subExample.getOrder() + 1) + " " + subExample.getName();
 
-                    addExampleHeader(subExampleText, "(" + subExample.getPoints() + " " + getLocaleMessage("exerciseSheet.points") + ")", subExampleHeaderFontSize, doc);
+                    addExampleHeader(subExampleText, "(" + subExample.getPoints() + " " + getLocaleMessage(EXERCISE_SHEET_POINTS_CODE) + ")", SUB_EXAMPLE_HEADER_FONT_SIZE, doc);
                     addHtmlToPdfDocument(subExample.getDescription(), doc);
                     addEmptyLinesToDocument(doc, 1);
                 }
