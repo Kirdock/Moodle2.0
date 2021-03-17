@@ -88,7 +88,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: Semester with this year and type already exists!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getErrorResponseCode(), ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS);
+        assertEquals(ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS,exception.getErrorResponseCode());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: Semester not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -223,7 +223,7 @@ public class SemesterServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: Semester not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test

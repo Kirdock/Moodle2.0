@@ -1,5 +1,6 @@
 package com.aau.moodle20.services;
 
+import com.aau.moodle20.security.jwt.AuthTokenFilter;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
@@ -10,12 +11,15 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class FooterPageEventHandler implements IEventHandler {
 
     private final Document document;
+    private static final Logger footerPageLogger = LoggerFactory.getLogger(FooterPageEventHandler.class);
 
     FooterPageEventHandler(Document document) {
         this.document = document;
@@ -33,7 +37,7 @@ public class FooterPageEventHandler implements IEventHandler {
         try {
             canvas.setFontAndSize(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD), 9);
         } catch (IOException e) {
-            System.out.println(e.toString());
+            footerPageLogger.error(e.getMessage(),e);
         }
         canvas.moveText((pageSize.getRight() - document.getRightMargin() - (pageSize.getLeft() + document.getLeftMargin())) / 2 + document.getLeftMargin(), (pageSize.getBottom() + document.getBottomMargin()) - 20)
                 .showText(Integer.toString(pageNumber))

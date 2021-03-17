@@ -67,7 +67,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: Course not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: User not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: User is not assigned to this course!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.UNAUTHORIZED);
+        assertEquals(HttpStatus.UNAUTHORIZED,exception.getHttpStatus());
     }
 
     @Test
@@ -119,7 +119,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: User is not assigned to this course!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.UNAUTHORIZED);
+        assertEquals(HttpStatus.UNAUTHORIZED,exception.getHttpStatus());
     }
 
 
@@ -142,7 +142,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: User is not assigned to this course!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.UNAUTHORIZED);
+        assertEquals(HttpStatus.UNAUTHORIZED,exception.getHttpStatus());
     }
 
     @Test
@@ -175,7 +175,7 @@ public class UserCourseServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: Course not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test

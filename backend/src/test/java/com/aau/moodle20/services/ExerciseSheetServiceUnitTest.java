@@ -76,7 +76,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: Course not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error Exercise Sheet with this name already exists in given course";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getErrorResponseCode(), ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS);
+        assertEquals(ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS,exception.getErrorResponseCode());
     }
 
     @Test
@@ -131,7 +131,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: ExerciseSheet not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error Exercise Sheet with this name already exists in given course";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getErrorResponseCode(), ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS);
+        assertEquals(ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS,exception.getErrorResponseCode());
     }
 
     @Test
@@ -177,7 +177,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: ExerciseSheet not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -188,7 +188,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: ExerciseSheet not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
     @Test
     public void getExerciseSheetKreuzel_no_examples_no_Students()  {
@@ -371,7 +371,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: ExerciseSheet not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -437,7 +437,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: ExerciseSheet not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -462,7 +462,7 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         });
         String expectedMessage = "Error: ExerciseSheet not found!";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND,exception.getHttpStatus());
     }
 
     @Test
@@ -493,13 +493,14 @@ public class ExerciseSheetServiceUnitTest extends AbstractServiceTest{
         course.getStudents().add(userInCourse2);
 
         when(courseRepository.findById(course.getId())).thenReturn(Optional.of(course));
+        Long courseId = course.getId();
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
-            exerciseSheetService.getExerciseSheetsFromCourse(course.getId());
+            exerciseSheetService.getExerciseSheetsFromCourse(courseId);
         });
         String expectedMessage = "Error: not authorized to access exerciseSheets";
         assertEquals(expectedMessage,exception.getMessage());
-        assertEquals(exception.getHttpStatus(), HttpStatus.UNAUTHORIZED);
+        assertEquals(HttpStatus.UNAUTHORIZED,exception.getHttpStatus());
     }
 
     @Test

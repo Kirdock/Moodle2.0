@@ -93,10 +93,11 @@ public class UserServiceUnitTests extends AbstractServiceTest{
     public void registerUser_matriculationNumber_already_exists() {
         mockSecurityContext_WithUserDetails(getUserDetails_Not_Admin());
         User user = getNormalUser();
+        SignUpRequest request = createSignUpRequest();
         when(userRepository.existsByMatriculationNumber(user.getMatriculationNumber())).thenReturn(Boolean.TRUE);
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
-            userService.registerUser(createSignUpRequest());
+            userService.registerUser(request);
         });
         String expectedMessage = "Error: User with this matriculationNumber already exists!";
         assertEquals(expectedMessage,exception.getMessage());
@@ -110,7 +111,7 @@ public class UserServiceUnitTests extends AbstractServiceTest{
         when(userRepository.existsByUsername(request.getUsername())).thenReturn(Boolean.TRUE);
 
         ServiceException exception = assertThrows(ServiceException.class, () -> {
-            userService.registerUser(createSignUpRequest());
+            userService.registerUser(request);
         });
         String expectedMessage = "Error: User with this username already exists!";
         assertEquals(expectedMessage,exception.getMessage());
