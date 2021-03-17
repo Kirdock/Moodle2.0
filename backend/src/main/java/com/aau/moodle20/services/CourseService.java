@@ -37,7 +37,7 @@ public class CourseService extends AbstractService {
         Semester semester = readSemester(createCourseRequest.getSemesterId());
         // check if owner exists
         readUser(createCourseRequest.getOwner());
-        if (courseRepository.existsByNumberAndSemesterId(createCourseRequest.getNumber(), createCourseRequest.getSemesterId()))
+        if (Boolean.TRUE.equals(courseRepository.existsByNumberAndSemesterId(createCourseRequest.getNumber(), createCourseRequest.getSemesterId())))
             throw new ServiceException("Course in Semester already exists",null, ApiErrorResponseCodes.COURSE_IN_SEMESTER_ALREADY_EXISTS,null,null);
 
         Course course = new Course();
@@ -213,10 +213,9 @@ public class CourseService extends AbstractService {
                     }
                 }
 
-                if (example.getSupportFileTypes() == null)
-                    continue;
-
-                copySupportFileType(example.getSupportFileTypes(), copiedExample);
+                if (example.getSupportFileTypes() != null) {
+                    copySupportFileType(example.getSupportFileTypes(), copiedExample);
+                }
             }
         }
         CourseResponseObject responseObject = new CourseResponseObject();

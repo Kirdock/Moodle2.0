@@ -37,7 +37,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if (user.getAdmin())
+        if (Boolean.TRUE.equals(user.getAdmin()))
             authorities.add(new SimpleGrantedAuthority("Admin"));
 
         UserDetailsImpl userDetails = new UserDetailsImpl(

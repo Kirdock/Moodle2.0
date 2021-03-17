@@ -55,7 +55,7 @@ public class FinishesExampleService extends AbstractService {
         UserDetailsImpl userDetails = getUserDetails();
         for (UserKreuzeMultilRequest userKreuzeMultilRequest : userKreuzeMultilRequests) {
             Course course = readExample(userKreuzeMultilRequest.getExampleId()).getExerciseSheet().getCourse();
-            if (!userDetails.getAdmin() && !isOwner(course))
+            if (Boolean.FALSE.equals(userDetails.getAdmin()) && Boolean.FALSE.equals(isOwner(course)))
                 throw new ServiceException("Error: Access denied", null, null, null, HttpStatus.FORBIDDEN);
 
             updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(), userKreuzeMultilRequest.getMatriculationNumber(), userKreuzeMultilRequest.getState(), null, true);
@@ -124,7 +124,7 @@ public class FinishesExampleService extends AbstractService {
             throw new ServiceException("Error: max upload counts reached!", null, null, null, null);
 
         saveFileToDisk(file, example);
-        String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
+        String filePath = Paths.get(createUserExampleAttachmentDir(example) , file.getOriginalFilename()).toString();
         violations = executeValidator(filePath, example);
 
         finishesExample.setFileName(file.getOriginalFilename());
@@ -179,7 +179,7 @@ public class FinishesExampleService extends AbstractService {
 
     protected byte[] readFileFromDisk(FinishesExample finishesExample) throws IOException {
         String filePath = createUserExampleAttachmentDir(finishesExample.getExample());
-        Path path = Paths.get(filePath + "/" + finishesExample.getFileName());
+        Path path = Paths.get(filePath , finishesExample.getFileName());
 
         return Files.readAllBytes(path);
     }
@@ -190,7 +190,7 @@ public class FinishesExampleService extends AbstractService {
 
         String userDir = "/" + finishesExample.getId().getMatriculationNumber();
         String filePath = FileConstants.ATTACHMENTS_DIR + createExampleAttachmentDir(finishesExample.getExample()) + userDir;
-        Path path = Paths.get(filePath + "/" + finishesExample.getFileName());
+        Path path = Paths.get(filePath , finishesExample.getFileName());
 
         Files.deleteIfExists(path);
     }

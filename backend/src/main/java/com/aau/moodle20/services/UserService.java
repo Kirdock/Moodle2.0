@@ -208,7 +208,7 @@ public class UserService extends AbstractService {
         List<User> users = getUserObjectsFromFile(file);
         List<User> realUsers = new ArrayList<>();
         for (User user : users) {
-            if (userRepository.existsByMatriculationNumber(user.getMatriculationNumber())) {
+            if (Boolean.TRUE.equals(userRepository.existsByMatriculationNumber(user.getMatriculationNumber()))) {
                 realUsers.add(user);
             }
         }
@@ -406,7 +406,7 @@ public class UserService extends AbstractService {
     }
 
     protected void generateNewTemporaryPassword(User user) {
-        String password = developerMode ? PASSWORD : generateRandomPassword();
+        String password = Boolean.TRUE.equals(developerMode) ? PASSWORD : generateRandomPassword();
         String encodedPassword = encoder.encode(password);
         user.setPassword(encodedPassword);
         if (Boolean.FALSE.equals(developerMode))

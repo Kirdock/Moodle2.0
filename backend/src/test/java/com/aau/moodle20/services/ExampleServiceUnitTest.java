@@ -766,6 +766,7 @@ public class ExampleServiceUnitTest extends AbstractServiceTest{
         mockSecurityContext_WithUserDetails(getUserDetails_Admin());
         Example example = getTestExample(EXAMPLE_ID);
         Example copiedExample = example.copy();
+        copiedExample.setId(EXAMPLE_ID+12);
         copiedExample.setExerciseSheet(example.getExerciseSheet());
         exampleService.copyValidator(example,copiedExample);
         Example expectedExample = example.copy();

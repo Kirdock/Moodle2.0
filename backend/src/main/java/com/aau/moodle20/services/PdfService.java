@@ -373,7 +373,7 @@ public class PdfService extends AbstractService {
         boolean isOwner = isOwner(exerciseSheet.getCourse());
         boolean isStudent = exerciseSheet.getCourse().getStudents().stream()
                 .anyMatch(userInCourse -> userDetails.getMatriculationNumber().equals(userInCourse.getId().getMatriculationNumber()));
-        if (!userDetails.getAdmin() && !isOwner && !isStudent)
+        if (Boolean.FALSE.equals(userDetails.getAdmin()) && Boolean.FALSE.equals(isOwner) && Boolean.FALSE.equals(isStudent))
             throw new ServiceException("Access is denied", null, null, null, HttpStatus.FORBIDDEN);
 
 

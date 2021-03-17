@@ -79,7 +79,7 @@ public class ExampleController {
 
     @PreAuthorize("hasPermission(#exampleId, 'Example', 'update')")
     @PostMapping(value = "/example/validator")
-    public ResponseEntity<MessageResponse> setExampleValidator(@RequestParam(value = "file", required = true) MultipartFile validator, @Valid @RequestParam(value = "id", required = true) Long exampleId) throws IOException, ClassNotFoundException {
+    public ResponseEntity<MessageResponse> setExampleValidator(@RequestParam(value = "file") MultipartFile validator, @Valid @RequestParam(value = "id") Long exampleId) throws IOException {
         exampleService.setExampleValidator(validator, exampleId);
         return ResponseEntity.ok(new MessageResponse("Validator was successfully set"));
     }
