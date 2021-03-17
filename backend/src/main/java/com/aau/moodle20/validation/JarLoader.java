@@ -37,7 +37,7 @@ public class JarLoader extends ClassLoader {
             Class<?> newClass = null;
             Enumeration<JarEntry> en = jarFile.entries();
             while (en.hasMoreElements()) {
-                JarEntry je = (JarEntry) en.nextElement();
+                JarEntry je = en.nextElement();
                 if (je.isDirectory() || !je.getName().endsWith(".class")) {
                     continue;
                 }

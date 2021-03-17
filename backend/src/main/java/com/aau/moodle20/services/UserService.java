@@ -69,17 +69,17 @@ public class UserService extends AbstractService {
     }
 
     public void registerUser(SignUpRequest signUpRequest) {
-        if (userRepository.existsByMatriculationNumber(signUpRequest.getMatriculationNumber())) {
+        if (Boolean.TRUE.equals(userRepository.existsByMatriculationNumber(signUpRequest.getMatriculationNumber()))) {
             throw new ServiceException("Error: User with this matriculationNumber already exists!", null, ApiErrorResponseCodes.MATRICULATION_NUMBER_ALREADY_EXISTS, null, null);
         }
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        if (Boolean.TRUE.equals(userRepository.existsByUsername(signUpRequest.getUsername()))) {
             throw new ServiceException("Error: User with this username already exists!", null, ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS, null, null);
         }
 
         String emailSubject = getLocaleMessage("registerUser.email.subject");
         String emailText = getLocaleMessage("registerUser.email.text");
 
-        String password = developerMode ? "password" : generateRandomPassword();
+        String password = Boolean.TRUE.equals(developerMode) ? "password" : generateRandomPassword();
         String encodedPassword = encoder.encode(password);
 
         //username, matrikelNumber, forename, surename, password, isAdmin
@@ -91,10 +91,10 @@ public class UserService extends AbstractService {
         user.setPassword(encodedPassword);
         user.setAdmin(signUpRequest.getIsAdmin() != null ? signUpRequest.getIsAdmin() : Boolean.FALSE);
         user.setEmail(signUpRequest.getEmail());
-        if (!developerMode)
+        if (Boolean.FALSE.equals(developerMode))
             user.setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
         userRepository.save(user);
-        if (!developerMode)
+        if (Boolean.FALSE.equals(developerMode))
             emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace("{password}", password));
     }
 
@@ -113,7 +113,7 @@ public class UserService extends AbstractService {
 
         Integer lineNumber = 1;
         for (User user : users) {
-            if (developerMode)
+            if (Boolean.TRUE.equals(developerMode))
                 user.setPassword(standardPassword);
             else {
                 String password = generateRandomPassword();
@@ -129,7 +129,7 @@ public class UserService extends AbstractService {
             lineNumber++;
         }
         userRepository.saveAll(usersToBeSaves);
-        if (!developerMode) {
+        if (Boolean.FALSE.equals(developerMode)) {
             for (User user : usersToBeSaves) {
                 emailService.sendEmail(user.getEmail(), emailSubject, emailText.replace("{password}", passwords.get(user.getMatriculationNumber())));
             }
@@ -304,7 +304,7 @@ public class UserService extends AbstractService {
         UserDetailsImpl userDetails = getUserDetails();
         if (updateUserRequest.getMatriculationNumber() != null && updateUserRequest.getMatriculationNumber().length() > 0) {
             matriculationNumber = updateUserRequest.getMatriculationNumber();
-            if (!userRepository.existsByMatriculationNumber(matriculationNumber))
+            if (Boolean.FALSE.equals(userRepository.existsByMatriculationNumber(matriculationNumber)))
                 throw new ServiceException("Error: user with matriculationNumber:" + matriculationNumber + " does not exists",null,null,null, HttpStatus.NOT_FOUND);
         } else {
             matriculationNumber = userDetails.getMatriculationNumber();
@@ -318,7 +318,7 @@ public class UserService extends AbstractService {
         user.setEmail(updateUserRequest.getEmail());
         user.setSurname(updateUserRequest.getSurname());
         user.setForename(updateUserRequest.getForename());
-        if (userDetails.getAdmin() && updateUserRequest.getIsAdmin() != null)
+        if (Boolean.TRUE.equals(userDetails.getAdmin()) && updateUserRequest.getIsAdmin() != null)
             user.setAdmin(updateUserRequest.getIsAdmin());
 
         userRepository.saveAndFlush(user);
@@ -379,9 +379,8 @@ public class UserService extends AbstractService {
         CharacterRule splCharRule = new CharacterRule(specialChars);
         splCharRule.setNumberOfCharacters(2);
 
-        String password = gen.generatePassword(10, splCharRule, lowerCaseRule,
+        return gen.generatePassword(10, splCharRule, lowerCaseRule,
                 upperCaseRule, digitRule);
-        return password;
     }
 
 
@@ -406,11 +405,11 @@ public class UserService extends AbstractService {
         String password = developerMode ? "password" : generateRandomPassword();
         String encodedPassword = encoder.encode(password);
         user.setPassword(encodedPassword);
-        if (!developerMode)
+        if (Boolean.FALSE.equals(developerMode))
             user.setPasswordExpireDate(LocalDateTime.now().plusHours(tempPasswordExpirationHours));
         userRepository.save(user);
 
-        if (!developerMode) {
+        if (Boolean.FALSE.equals(developerMode)) {
             String emailSubject = getLocaleMessage("registerUser.email.subject");
             String emailText = getLocaleMessage("registerUser.email.text");
 

@@ -187,7 +187,7 @@ public class ExampleService extends AbstractService {
         }
     }
 
-    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws IOException, ClassNotFoundException {
+    public void setExampleValidator(MultipartFile validatorFile, Long exampleId) throws IOException {
         Example example = readExample(exampleId);
         String fileName = validatorFile.getOriginalFilename();
         if (fileName != null) {

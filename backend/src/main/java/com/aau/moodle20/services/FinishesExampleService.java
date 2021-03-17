@@ -108,7 +108,7 @@ public class FinishesExampleService extends AbstractService {
             throw new ServiceException("Error: Not assigned to this course", null, null, null, HttpStatus.FORBIDDEN);
 
 
-        if (!finishesExampleRepository.existsByExampleIdAndUserMatriculationNumber(exampleId, userDetails.getMatriculationNumber())) {
+        if (Boolean.FALSE.equals(finishesExampleRepository.existsByExampleIdAndUserMatriculationNumber(exampleId, userDetails.getMatriculationNumber()))) {
             List<UserKreuzelRequest> requests = new ArrayList<>();
             UserKreuzelRequest kreuzelRequest = new UserKreuzelRequest();
             kreuzelRequest.setDescription(null);
@@ -244,7 +244,7 @@ public class FinishesExampleService extends AbstractService {
         Course course = readCourse(courseId);
 
         // check permission
-        if (!isAdmin() && !isOwner(course))
+        if (Boolean.FALSE.equals(isAdmin()) && Boolean.FALSE.equals(isOwner(course)))
             throw new ServiceException("Error: Not admin or Course Owner!", null, null, null, HttpStatus.FORBIDDEN);
 
         Comparator<ExerciseSheet> exerciseSheetComparator = Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName);
@@ -290,7 +290,7 @@ public class FinishesExampleService extends AbstractService {
      * @param user
      * @return True or False
      */
-    protected Boolean hasUserFinishedExample(Example example, User user) {
+    protected boolean hasUserFinishedExample(Example example, User user) {
         Optional<FinishesExample> optFinishesExample = example.getExamplesFinishedByUser().stream()
                 .filter(finishesExample -> finishesExample.getUser().getMatriculationNumber().equals(user.getMatriculationNumber()))
                 .findFirst();

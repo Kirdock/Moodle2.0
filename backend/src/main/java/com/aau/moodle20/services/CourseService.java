@@ -57,12 +57,13 @@ public class CourseService extends AbstractService {
     public Course updateCourse(UpdateCourseRequest updateCourseRequest) {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(updateCourseRequest.getId());
-        if (Boolean.TRUE.equals(userDetails.getAdmin()) && updateCourseRequest.getOwner() != null && !userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner()))
+        if (Boolean.TRUE.equals(userDetails.getAdmin()) && updateCourseRequest.getOwner() != null &&
+                Boolean.FALSE.equals(userRepository.existsByMatriculationNumber(updateCourseRequest.getOwner())))
             throw new ServiceException("Error: Owner cannot be updated because the given matriculationNumber those not exists!", null, null, null, HttpStatus.NOT_FOUND);
 
         // if number is updated check if given number already exists in semester
         if (!updateCourseRequest.getNumber().equals(course.getNumber())) {
-            if (courseRepository.existsByNumberAndSemesterId(updateCourseRequest.getNumber(), course.getSemester().getId()))
+            if (Boolean.TRUE.equals(courseRepository.existsByNumberAndSemesterId(updateCourseRequest.getNumber(), course.getSemester().getId())))
                 throw new ServiceException("Error: A Course with this number already exists", null, ApiErrorResponseCodes.CHANGED_COURSE_NUMBER_ALREADY_EXISTS, null, null);
         }
 
@@ -71,7 +72,7 @@ public class CourseService extends AbstractService {
         course.setName(updateCourseRequest.getName());
         course.setNumber(updateCourseRequest.getNumber());
         course.setDescription(updateCourseRequest.getDescription());
-        if (userDetails.getAdmin() && updateCourseRequest.getOwner() != null)
+        if (Boolean.TRUE.equals(userDetails.getAdmin()) && updateCourseRequest.getOwner() != null)
             course.setOwner(new User(updateCourseRequest.getOwner()));
 
         return courseRepository.save(course);
@@ -102,7 +103,7 @@ public class CourseService extends AbstractService {
         CourseResponseObject responseObject = course.createCourseResponseObjectGetCourse();
         responseObject.setPresented(createCoursePresentedList(course));
 
-        if (userDetails.getAdmin())
+        if (Boolean.TRUE.equals(userDetails.getAdmin()))
             responseObject.setOwner(course.getOwner().getMatriculationNumber());
 
         return responseObject;
@@ -142,7 +143,7 @@ public class CourseService extends AbstractService {
         List<FinishesExampleResponse> finishesExampleResponses = new ArrayList<>();
         for (FinishesExample finishesExample : example.getExamplesFinishedByUser()) {
 
-            if (finishesExample.getHasPresented()) {
+            if (Boolean.TRUE.equals(finishesExample.getHasPresented())) {
                 FinishesExampleResponse finishesExampleResponse = new FinishesExampleResponse();
                 finishesExampleResponse.setMatriculationNumber(finishesExample.getUser().getMatriculationNumber());
                 finishesExampleResponse.setSurname(finishesExample.getUser().getSurname());
@@ -163,7 +164,7 @@ public class CourseService extends AbstractService {
         Semester semester = readSemester(copyCourseRequest.getSemesterId());
         Course originalCourse = readCourse(copyCourseRequest.getCourseId());
 
-        if (courseRepository.existsByNumberAndSemesterId(originalCourse.getNumber(), semester.getId()))
+        if (Boolean.TRUE.equals(courseRepository.existsByNumberAndSemesterId(originalCourse.getNumber(), semester.getId())))
             throw new ServiceException("Error: A course with this number already exists in given semester!", null, ApiErrorResponseCodes.COPIED_COURSE_NUMBER_ALREADY_EXISTS, null, null);
 
         // first copy course

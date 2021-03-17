@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 @Service
 public class PdfService extends AbstractService {
 
-    private final Integer EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE = 7;
-    private final Float exampleHeaderFontSize = 13f;
-    private final Float subExampleHeaderFontSize = 11f;
+    private static final Integer exampleNumberToSwitchLandScape = 7;
+    private static final Float exampleHeaderFontSize = 13f;
+    private static final Float subExampleHeaderFontSize = 11f;
     private ResourceBundleMessageSource resourceBundleMessageSource;
 
     public PdfService(ResourceBundleMessageSource resourceBundleMessageSource) {
@@ -68,7 +68,7 @@ public class PdfService extends AbstractService {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument pdfDoc = new PdfDocument(new PdfWriter(baos));
         Document doc = new Document(pdfDoc);
-        if (exampleNumber > EXAMPLE_NUMBER_TO_SWITCH_TO_LANDSCAPE)
+        if (exampleNumber > exampleNumberToSwitchLandScape)
             pdfDoc.setDefaultPageSize(PageSize.A4.rotate());
 
         Paragraph titleParagraph = getTitleParagraph(getLocaleMessage("kreuzelList.title"));
@@ -189,7 +189,7 @@ public class PdfService extends AbstractService {
         return cell;
     }
 
-    protected Paragraph getTitleParagraph(String text) throws IOException {
+    protected Paragraph getTitleParagraph(String text) {
 
         Paragraph preface = new Paragraph();
         preface.setTextAlignment(TextAlignment.CENTER);

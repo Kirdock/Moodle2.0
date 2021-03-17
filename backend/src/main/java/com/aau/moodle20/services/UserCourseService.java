@@ -37,7 +37,7 @@ public class UserCourseService extends AbstractService {
         Boolean isCourseAssigned = currentUser.getCourses().stream()
                 .filter(userInCourse -> !ECourseRole.NONE.equals(userInCourse.getRole()))
                 .anyMatch(userInCourse -> userInCourse.getCourse().getId().equals(courseId));
-        if (!isCourseAssigned)
+        if (Boolean.FALSE.equals(isCourseAssigned))
             throw new ServiceException("Error: User is not assigned to this course!", null, null, null, HttpStatus.UNAUTHORIZED);
 
         return course.createCourseResponseObjectGetAssignedCourse(currentUser.getMatriculationNumber());
@@ -49,13 +49,13 @@ public class UserCourseService extends AbstractService {
         List<UserInCourse> userInCourses = new ArrayList<>();
         for (AssignUserToCourseRequest assignUserToCourseRequest : assignUserToCourseRequests) {
 
-            if (!userRepository.existsByMatriculationNumber(assignUserToCourseRequest.getMatriculationNumber()))
+            if (Boolean.FALSE.equals(userRepository.existsByMatriculationNumber(assignUserToCourseRequest.getMatriculationNumber())))
                 throw new ServiceException("Error: User with matrikulationNumber:" + assignUserToCourseRequest.getMatriculationNumber() + " does not exist",null,null,null,null);
 
-            if (!courseRepository.existsById(assignUserToCourseRequest.getCourseId()))
+            if (Boolean.FALSE.equals(courseRepository.existsById(assignUserToCourseRequest.getCourseId())))
                 throw new ServiceException("Error: Course with id:" + assignUserToCourseRequest.getCourseId() + " does not exist",null,null,null,null);
 
-            if (!getUserDetails().getAdmin() && !isOwner(assignUserToCourseRequest.getCourseId()))
+            if (Boolean.FALSE.equals(getUserDetails().getAdmin()) && Boolean.FALSE.equals(isOwner(assignUserToCourseRequest.getCourseId())))
                 throw new ServiceException("Error: User is not owner of course: " + assignUserToCourseRequest.getCourseId(), null, null, null, HttpStatus.FORBIDDEN);
 
             UserCourseKey userCourseKey = new UserCourseKey();

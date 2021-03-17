@@ -2,7 +2,6 @@ package com.aau.moodle20.exception;
 
 import org.springframework.http.HttpStatus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceException extends RuntimeException {

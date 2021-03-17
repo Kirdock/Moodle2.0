@@ -167,7 +167,7 @@ public class ExerciseSheetService extends AbstractService {
         Boolean isAssignedUser = exerciseSheet.getCourse().getStudents().stream()
                 .anyMatch(userInCourse -> userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
         ExerciseSheetResponseObject responseObject = new ExerciseSheetResponseObject();
-        if (isAssignedUser) {
+        if (Boolean.TRUE.equals(isAssignedUser)) {
             responseObject = exerciseSheet.getResponseObject(userDetails.getMatriculationNumber());
         }
 
@@ -187,11 +187,11 @@ public class ExerciseSheetService extends AbstractService {
     public List<ExerciseSheetResponseObject> getExerciseSheetsFromCourse(Long courseId) {
         UserDetailsImpl userDetails = getUserDetails();
         Course course = readCourse(courseId);
-        if (!userDetails.getAdmin()) {
+        if (Boolean.FALSE.equals(userDetails.getAdmin())) {
             boolean isOwner = course.getOwner().getMatriculationNumber().equals(userDetails.getMatriculationNumber());
             boolean isStudentInCourse = course.getStudents().stream()
                     .anyMatch(userInCourse -> userInCourse.getRole().equals(ECourseRole.STUDENT) && userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
-            if (!isOwner && !isStudentInCourse)
+            if (Boolean.FALSE.equals(isOwner) && Boolean.FALSE.equals(isStudentInCourse))
                 throw new ServiceException("Error: not authorized to access exerciseSheets", null, null, null, HttpStatus.UNAUTHORIZED);
         }
 

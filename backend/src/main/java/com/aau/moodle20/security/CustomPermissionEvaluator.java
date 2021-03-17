@@ -37,7 +37,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private UserRepository userRepository;
-    private final String UPDATE_PERMISSION ="update";
+    private static final String UPDATE ="update";
 
 
 
@@ -79,9 +79,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         Course course = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if (UPDATE_PERMISSION.equals(permission) && targetId instanceof Long) {
+        if (UPDATE.equals(permission) && targetId instanceof Long) {
             exampleId = (Long) targetId;
-        } else if (UPDATE_PERMISSION.equals(permission) && targetId instanceof List) {
+        } else if (UPDATE.equals(permission) && targetId instanceof List) {
             List<ExampleOrderRequest> exampleOrderRequests = (List<ExampleOrderRequest>) targetId;
             hasPermission = handleExampleOrderRequests(exampleOrderRequests, userDetails);
         } else if ("get".equals(permission) && targetId instanceof Long) {
@@ -111,7 +111,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         Course course = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if (UPDATE_PERMISSION.equals(permission) && targetId instanceof Long)
+        if (UPDATE.equals(permission) && targetId instanceof Long)
             exerciseSheetId = (Long) targetId;
         else if ("get".equals(permission) && targetId instanceof Long)
             exerciseSheetId = (Long) targetId;
@@ -138,7 +138,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         Course course = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if ((UPDATE_PERMISSION.equals(permission) || "get".equals(permission)) && targetId instanceof Long) {
+        if ((UPDATE.equals(permission) || "get".equals(permission)) && targetId instanceof Long) {
             Optional<User> optionalUser = userRepository.findByMatriculationNumber(userDetails.getMatriculationNumber());
             course = getCourseFromExample((Long) targetId);
             Long courseId = course.getId();
@@ -156,7 +156,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         Long courseId = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if (UPDATE_PERMISSION.equals(permission) && targetId instanceof Long) {
+        if (UPDATE.equals(permission) && targetId instanceof Long) {
             courseId = (Long) targetId;
         } else if ("get".equals(permission) && targetId instanceof Long)
             courseId = (Long) targetId;
@@ -172,7 +172,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         String matriculationNumber = null;
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if (UPDATE_PERMISSION.equals(permission)) {
+        if (UPDATE.equals(permission)) {
             if (targetId instanceof String)
                 matriculationNumber = (String) targetId;
             else

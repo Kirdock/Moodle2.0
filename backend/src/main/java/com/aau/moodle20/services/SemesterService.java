@@ -20,7 +20,7 @@ public class SemesterService extends AbstractService {
 
 
     public void createSemester(CreateSemesterRequest createSemesterRequest) {
-        if (semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear()))
+        if (Boolean.TRUE.equals(semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear())))
             throw new ServiceException("Error: Semester with this year and type already exists!", null, ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS, null, null);
         Semester semester = new Semester();
         semester.setType(createSemesterRequest.getType());
@@ -32,9 +32,9 @@ public class SemesterService extends AbstractService {
     public List<Semester> getSemesters() {
         List<Semester> semestersToBeReturned = new ArrayList<>();
         UserDetailsImpl userDetails = getUserDetails();
-        if (userDetails.getAdmin())
+        if (Boolean.TRUE.equals(userDetails.getAdmin()))
             semestersToBeReturned = semesterRepository.findAll();
-        else if (courseRepository.existsByOwnerMatriculationNumber(userDetails.getMatriculationNumber())) {
+        else if (Boolean.TRUE.equals(courseRepository.existsByOwnerMatriculationNumber(userDetails.getMatriculationNumber()))) {
             List<Course> courses = courseRepository.findByOwnerMatriculationNumber(userDetails.getMatriculationNumber());
             List<Semester> semesters = courses.stream().map(Course::getSemester).collect(Collectors.toList());
             for (Semester semester : semesters) {
@@ -65,9 +65,9 @@ public class SemesterService extends AbstractService {
         readSemester(semesterId);
         UserDetailsImpl userDetails = getUserDetails();
         List<CourseResponseObject> responseObjects = new ArrayList<>();
-        List<Course> courses = null;
+        List<Course> courses;
 
-        if (userDetails.getAdmin())
+        if (Boolean.TRUE.equals(userDetails.getAdmin()))
             courses = courseRepository.findCoursesBySemesterId(semesterId);
         else
             courses = courseRepository.findCoursesBySemesterIdAndOwnerMatriculationNumber(semesterId, userDetails.getMatriculationNumber());
