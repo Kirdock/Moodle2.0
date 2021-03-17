@@ -13,8 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)
@@ -31,6 +30,7 @@ public class EmailServiceUnitTest{
     @Test
     public void sendEmail_to_null()  {
         emailService.sendEmail(null,"test","text");
+        verify(emailSender,times(0)).send(any(SimpleMailMessage.class));
     }
 
     @Test
