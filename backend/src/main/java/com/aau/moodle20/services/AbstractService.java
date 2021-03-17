@@ -114,17 +114,17 @@ public class AbstractService {
             fileToBeSaved.mkdirs();
         }
 
-        Path path = Paths.get(filePath + "/" + file.getOriginalFilename());
+        Path path = Paths.get(filePath , file.getOriginalFilename());
         Files.write(path, file.getBytes());
     }
 
     protected byte[] readFileFromDisk(String filePath, String fileName) throws IOException {
-        Path path = Paths.get(filePath + "/" + fileName);
+        Path path = Paths.get(filePath , fileName);
         return Files.readAllBytes(path);
     }
 
     protected boolean deleteFileFromDisk(String filePath, String fileName) throws IOException, ServiceException {
-        Path path = Paths.get(filePath + "/" + fileName);
+        Path path = Paths.get(filePath , fileName);
         return Files.deleteIfExists(path);
     }
 
