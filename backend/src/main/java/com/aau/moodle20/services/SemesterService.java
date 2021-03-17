@@ -21,7 +21,7 @@ public class SemesterService extends AbstractService {
 
     public void createSemester(CreateSemesterRequest createSemesterRequest) {
         if (semesterRepository.existsByTypeAndYear(createSemesterRequest.getType(), createSemesterRequest.getYear()))
-            throw new ServiceException("Error: Semester with this year and type already exists!", ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS);
+            throw new ServiceException("Error: Semester with this year and type already exists!", null, ApiErrorResponseCodes.SEMESTER_ALREADY_EXISTS, null, null);
         Semester semester = new Semester();
         semester.setType(createSemesterRequest.getType());
         semester.setYear(createSemesterRequest.getYear());

@@ -60,11 +60,11 @@ public class ValidatorHandler {
             saveFile(filePath, file);
             IValidator validator = loadValidator(filePath);
             if (validator == null) {
-                throw new ServiceException("Error: no validator found in Jar File", ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR);
+                throw new ServiceException("Error: no validator found in Jar File",null, ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR,null,null);
             }
 
         } catch (ClassNotFoundException e) {
-            throw new ServiceException("Error: classNotFoundException", e, ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR);
+            throw new ServiceException("Error: classNotFoundException", e, ApiErrorResponseCodes.NO_VALID_VALIDATOR_FOUND_IN_JAR,null,null);
         }
     }
 

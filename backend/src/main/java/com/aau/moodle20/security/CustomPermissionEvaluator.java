@@ -205,21 +205,21 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     protected Course readCourse(Long courseId) {
         Optional<Course> optionalCourse = courseRepository.findById(courseId);
         if (!optionalCourse.isPresent())
-            throw new ServiceException("Error: Course not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Course not found!",null,null,null, HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 
     protected Example readExample(Long exampleId) {
         Optional<Example> optionalCourse = exampleRepository.findById(exampleId);
         if (!optionalCourse.isPresent())
-            throw new ServiceException("Error: Example not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Example not found!",null,null,null, HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 
     protected ExerciseSheet readExerciseSheet(Long exampleId) {
         Optional<ExerciseSheet> optionalCourse = exerciseSheetRepository.findById(exampleId);
         if (!optionalCourse.isPresent())
-            throw new ServiceException("Error: ExerciseSheet not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: ExerciseSheet not found!",null,null,null, HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 

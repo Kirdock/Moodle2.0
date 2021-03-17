@@ -70,10 +70,10 @@ public class UserService extends AbstractService {
 
     public void registerUser(SignUpRequest signUpRequest) {
         if (userRepository.existsByMatriculationNumber(signUpRequest.getMatriculationNumber())) {
-            throw new ServiceException("Error: User with this matriculationNumber already exists!", ApiErrorResponseCodes.MATRICULATION_NUMBER_ALREADY_EXISTS);
+            throw new ServiceException("Error: User with this matriculationNumber already exists!", null, ApiErrorResponseCodes.MATRICULATION_NUMBER_ALREADY_EXISTS, null, null);
         }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new ServiceException("Error: User with this username already exists!", ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS);
+            throw new ServiceException("Error: User with this username already exists!", null, ApiErrorResponseCodes.USERNAME_ALREADY_EXISTS, null, null);
         }
 
         String emailSubject = getLocaleMessage("registerUser.email.subject");
@@ -275,8 +275,7 @@ public class UserService extends AbstractService {
 
             lines.remove(0); // Remove first line because it only contains column descriptions
         } catch (IOException e) {
-            System.err.println(e.getMessage());
-            throw new ServiceException(e.getMessage(), e);
+            throw new ServiceException(e.getMessage(), e,null,null,null);
         }
         return lines;
     }
@@ -291,9 +290,9 @@ public class UserService extends AbstractService {
     public void changePassword(ChangePasswordRequest changePasswordRequest) {
         User currentUser = getCurrentUser();
         if (!encoder.matches(changePasswordRequest.getOldPassword(), currentUser.getPassword()))
-            throw new ServiceException("Password for User not correct!");
+            throw new ServiceException("Password for User not correct!",null,null,null,null);
         if (adminMatriculationNumber.equals(currentUser.getMatriculationNumber()))
-            throw new ServiceException("Password for Root Admin cannot be changed");
+            throw new ServiceException("Password for Root Admin cannot be changed",null,null,null,null);
         currentUser.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
         currentUser.setPasswordExpireDate(null);
         userRepository.save(currentUser);
@@ -306,13 +305,13 @@ public class UserService extends AbstractService {
         if (updateUserRequest.getMatriculationNumber() != null && updateUserRequest.getMatriculationNumber().length() > 0) {
             matriculationNumber = updateUserRequest.getMatriculationNumber();
             if (!userRepository.existsByMatriculationNumber(matriculationNumber))
-                throw new ServiceException("Error: user with matriculationNumber:" + matriculationNumber + " does not exists", HttpStatus.NOT_FOUND);
+                throw new ServiceException("Error: user with matriculationNumber:" + matriculationNumber + " does not exists",null,null,null, HttpStatus.NOT_FOUND);
         } else {
             matriculationNumber = userDetails.getMatriculationNumber();
         }
 
         if (adminMatriculationNumber.equals(matriculationNumber))
-            throw new ServiceException("Error: Root admin cannot be updated!");
+            throw new ServiceException("Error: Root admin cannot be updated!",null,null,null,null);
 
         User user = readUser(matriculationNumber);
         boolean hasEmailChanged = !updateUserRequest.getEmail().equals(user.getEmail());
@@ -333,7 +332,7 @@ public class UserService extends AbstractService {
         User user = readUser(matriculationNumber);
 
         if (user.getMatriculationNumber().equals(adminMatriculationNumber))
-            throw new ServiceException("Super Admin user cannot be deleted!");
+            throw new ServiceException("Super Admin user cannot be deleted!",null,null,null,null);
 
         User adminUser = readUser(adminMatriculationNumber);
         List<Course> courses = courseRepository.findByOwnerMatriculationNumber(matriculationNumber);
@@ -393,7 +392,7 @@ public class UserService extends AbstractService {
                 LocalDateTime now = LocalDateTime.now();
                 if (now.isAfter(optionalUser.get().getPasswordExpireDate())) {
                     generateNewTemporaryPassword(optionalUser.get());
-                    throw new ServiceException("Error: temporary password is expired", ApiErrorResponseCodes.TEMPORARY_PASSWORD_EXPIRED);
+                    throw new ServiceException("Error: temporary password is expired", null,ApiErrorResponseCodes.TEMPORARY_PASSWORD_EXPIRED,null,null);
                 } else {
                     optionalUser.get().setPasswordExpireDate(null);
                     userRepository.save(optionalUser.get());

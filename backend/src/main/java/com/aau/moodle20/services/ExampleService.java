@@ -40,7 +40,7 @@ public class ExampleService extends AbstractService {
         if (createExampleRequest.getSubmitFile() != null && createExampleRequest.getSubmitFile()) {
             if ((createExampleRequest.getSupportedFileTypes() == null || createExampleRequest.getSupportedFileTypes().isEmpty()) &&
                     (createExampleRequest.getCustomFileTypes() == null || createExampleRequest.getCustomFileTypes().isEmpty()))
-                throw new ServiceException("Error:either supported file types or custom file types  must be specified!");
+                throw new ServiceException("Error:either supported file types or custom file types  must be specified!", null, null, null, null);
         }
         if (createExampleRequest.getParentId() != null)
             parentExample = readExample(createExampleRequest.getParentId());
@@ -86,13 +86,13 @@ public class ExampleService extends AbstractService {
                     .filter(example -> !example.getId().equals(exampleId)).collect(Collectors.toList());
             boolean alreadyExists = examples.stream().anyMatch(example -> example.getName().equals(exampleName));
             if (alreadyExists)
-                throw new ServiceException("Error: example with this name already exists in exerciseSheet", ApiErrorResponseCodes.EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS);
+                throw new ServiceException("Error: example with this name already exists in exerciseSheet", null, ApiErrorResponseCodes.EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS, null, null);
         } else {
             boolean alreadyExists = parentExample.getSubExamples().stream()
                     .filter(example -> !example.getId().equals(exampleId))
                     .anyMatch(example -> example.getName().equals(exampleName));
             if (alreadyExists)
-                throw new ServiceException("Error: sub example with this name already exists in exerciseSheet", ApiErrorResponseCodes.SUB_EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS);
+                throw new ServiceException("Error: sub example with this name already exists in exerciseSheet", null, ApiErrorResponseCodes.SUB_EXAMPLE_WITH_THIS_NAME_ALREADY_EXISTS, null, null);
         }
     }
 
@@ -125,7 +125,7 @@ public class ExampleService extends AbstractService {
         if (updateExampleRequest.getSubmitFile() != null && updateExampleRequest.getSubmitFile()) {
             if ((updateExampleRequest.getSupportedFileTypes() == null || updateExampleRequest.getSupportedFileTypes().isEmpty()) &&
                     (updateExampleRequest.getCustomFileTypes() == null || updateExampleRequest.getCustomFileTypes().isEmpty()))
-                throw new ServiceException("Error:either supported file types or custom file types  must be specified!");
+                throw new ServiceException("Error:either supported file types or custom file types  must be specified!", null, null, null, null);
         }
         ExerciseSheet exerciseSheet = readExerciseSheet(updateExampleRequest.getExerciseSheetId());
         Example parentExample = updateExampleRequest.getParentId() != null ? readExample(updateExampleRequest.getParentId()) : null;
@@ -193,7 +193,7 @@ public class ExampleService extends AbstractService {
         if (fileName != null) {
             String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
             if (!FileConstants.JAR_FILE_EXTENSION.equals(extension))
-                throw new ServiceException("Error: Not a jar File!");
+                throw new ServiceException("Error: Not a jar File!",null,null,null,null);
         }
         validatorHandler.checkValidatorFile(validatorFile);
 

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ExerciseSheetService extends AbstractService {
-    
+
     private ExampleService exampleService;
 
     public ExerciseSheetService(ExampleService exampleService) {
@@ -57,7 +57,7 @@ public class ExerciseSheetService extends AbstractService {
             exists = course.getExerciseSheets().stream().anyMatch(exerciseSheet1 -> exerciseSheet1.getName().equals(name));
         }
         if (exists)
-            throw new ServiceException("Error Exercise Sheet with this name already exists in given course", ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS);
+            throw new ServiceException("Error Exercise Sheet with this name already exists in given course",null, ApiErrorResponseCodes.EXERCISE_SHEET_WITH_THIS_NAME_ALREADY_EXISTS,null,null);
     }
 
 
@@ -192,7 +192,7 @@ public class ExerciseSheetService extends AbstractService {
             boolean isStudentInCourse = course.getStudents().stream()
                     .anyMatch(userInCourse -> userInCourse.getRole().equals(ECourseRole.STUDENT) && userInCourse.getUser().getMatriculationNumber().equals(userDetails.getMatriculationNumber()));
             if (!isOwner && !isStudentInCourse)
-                throw new ServiceException("Error: not authorized to access exerciseSheets", HttpStatus.UNAUTHORIZED);
+                throw new ServiceException("Error: not authorized to access exerciseSheets", null, null, null, HttpStatus.UNAUTHORIZED);
         }
 
         List<ExerciseSheet> exerciseSheets = exerciseSheetRepository.findByCourseId(courseId);

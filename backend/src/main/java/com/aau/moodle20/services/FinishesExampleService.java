@@ -35,8 +35,7 @@ public class FinishesExampleService extends AbstractService {
 
     private ValidatorHandler validatorHandler;
 
-    public FinishesExampleService(ValidatorHandler validatorHandler)
-    {
+    public FinishesExampleService(ValidatorHandler validatorHandler) {
         this.validatorHandler = validatorHandler;
     }
 
@@ -45,7 +44,7 @@ public class FinishesExampleService extends AbstractService {
         UserDetailsImpl userDetails = getUserDetails();
         for (UserKreuzelRequest userKreuzelRequest : userKreuzelRequests) {
             if (!isAssignedToCourse(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber()))
-                throw new ServiceException("Error: Access denied", HttpStatus.FORBIDDEN);
+                throw new ServiceException("Error: Access denied", null, null, null, HttpStatus.FORBIDDEN);
 
             updateOrCreateUserKreuzel(userKreuzelRequest.getExampleId(), userDetails.getMatriculationNumber(), userKreuzelRequest.getState(), userKreuzelRequest.getDescription(), false);
         }
@@ -57,7 +56,7 @@ public class FinishesExampleService extends AbstractService {
         for (UserKreuzeMultilRequest userKreuzeMultilRequest : userKreuzeMultilRequests) {
             Course course = readExample(userKreuzeMultilRequest.getExampleId()).getExerciseSheet().getCourse();
             if (!userDetails.getAdmin() && !isOwner(course))
-                throw new ServiceException("Error: Access denied", HttpStatus.FORBIDDEN);
+                throw new ServiceException("Error: Access denied", null, null, null, HttpStatus.FORBIDDEN);
 
             updateOrCreateUserKreuzel(userKreuzeMultilRequest.getExampleId(), userKreuzeMultilRequest.getMatriculationNumber(), userKreuzeMultilRequest.getState(), null, true);
         }
@@ -69,7 +68,7 @@ public class FinishesExampleService extends AbstractService {
         Example example = readExample(exampleId);
         User user = readUser(matriculationNumber);
         if (!example.getSubExamples().isEmpty())
-            throw new ServiceException("Error: Example has sub-examples and can therefore not be kreuzelt");
+            throw new ServiceException("Error: Example has sub-examples and can therefore not be kreuzelt", null, null, null, null);
 
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
                 .findByExampleIdAndUserMatriculationNumber(exampleId, matriculationNumber);
@@ -102,11 +101,11 @@ public class FinishesExampleService extends AbstractService {
         Example example = readExample(exampleId);
 
         if (Boolean.FALSE.equals(example.getSubmitFile()))
-            throw new ServiceException("Error: not submit file for this example");
+            throw new ServiceException("Error: not submit file for this example", null, null, null, null);
         if (file.isEmpty())
-            throw new ServiceException("Error: given file is empty");
+            throw new ServiceException("Error: given file is empty", null, null, null, null);
         if (!isAssignedToCourse(exampleId, userDetails.getMatriculationNumber()))
-            throw new ServiceException("Error: Not assigned to this course", HttpStatus.FORBIDDEN);
+            throw new ServiceException("Error: Not assigned to this course", null, null, null, HttpStatus.FORBIDDEN);
 
 
         if (!finishesExampleRepository.existsByExampleIdAndUserMatriculationNumber(exampleId, userDetails.getMatriculationNumber())) {
@@ -122,7 +121,7 @@ public class FinishesExampleService extends AbstractService {
 
         FinishesExample finishesExample = readFinishesExample(exampleId, userDetails.getMatriculationNumber());
         if (finishesExample.getRemainingUploadCount() == 0 && finishesExample.getExample().getUploadCount() != 0)
-            throw new ServiceException("Error: max upload counts reached!");
+            throw new ServiceException("Error: max upload counts reached!", null, null, null, null);
 
         saveFileToDisk(file, example);
         String filePath = createUserExampleAttachmentDir(example) + "/" + file.getOriginalFilename();
@@ -169,7 +168,7 @@ public class FinishesExampleService extends AbstractService {
         validator = null;
         return violations;
     }
-    
+
     protected void saveFileToDisk(MultipartFile file, Example example) throws IOException {
         String filePath = createUserExampleAttachmentDir(example);
         File directory = new File(filePath);
@@ -208,7 +207,7 @@ public class FinishesExampleService extends AbstractService {
         try {
             finishesExample.setAttachmentContent(readFileFromDisk(finishesExample));
         } catch (IOException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e.getMessage(), null, null, null, null);
         }
 
         return finishesExample;
@@ -226,7 +225,7 @@ public class FinishesExampleService extends AbstractService {
         Optional<FinishesExample> optionalFinishesExample = finishesExampleRepository
                 .findByExampleIdAndUserMatriculationNumber(exampleId, matriculationNumber);
         if (!optionalFinishesExample.isPresent())
-            throw new ServiceException("Error: user did not check this example");
+            throw new ServiceException("Error: user did not check this example", null, null, null, null);
 
         return optionalFinishesExample.get();
     }
@@ -246,7 +245,7 @@ public class FinishesExampleService extends AbstractService {
 
         // check permission
         if (!isAdmin() && !isOwner(course))
-            throw new ServiceException("Error: Not admin or Course Owner!", HttpStatus.FORBIDDEN);
+            throw new ServiceException("Error: Not admin or Course Owner!", null, null, null, HttpStatus.FORBIDDEN);
 
         Comparator<ExerciseSheet> exerciseSheetComparator = Comparator.comparing(ExerciseSheet::getSubmissionDate).thenComparing(ExerciseSheet::getName);
         Comparator<Example> exampleComparator = Comparator.comparing(Example::getOrder);

@@ -54,35 +54,35 @@ public class AbstractService {
     protected Semester readSemester(Long semesterId) {
         Optional<Semester> optionalSemester = semesterRepository.findById(semesterId);
         if (!optionalSemester.isPresent())
-            throw new ServiceException("Error: Semester not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Semester not found!",null, null, null, HttpStatus.NOT_FOUND);
         return optionalSemester.get();
     }
 
     protected Course readCourse(Long courseId) {
         Optional<Course> optionalCourse = courseRepository.findById(courseId);
         if (!optionalCourse.isPresent())
-            throw new ServiceException("Error: Course not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Course not found!", null,null, null, HttpStatus.NOT_FOUND);
         return optionalCourse.get();
     }
 
     protected User readUser(String matriculationNumber) {
         Optional<User> optionalUser = userRepository.findByMatriculationNumber(matriculationNumber);
         if (!optionalUser.isPresent())
-            throw new ServiceException("Error: User not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: User not found!",null, null, null, HttpStatus.NOT_FOUND);
         return optionalUser.get();
     }
 
     protected ExerciseSheet readExerciseSheet(Long exerciseSheetId) {
         Optional<ExerciseSheet> optionalExerciseSheet = exerciseSheetRepository.findById(exerciseSheetId);
         if (!optionalExerciseSheet.isPresent())
-            throw new ServiceException("Error: ExerciseSheet not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: ExerciseSheet not found!",null, null, null, HttpStatus.NOT_FOUND);
         return optionalExerciseSheet.get();
     }
 
     protected Example readExample(Long exampleId) {
         Optional<Example> optionalExample = exampleRepository.findById(exampleId);
         if (!optionalExample.isPresent())
-            throw new ServiceException("Error: Example not found!", HttpStatus.NOT_FOUND);
+            throw new ServiceException("Error: Example not found!",null, null, null, HttpStatus.NOT_FOUND);
         return optionalExample.get();
     }
 
