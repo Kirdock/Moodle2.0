@@ -60,7 +60,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             authTokenFilterLogger.error("JWT claims string is empty: {}", e.getMessage());
 
         } catch (Exception e) {
-            authTokenFilterLogger.error("Cannot set user authentication: {}", e);
+            authTokenFilterLogger.error("Cannot set user authentication: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
