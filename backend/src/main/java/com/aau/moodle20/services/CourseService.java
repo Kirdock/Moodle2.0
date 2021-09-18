@@ -10,6 +10,7 @@ import com.aau.moodle20.payload.request.UpdateCoursePresets;
 import com.aau.moodle20.payload.request.UpdateCourseRequest;
 import com.aau.moodle20.payload.response.CourseResponseObject;
 import com.aau.moodle20.payload.response.FinishesExampleResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,7 +29,7 @@ public class CourseService extends AbstractService {
 
     private ExampleService exampleService;
 
-    public CourseService(ExampleService exampleService) {
+    public CourseService(@Autowired ExampleService exampleService) {
         this.exampleService = exampleService;
     }
 
